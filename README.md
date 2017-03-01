@@ -1,7 +1,6 @@
 
 This is a collection of my github gists and tutorials over many years.
 
-### Index
 
 * Working with Serverless and Java - Part 1
 
