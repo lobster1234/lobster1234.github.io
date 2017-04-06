@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.4.3">Jekyll</generator><link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://lobster1234.github.io/" rel="alternate" type="text/html" /><updated>2017-04-06T02:29:34-07:00</updated><id>https://lobster1234.github.io/</id><title type="html">My Blog</title><subtitle>Manish Pandit's tech blog with gists and all the awesome goodies around programming, devops, architecture, and infrastructure.
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.4.3">Jekyll</generator><link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://lobster1234.github.io/" rel="alternate" type="text/html" /><updated>2017-04-06T02:31:00-07:00</updated><id>https://lobster1234.github.io/</id><title type="html">My Blog</title><subtitle>Manish Pandit's tech blog with gists and all the awesome goodies around programming, devops, architecture, and infrastructure.
 </subtitle><entry><title type="html">Using localstack with AWS Command Line</title><link href="https://lobster1234.github.io/aws/localstack/2017/04/05/working-with-localstack-command-line.html" rel="alternate" type="text/html" title="Using localstack with AWS Command Line" /><published>2017-04-05T23:44:37-07:00</published><updated>2017-04-05T23:44:37-07:00</updated><id>https://lobster1234.github.io/aws/localstack/2017/04/05/working-with-localstack-command-line</id><content type="html" xml:base="https://lobster1234.github.io/aws/localstack/2017/04/05/working-with-localstack-command-line.html">&lt;p&gt;&lt;a href=&quot;https://github.com/atlassian/localstack&quot;&gt;Localstack&lt;/a&gt; is a really useful project by Atlassian, which allows for local development using the AWS cloud stack. In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against.In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against. This post is a quick and handy gist of using AWS command line to work with localstack.
 &lt;!--more--&gt;&lt;/p&gt;
 &lt;h1 id=&quot;starting-localstack&quot;&gt;Starting localstack&lt;/h1&gt;
@@ -469,7 +469,129 @@ Duration (avg.): 276.55ms
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;p&gt;Now that we have successfully deployed and tested the templated service, we are now ready to dive deeper into the actual code, configuration, and constructs of serverless framework. That will be Part-2 of this tutorial.&lt;/p&gt;</content><author><name></name></author><summary type="html">Serverless is a node.js based framework that makes creating, deploying, and managing serverless functions a breeze. We will use AWS as our FaaS (Function-as-a-Service) provider, although Serverless supports IBM OpenWhisk and Microsoft Azure as well. In this tutorial, we will create and deploy a java-maven based AWS Lambda function. In Part-1 we will not modify any code, or even look at the generated code. We will focus on the deployment and the command line interface to manage lambda, provided out of the box by serverless framework.</summary></entry><entry><title type="html">AWS Training at Marqeta : SQS Lab</title><link href="https://lobster1234.github.io/aws/sqs/2017/02/27/marqeta-aws-sqs-lab.html" rel="alternate" type="text/html" title="AWS Training at Marqeta : SQS Lab" /><published>2017-02-27T19:10:44-08:00</published><updated>2017-02-27T19:10:44-08:00</updated><id>https://lobster1234.github.io/aws/sqs/2017/02/27/marqeta-aws-sqs-lab</id><content type="html" xml:base="https://lobster1234.github.io/aws/sqs/2017/02/27/marqeta-aws-sqs-lab.html">&lt;p&gt;This post is the handout for the SQS Lab I ran as a part of hands-on AWS training to the Engineering + DevOps team at &lt;a href=&quot;https://www.marqeta.com&quot;&gt;Marqeta&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Now that we have successfully deployed and tested the templated service, we are now ready to dive deeper into the actual code, configuration, and constructs of serverless framework. That will be Part-2 of this tutorial.&lt;/p&gt;</content><author><name></name></author><summary type="html">Serverless is a node.js based framework that makes creating, deploying, and managing serverless functions a breeze. We will use AWS as our FaaS (Function-as-a-Service) provider, although Serverless supports IBM OpenWhisk and Microsoft Azure as well. In this tutorial, we will create and deploy a java-maven based AWS Lambda function. In Part-1 we will not modify any code, or even look at the generated code. We will focus on the deployment and the command line interface to manage lambda, provided out of the box by serverless framework.</summary></entry><entry><title type="html">Notes from AWS Lambda Deep Dive Webinar</title><link href="https://lobster1234.github.io/aws/serverless/lambda/2017/02/27/notes-from-aws-lambda-deep-dive-webinar.html" rel="alternate" type="text/html" title="Notes from AWS Lambda Deep Dive Webinar" /><published>2017-02-27T07:20:44-08:00</published><updated>2017-02-27T07:20:44-08:00</updated><id>https://lobster1234.github.io/aws/serverless/lambda/2017/02/27/notes-from-aws-lambda-deep-dive-webinar</id><content type="html" xml:base="https://lobster1234.github.io/aws/serverless/lambda/2017/02/27/notes-from-aws-lambda-deep-dive-webinar.html">&lt;p&gt;I’ve put together my notes from the AWS webinar, which can be seen &lt;a href=&quot;https://www.youtube.com/watch?v=dB4zJk_fqrU&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Lambda is the key enabler and a core AWS component for serverless computing. Lets you run the code you want, without worrying about the underlying infrastructure and provisioning. It is also cost efficient, as there are no instances that are in running state but idle. Lambda handles scaling up and scaling down as needed, transparently to the customer.&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h2 id=&quot;components&quot;&gt;Components&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;Event Source - Changes in state of the resources or data, or any events triggered explicitly or implicitly. A large number of AWS services can act as Event Sources - Like S3 (Object PUT, DELETE..), DynamoDB, IoT, CloudFormation, CloudWatch, SNS, API Gateway and Cron schedule to name a few.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Function - The piece of code that would be run when that event occurs. The function can access any services downstream if needed. Currently Supported languages are Node.js, Python, Java 8 and C#.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;use-cases&quot;&gt;Use cases&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;Stateless, event-based file/data processing.&lt;/li&gt;
+  &lt;li&gt;On demand execution of some logic where an event is generated via an explicit action.&lt;/li&gt;
+  &lt;li&gt;Custom Workflows for state changes within AWS.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;development&quot;&gt;Development&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;Code can be developed in the 4 supported languages (currently).&lt;/li&gt;
+  &lt;li&gt;The code should have no affinity or access to the underlying infrastructure, and should use external infrastructure for state (like a cache or a database). The code should be entirely stateless.&lt;/li&gt;
+  &lt;li&gt;The memory usage allowed is from 128MB to 1.5GB in increments of 64MB. CPU and network are allocated proportionately.&lt;/li&gt;
+  &lt;li&gt;Lambda can be invoked synchronously (the client waits for a response from the function), and asynchronously (fire and forget, a 202 Accepted).&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;what-is-in-it&quot;&gt;What is in it&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Handler()&lt;/code&gt; function - Entry point for Lambda.&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Event&lt;/code&gt; Object - The request (representation of the event). Can be a stream or an simple data type.&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Context&lt;/code&gt; Object - Provides a handle to the environment and basic utilities like time, logging and client/event info.&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;FunctionConfiguration&lt;/code&gt; Metadata
+    &lt;ol&gt;
+      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;VpcConfig&lt;/code&gt; - Useful if you want to access your private resources within your VPC. Enables the lambda environment to be able to talk to your VPC.&lt;/li&gt;
+      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;DeadLetterConfig&lt;/code&gt; - Failed events are sent to SQS or SNS. A dead letter queue or an SNS topic can be configured where the event is sent back in case the lambda function fails to process it. It is only available for async requests.&lt;/li&gt;
+      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Environment&lt;/code&gt; - Key value pairs as a part of the configuration, which are then available as environment variables to the function. They’re encrypted at rest via KMS, and are decrypted during lambda initialization.&lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;limits&quot;&gt;Limits&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;512 MB of temporary storage (ephemeral).&lt;/li&gt;
+  &lt;li&gt;1024 File Descriptors&lt;/li&gt;
+  &lt;li&gt;1024 processes + threads&lt;/li&gt;
+  &lt;li&gt;300 seconds maximum execution duration&lt;/li&gt;
+  &lt;li&gt;6MB Request payload&lt;/li&gt;
+  &lt;li&gt;6MB Response&lt;/li&gt;
+  &lt;li&gt;50MB Deployment package (compressed)&lt;/li&gt;
+  &lt;li&gt;250MB Uncompressed&lt;/li&gt;
+  &lt;li&gt;4KB Environment variables&lt;/li&gt;
+  &lt;li&gt;100 Concurrent Executions (can be increased by requesting Amazon)&lt;/li&gt;
+  &lt;li&gt;75GB total size of all lambdas across one region.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;container-model&quot;&gt;Container Model&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;Each execution happens in a container that is created and managed by AWS. Containers are  re-used. This re-use can let us share cached static data, or DB connections between invocations. The folder &lt;code class=&quot;highlighter-rouge&quot;&gt;/tmp&lt;/code&gt; is available across invocations. However, do not rely on this, use it opportunistically.&lt;/li&gt;
+  &lt;li&gt;Bootstrapping happens when a function is invoked for the first time after creation or update. The start time can be reduced by allowing more memory, having a smaller deployment package. Clearly Python and Node.js will be much quicker to bootstrap than Java and C#. Strip down the deployment of all the libraries that are not needed, as lambda will load everything that is present in the package. Mode to an interpreted language if cold starts are not within acceptable limits.&lt;/li&gt;
+  &lt;li&gt;Containers run Amazon Linux AMI. If there are any native binaries, compile against this environment.&lt;/li&gt;
+  &lt;li&gt;OpenJDK 1.8 is already provided by the container, so does not need to be packaged. Similarly AWS SDK for other languages, etc.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;deployment&quot;&gt;Deployment&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;A zip file or a jar file containing the code and dependencies. Use Maven or Eclipse to make a package.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;cicd-options&quot;&gt;CI/CD Options&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;Use AWS CodeCommit, CodeBuild, CodePipeline&lt;/li&gt;
+  &lt;li&gt;Use Github, Jenkins, CodeShip&lt;/li&gt;
+  &lt;li&gt;Put the package on an S3 location&lt;/li&gt;
+  &lt;li&gt;AWS &lt;code class=&quot;highlighter-rouge&quot;&gt;SAM&lt;/code&gt; - Serverless Application Model&lt;/li&gt;
+  &lt;li&gt;CloudFormation supports &lt;code class=&quot;highlighter-rouge&quot;&gt;SAM&lt;/code&gt; extensions&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;versioning&quot;&gt;Versioning&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;A version is an immutable copy of code+config&lt;/li&gt;
+  &lt;li&gt;Each version gets it’s own ARN&lt;/li&gt;
+  &lt;li&gt;Versions can be aliased (like 13=Dev, 11=Prod, 12=Beta)&lt;/li&gt;
+  &lt;li&gt;The aliasing enables rollbacks or staged promotions.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;security-and-scaling&quot;&gt;Security and Scaling&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;The Push model, where the upstream service invokes the function. The resource level policies are applied to the lambda function which control which resources can invoke it (Like allow S3 to invoke this function). The policies are already created when the event source is attached via the console.&lt;/li&gt;
+  &lt;li&gt;The pull model is used for stream event sources (Kinesis and DynbamoDB). Here lambda polls instead of the resources pushing. An IAM policy is created for the Lambda to be able to poll the source (instead of the other way around for Push).&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;concurrency-and-scaling&quot;&gt;Concurrency and Scaling&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;Requests per second * function execution duration&lt;/li&gt;
+  &lt;li&gt;When throttled, the async events are retried automatically for 6 hours, with delays between retries.&lt;/li&gt;
+  &lt;li&gt;For sync requests, the client gets a 429.&lt;/li&gt;
+  &lt;li&gt;Use async model if bursts are expected as retries are handled automatically when throttled.&lt;/li&gt;
+  &lt;li&gt;Request AWS to increase the concurrency limit if consistently getting throttled.&lt;/li&gt;
+  &lt;li&gt;Ensure the downstream also keeps up with Lambda throttling, for example, if each lambda creates 10 MySQL connections, 100 concurrent invocations is not something MySQL will be able to handle.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;debugging-and-operations&quot;&gt;Debugging and Operations&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;4xx errors can be invalid parameter value (400), resource not found (404), request too large (413) and can be fixed by the developer.&lt;/li&gt;
+  &lt;li&gt;5xx need to be fixed by the admin&lt;/li&gt;
+  &lt;li&gt;Stream based events are retried till the data expires&lt;/li&gt;
+  &lt;li&gt;Async invocations are retried 2 extra times before sent to dead letter queue&lt;/li&gt;
+  &lt;li&gt;For sync invocations, the caller will need to implement the retry logic when they get an error from the call&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;tracing-tracking-and-logging&quot;&gt;Tracing, Tracking and Logging&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;AWS X-Ray (Preview) for detailed breakdown of lambda performance and behavior metrics.&lt;/li&gt;
+  &lt;li&gt;All calls made to lambda are logged to CloudTrail. They can be delivered to S3 and analyzed.&lt;/li&gt;
+  &lt;li&gt;Every start, end, and report goes to CloudWatch&lt;/li&gt;
+  &lt;li&gt;Java User logs can be created via &lt;code class=&quot;highlighter-rouge&quot;&gt;System.out.println()&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;System.err.println()&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;LambdaLogger.log()&lt;/code&gt;, and &lt;code class=&quot;highlighter-rouge&quot;&gt;Log4j.*&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Default metrics are free - which include duration, throttles, errors, etc. Custom metrics can also be added by the function itself via the CloudWatch API.&lt;/li&gt;
+&lt;/ul&gt;</content><author><name></name></author><summary type="html">I’ve put together my notes from the AWS webinar, which can be seen here. Lambda is the key enabler and a core AWS component for serverless computing. Lets you run the code you want, without worrying about the underlying infrastructure and provisioning. It is also cost efficient, as there are no instances that are in running state but idle. Lambda handles scaling up and scaling down as needed, transparently to the customer.</summary></entry><entry><title type="html">AWS Training at Marqeta : SQS Lab</title><link href="https://lobster1234.github.io/aws/sqs/2017/02/17/marqeta-aws-sqs-lab.html" rel="alternate" type="text/html" title="AWS Training at Marqeta : SQS Lab" /><published>2017-02-17T19:10:44-08:00</published><updated>2017-02-17T19:10:44-08:00</updated><id>https://lobster1234.github.io/aws/sqs/2017/02/17/marqeta-aws-sqs-lab</id><content type="html" xml:base="https://lobster1234.github.io/aws/sqs/2017/02/17/marqeta-aws-sqs-lab.html">&lt;p&gt;This post is the handout for the SQS Lab I ran as a part of hands-on AWS training to the Engineering + DevOps team at &lt;a href=&quot;https://www.marqeta.com&quot;&gt;Marqeta&lt;/a&gt;.&lt;/p&gt;
 
 &lt;!--more--&gt;
 
@@ -592,126 +714,4 @@ aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.co
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;p&gt;Now even if we try to get message after 30 seconds, this message will not show up. However, it will after 120 seconds unless we delete it. Remember that this value is absolute, which means it changes the timeout from default (30 seconds) to 120 seconds and not to 30+120 seconds.&lt;/p&gt;</content><author><name></name></author><summary type="html">This post is the handout for the SQS Lab I ran as a part of hands-on AWS training to the Engineering + DevOps team at Marqeta.</summary></entry><entry><title type="html">Notes from AWS Lambda Deep Dive Webinar</title><link href="https://lobster1234.github.io/aws/serverless/lambda/2017/02/27/notes-from-aws-lambda-deep-dive-webinar.html" rel="alternate" type="text/html" title="Notes from AWS Lambda Deep Dive Webinar" /><published>2017-02-27T07:20:44-08:00</published><updated>2017-02-27T07:20:44-08:00</updated><id>https://lobster1234.github.io/aws/serverless/lambda/2017/02/27/notes-from-aws-lambda-deep-dive-webinar</id><content type="html" xml:base="https://lobster1234.github.io/aws/serverless/lambda/2017/02/27/notes-from-aws-lambda-deep-dive-webinar.html">&lt;p&gt;I’ve put together my notes from the AWS webinar, which can be seen &lt;a href=&quot;https://www.youtube.com/watch?v=dB4zJk_fqrU&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;Lambda is the key enabler and a core AWS component for serverless computing. Lets you run the code you want, without worrying about the underlying infrastructure and provisioning. It is also cost efficient, as there are no instances that are in running state but idle. Lambda handles scaling up and scaling down as needed, transparently to the customer.&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;h2 id=&quot;components&quot;&gt;Components&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Event Source - Changes in state of the resources or data, or any events triggered explicitly or implicitly. A large number of AWS services can act as Event Sources - Like S3 (Object PUT, DELETE..), DynamoDB, IoT, CloudFormation, CloudWatch, SNS, API Gateway and Cron schedule to name a few.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Function - The piece of code that would be run when that event occurs. The function can access any services downstream if needed. Currently Supported languages are Node.js, Python, Java 8 and C#.&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;use-cases&quot;&gt;Use cases&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;Stateless, event-based file/data processing.&lt;/li&gt;
-  &lt;li&gt;On demand execution of some logic where an event is generated via an explicit action.&lt;/li&gt;
-  &lt;li&gt;Custom Workflows for state changes within AWS.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;development&quot;&gt;Development&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;Code can be developed in the 4 supported languages (currently).&lt;/li&gt;
-  &lt;li&gt;The code should have no affinity or access to the underlying infrastructure, and should use external infrastructure for state (like a cache or a database). The code should be entirely stateless.&lt;/li&gt;
-  &lt;li&gt;The memory usage allowed is from 128MB to 1.5GB in increments of 64MB. CPU and network are allocated proportionately.&lt;/li&gt;
-  &lt;li&gt;Lambda can be invoked synchronously (the client waits for a response from the function), and asynchronously (fire and forget, a 202 Accepted).&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;what-is-in-it&quot;&gt;What is in it&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Handler()&lt;/code&gt; function - Entry point for Lambda.&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Event&lt;/code&gt; Object - The request (representation of the event). Can be a stream or an simple data type.&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Context&lt;/code&gt; Object - Provides a handle to the environment and basic utilities like time, logging and client/event info.&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;FunctionConfiguration&lt;/code&gt; Metadata
-    &lt;ol&gt;
-      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;VpcConfig&lt;/code&gt; - Useful if you want to access your private resources within your VPC. Enables the lambda environment to be able to talk to your VPC.&lt;/li&gt;
-      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;DeadLetterConfig&lt;/code&gt; - Failed events are sent to SQS or SNS. A dead letter queue or an SNS topic can be configured where the event is sent back in case the lambda function fails to process it. It is only available for async requests.&lt;/li&gt;
-      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Environment&lt;/code&gt; - Key value pairs as a part of the configuration, which are then available as environment variables to the function. They’re encrypted at rest via KMS, and are decrypted during lambda initialization.&lt;/li&gt;
-    &lt;/ol&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;limits&quot;&gt;Limits&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;512 MB of temporary storage (ephemeral).&lt;/li&gt;
-  &lt;li&gt;1024 File Descriptors&lt;/li&gt;
-  &lt;li&gt;1024 processes + threads&lt;/li&gt;
-  &lt;li&gt;300 seconds maximum execution duration&lt;/li&gt;
-  &lt;li&gt;6MB Request payload&lt;/li&gt;
-  &lt;li&gt;6MB Response&lt;/li&gt;
-  &lt;li&gt;50MB Deployment package (compressed)&lt;/li&gt;
-  &lt;li&gt;250MB Uncompressed&lt;/li&gt;
-  &lt;li&gt;4KB Environment variables&lt;/li&gt;
-  &lt;li&gt;100 Concurrent Executions (can be increased by requesting Amazon)&lt;/li&gt;
-  &lt;li&gt;75GB total size of all lambdas across one region.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;container-model&quot;&gt;Container Model&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;Each execution happens in a container that is created and managed by AWS. Containers are  re-used. This re-use can let us share cached static data, or DB connections between invocations. The folder &lt;code class=&quot;highlighter-rouge&quot;&gt;/tmp&lt;/code&gt; is available across invocations. However, do not rely on this, use it opportunistically.&lt;/li&gt;
-  &lt;li&gt;Bootstrapping happens when a function is invoked for the first time after creation or update. The start time can be reduced by allowing more memory, having a smaller deployment package. Clearly Python and Node.js will be much quicker to bootstrap than Java and C#. Strip down the deployment of all the libraries that are not needed, as lambda will load everything that is present in the package. Mode to an interpreted language if cold starts are not within acceptable limits.&lt;/li&gt;
-  &lt;li&gt;Containers run Amazon Linux AMI. If there are any native binaries, compile against this environment.&lt;/li&gt;
-  &lt;li&gt;OpenJDK 1.8 is already provided by the container, so does not need to be packaged. Similarly AWS SDK for other languages, etc.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;deployment&quot;&gt;Deployment&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;A zip file or a jar file containing the code and dependencies. Use Maven or Eclipse to make a package.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;cicd-options&quot;&gt;CI/CD Options&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;Use AWS CodeCommit, CodeBuild, CodePipeline&lt;/li&gt;
-  &lt;li&gt;Use Github, Jenkins, CodeShip&lt;/li&gt;
-  &lt;li&gt;Put the package on an S3 location&lt;/li&gt;
-  &lt;li&gt;AWS &lt;code class=&quot;highlighter-rouge&quot;&gt;SAM&lt;/code&gt; - Serverless Application Model&lt;/li&gt;
-  &lt;li&gt;CloudFormation supports &lt;code class=&quot;highlighter-rouge&quot;&gt;SAM&lt;/code&gt; extensions&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;versioning&quot;&gt;Versioning&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;A version is an immutable copy of code+config&lt;/li&gt;
-  &lt;li&gt;Each version gets it’s own ARN&lt;/li&gt;
-  &lt;li&gt;Versions can be aliased (like 13=Dev, 11=Prod, 12=Beta)&lt;/li&gt;
-  &lt;li&gt;The aliasing enables rollbacks or staged promotions.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;security-and-scaling&quot;&gt;Security and Scaling&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;The Push model, where the upstream service invokes the function. The resource level policies are applied to the lambda function which control which resources can invoke it (Like allow S3 to invoke this function). The policies are already created when the event source is attached via the console.&lt;/li&gt;
-  &lt;li&gt;The pull model is used for stream event sources (Kinesis and DynbamoDB). Here lambda polls instead of the resources pushing. An IAM policy is created for the Lambda to be able to poll the source (instead of the other way around for Push).&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;concurrency-and-scaling&quot;&gt;Concurrency and Scaling&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;Requests per second * function execution duration&lt;/li&gt;
-  &lt;li&gt;When throttled, the async events are retried automatically for 6 hours, with delays between retries.&lt;/li&gt;
-  &lt;li&gt;For sync requests, the client gets a 429.&lt;/li&gt;
-  &lt;li&gt;Use async model if bursts are expected as retries are handled automatically when throttled.&lt;/li&gt;
-  &lt;li&gt;Request AWS to increase the concurrency limit if consistently getting throttled.&lt;/li&gt;
-  &lt;li&gt;Ensure the downstream also keeps up with Lambda throttling, for example, if each lambda creates 10 MySQL connections, 100 concurrent invocations is not something MySQL will be able to handle.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;debugging-and-operations&quot;&gt;Debugging and Operations&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;4xx errors can be invalid parameter value (400), resource not found (404), request too large (413) and can be fixed by the developer.&lt;/li&gt;
-  &lt;li&gt;5xx need to be fixed by the admin&lt;/li&gt;
-  &lt;li&gt;Stream based events are retried till the data expires&lt;/li&gt;
-  &lt;li&gt;Async invocations are retried 2 extra times before sent to dead letter queue&lt;/li&gt;
-  &lt;li&gt;For sync invocations, the caller will need to implement the retry logic when they get an error from the call&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;tracing-tracking-and-logging&quot;&gt;Tracing, Tracking and Logging&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;AWS X-Ray (Preview) for detailed breakdown of lambda performance and behavior metrics.&lt;/li&gt;
-  &lt;li&gt;All calls made to lambda are logged to CloudTrail. They can be delivered to S3 and analyzed.&lt;/li&gt;
-  &lt;li&gt;Every start, end, and report goes to CloudWatch&lt;/li&gt;
-  &lt;li&gt;Java User logs can be created via &lt;code class=&quot;highlighter-rouge&quot;&gt;System.out.println()&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;System.err.println()&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;LambdaLogger.log()&lt;/code&gt;, and &lt;code class=&quot;highlighter-rouge&quot;&gt;Log4j.*&lt;/code&gt;&lt;/li&gt;
-  &lt;li&gt;Default metrics are free - which include duration, throttles, errors, etc. Custom metrics can also be added by the function itself via the CloudWatch API.&lt;/li&gt;
-&lt;/ul&gt;</content><author><name></name></author><summary type="html">I’ve put together my notes from the AWS webinar, which can be seen here. Lambda is the key enabler and a core AWS component for serverless computing. Lets you run the code you want, without worrying about the underlying infrastructure and provisioning. It is also cost efficient, as there are no instances that are in running state but idle. Lambda handles scaling up and scaling down as needed, transparently to the customer.</summary></entry></feed>
+&lt;p&gt;Now even if we try to get message after 30 seconds, this message will not show up. However, it will after 120 seconds unless we delete it. Remember that this value is absolute, which means it changes the timeout from default (30 seconds) to 120 seconds and not to 30+120 seconds.&lt;/p&gt;</content><author><name></name></author><summary type="html">This post is the handout for the SQS Lab I ran as a part of hands-on AWS training to the Engineering + DevOps team at Marqeta.</summary></entry></feed>
