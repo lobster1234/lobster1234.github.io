@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.4.3">Jekyll</generator><link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://lobster1234.github.io/" rel="alternate" type="text/html" /><updated>2017-04-06T01:29:43-07:00</updated><id>https://lobster1234.github.io/</id><title type="html">My Blog</title><subtitle>Manish Pandit's tech blog with gists and all the awesome goodies around programming, devops, architecture, and infrastructure.
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.4.3">Jekyll</generator><link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://lobster1234.github.io/" rel="alternate" type="text/html" /><updated>2017-04-06T01:43:02-07:00</updated><id>https://lobster1234.github.io/</id><title type="html">My Blog</title><subtitle>Manish Pandit's tech blog with gists and all the awesome goodies around programming, devops, architecture, and infrastructure.
 </subtitle><entry><title type="html">Using localstack with AWS Command Line</title><link href="https://lobster1234.github.io/aws/localstack/2017/04/05/working-with-localstack-command-line.html" rel="alternate" type="text/html" title="Using localstack with AWS Command Line" /><published>2017-04-05T23:44:37-07:00</published><updated>2017-04-05T23:44:37-07:00</updated><id>https://lobster1234.github.io/aws/localstack/2017/04/05/working-with-localstack-command-line</id><content type="html" xml:base="https://lobster1234.github.io/aws/localstack/2017/04/05/working-with-localstack-command-line.html">&lt;p&gt;&lt;a href=&quot;https://github.com/atlassian/localstack&quot;&gt;Localstack&lt;/a&gt; is a really useful project by Atlassian, which allows for local development using the AWS cloud stack. In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against.In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against. This post is a quick and handy gist of using AWS command line to work with localstack.
 &lt;!--more--&gt;&lt;/p&gt;
 &lt;h1 id=&quot;starting-localstack&quot;&gt;Starting localstack&lt;/h1&gt;
@@ -183,4 +183,290 @@ sys	0m0.167s
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws --endpoint-url=http://localhost:4576 sqs delete-message --queue-url http://localhost:4576/123456789012/test_queue --receipt-handle 'yugzzebhnnksfuvbjlibfnlejyqbulxqfegsnrgafjeabxaatxbmeiyfkfliedslohseosgjwkxhdzllpudhccjhorpkwbgjgyzeyzjwkfvqflathnvsmugeyevbqmfyqanuxetvdhcetseuwzrqpexogzggznndxmbqowtlalvqtffntdahhihel'
 
 &lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;</content><author><name></name></author><summary type="html">Localstack is a really useful project by Atlassian, which allows for local development using the AWS cloud stack. In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against.In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against. This post is a quick and handy gist of using AWS command line to work with localstack.</summary></entry></feed>
+&lt;/div&gt;</content><author><name></name></author><summary type="html">Localstack is a really useful project by Atlassian, which allows for local development using the AWS cloud stack. In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against.In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against. This post is a quick and handy gist of using AWS command line to work with localstack.</summary></entry><entry><title type="html">AWS Lambda with Serverless Framework and Java/Maven - Part 1</title><link href="https://lobster1234.github.io/aws/localstack/2017/04/05/serverless-framework-java-maven-part-1.html" rel="alternate" type="text/html" title="AWS Lambda with Serverless Framework and Java/Maven - Part 1" /><published>2017-04-05T23:44:37-07:00</published><updated>2017-04-05T23:44:37-07:00</updated><id>https://lobster1234.github.io/aws/localstack/2017/04/05/serverless-framework-java-maven-part-1</id><content type="html" xml:base="https://lobster1234.github.io/aws/localstack/2017/04/05/serverless-framework-java-maven-part-1.html">&lt;p&gt;&lt;a href=&quot;https://serverless.com&quot;&gt;Serverless&lt;/a&gt; is a node.js based framework that makes creating, deploying, and managing serverless functions a breeze. We will use AWS as our FaaS (Function-as-a-Service) provider, although Serverless supports IBM OpenWhisk and Microsoft Azure as well.&lt;/p&gt;
+
+&lt;p&gt;In this tutorial, we will create and deploy a java-maven based AWS Lambda function. In Part-1 we will not modify any code, or even look at the generated code. We will focus on the deployment and the command line interface to manage lambda, provided out of the box by serverless framework.&lt;/p&gt;
+
+&lt;p&gt;&amp;lt;!-more–&amp;gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;pre-requisites&quot;&gt;Pre-requisites&lt;/h3&gt;
+&lt;p&gt;Here is what the setup on my Mac looks like (Sierra)&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;brew&lt;/code&gt; (1.1.10) - you will need this if you do not have node/npm installed already.&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;node&lt;/code&gt; (v7.6.0)&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;npm&lt;/code&gt; (4.1.2)&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Apache Maven&lt;/code&gt; (3.2.5)&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Oracle JDK&lt;/code&gt; (1.8.0_121)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;install-serverless&quot;&gt;Install Serverless&lt;/h3&gt;
+&lt;p&gt;If you do not have &lt;code class=&quot;highlighter-rouge&quot;&gt;node&lt;/code&gt; installed, use &lt;code class=&quot;highlighter-rouge&quot;&gt;brew install node&lt;/code&gt; to install &lt;code class=&quot;highlighter-rouge&quot;&gt;node&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;npm&lt;/code&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Manishs-MacBook-Pro:~ mpandit$ npm install serverless -g
+/usr/local/bin/serverless -&amp;gt; /usr/local/lib/node_modules/serverless/bin/serverless
+/usr/local/bin/slss -&amp;gt; /usr/local/lib/node_modules/serverless/bin/serverless
+/usr/local/bin/sls -&amp;gt; /usr/local/lib/node_modules/serverless/bin/serverless
+
+&amp;gt; serverless@1.7.0 postinstall /usr/local/lib/node_modules/serverless
+&amp;gt; node ./scripts/postinstall.js
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h3 id=&quot;configure-serverless-for-aws&quot;&gt;Configure Serverless for AWS&lt;/h3&gt;
+&lt;p&gt;Serverless needs to use AWS credentials for an IAM user. I recommend creating a user with no access, and we can add permissions as we go.&lt;/p&gt;
+
+&lt;p&gt;We create a &lt;em&gt;programmatic-access-only&lt;/em&gt; user called &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless&lt;/code&gt;, and added it to a new group called &lt;code class=&quot;highlighter-rouge&quot;&gt;Serverless&lt;/code&gt;. The group should have no permissions associated with it.&lt;/p&gt;
+
+&lt;p&gt;Next, copy paste the AWS credentials of this user in the command below.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Manishs-MacBook-Pro:serverless-java mpandit$ serverless config credentials --provider aws --key &amp;lt;key&amp;gt; --secret &amp;lt;secret&amp;gt;
+
+Serverless: Setting up AWS...
+Serverless: Saving your AWS profile in &quot;~/.aws/credentials&quot;...
+Serverless: Success! Your AWS access keys were stored under the &quot;default&quot; profile.
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Serverless uses &lt;code class=&quot;highlighter-rouge&quot;&gt;us-east-1&lt;/code&gt; region by default, which can be overriden by providing the &lt;code class=&quot;highlighter-rouge&quot;&gt;--region&lt;/code&gt; parameter.&lt;/p&gt;
+
+&lt;h3 id=&quot;create-the-java-project&quot;&gt;Create the Java project&lt;/h3&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Manishs-MacBook-Pro:~ mpandit$ cd ~/work
+Manishs-MacBook-Pro:work mpandit$ mkdir serverless-java
+Manishs-MacBook-Pro:work mpandit$ cd serverless-java
+Manishs-MacBook-Pro:serverless-java mpandit$ serverless create --template aws-java-maven
+
+Serverless: Generating boilerplate...
+ _______                             __
+|   _   .-----.----.--.--.-----.----|  .-----.-----.-----.
+|   |___|  -__|   _|  |  |  -__|   _|  |  -__|__ --|__ --|
+|____   |_____|__|  \___/|_____|__| |__|_____|_____|_____|
+|   |   |             The Serverless Application Framework
+|       |                           serverless.com, v1.7.0
+ -------'
+
+Serverless: Successfully generated boilerplate for template: &quot;aws-java-maven&quot;
+Serverless: NOTE: Please update the &quot;service&quot; property in serverless.yml with your service name
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h3 id=&quot;set-up-iam-policies&quot;&gt;Set up IAM Policies&lt;/h3&gt;
+&lt;p&gt;If you run &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless info&lt;/code&gt;, it will report an error as our user does not really have any permissions.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Manishs-MacBook-Pro:serverless-java mpandit$ serverless info
+
+  Serverless Error ---------------------------------------
+
+     User: arn:aws:iam::123456789209:user/serverless is not
+     authorized to perform: cloudformation:DescribeStacks
+     on resource: arn:aws:cloudformation:us-east-1:123456789209:stack/aws-java-maven-dev/*
+
+  Get Support --------------------------------------------
+     Docs:          docs.serverless.com
+     Bugs:          github.com/serverless/serverless/issues
+
+  Your Environment Information -----------------------------
+     OS:                 darwin
+     Node Version:       7.6.0
+     Serverless Version: 1.7.0
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Lets add CloudFormation policy to this user. We will do this via adding the permission to the associated group.&lt;/p&gt;
+
+&lt;p&gt;You will notice that there is no such thing as &lt;code class=&quot;highlighter-rouge&quot;&gt;AmazonCloudFormationFullAccess&lt;/code&gt;. Hence, we will need to create a custom policy.&lt;/p&gt;
+
+&lt;p&gt;Click the Group name on the IAM console, and click the Permissions tab. Expand Inline Policies, and click the link that allows creation of an inline policy.&lt;/p&gt;
+
+&lt;p&gt;In the page that opens up, select Policy Generator and proceed and make these selections -&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Effect : Allow&lt;/li&gt;
+  &lt;li&gt;AWS Service: AWS CloudFormation&lt;/li&gt;
+  &lt;li&gt;Actions - All Actions Selected&lt;/li&gt;
+  &lt;li&gt;ARN - *&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Click Add Statement, and click Next Step. This will show the policy we just created. Rename it to &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless-cloudformation-policy&lt;/code&gt;. Click Apply.&lt;/p&gt;
+&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;Version&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;2012-10-17&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;Statement&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;Sid&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Stmt1488265872000&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;Effect&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Allow&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;Action&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+                &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;cloudformation:*&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;Resource&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+                &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;*&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;We will also need to give S3 access to this user, as serverless would need to upload the artifact to S3 for deployment via CloudFormation. We now add &lt;code class=&quot;highlighter-rouge&quot;&gt;AmazonS3FullAccess&lt;/code&gt; to this group, and our user will inherit it. This time we will click Attach Policy under Managed Policies instead of Inline Policies.&lt;/p&gt;
+
+&lt;p&gt;Another Managed Policy is for CloudWatch Logs access, so we will select &lt;code class=&quot;highlighter-rouge&quot;&gt;CloudWatchLogsFullAccess&lt;/code&gt; and attach to the group.&lt;/p&gt;
+
+&lt;p&gt;As a part of the deployment process, serverless would need to associate the lambda with the invocation role. In order to do that, attach &lt;code class=&quot;highlighter-rouge&quot;&gt;IAMFullAccess&lt;/code&gt; policy from the Managed Policies to the group as well.&lt;/p&gt;
+
+&lt;p&gt;Finally, we add &lt;code class=&quot;highlighter-rouge&quot;&gt;AWSLambdaFullAccess&lt;/code&gt; to this group so the serverless framework can manage the services (lambda functions).&lt;/p&gt;
+
+&lt;p&gt;To summarize, our &lt;code class=&quot;highlighter-rouge&quot;&gt;Serverless&lt;/code&gt; IAM Group should have following policies -&lt;/p&gt;
+
+&lt;p&gt;Managed -&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;AmazonS3FullAccess&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;CloudWatchLogsFullAccess&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;IAMFullAccess&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;AWSLambdaFullAccess&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Inline - &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless-cloudformation-policy&lt;/code&gt; for CloudFormation.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;One thing to keep in mind is that for functions that are triggered by an event, the event source would need access to invoke the function. This is managed via function policies, which are set up when the trigger is configured. For instance, if you want the lambda to be triggered on an S3 event on a bucket, the association between the S3 bucket and the function will need to have a function policy.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Now you’ll notice that the &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless info&lt;/code&gt; command returns no services.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Manishs-MacBook-Pro:serverless-java mpandit$ serverless info
+
+  Serverless Error ---------------------------------------
+
+     Stack with id aws-java-maven-dev does not exist
+
+  Get Support --------------------------------------------
+     Docs:          docs.serverless.com
+     Bugs:          github.com/serverless/serverless/issues
+
+  Your Environment Information -----------------------------
+     OS:                 darwin
+     Node Version:       7.6.0
+     Serverless Version: 1.7.0
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;deploy-the-stack&quot;&gt;Deploy the stack&lt;/h3&gt;
+&lt;p&gt;Since deployment of the stack is essentially setting up our lambda function (the template has a simple function), we need to create the artifact (jar).&lt;/p&gt;
+
+&lt;p&gt;Since this is a maven project, we use maven to build the project.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Manishs-MacBook-Pro:serverless-java mpandit$ mvn clean install
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building hello dev
+[INFO] ------------------------------------------------------------------------
+...
+...
+...
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 14.709 s
+[INFO] Finished at: 2017-02-27T23:26:00-08:00
+[INFO] Final Memory: 23M/145M
+[INFO] ------------------------------------------------------------------------
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Now that we have the artifact in &lt;code class=&quot;highlighter-rouge&quot;&gt;target&lt;/code&gt; folder (&lt;code class=&quot;highlighter-rouge&quot;&gt;hello-dev.jar&lt;/code&gt;), we can go ahead deploy it.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Manishs-MacBook-Pro:serverless-java mpandit$ serverless deploy
+Serverless: Creating Stack...
+Serverless: Checking Stack create progress...
+.....
+Serverless: Stack create finished...
+Serverless: Uploading CloudFormation file to S3...
+Serverless: Uploading service .zip file to S3 (1.98 MB)...
+Serverless: Updating Stack...
+Serverless: Checking Stack update progress...
+..................
+Serverless: Stack update finished...
+Service Information
+service: aws-java-maven
+stage: dev
+region: us-east-1
+api keys:
+  None
+endpoints:
+  None
+functions:
+  aws-java-maven-dev-hello
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;You can check the AWS CloudFormation section in the console to view details of the stack that has just been created.&lt;/p&gt;
+
+&lt;p&gt;Now that our service is deployed, it wil show up under &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless info&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Manishs-MacBook-Pro:serverless-java mpandit$ serverless info
+Service Information
+service: aws-java-maven
+stage: dev
+region: us-east-1
+api keys:
+  None
+endpoints:
+  None
+functions:
+  aws-java-maven-dev-hello
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Next, lets try to invoke it.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Manishs-MacBook-Pro:serverless-java mpandit$ serverless invoke --function  hello
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;statusCode&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;200&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;body&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;{\&quot;message\&quot;:\&quot;Go Serverless v1.x! Your function executed successfully!\&quot;,\&quot;input\&quot;:{}}&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;headers&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;X-Powered-By&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;AWS Lambda &amp;amp; serverless&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;isBase64Encoded&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The function can also be invoked with an input. The input is essentially a Map, so we can pass it a JSON string with the &lt;code class=&quot;highlighter-rouge&quot;&gt;--data&lt;/code&gt; parameter.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Manishs-MacBook-Pro:serverless-java mpandit$ serverless invoke --function hello --data '{&quot;key&quot;:&quot;value&quot;}'
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;statusCode&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;200&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;body&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;{\&quot;message\&quot;:\&quot;Go Serverless v1.x! Your function executed successfully!\&quot;,\&quot;input\&quot;:{\&quot;key\&quot;:\&quot;value\&quot;}}&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;headers&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;X-Powered-By&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;AWS Lambda &amp;amp; serverless&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;isBase64Encoded&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;A good idea would be to explore the CloudWatch Logs and Lambda metrics for our function from the console.&lt;/p&gt;
+
+&lt;p&gt;The same can be done command line, like so -&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Manishs-MacBook-Pro:serverless-java mpandit$ serverless logs --function hello
+START RequestId: f8390071-fd8d-11e6-9195-554889504121 Version: $LATEST
+2017-02-28 08:14:48 &amp;lt;f8390071-fd8d-11e6-9195-554889504121&amp;gt; INFO  com.serverless.Handler:17 - received: {}
+END RequestId: f8390071-fd8d-11e6-9195-554889504121
+REPORT RequestId: f8390071-fd8d-11e6-9195-554889504121	Duration: 445.52 ms	Billed Duration: 500 ms 	Memory Size: 1024 MB	Max Memory Used: 57 MB
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;We can also look at the metrics associated with our functions (The 1 error is because I had passed a malformed JSON input).&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Manishs-MacBook-Pro:serverless-java mpandit$ serverless metrics
+Service wide metrics
+February 27, 2017 1:59 AM - February 28, 2017 1:59 AM
+
+Invocations: 7
+Throttles: 0
+Errors: 1
+Duration (avg.): 276.55ms
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Manishs-MacBook-Pro:serverless-java mpandit$ serverless metrics --function hello
+hello
+February 27, 2017 1:59 AM - February 28, 2017 1:59 AM
+
+Invocations: 7
+Throttles: 0
+Errors: 1
+Duration (avg.): 276.55ms
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Now that we have successfully deployed and tested the templated service, we are now ready to dive deeper into the actual code, configuration, and constructs of serverless framework. That will be Part-2 of this tutorial.&lt;/p&gt;</content><author><name></name></author><summary type="html">Serverless is a node.js based framework that makes creating, deploying, and managing serverless functions a breeze. We will use AWS as our FaaS (Function-as-a-Service) provider, although Serverless supports IBM OpenWhisk and Microsoft Azure as well. In this tutorial, we will create and deploy a java-maven based AWS Lambda function. In Part-1 we will not modify any code, or even look at the generated code. We will focus on the deployment and the command line interface to manage lambda, provided out of the box by serverless framework. &amp;lt;!-more–&amp;gt; Pre-requisites Here is what the setup on my Mac looks like (Sierra) brew (1.1.10) - you will need this if you do not have node/npm installed already. node (v7.6.0) npm (4.1.2) Apache Maven (3.2.5) Oracle JDK (1.8.0_121) Install Serverless If you do not have node installed, use brew install node to install node and npm. Manishs-MacBook-Pro:~ mpandit$ npm install serverless -g /usr/local/bin/serverless -&amp;gt; /usr/local/lib/node_modules/serverless/bin/serverless /usr/local/bin/slss -&amp;gt; /usr/local/lib/node_modules/serverless/bin/serverless /usr/local/bin/sls -&amp;gt; /usr/local/lib/node_modules/serverless/bin/serverless &amp;gt; serverless@1.7.0 postinstall /usr/local/lib/node_modules/serverless &amp;gt; node ./scripts/postinstall.js Configure Serverless for AWS Serverless needs to use AWS credentials for an IAM user. I recommend creating a user with no access, and we can add permissions as we go. We create a programmatic-access-only user called serverless, and added it to a new group called Serverless. The group should have no permissions associated with it. Next, copy paste the AWS credentials of this user in the command below. Manishs-MacBook-Pro:serverless-java mpandit$ serverless config credentials --provider aws --key &amp;lt;key&amp;gt; --secret &amp;lt;secret&amp;gt; Serverless: Setting up AWS... Serverless: Saving your AWS profile in &quot;~/.aws/credentials&quot;... Serverless: Success! Your AWS access keys were stored under the &quot;default&quot; profile. Serverless uses us-east-1 region by default, which can be overriden by providing the --region parameter. Create the Java project Manishs-MacBook-Pro:~ mpandit$ cd ~/work Manishs-MacBook-Pro:work mpandit$ mkdir serverless-java Manishs-MacBook-Pro:work mpandit$ cd serverless-java Manishs-MacBook-Pro:serverless-java mpandit$ serverless create --template aws-java-maven Serverless: Generating boilerplate... _______ __ | _ .-----.----.--.--.-----.----| .-----.-----.-----. | |___| -__| _| | | -__| _| | -__|__ --|__ --| |____ |_____|__| \___/|_____|__| |__|_____|_____|_____| | | | The Serverless Application Framework | | serverless.com, v1.7.0 -------' Serverless: Successfully generated boilerplate for template: &quot;aws-java-maven&quot; Serverless: NOTE: Please update the &quot;service&quot; property in serverless.yml with your service name Set up IAM Policies If you run serverless info, it will report an error as our user does not really have any permissions. Manishs-MacBook-Pro:serverless-java mpandit$ serverless info Serverless Error --------------------------------------- User: arn:aws:iam::123456789209:user/serverless is not authorized to perform: cloudformation:DescribeStacks on resource: arn:aws:cloudformation:us-east-1:123456789209:stack/aws-java-maven-dev/* Get Support -------------------------------------------- Docs: docs.serverless.com Bugs: github.com/serverless/serverless/issues Your Environment Information ----------------------------- OS: darwin Node Version: 7.6.0 Serverless Version: 1.7.0 Lets add CloudFormation policy to this user. We will do this via adding the permission to the associated group. You will notice that there is no such thing as AmazonCloudFormationFullAccess. Hence, we will need to create a custom policy. Click the Group name on the IAM console, and click the Permissions tab. Expand Inline Policies, and click the link that allows creation of an inline policy. In the page that opens up, select Policy Generator and proceed and make these selections - Effect : Allow AWS Service: AWS CloudFormation Actions - All Actions Selected ARN - * Click Add Statement, and click Next Step. This will show the policy we just created. Rename it to serverless-cloudformation-policy. Click Apply. { &quot;Version&quot;: &quot;2012-10-17&quot;, &quot;Statement&quot;: [ { &quot;Sid&quot;: &quot;Stmt1488265872000&quot;, &quot;Effect&quot;: &quot;Allow&quot;, &quot;Action&quot;: [ &quot;cloudformation:*&quot; ], &quot;Resource&quot;: [ &quot;*&quot; ] } ] } We will also need to give S3 access to this user, as serverless would need to upload the artifact to S3 for deployment via CloudFormation. We now add AmazonS3FullAccess to this group, and our user will inherit it. This time we will click Attach Policy under Managed Policies instead of Inline Policies. Another Managed Policy is for CloudWatch Logs access, so we will select CloudWatchLogsFullAccess and attach to the group. As a part of the deployment process, serverless would need to associate the lambda with the invocation role. In order to do that, attach IAMFullAccess policy from the Managed Policies to the group as well. Finally, we add AWSLambdaFullAccess to this group so the serverless framework can manage the services (lambda functions). To summarize, our Serverless IAM Group should have following policies - Managed - AmazonS3FullAccess CloudWatchLogsFullAccess IAMFullAccess AWSLambdaFullAccess Inline - serverless-cloudformation-policy for CloudFormation. One thing to keep in mind is that for functions that are triggered by an event, the event source would need access to invoke the function. This is managed via function policies, which are set up when the trigger is configured. For instance, if you want the lambda to be triggered on an S3 event on a bucket, the association between the S3 bucket and the function will need to have a function policy. Now you’ll notice that the serverless info command returns no services. Manishs-MacBook-Pro:serverless-java mpandit$ serverless info Serverless Error --------------------------------------- Stack with id aws-java-maven-dev does not exist Get Support -------------------------------------------- Docs: docs.serverless.com Bugs: github.com/serverless/serverless/issues Your Environment Information ----------------------------- OS: darwin Node Version: 7.6.0 Serverless Version: 1.7.0 Deploy the stack Since deployment of the stack is essentially setting up our lambda function (the template has a simple function), we need to create the artifact (jar). Since this is a maven project, we use maven to build the project. Manishs-MacBook-Pro:serverless-java mpandit$ mvn clean install [INFO] Scanning for projects... [INFO] [INFO] ------------------------------------------------------------------------ [INFO] Building hello dev [INFO] ------------------------------------------------------------------------ ... ... ... [INFO] ------------------------------------------------------------------------ [INFO] BUILD SUCCESS [INFO] ------------------------------------------------------------------------ [INFO] Total time: 14.709 s [INFO] Finished at: 2017-02-27T23:26:00-08:00 [INFO] Final Memory: 23M/145M [INFO] ------------------------------------------------------------------------ Now that we have the artifact in target folder (hello-dev.jar), we can go ahead deploy it. Manishs-MacBook-Pro:serverless-java mpandit$ serverless deploy Serverless: Creating Stack... Serverless: Checking Stack create progress... ..... Serverless: Stack create finished... Serverless: Uploading CloudFormation file to S3... Serverless: Uploading service .zip file to S3 (1.98 MB)... Serverless: Updating Stack... Serverless: Checking Stack update progress... .................. Serverless: Stack update finished... Service Information service: aws-java-maven stage: dev region: us-east-1 api keys: None endpoints: None functions: aws-java-maven-dev-hello You can check the AWS CloudFormation section in the console to view details of the stack that has just been created. Now that our service is deployed, it wil show up under serverless info Manishs-MacBook-Pro:serverless-java mpandit$ serverless info Service Information service: aws-java-maven stage: dev region: us-east-1 api keys: None endpoints: None functions: aws-java-maven-dev-hello Next, lets try to invoke it. Manishs-MacBook-Pro:serverless-java mpandit$ serverless invoke --function hello { &quot;statusCode&quot;: 200, &quot;body&quot;: &quot;{\&quot;message\&quot;:\&quot;Go Serverless v1.x! Your function executed successfully!\&quot;,\&quot;input\&quot;:{}}&quot;, &quot;headers&quot;: { &quot;X-Powered-By&quot;: &quot;AWS Lambda &amp;amp; serverless&quot; }, &quot;isBase64Encoded&quot;: false } The function can also be invoked with an input. The input is essentially a Map, so we can pass it a JSON string with the --data parameter. Manishs-MacBook-Pro:serverless-java mpandit$ serverless invoke --function hello --data '{&quot;key&quot;:&quot;value&quot;}' { &quot;statusCode&quot;: 200, &quot;body&quot;: &quot;{\&quot;message\&quot;:\&quot;Go Serverless v1.x! Your function executed successfully!\&quot;,\&quot;input\&quot;:{\&quot;key\&quot;:\&quot;value\&quot;}}&quot;, &quot;headers&quot;: { &quot;X-Powered-By&quot;: &quot;AWS Lambda &amp;amp; serverless&quot; }, &quot;isBase64Encoded&quot;: false } A good idea would be to explore the CloudWatch Logs and Lambda metrics for our function from the console. The same can be done command line, like so - Manishs-MacBook-Pro:serverless-java mpandit$ serverless logs --function hello START RequestId: f8390071-fd8d-11e6-9195-554889504121 Version: $LATEST 2017-02-28 08:14:48 &amp;lt;f8390071-fd8d-11e6-9195-554889504121&amp;gt; INFO com.serverless.Handler:17 - received: {} END RequestId: f8390071-fd8d-11e6-9195-554889504121 REPORT RequestId: f8390071-fd8d-11e6-9195-554889504121 Duration: 445.52 ms Billed Duration: 500 ms Memory Size: 1024 MB Max Memory Used: 57 MB We can also look at the metrics associated with our functions (The 1 error is because I had passed a malformed JSON input). Manishs-MacBook-Pro:serverless-java mpandit$ serverless metrics Service wide metrics February 27, 2017 1:59 AM - February 28, 2017 1:59 AM Invocations: 7 Throttles: 0 Errors: 1 Duration (avg.): 276.55ms Manishs-MacBook-Pro:serverless-java mpandit$ serverless metrics --function hello hello February 27, 2017 1:59 AM - February 28, 2017 1:59 AM Invocations: 7 Throttles: 0 Errors: 1 Duration (avg.): 276.55ms Now that we have successfully deployed and tested the templated service, we are now ready to dive deeper into the actual code, configuration, and constructs of serverless framework. That will be Part-2 of this tutorial.</summary></entry></feed>
