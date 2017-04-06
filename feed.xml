@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.4.3">Jekyll</generator><link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://lobster1234.github.io/" rel="alternate" type="text/html" /><updated>2017-04-06T02:40:50-07:00</updated><id>https://lobster1234.github.io/</id><title type="html">My Blog</title><subtitle>Manish Pandit's tech blog with gists and all the awesome goodies around programming, devops, architecture, and infrastructure.
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.4.3">Jekyll</generator><link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://lobster1234.github.io/" rel="alternate" type="text/html" /><updated>2017-04-06T02:56:07-07:00</updated><id>https://lobster1234.github.io/</id><title type="html">My Blog</title><subtitle>Manish Pandit's tech blog with gists and all the awesome goodies around programming, devops, architecture, and infrastructure.
 </subtitle><entry><title type="html">Using localstack with AWS Command Line</title><link href="https://lobster1234.github.io/aws/localstack/2017/04/05/working-with-localstack-command-line.html" rel="alternate" type="text/html" title="Using localstack with AWS Command Line" /><published>2017-04-05T23:44:37-07:00</published><updated>2017-04-05T23:44:37-07:00</updated><id>https://lobster1234.github.io/aws/localstack/2017/04/05/working-with-localstack-command-line</id><content type="html" xml:base="https://lobster1234.github.io/aws/localstack/2017/04/05/working-with-localstack-command-line.html">&lt;p&gt;&lt;a href=&quot;https://github.com/atlassian/localstack&quot;&gt;Localstack&lt;/a&gt; is a really useful project by Atlassian, which allows for local development using the AWS cloud stack. In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against.In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against. This post is a quick and handy gist of using AWS command line to work with localstack.
 &lt;!--more--&gt;&lt;/p&gt;
 &lt;h1 id=&quot;starting-localstack&quot;&gt;Starting localstack&lt;/h1&gt;
@@ -749,4 +749,79 @@ aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.co
     &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;</content><author><name></name></author><summary type="html">Here is the problem statement. Print YES if the brackets in a given string are balanced, else print NO. Here is my O(N) submission to the challenge.</summary></entry></feed>
+&lt;/div&gt;</content><author><name></name></author><summary type="html">Here is the problem statement. Print YES if the brackets in a given string are balanced, else print NO. Here is my O(N) submission to the challenge.</summary></entry><entry><title type="html">Multitenant MySQL Setup</title><link href="https://lobster1234.github.io/databases/2016/11/03/multitenant-mysql.html" rel="alternate" type="text/html" title="Multitenant MySQL Setup" /><published>2016-11-03T10:05:22-07:00</published><updated>2016-11-03T10:05:22-07:00</updated><id>https://lobster1234.github.io/databases/2016/11/03/multitenant-mysql</id><content type="html" xml:base="https://lobster1234.github.io/databases/2016/11/03/multitenant-mysql.html">&lt;p&gt;It is much easier to make API/code multi-tenant, but it is a different story for databases. This problem exists at pretty much all SaaS based solutions, intending to provide data and service level isolation for many users/customers while trying to keep the code + database scalable. However, here are a few strategies that can be employed, based on the pros/cons and the freedom/constraints driving the solution.&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h2 id=&quot;use-a-tenant_id-for-each-record&quot;&gt;Use a tenant_id for each record&lt;/h2&gt;
+
+&lt;h4 id=&quot;how&quot;&gt;How&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;Single database running on single instance&lt;/li&gt;
+  &lt;li&gt;Every record has a &lt;code class=&quot;highlighter-rouge&quot;&gt;tenant_id&lt;/code&gt; as a part of the composite primary key.&lt;/li&gt;
+  &lt;li&gt;Application will need to provide this &lt;code class=&quot;highlighter-rouge&quot;&gt;tenant_id&lt;/code&gt; for every query as a part of the where clause&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;pros&quot;&gt;Pros&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;One database, one instance&lt;/li&gt;
+  &lt;li&gt;Relatively easy to run cross-tenant queries&lt;/li&gt;
+  &lt;li&gt;Relatively easier to manage and apply schema updates&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;cons&quot;&gt;Cons&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;No db level isolation of tenant data&lt;/li&gt;
+  &lt;li&gt;No option to support schema changes specific to a tenant&lt;/li&gt;
+  &lt;li&gt;Imbalance of tenants can adversely affect the DB performance, creating hotspots&lt;/li&gt;
+  &lt;li&gt;The sheer size and operation frequency increases the chances of db file corruption&lt;/li&gt;
+  &lt;li&gt;Will hit the file system size limits&lt;/li&gt;
+  &lt;li&gt;Trust the developer to provide the additional where condition&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;put-every-tenant-in-a-separate-db-same-instance&quot;&gt;Put every tenant in a separate db, same instance&lt;/h2&gt;
+
+&lt;h4 id=&quot;how-1&quot;&gt;How&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;Every tenant gets his schema, but runs under the same physical database server&lt;/li&gt;
+  &lt;li&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;tenant_id&lt;/code&gt; becomes the db name, so the queries do not change, but the connection string changes.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;pros-1&quot;&gt;Pros&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;Managable dataset size per tenant&lt;/li&gt;
+  &lt;li&gt;Better control of any schema changes specific to a tenant, if needed.&lt;/li&gt;
+  &lt;li&gt;DB level isolation of tenant data&lt;/li&gt;
+  &lt;li&gt;Easier to roll out tenant specific code release as other tenants wont be affected by schema changes if the app servers are deployed separately per tenant.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;cons-1&quot;&gt;Cons&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;Will need to apply schema changes to all such DBs, making coordination of code changes harder if dedicated app servers talk to the db.&lt;/li&gt;
+  &lt;li&gt;Will hit the system file size limits, as it is still 1 physical file&lt;/li&gt;
+  &lt;li&gt;The fact that there is only 1 physical file, there could be IO contention just like 1 db per instance&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;put-every-tenant-in-its-own-instance&quot;&gt;Put every tenant in its own instance&lt;/h2&gt;
+
+&lt;h4 id=&quot;how-2&quot;&gt;How&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;Every tenant gets a provisioned hardware mysql instance&lt;/li&gt;
+  &lt;li&gt;The code will need to use separate connection strings, no impact to SQL&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;pros-2&quot;&gt;Pros&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;Complete physical isolation of tenant data&lt;/li&gt;
+  &lt;li&gt;Control of the DB instance size based on the load exerted by the tenant&lt;/li&gt;
+  &lt;li&gt;Predictable Disk IO performance, due to isolation of data usage patterns&lt;/li&gt;
+  &lt;li&gt;Can have customized DB schema changes to a tenant&lt;/li&gt;
+  &lt;li&gt;Easier to roll out tenant specific code release (if dedicated app servers talk to a specific db)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;cons-2&quot;&gt;Cons&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;Each tenant DB instance is $$&lt;/li&gt;
+  &lt;li&gt;The cost quickly adds up with secondaries (standby) and read replicas if needed&lt;/li&gt;
+  &lt;li&gt;Same challenge with DB schema updates across all tenants&lt;/li&gt;
+&lt;/ul&gt;</content><author><name></name></author><summary type="html">It is much easier to make API/code multi-tenant, but it is a different story for databases. This problem exists at pretty much all SaaS based solutions, intending to provide data and service level isolation for many users/customers while trying to keep the code + database scalable. However, here are a few strategies that can be employed, based on the pros/cons and the freedom/constraints driving the solution.</summary></entry></feed>
