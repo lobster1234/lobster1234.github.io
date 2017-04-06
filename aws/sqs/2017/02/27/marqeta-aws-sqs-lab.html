@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>AWS Training at Marqeta : SQS Lab</title>
+  <meta name="description" content="This post is the handout for the SQS Lab I ran as a part of hands-on AWS training to the Engineering + DevOps team at Marqeta.">
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="https://lobster1234.github.io/aws/sqs/2017/02/27/marqeta-aws-sqs-lab.html">
+  <link rel="alternate" type="application/rss+xml" title="My Blog" href="/feed.xml">
+  
+  
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">My Blog</a>
+
+    <nav class="site-nav">
+      <span class="menu-icon">
+        <svg viewBox="0 0 18 15" width="18px" height="15px">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </span>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About Me</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">AWS Training at Marqeta : SQS Lab</h1>
+    <p class="post-meta"><time datetime="2017-02-27T19:10:44-08:00" itemprop="datePublished">Feb 27, 2017</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>This post is the handout for the SQS Lab I ran as a part of hands-on AWS training to the Engineering + DevOps team at <a href="https://www.marqeta.com">Marqeta</a>.</p>
+
+<!--more-->
+
+<p>In this lab we will use AWS CLI to work with SQS. I’ve replaced the account ID with 111111111111.</p>
+
+<h2 id="prepare-the-cli-aws-shell">Prepare the CLI (aws-shell)</h2>
+<p>In the previous lab we configured <code class="highlighter-rouge">aws-shell</code> on our laptops with an access key, secret, and default region. However, the user only had <code class="highlighter-rouge">AmazonS3FullAccess</code> via a managed policy, and <code class="highlighter-rouge">AmazonEC2FullAccess</code> via the <code class="highlighter-rouge">developers</code> group.</p>
+
+<p>We will fire up the <code class="highlighter-rouge">aws-shell</code> and use basic SQS commands. Autocomplete feature of the shell will come in very handy as you’ll see.</p>
+
+<p>First, we will try to list the queues we have in our account.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sqs list-queues
+
+An error occurred (AccessDenied) when calling the ListQueues operation: Access to the resource https://queue.amazonaws.com/ is denied.
+aws&gt;
+</code></pre>
+</div>
+<p>Since the access key and secret we’re using is not tied to SQS policy, we go ahead and add that to the <code class="highlighter-rouge">developers</code> group. It is called <code class="highlighter-rouge">AmazonSQSFullAccess</code>.</p>
+
+<p>Once done, you should see an empty list for the same command.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sqs list-queues
+aws&gt;
+</code></pre>
+</div>
+<p>Next, lets create a queue.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sqs create-queue --queue-name my_test_queue
+{
+    "QueueUrl": "https://queue.amazonaws.com/111111111111/my_test_queue"
+}
+aws&gt;
+</code></pre>
+</div>
+<p>We can go on the console in SQS section, and see this queue being created. You will notice that the Queue URL on the console is a bit richer, with region in there as well.</p>
+
+<p><code class="highlighter-rouge">	https://sqs.us-east-1.amazonaws.com/111111111111/my_test_queue
+</code>
+Now that we’ve created a queue, we will go ahead and send a message to it. As you do this, you will notice that <code class="highlighter-rouge">aws-shell</code> will autocomplete the queue-url for us.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sqs send-message --queue-url https://queue.amazonaws.com/111111111111/my_test_queue --message-body "Hello!"
+{
+    "MD5OfMessageBody": "952d2c56d0485958336747bcdd98590d",
+    "MessageId": "31e40b96-c61c-4b6a-8682-67ebb7badc36"
+}
+aws&gt;
+</code></pre>
+</div>
+<p>The max message size is 256KB, with a default visibility timeout of 30 seconds. This means whoever consumes this message has 30 seconds to process it, otherwise it will become available to other consumers for processing, i.e. back in the queue. Lets give that a try.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sqs receive-message --queue-url https://queue.amazonaws.com/111111111111/my_test_queue
+{
+    "Messages": [
+        {
+            "Body": "Hello!",
+            "ReceiptHandle": "AQEBD9ziSgXsnzTdBNzjNDksLpLU/ASfSdxdeFT1MkzCezLdnKL9HljPpsRaz97eSdjRCm27c3/iNcaITv2PEFgpNs62zezc4jpzWh3ysPYVwVgBjqbhobVQiF8JBRxuHSfqgQ8qSsgF2QOpU2Bn6qE/wC/LSqwxNqd/aQRab5EUA9zgqHx9L15FIlbmdGrz8Qz6ebPyFi4Lr5gb+S79t+wN9s0yE9+kEQvKjeweF0OHRyGeBWybwEFVlc3qPeo0QT9WLdkQ68PKBCY8s7djSJoD7npv9j2YeFS4+EcNzJ9ql5x2wpzcLOF672exXivigcjGMUdP9JT32Xju61ixWYnIDgd7KXWo12f+VgSc7/s143kZGPNwpkicvoNRlmzx/urI",
+            "MD5OfBody": "952d2c56d0485958336747bcdd98590d",
+            "MessageId": "31e40b96-c61c-4b6a-8682-67ebb7badc36"
+        }
+    ]
+}
+aws&gt;
+</code></pre>
+</div>
+<p>We immediately fire the same command, and notice nothing comes back.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sqs receive-message --queue-url https://queue.amazonaws.com/111111111111/my_test_queue
+aws&gt;
+</code></pre>
+</div>
+<p>This is due to the visibility timeout of 30 seconds. Lets wait 30 seconds, and you’ll see the same message comes back on the queue.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sqs receive-message --queue-url https://queue.amazonaws.com/111111111111/my_test_queue
+{
+    "Messages": [
+        {
+            "Body": "Hello!",
+            "ReceiptHandle": "AQEBU5MiEmzKdpwJ705Ehe6brf5fmkx0sa+m2ibZxbVsmdsKiHX+RyDu4s+T2yBNP9MS7NjSmEA9l/dLgwn55cN6qDCTCxxOrvVEp1MVMqximPCjzFgkmYTYR5w32TBqamDxKqadAGPUgjLyLlvD/M5tc+MuyvrFL2WaWovK7cpMRk5VGlW+pSaC+TNfhtt2QeLpNW4GUnLxtAu96BrY54ll3jelHtt3jnuAqNOaJ6nzDwKvfonyrpdd4sVS+cKPo4LzS47kJyX8p/gZdi/7cY5Oty+1RhfEkfmkEUKm2Eg4DK8Rm+E9jyUjYK+VmxWc/0JAeKwGRkIuZEuYW1kWav7y3/PkJNaXHJvVQtyLDQiSy8zf8wrjyoyGknaonmUIHtyP",
+            "MD5OfBody": "952d2c56d0485958336747bcdd98590d",
+            "MessageId": "31e40b96-c61c-4b6a-8682-67ebb7badc36"
+        }
+    ]
+}
+aws&gt;
+</code></pre>
+</div>
+<p>This is where the application developers have to pick a right visibility timeout, which should allow the consumer enough time to process the message and delete it from the queue, so multiple processing does not occur. Let us delete the message after processing (reading) it.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sqs delete-message --queue-url https://queue.amazonaws.com/111111111111/my_test_queue --receipt-handle "AQEBHh4KsuIv0QABOD49rbmmu6V0r0I34ENhrQqT5me0pPMfM2KOBWX+NvqPVV8eaB3T7zujcJj0qgQlvvqbzgCMKeKYSlExbVgLs6tFHKZgR6wUVH/X6RhN579u4LHFo3SBu9IExDpz226sEoVAn0MOhOlvArU72xJQm+pNPwRjEicQxu6MQPakfiq8yHGICYSUPyBhz+/OwxLx4iDe8exWY2Esvz2zt1q7kD/u2PqzPXiL0uIBsW18tyslMfftGSEV3cB19HFJEHNJ9olZtstNMrX1MAGJZqDHxS1rllSCrNCiqD4264Ou/eyf7duPwhvNT97mmUS0NbCuhTX5P3Kt4BytNFwKY3Qu13vkgb1rciO/1NNifwNbJ+gjOI7xS246"
+aws&gt;
+</code></pre>
+</div>
+<p>Notice that we need to provide the <code class="highlighter-rouge">receipt-handle</code> that we got after receiving the message in order to delete it.</p>
+
+<p>Next we can go on the console and look at cloudwatch monitoring. We will also create an alarm to notify us if a message has not been picked up for N minutes. This is something that can alert us of dead consumers, or an issue with processing the messages.</p>
+
+<h2 id="more-on-visibility-timeout">More on visibility timeout</h2>
+
+<p>In order to change visibility timeout, which can be done when the consumer does not want the message to go back in the queue, like it wants to retry processing the message itself instead of passing it on to another consumer, it can be done by providing the <code class="highlighter-rouge">queue-url</code> and the <code class="highlighter-rouge">receipt-handle</code> like so - note that <code class="highlighter-rouge">visibility-timeout</code> is specified in seconds.</p>
+
+<p>Lets push a message, consume it, and then increase the <code class="highlighter-rouge">visibility-timeout</code> to 2 minutes (120 seconds).</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sqs send-message --queue-url https://queue.amazonaws.com/111111111111/my_test_queue --message-body "Gonna take long"
+{
+    "MD5OfMessageBody": "de80b2f443dc0a15382a40a625b74d3a",
+    "MessageId": "8efcd759-eb0f-48a3-92fe-5b83e0dd8740"
+}
+aws&gt; sqs receive-message --queue-url https://queue.amazonaws.com/111111111111/my_test_queue
+{
+    "Messages": [
+        {
+            "Body": "Gonna take long",
+            "ReceiptHandle": "AQEBYkUuIUjSEnzSI7ymjk/oRB0K9osJ2Nyud1+pij4nVAJ8taZ+FHq1kvWIm4LGrjZEVveMPOjsxP/nmmaUCEXAZKYQHATnQDT2Hqt+NJiMQG+EFd6HBTXtT5gH29UN/ieAOGHAV6zWR2IJH+h4eRA8U7tgciatz5P/KGrHgH1qmxe9EoSkXOulikG82cs22gymNBeqNe+TZiNgwH6Kfd6CwTcCh8oowk1YXMqXaVCBso1n1R7JtMkDWd4R1CnEVCtTt1ZCfbVgHrKADPFkuwUYIp0lEXXYeDD5GqvJBaR3+INFW2t7qEMb0uzPr1s9n42W2uMEC7u45dqYss9mWlNhrI7+YG6IxCL0jx7VxIIrkOj1ihsHgwj+bxMCH7Eiu+87",
+            "MD5OfBody": "de80b2f443dc0a15382a40a625b74d3a",
+            "MessageId": "8efcd759-eb0f-48a3-92fe-5b83e0dd8740"
+        }
+    ]
+}
+
+aws&gt; sqs change-message-visibility --queue-url https://queue.amazonaws.com/111111111111/my_test_queue --receipt-handle "AQEBYkUuIUjSEnzSI7ymjk/oRB0K9osJ2Nyud1+pij4nVAJ8taZ+FHq1kvWIm4LGrjZEVveMPOjsxP/nmmaUCEXAZKYQHATnQDT2Hqt+NJiMQG+EFd6HBTXtT5gH29UN/ieAOGHAV6zWR2IJH+h4eRA8U7tgciatz5P/KGrHgH1qmxe9EoSkXOulikG82cs22gymNBeqNe+TZiNgwH6Kfd6CwTcCh8oowk1YXMqXaVCBso1n1R7JtMkDWd4R1CnEVCtTt1ZCfbVgHrKADPFkuwUYIp0lEXXYeDD5GqvJBaR3+INFW2t7qEMb0uzPr1s9n42W2uMEC7u45dqYss9mWlNhrI7+YG6IxCL0jx7VxIIrkOj1ihsHgwj+bxMCH7Eiu+87" --visibility-timeout 120
+</code></pre>
+</div>
+
+<p>Now even if we try to get message after 30 seconds, this message will not show up. However, it will after 120 seconds unless we delete it. Remember that this value is absolute, which means it changes the timeout from default (30 seconds) to 120 seconds and not to 30+120 seconds.</p>
+
+  </div>
+
+  
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>
+            
+              
+            
+            </li>
+            
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://twitter.com/lobster1234"><span class="icon icon--twitter"><svg viewBox="0 0 16 16" width="16px" height="16px"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">lobster1234</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>Last Updated: Apr 6, 2017</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

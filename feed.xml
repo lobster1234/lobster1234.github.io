@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.4.3">Jekyll</generator><link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://lobster1234.github.io/" rel="alternate" type="text/html" /><updated>2017-04-06T02:05:33-07:00</updated><id>https://lobster1234.github.io/</id><title type="html">My Blog</title><subtitle>Manish Pandit's tech blog with gists and all the awesome goodies around programming, devops, architecture, and infrastructure.
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.4.3">Jekyll</generator><link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://lobster1234.github.io/" rel="alternate" type="text/html" /><updated>2017-04-06T02:29:34-07:00</updated><id>https://lobster1234.github.io/</id><title type="html">My Blog</title><subtitle>Manish Pandit's tech blog with gists and all the awesome goodies around programming, devops, architecture, and infrastructure.
 </subtitle><entry><title type="html">Using localstack with AWS Command Line</title><link href="https://lobster1234.github.io/aws/localstack/2017/04/05/working-with-localstack-command-line.html" rel="alternate" type="text/html" title="Using localstack with AWS Command Line" /><published>2017-04-05T23:44:37-07:00</published><updated>2017-04-05T23:44:37-07:00</updated><id>https://lobster1234.github.io/aws/localstack/2017/04/05/working-with-localstack-command-line</id><content type="html" xml:base="https://lobster1234.github.io/aws/localstack/2017/04/05/working-with-localstack-command-line.html">&lt;p&gt;&lt;a href=&quot;https://github.com/atlassian/localstack&quot;&gt;Localstack&lt;/a&gt; is a really useful project by Atlassian, which allows for local development using the AWS cloud stack. In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against.In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against. This post is a quick and handy gist of using AWS command line to work with localstack.
 &lt;!--more--&gt;&lt;/p&gt;
 &lt;h1 id=&quot;starting-localstack&quot;&gt;Starting localstack&lt;/h1&gt;
@@ -469,7 +469,130 @@ Duration (avg.): 276.55ms
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;p&gt;Now that we have successfully deployed and tested the templated service, we are now ready to dive deeper into the actual code, configuration, and constructs of serverless framework. That will be Part-2 of this tutorial.&lt;/p&gt;</content><author><name></name></author><summary type="html">Serverless is a node.js based framework that makes creating, deploying, and managing serverless functions a breeze. We will use AWS as our FaaS (Function-as-a-Service) provider, although Serverless supports IBM OpenWhisk and Microsoft Azure as well. In this tutorial, we will create and deploy a java-maven based AWS Lambda function. In Part-1 we will not modify any code, or even look at the generated code. We will focus on the deployment and the command line interface to manage lambda, provided out of the box by serverless framework.</summary></entry><entry><title type="html">Notes from AWS Lambda Deep Dive Webinar</title><link href="https://lobster1234.github.io/aws/serverless/lambda/2017/02/27/notes-from-aws-lambda-deep-dive-webinar.html" rel="alternate" type="text/html" title="Notes from AWS Lambda Deep Dive Webinar" /><published>2017-02-27T07:20:44-08:00</published><updated>2017-02-27T07:20:44-08:00</updated><id>https://lobster1234.github.io/aws/serverless/lambda/2017/02/27/notes-from-aws-lambda-deep-dive-webinar</id><content type="html" xml:base="https://lobster1234.github.io/aws/serverless/lambda/2017/02/27/notes-from-aws-lambda-deep-dive-webinar.html">&lt;p&gt;I’ve put together my notes from the AWS webinar, which can be seen &lt;a href=&quot;https://www.youtube.com/watch?v=dB4zJk_fqrU&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Now that we have successfully deployed and tested the templated service, we are now ready to dive deeper into the actual code, configuration, and constructs of serverless framework. That will be Part-2 of this tutorial.&lt;/p&gt;</content><author><name></name></author><summary type="html">Serverless is a node.js based framework that makes creating, deploying, and managing serverless functions a breeze. We will use AWS as our FaaS (Function-as-a-Service) provider, although Serverless supports IBM OpenWhisk and Microsoft Azure as well. In this tutorial, we will create and deploy a java-maven based AWS Lambda function. In Part-1 we will not modify any code, or even look at the generated code. We will focus on the deployment and the command line interface to manage lambda, provided out of the box by serverless framework.</summary></entry><entry><title type="html">AWS Training at Marqeta : SQS Lab</title><link href="https://lobster1234.github.io/aws/sqs/2017/02/27/marqeta-aws-sqs-lab.html" rel="alternate" type="text/html" title="AWS Training at Marqeta : SQS Lab" /><published>2017-02-27T19:10:44-08:00</published><updated>2017-02-27T19:10:44-08:00</updated><id>https://lobster1234.github.io/aws/sqs/2017/02/27/marqeta-aws-sqs-lab</id><content type="html" xml:base="https://lobster1234.github.io/aws/sqs/2017/02/27/marqeta-aws-sqs-lab.html">&lt;p&gt;This post is the handout for the SQS Lab I ran as a part of hands-on AWS training to the Engineering + DevOps team at &lt;a href=&quot;https://www.marqeta.com&quot;&gt;Marqeta&lt;/a&gt;.&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;p&gt;In this lab we will use AWS CLI to work with SQS. I’ve replaced the account ID with 111111111111.&lt;/p&gt;
+
+&lt;h2 id=&quot;prepare-the-cli-aws-shell&quot;&gt;Prepare the CLI (aws-shell)&lt;/h2&gt;
+&lt;p&gt;In the previous lab we configured &lt;code class=&quot;highlighter-rouge&quot;&gt;aws-shell&lt;/code&gt; on our laptops with an access key, secret, and default region. However, the user only had &lt;code class=&quot;highlighter-rouge&quot;&gt;AmazonS3FullAccess&lt;/code&gt; via a managed policy, and &lt;code class=&quot;highlighter-rouge&quot;&gt;AmazonEC2FullAccess&lt;/code&gt; via the &lt;code class=&quot;highlighter-rouge&quot;&gt;developers&lt;/code&gt; group.&lt;/p&gt;
+
+&lt;p&gt;We will fire up the &lt;code class=&quot;highlighter-rouge&quot;&gt;aws-shell&lt;/code&gt; and use basic SQS commands. Autocomplete feature of the shell will come in very handy as you’ll see.&lt;/p&gt;
+
+&lt;p&gt;First, we will try to list the queues we have in our account.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sqs list-queues
+
+An error occurred (AccessDenied) when calling the ListQueues operation: Access to the resource https://queue.amazonaws.com/ is denied.
+aws&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Since the access key and secret we’re using is not tied to SQS policy, we go ahead and add that to the &lt;code class=&quot;highlighter-rouge&quot;&gt;developers&lt;/code&gt; group. It is called &lt;code class=&quot;highlighter-rouge&quot;&gt;AmazonSQSFullAccess&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Once done, you should see an empty list for the same command.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sqs list-queues
+aws&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Next, lets create a queue.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sqs create-queue --queue-name my_test_queue
+{
+    &quot;QueueUrl&quot;: &quot;https://queue.amazonaws.com/111111111111/my_test_queue&quot;
+}
+aws&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;We can go on the console in SQS section, and see this queue being created. You will notice that the Queue URL on the console is a bit richer, with region in there as well.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;	https://sqs.us-east-1.amazonaws.com/111111111111/my_test_queue
+&lt;/code&gt;
+Now that we’ve created a queue, we will go ahead and send a message to it. As you do this, you will notice that &lt;code class=&quot;highlighter-rouge&quot;&gt;aws-shell&lt;/code&gt; will autocomplete the queue-url for us.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sqs send-message --queue-url https://queue.amazonaws.com/111111111111/my_test_queue --message-body &quot;Hello!&quot;
+{
+    &quot;MD5OfMessageBody&quot;: &quot;952d2c56d0485958336747bcdd98590d&quot;,
+    &quot;MessageId&quot;: &quot;31e40b96-c61c-4b6a-8682-67ebb7badc36&quot;
+}
+aws&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;The max message size is 256KB, with a default visibility timeout of 30 seconds. This means whoever consumes this message has 30 seconds to process it, otherwise it will become available to other consumers for processing, i.e. back in the queue. Lets give that a try.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sqs receive-message --queue-url https://queue.amazonaws.com/111111111111/my_test_queue
+{
+    &quot;Messages&quot;: [
+        {
+            &quot;Body&quot;: &quot;Hello!&quot;,
+            &quot;ReceiptHandle&quot;: &quot;AQEBD9ziSgXsnzTdBNzjNDksLpLU/ASfSdxdeFT1MkzCezLdnKL9HljPpsRaz97eSdjRCm27c3/iNcaITv2PEFgpNs62zezc4jpzWh3ysPYVwVgBjqbhobVQiF8JBRxuHSfqgQ8qSsgF2QOpU2Bn6qE/wC/LSqwxNqd/aQRab5EUA9zgqHx9L15FIlbmdGrz8Qz6ebPyFi4Lr5gb+S79t+wN9s0yE9+kEQvKjeweF0OHRyGeBWybwEFVlc3qPeo0QT9WLdkQ68PKBCY8s7djSJoD7npv9j2YeFS4+EcNzJ9ql5x2wpzcLOF672exXivigcjGMUdP9JT32Xju61ixWYnIDgd7KXWo12f+VgSc7/s143kZGPNwpkicvoNRlmzx/urI&quot;,
+            &quot;MD5OfBody&quot;: &quot;952d2c56d0485958336747bcdd98590d&quot;,
+            &quot;MessageId&quot;: &quot;31e40b96-c61c-4b6a-8682-67ebb7badc36&quot;
+        }
+    ]
+}
+aws&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;We immediately fire the same command, and notice nothing comes back.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sqs receive-message --queue-url https://queue.amazonaws.com/111111111111/my_test_queue
+aws&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;This is due to the visibility timeout of 30 seconds. Lets wait 30 seconds, and you’ll see the same message comes back on the queue.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sqs receive-message --queue-url https://queue.amazonaws.com/111111111111/my_test_queue
+{
+    &quot;Messages&quot;: [
+        {
+            &quot;Body&quot;: &quot;Hello!&quot;,
+            &quot;ReceiptHandle&quot;: &quot;AQEBU5MiEmzKdpwJ705Ehe6brf5fmkx0sa+m2ibZxbVsmdsKiHX+RyDu4s+T2yBNP9MS7NjSmEA9l/dLgwn55cN6qDCTCxxOrvVEp1MVMqximPCjzFgkmYTYR5w32TBqamDxKqadAGPUgjLyLlvD/M5tc+MuyvrFL2WaWovK7cpMRk5VGlW+pSaC+TNfhtt2QeLpNW4GUnLxtAu96BrY54ll3jelHtt3jnuAqNOaJ6nzDwKvfonyrpdd4sVS+cKPo4LzS47kJyX8p/gZdi/7cY5Oty+1RhfEkfmkEUKm2Eg4DK8Rm+E9jyUjYK+VmxWc/0JAeKwGRkIuZEuYW1kWav7y3/PkJNaXHJvVQtyLDQiSy8zf8wrjyoyGknaonmUIHtyP&quot;,
+            &quot;MD5OfBody&quot;: &quot;952d2c56d0485958336747bcdd98590d&quot;,
+            &quot;MessageId&quot;: &quot;31e40b96-c61c-4b6a-8682-67ebb7badc36&quot;
+        }
+    ]
+}
+aws&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;This is where the application developers have to pick a right visibility timeout, which should allow the consumer enough time to process the message and delete it from the queue, so multiple processing does not occur. Let us delete the message after processing (reading) it.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sqs delete-message --queue-url https://queue.amazonaws.com/111111111111/my_test_queue --receipt-handle &quot;AQEBHh4KsuIv0QABOD49rbmmu6V0r0I34ENhrQqT5me0pPMfM2KOBWX+NvqPVV8eaB3T7zujcJj0qgQlvvqbzgCMKeKYSlExbVgLs6tFHKZgR6wUVH/X6RhN579u4LHFo3SBu9IExDpz226sEoVAn0MOhOlvArU72xJQm+pNPwRjEicQxu6MQPakfiq8yHGICYSUPyBhz+/OwxLx4iDe8exWY2Esvz2zt1q7kD/u2PqzPXiL0uIBsW18tyslMfftGSEV3cB19HFJEHNJ9olZtstNMrX1MAGJZqDHxS1rllSCrNCiqD4264Ou/eyf7duPwhvNT97mmUS0NbCuhTX5P3Kt4BytNFwKY3Qu13vkgb1rciO/1NNifwNbJ+gjOI7xS246&quot;
+aws&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Notice that we need to provide the &lt;code class=&quot;highlighter-rouge&quot;&gt;receipt-handle&lt;/code&gt; that we got after receiving the message in order to delete it.&lt;/p&gt;
+
+&lt;p&gt;Next we can go on the console and look at cloudwatch monitoring. We will also create an alarm to notify us if a message has not been picked up for N minutes. This is something that can alert us of dead consumers, or an issue with processing the messages.&lt;/p&gt;
+
+&lt;h2 id=&quot;more-on-visibility-timeout&quot;&gt;More on visibility timeout&lt;/h2&gt;
+
+&lt;p&gt;In order to change visibility timeout, which can be done when the consumer does not want the message to go back in the queue, like it wants to retry processing the message itself instead of passing it on to another consumer, it can be done by providing the &lt;code class=&quot;highlighter-rouge&quot;&gt;queue-url&lt;/code&gt; and the &lt;code class=&quot;highlighter-rouge&quot;&gt;receipt-handle&lt;/code&gt; like so - note that &lt;code class=&quot;highlighter-rouge&quot;&gt;visibility-timeout&lt;/code&gt; is specified in seconds.&lt;/p&gt;
+
+&lt;p&gt;Lets push a message, consume it, and then increase the &lt;code class=&quot;highlighter-rouge&quot;&gt;visibility-timeout&lt;/code&gt; to 2 minutes (120 seconds).&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sqs send-message --queue-url https://queue.amazonaws.com/111111111111/my_test_queue --message-body &quot;Gonna take long&quot;
+{
+    &quot;MD5OfMessageBody&quot;: &quot;de80b2f443dc0a15382a40a625b74d3a&quot;,
+    &quot;MessageId&quot;: &quot;8efcd759-eb0f-48a3-92fe-5b83e0dd8740&quot;
+}
+aws&amp;gt; sqs receive-message --queue-url https://queue.amazonaws.com/111111111111/my_test_queue
+{
+    &quot;Messages&quot;: [
+        {
+            &quot;Body&quot;: &quot;Gonna take long&quot;,
+            &quot;ReceiptHandle&quot;: &quot;AQEBYkUuIUjSEnzSI7ymjk/oRB0K9osJ2Nyud1+pij4nVAJ8taZ+FHq1kvWIm4LGrjZEVveMPOjsxP/nmmaUCEXAZKYQHATnQDT2Hqt+NJiMQG+EFd6HBTXtT5gH29UN/ieAOGHAV6zWR2IJH+h4eRA8U7tgciatz5P/KGrHgH1qmxe9EoSkXOulikG82cs22gymNBeqNe+TZiNgwH6Kfd6CwTcCh8oowk1YXMqXaVCBso1n1R7JtMkDWd4R1CnEVCtTt1ZCfbVgHrKADPFkuwUYIp0lEXXYeDD5GqvJBaR3+INFW2t7qEMb0uzPr1s9n42W2uMEC7u45dqYss9mWlNhrI7+YG6IxCL0jx7VxIIrkOj1ihsHgwj+bxMCH7Eiu+87&quot;,
+            &quot;MD5OfBody&quot;: &quot;de80b2f443dc0a15382a40a625b74d3a&quot;,
+            &quot;MessageId&quot;: &quot;8efcd759-eb0f-48a3-92fe-5b83e0dd8740&quot;
+        }
+    ]
+}
+
+aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.com/111111111111/my_test_queue --receipt-handle &quot;AQEBYkUuIUjSEnzSI7ymjk/oRB0K9osJ2Nyud1+pij4nVAJ8taZ+FHq1kvWIm4LGrjZEVveMPOjsxP/nmmaUCEXAZKYQHATnQDT2Hqt+NJiMQG+EFd6HBTXtT5gH29UN/ieAOGHAV6zWR2IJH+h4eRA8U7tgciatz5P/KGrHgH1qmxe9EoSkXOulikG82cs22gymNBeqNe+TZiNgwH6Kfd6CwTcCh8oowk1YXMqXaVCBso1n1R7JtMkDWd4R1CnEVCtTt1ZCfbVgHrKADPFkuwUYIp0lEXXYeDD5GqvJBaR3+INFW2t7qEMb0uzPr1s9n42W2uMEC7u45dqYss9mWlNhrI7+YG6IxCL0jx7VxIIrkOj1ihsHgwj+bxMCH7Eiu+87&quot; --visibility-timeout 120
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Now even if we try to get message after 30 seconds, this message will not show up. However, it will after 120 seconds unless we delete it. Remember that this value is absolute, which means it changes the timeout from default (30 seconds) to 120 seconds and not to 30+120 seconds.&lt;/p&gt;</content><author><name></name></author><summary type="html">This post is the handout for the SQS Lab I ran as a part of hands-on AWS training to the Engineering + DevOps team at Marqeta.</summary></entry><entry><title type="html">Notes from AWS Lambda Deep Dive Webinar</title><link href="https://lobster1234.github.io/aws/serverless/lambda/2017/02/27/notes-from-aws-lambda-deep-dive-webinar.html" rel="alternate" type="text/html" title="Notes from AWS Lambda Deep Dive Webinar" /><published>2017-02-27T07:20:44-08:00</published><updated>2017-02-27T07:20:44-08:00</updated><id>https://lobster1234.github.io/aws/serverless/lambda/2017/02/27/notes-from-aws-lambda-deep-dive-webinar</id><content type="html" xml:base="https://lobster1234.github.io/aws/serverless/lambda/2017/02/27/notes-from-aws-lambda-deep-dive-webinar.html">&lt;p&gt;I’ve put together my notes from the AWS webinar, which can be seen &lt;a href=&quot;https://www.youtube.com/watch?v=dB4zJk_fqrU&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;Lambda is the key enabler and a core AWS component for serverless computing. Lets you run the code you want, without worrying about the underlying infrastructure and provisioning. It is also cost efficient, as there are no instances that are in running state but idle. Lambda handles scaling up and scaling down as needed, transparently to the customer.&lt;/p&gt;
 
