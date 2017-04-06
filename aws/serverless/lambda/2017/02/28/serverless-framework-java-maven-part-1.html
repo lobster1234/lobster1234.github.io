@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>AWS Lambda with Serverless Framework and Java/Maven - Part 1</title>
+  <meta name="description" content="Serverless is a node.js based framework that makes creating, deploying, and managing serverless functions a breeze. We will use AWS as our FaaS (Function-as-...">
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="https://lobster1234.github.io/aws/serverless/lambda/2017/02/28/serverless-framework-java-maven-part-1.html">
+  <link rel="alternate" type="application/rss+xml" title="My Blog" href="/feed.xml">
+  
+  
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">My Blog</a>
+
+    <nav class="site-nav">
+      <span class="menu-icon">
+        <svg viewBox="0 0 18 15" width="18px" height="15px">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </span>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About Me</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">AWS Lambda with Serverless Framework and Java/Maven - Part 1</h1>
+    <p class="post-meta"><time datetime="2017-02-28T22:15:37-08:00" itemprop="datePublished">Feb 28, 2017</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p><a href="https://serverless.com">Serverless</a> is a node.js based framework that makes creating, deploying, and managing serverless functions a breeze. We will use AWS as our FaaS (Function-as-a-Service) provider, although Serverless supports IBM OpenWhisk and Microsoft Azure as well.</p>
+
+<p>In this tutorial, we will create and deploy a java-maven based AWS Lambda function. In Part-1 we will not modify any code, or even look at the generated code. We will focus on the deployment and the command line interface to manage lambda, provided out of the box by serverless framework.</p>
+
+<!--more-->
+
+<h3 id="pre-requisites">Pre-requisites</h3>
+<p>Here is what the setup on my Mac looks like (Sierra)</p>
+<ul>
+  <li><code class="highlighter-rouge">brew</code> (1.1.10) - you will need this if you do not have node/npm installed already.</li>
+  <li><code class="highlighter-rouge">node</code> (v7.6.0)</li>
+  <li><code class="highlighter-rouge">npm</code> (4.1.2)</li>
+  <li><code class="highlighter-rouge">Apache Maven</code> (3.2.5)</li>
+  <li><code class="highlighter-rouge">Oracle JDK</code> (1.8.0_121)</li>
+</ul>
+
+<h3 id="install-serverless">Install Serverless</h3>
+<p>If you do not have <code class="highlighter-rouge">node</code> installed, use <code class="highlighter-rouge">brew install node</code> to install <code class="highlighter-rouge">node</code> and <code class="highlighter-rouge">npm</code>.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>Manishs-MacBook-Pro:~ mpandit$ npm install serverless -g
+/usr/local/bin/serverless -&gt; /usr/local/lib/node_modules/serverless/bin/serverless
+/usr/local/bin/slss -&gt; /usr/local/lib/node_modules/serverless/bin/serverless
+/usr/local/bin/sls -&gt; /usr/local/lib/node_modules/serverless/bin/serverless
+
+&gt; serverless@1.7.0 postinstall /usr/local/lib/node_modules/serverless
+&gt; node ./scripts/postinstall.js
+</code></pre>
+</div>
+<h3 id="configure-serverless-for-aws">Configure Serverless for AWS</h3>
+<p>Serverless needs to use AWS credentials for an IAM user. I recommend creating a user with no access, and we can add permissions as we go.</p>
+
+<p>We create a <em>programmatic-access-only</em> user called <code class="highlighter-rouge">serverless</code>, and added it to a new group called <code class="highlighter-rouge">Serverless</code>. The group should have no permissions associated with it.</p>
+
+<p>Next, copy paste the AWS credentials of this user in the command below.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>Manishs-MacBook-Pro:serverless-java mpandit$ serverless config credentials --provider aws --key &lt;key&gt; --secret &lt;secret&gt;
+
+Serverless: Setting up AWS...
+Serverless: Saving your AWS profile in "~/.aws/credentials"...
+Serverless: Success! Your AWS access keys were stored under the "default" profile.
+</code></pre>
+</div>
+<p>Serverless uses <code class="highlighter-rouge">us-east-1</code> region by default, which can be overriden by providing the <code class="highlighter-rouge">--region</code> parameter.</p>
+
+<h3 id="create-the-java-project">Create the Java project</h3>
+<div class="highlighter-rouge"><pre class="highlight"><code>Manishs-MacBook-Pro:~ mpandit$ cd ~/work
+Manishs-MacBook-Pro:work mpandit$ mkdir serverless-java
+Manishs-MacBook-Pro:work mpandit$ cd serverless-java
+Manishs-MacBook-Pro:serverless-java mpandit$ serverless create --template aws-java-maven
+
+Serverless: Generating boilerplate...
+ _______                             __
+|   _   .-----.----.--.--.-----.----|  .-----.-----.-----.
+|   |___|  -__|   _|  |  |  -__|   _|  |  -__|__ --|__ --|
+|____   |_____|__|  \___/|_____|__| |__|_____|_____|_____|
+|   |   |             The Serverless Application Framework
+|       |                           serverless.com, v1.7.0
+ -------'
+
+Serverless: Successfully generated boilerplate for template: "aws-java-maven"
+Serverless: NOTE: Please update the "service" property in serverless.yml with your service name
+</code></pre>
+</div>
+<h3 id="set-up-iam-policies">Set up IAM Policies</h3>
+<p>If you run <code class="highlighter-rouge">serverless info</code>, it will report an error as our user does not really have any permissions.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>Manishs-MacBook-Pro:serverless-java mpandit$ serverless info
+
+  Serverless Error ---------------------------------------
+
+     User: arn:aws:iam::123456789209:user/serverless is not
+     authorized to perform: cloudformation:DescribeStacks
+     on resource: arn:aws:cloudformation:us-east-1:123456789209:stack/aws-java-maven-dev/*
+
+  Get Support --------------------------------------------
+     Docs:          docs.serverless.com
+     Bugs:          github.com/serverless/serverless/issues
+
+  Your Environment Information -----------------------------
+     OS:                 darwin
+     Node Version:       7.6.0
+     Serverless Version: 1.7.0
+
+</code></pre>
+</div>
+<p>Lets add CloudFormation policy to this user. We will do this via adding the permission to the associated group.</p>
+
+<p>You will notice that there is no such thing as <code class="highlighter-rouge">AmazonCloudFormationFullAccess</code>. Hence, we will need to create a custom policy.</p>
+
+<p>Click the Group name on the IAM console, and click the Permissions tab. Expand Inline Policies, and click the link that allows creation of an inline policy.</p>
+
+<p>In the page that opens up, select Policy Generator and proceed and make these selections -</p>
+
+<ul>
+  <li>Effect : Allow</li>
+  <li>AWS Service: AWS CloudFormation</li>
+  <li>Actions - All Actions Selected</li>
+  <li>ARN - *</li>
+</ul>
+
+<p>Click Add Statement, and click Next Step. This will show the policy we just created. Rename it to <code class="highlighter-rouge">serverless-cloudformation-policy</code>. Click Apply.</p>
+<div class="language-json highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="w">
+    </span><span class="nt">"Version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2012-10-17"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"Statement"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="nt">"Sid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Stmt1488265872000"</span><span class="p">,</span><span class="w">
+            </span><span class="nt">"Effect"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Allow"</span><span class="p">,</span><span class="w">
+            </span><span class="nt">"Action"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+                </span><span class="s2">"cloudformation:*"</span><span class="w">
+            </span><span class="p">],</span><span class="w">
+            </span><span class="nt">"Resource"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+                </span><span class="s2">"*"</span><span class="w">
+            </span><span class="p">]</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+</div>
+<p>We will also need to give S3 access to this user, as serverless would need to upload the artifact to S3 for deployment via CloudFormation. We now add <code class="highlighter-rouge">AmazonS3FullAccess</code> to this group, and our user will inherit it. This time we will click Attach Policy under Managed Policies instead of Inline Policies.</p>
+
+<p>Another Managed Policy is for CloudWatch Logs access, so we will select <code class="highlighter-rouge">CloudWatchLogsFullAccess</code> and attach to the group.</p>
+
+<p>As a part of the deployment process, serverless would need to associate the lambda with the invocation role. In order to do that, attach <code class="highlighter-rouge">IAMFullAccess</code> policy from the Managed Policies to the group as well.</p>
+
+<p>Finally, we add <code class="highlighter-rouge">AWSLambdaFullAccess</code> to this group so the serverless framework can manage the services (lambda functions).</p>
+
+<p>To summarize, our <code class="highlighter-rouge">Serverless</code> IAM Group should have following policies -</p>
+
+<p>Managed -</p>
+<ul>
+  <li><code class="highlighter-rouge">AmazonS3FullAccess</code></li>
+  <li><code class="highlighter-rouge">CloudWatchLogsFullAccess</code></li>
+  <li><code class="highlighter-rouge">IAMFullAccess</code></li>
+  <li><code class="highlighter-rouge">AWSLambdaFullAccess</code></li>
+</ul>
+
+<p>Inline - <code class="highlighter-rouge">serverless-cloudformation-policy</code> for CloudFormation.</p>
+
+<p><strong>One thing to keep in mind is that for functions that are triggered by an event, the event source would need access to invoke the function. This is managed via function policies, which are set up when the trigger is configured. For instance, if you want the lambda to be triggered on an S3 event on a bucket, the association between the S3 bucket and the function will need to have a function policy.</strong></p>
+
+<p>Now you’ll notice that the <code class="highlighter-rouge">serverless info</code> command returns no services.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>Manishs-MacBook-Pro:serverless-java mpandit$ serverless info
+
+  Serverless Error ---------------------------------------
+
+     Stack with id aws-java-maven-dev does not exist
+
+  Get Support --------------------------------------------
+     Docs:          docs.serverless.com
+     Bugs:          github.com/serverless/serverless/issues
+
+  Your Environment Information -----------------------------
+     OS:                 darwin
+     Node Version:       7.6.0
+     Serverless Version: 1.7.0
+</code></pre>
+</div>
+
+<h3 id="deploy-the-stack">Deploy the stack</h3>
+<p>Since deployment of the stack is essentially setting up our lambda function (the template has a simple function), we need to create the artifact (jar).</p>
+
+<p>Since this is a maven project, we use maven to build the project.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>Manishs-MacBook-Pro:serverless-java mpandit$ mvn clean install
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building hello dev
+[INFO] ------------------------------------------------------------------------
+...
+...
+...
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 14.709 s
+[INFO] Finished at: 2017-02-27T23:26:00-08:00
+[INFO] Final Memory: 23M/145M
+[INFO] ------------------------------------------------------------------------
+</code></pre>
+</div>
+<p>Now that we have the artifact in <code class="highlighter-rouge">target</code> folder (<code class="highlighter-rouge">hello-dev.jar</code>), we can go ahead deploy it.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>Manishs-MacBook-Pro:serverless-java mpandit$ serverless deploy
+Serverless: Creating Stack...
+Serverless: Checking Stack create progress...
+.....
+Serverless: Stack create finished...
+Serverless: Uploading CloudFormation file to S3...
+Serverless: Uploading service .zip file to S3 (1.98 MB)...
+Serverless: Updating Stack...
+Serverless: Checking Stack update progress...
+..................
+Serverless: Stack update finished...
+Service Information
+service: aws-java-maven
+stage: dev
+region: us-east-1
+api keys:
+  None
+endpoints:
+  None
+functions:
+  aws-java-maven-dev-hello
+</code></pre>
+</div>
+<p>You can check the AWS CloudFormation section in the console to view details of the stack that has just been created.</p>
+
+<p>Now that our service is deployed, it wil show up under <code class="highlighter-rouge">serverless info</code></p>
+<div class="highlighter-rouge"><pre class="highlight"><code>Manishs-MacBook-Pro:serverless-java mpandit$ serverless info
+Service Information
+service: aws-java-maven
+stage: dev
+region: us-east-1
+api keys:
+  None
+endpoints:
+  None
+functions:
+  aws-java-maven-dev-hello
+</code></pre>
+</div>
+<p>Next, lets try to invoke it.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>Manishs-MacBook-Pro:serverless-java mpandit$ serverless invoke --function  hello
+</code></pre>
+</div>
+<div class="language-json highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="w">
+    </span><span class="nt">"statusCode"</span><span class="p">:</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"body"</span><span class="p">:</span><span class="w"> </span><span class="s2">"{\"message\":\"Go Serverless v1.x! Your function executed successfully!\",\"input\":{}}"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"headers"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nt">"X-Powered-By"</span><span class="p">:</span><span class="w"> </span><span class="s2">"AWS Lambda &amp; serverless"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nt">"isBase64Encoded"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+</div>
+
+<p>The function can also be invoked with an input. The input is essentially a Map, so we can pass it a JSON string with the <code class="highlighter-rouge">--data</code> parameter.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>Manishs-MacBook-Pro:serverless-java mpandit$ serverless invoke --function hello --data '{"key":"value"}'
+</code></pre>
+</div>
+<div class="language-json highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="w">
+    </span><span class="nt">"statusCode"</span><span class="p">:</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"body"</span><span class="p">:</span><span class="w"> </span><span class="s2">"{\"message\":\"Go Serverless v1.x! Your function executed successfully!\",\"input\":{\"key\":\"value\"}}"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"headers"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nt">"X-Powered-By"</span><span class="p">:</span><span class="w"> </span><span class="s2">"AWS Lambda &amp; serverless"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nt">"isBase64Encoded"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+</div>
+
+<p>A good idea would be to explore the CloudWatch Logs and Lambda metrics for our function from the console.</p>
+
+<p>The same can be done command line, like so -</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>Manishs-MacBook-Pro:serverless-java mpandit$ serverless logs --function hello
+START RequestId: f8390071-fd8d-11e6-9195-554889504121 Version: $LATEST
+2017-02-28 08:14:48 &lt;f8390071-fd8d-11e6-9195-554889504121&gt; INFO  com.serverless.Handler:17 - received: {}
+END RequestId: f8390071-fd8d-11e6-9195-554889504121
+REPORT RequestId: f8390071-fd8d-11e6-9195-554889504121	Duration: 445.52 ms	Billed Duration: 500 ms 	Memory Size: 1024 MB	Max Memory Used: 57 MB
+</code></pre>
+</div>
+<p>We can also look at the metrics associated with our functions (The 1 error is because I had passed a malformed JSON input).</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>Manishs-MacBook-Pro:serverless-java mpandit$ serverless metrics
+Service wide metrics
+February 27, 2017 1:59 AM - February 28, 2017 1:59 AM
+
+Invocations: 7
+Throttles: 0
+Errors: 1
+Duration (avg.): 276.55ms
+</code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>Manishs-MacBook-Pro:serverless-java mpandit$ serverless metrics --function hello
+hello
+February 27, 2017 1:59 AM - February 28, 2017 1:59 AM
+
+Invocations: 7
+Throttles: 0
+Errors: 1
+Duration (avg.): 276.55ms
+</code></pre>
+</div>
+
+<p>Now that we have successfully deployed and tested the templated service, we are now ready to dive deeper into the actual code, configuration, and constructs of serverless framework. That will be Part-2 of this tutorial.</p>
+
+  </div>
+
+  
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>
+            
+              
+            
+            </li>
+            
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://twitter.com/lobster1234"><span class="icon icon--twitter"><svg viewBox="0 0 16 16" width="16px" height="16px"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">lobster1234</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>Last Updated: Apr 6, 2017</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
