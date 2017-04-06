@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-04-06T15:30:04-07:00</updated>
+  <updated>2017-04-06T16:01:25-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -213,6 +213,8 @@ user	0m0.291s
 sys	0m0.167s
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
+
+&lt;p&gt;I have reported this issue here - &lt;a href=&quot;https://github.com/atlassian/localstack/issues/52&quot;&gt;https://github.com/atlassian/localstack/issues/52&lt;/a&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;delete-this-message&quot;&gt;Delete this message&lt;/h3&gt;
 

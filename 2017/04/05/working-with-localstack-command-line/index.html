@@ -319,6 +319,8 @@ sys	0m0.167s
 </code></pre>
 </div>
 
+<p>I have reported this issue here - <a href="https://github.com/atlassian/localstack/issues/52">https://github.com/atlassian/localstack/issues/52</a></p>
+
 <h3 id="delete-this-message">Delete this message</h3>
 
 <div class="highlighter-rouge"><pre class="highlight"><code>aws --endpoint-url=http://localhost:4576 sqs delete-message --queue-url http://localhost:4576/123456789012/test_queue --receipt-handle 'yugzzebhnnksfuvbjlibfnlejyqbulxqfegsnrgafjeabxaatxbmeiyfkfliedslohseosgjwkxhdzllpudhccjhorpkwbgjgyzeyzjwkfvqflathnvsmugeyevbqmfyqanuxetvdhcetseuwzrqpexogzggznndxmbqowtlalvqtffntdahhihel'
