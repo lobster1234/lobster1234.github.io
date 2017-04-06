@@ -1,14 +1,186 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.4.3">Jekyll</generator><link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://lobster1234.github.io/" rel="alternate" type="text/html" /><updated>2017-04-06T00:06:33-07:00</updated><id>https://lobster1234.github.io/</id><title type="html">My Blog</title><subtitle>Manish Pandit's tech blog with gists and all the awesome goodies around programming, devops, architecture, and infrastructure.
-</subtitle><entry><title type="html">Welcome to Jekyll!</title><link href="https://lobster1234.github.io/jekyll/update/2017/04/05/welcome-to-jekyll.html" rel="alternate" type="text/html" title="Welcome to Jekyll!" /><published>2017-04-05T23:44:37-07:00</published><updated>2017-04-05T23:44:37-07:00</updated><id>https://lobster1234.github.io/jekyll/update/2017/04/05/welcome-to-jekyll</id><content type="html" xml:base="https://lobster1234.github.io/jekyll/update/2017/04/05/welcome-to-jekyll.html">&lt;p&gt;You’ll find this post in your &lt;code class=&quot;highlighter-rouge&quot;&gt;_posts&lt;/code&gt; directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run &lt;code class=&quot;highlighter-rouge&quot;&gt;jekyll serve&lt;/code&gt;, which launches a web server and auto-regenerates your site when a file is updated.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.4.3">Jekyll</generator><link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://lobster1234.github.io/" rel="alternate" type="text/html" /><updated>2017-04-06T00:15:35-07:00</updated><id>https://lobster1234.github.io/</id><title type="html">My Blog</title><subtitle>Manish Pandit's tech blog with gists and all the awesome goodies around programming, devops, architecture, and infrastructure.
+</subtitle><entry><title type="html">Using localstack with AWS Command Line</title><link href="https://lobster1234.github.io/aws/localstack/2017/04/05/working-with-localstack-command-line.html" rel="alternate" type="text/html" title="Using localstack with AWS Command Line" /><published>2017-04-05T23:44:37-07:00</published><updated>2017-04-05T23:44:37-07:00</updated><id>https://lobster1234.github.io/aws/localstack/2017/04/05/working-with-localstack-command-line</id><content type="html" xml:base="https://lobster1234.github.io/aws/localstack/2017/04/05/working-with-localstack-command-line.html">&lt;p&gt;&lt;a href=&quot;https://github.com/atlassian/localstack&quot;&gt;Localstack&lt;/a&gt; is a really useful project by Atlassian, which allows for local development using the AWS cloud stack. In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against.&lt;/p&gt;
 
-&lt;p&gt;To add new posts, simply add a file in the &lt;code class=&quot;highlighter-rouge&quot;&gt;_posts&lt;/code&gt; directory that follows the convention &lt;code class=&quot;highlighter-rouge&quot;&gt;YYYY-MM-DD-name-of-post.ext&lt;/code&gt; and includes the necessary front matter. Take a look at the source for this post to get an idea about how it works.&lt;/p&gt;
+&lt;h1 id=&quot;starting-localstack&quot;&gt;Starting localstack&lt;/h1&gt;
 
-&lt;p&gt;Jekyll also offers powerful support for code snippets:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;C02STG51GTFM:localstack mpandit$ make infra
+. .venv/bin/activate; exec localstack/mock/infra.py
+Starting local dev environment. CTRL-C to quit.
+Starting local Elasticsearch (port 4571)...
+Starting mock ES service (port 4578)...
+Starting mock S3 server (port 4572)...
+Starting mock SNS server (port 4575)...
+Starting mock SQS server (port 4576)...
+Starting mock API Gateway (port 4567)...
+Starting mock DynamoDB (port 4569)...
+Starting mock DynamoDB Streams (port 4570)...
+Starting mock Firehose (port 4573)...
+Starting mock Lambda (port 4574)...
+Starting mock Kinesis (port 4568)...
+Starting mock Redshift server (port 4577)...
+Ready.
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-  &lt;span class=&quot;nb&quot;&gt;puts&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Hi, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'Tom'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;#=&amp;gt; prints 'Hi, Tom' to STDOUT.&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;p&gt;Optionally, start the web interface (make sure you pull the latest code, as there were node compatibility issues up until 3/31/2017)&lt;/p&gt;
 
-&lt;p&gt;Check out the &lt;a href=&quot;https://jekyllrb.com/docs/home&quot;&gt;Jekyll docs&lt;/a&gt; for more info on how to get the most out of Jekyll. File all bugs/feature requests at &lt;a href=&quot;https://github.com/jekyll/jekyll&quot;&gt;Jekyll’s GitHub repo&lt;/a&gt;. If you have questions, you can ask them on &lt;a href=&quot;https://talk.jekyllrb.com/&quot;&gt;Jekyll Talk&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">You’ll find this post in your _posts directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run jekyll serve, which launches a web server and auto-regenerates your site when a file is updated.</summary></entry></feed>
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;C02STG51GTFM:localstack mpandit$ make web
+(. .venv/bin/activate; bin/localstack web --port=8080)
+ * Running on http://0.0.0.0:8080/ (Press CTRL+C to quit)
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 272-228-949
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h2 id=&quot;s3&quot;&gt;S3&lt;/h2&gt;
+
+&lt;h3 id=&quot;create-a-bucket&quot;&gt;Create a bucket&lt;/h3&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4572 s3 mb s3://mytestbucket
+make_bucket: mytestbucket
+
+C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4572 s3 ls
+2006-02-03 08:45:09 mytestbucket
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;copy-a-file-over&quot;&gt;Copy a file over&lt;/h3&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4572 s3 cp /tmp/mongo.log s3://mytestbucket
+upload: ../../../../tmp/mongo.log to s3://mytestbucket/mongo.log
+
+C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4572 s3 ls s3://mytestbucket
+2017-04-05 01:18:39       4789 mongo.log
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h3 id=&quot;delete-this-file&quot;&gt;Delete this file&lt;/h3&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4572 s3 rm s3://mytestbucket/mongo.log
+delete: s3://mytestbucket/mongo.log
+
+C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4572 s3 ls s3://mytestbucket
+
+C02STG51GTFM:localstack mpandit$
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h2 id=&quot;sns&quot;&gt;SNS&lt;/h2&gt;
+
+&lt;h3 id=&quot;create-a-topic&quot;&gt;Create a topic&lt;/h3&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4575 sns list-topics
+{
+    &quot;Topics&quot;: []
+}
+
+C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4575 sns create-topic --name test-topic
+{
+    &quot;TopicArn&quot;: &quot;arn:aws:sns:us-east-1:123456789012:test-topic&quot;
+}
+C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4575 sns list-topics
+{
+    &quot;Topics&quot;: [
+        {
+            &quot;TopicArn&quot;: &quot;arn:aws:sns:us-east-1:123456789012:test-topic&quot;
+        }
+    ]
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h3 id=&quot;subscribe-to-the-topic&quot;&gt;Subscribe to the topic&lt;/h3&gt;
+
+&lt;p&gt;(use any random email)&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4575 sns subscribe --topic-arn arn:aws:sns:us-east-1:123456789012:test-topic --protocol email --notification-endpoint pibehatin@1rentcar.top
+{
+    &quot;SubscriptionArn&quot;: &quot;arn:aws:sns:us-east-1:123456789012:test-topic:5aacffbe-ccf7-40d5-be97-c55af7392935&quot;
+}
+
+C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4575 sns list-subscriptions
+{
+    &quot;Subscriptions&quot;: [
+        {
+            &quot;Owner&quot;: &quot;&quot;,
+            &quot;Endpoint&quot;: &quot;pibehatin@1rentcar.top&quot;,
+            &quot;Protocol&quot;: &quot;email&quot;,
+            &quot;TopicArn&quot;: &quot;arn:aws:sns:us-east-1:123456789012:test-topic&quot;,
+            &quot;SubscriptionArn&quot;: &quot;arn:aws:sns:us-east-1:123456789012:test-topic:5aacffbe-ccf7-40d5-be97-c55af7392935&quot;
+        }
+    ]
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h3 id=&quot;publish-to-this-topic&quot;&gt;Publish to this topic&lt;/h3&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4575 sns publish  --topic-arn arn:aws:sns:us-east-1:123456789012:test-topic --message 'Test Message!'
+{
+    &quot;MessageId&quot;: &quot;n/a&quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h2 id=&quot;sqs&quot;&gt;SQS&lt;/h2&gt;
+
+&lt;h3 id=&quot;create-a-queue&quot;&gt;Create a Queue&lt;/h3&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4576 sqs create-queue --queue-name test_queue
+{
+    &quot;QueueUrl&quot;: &quot;http://localhost:4576/123456789012/test_queue&quot;
+}
+
+C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4576 sqs list-queues
+{
+    &quot;QueueUrls&quot;: [
+        &quot;http://localhost:4576/123456789012/test_queue&quot;
+    ]
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h3 id=&quot;send-a-message-to-this-queue&quot;&gt;Send a message to this queue&lt;/h3&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;C02STG51GTFM:localstack mpandit$  aws --endpoint-url=http://localhost:4576 sqs send-message --queue-url http://localhost:4576/123456789012/test_queue --message-body 'Test Message!'
+{
+    &quot;MD5OfMessageBody&quot;: &quot;df69267381a60e476252c989db9ac8ad&quot;,
+    &quot;MessageId&quot;: &quot;a6ed436b-076a-0d8d-73e1-cc3291a19c28&quot;
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h3 id=&quot;receive-the-message-from-this-queue&quot;&gt;Receive the message from this queue&lt;/h3&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;C02STG51GTFM:localstack mpandit$  aws --endpoint-url=http://localhost:4576 sqs receive-message --queue-url http://localhost:4576/123456789012/test_queue
+{
+    &quot;Messages&quot;: [
+        {
+            &quot;Body&quot;: &quot;Test Message!&quot;,
+            &quot;Attributes&quot;: {
+                &quot;ApproximateFirstReceiveTimestamp&quot;: &quot;1.49138149959e+12&quot;,
+                &quot;SenderId&quot;: &quot;AIDAIT2UOQQY3AUEKVGXU&quot;,
+                &quot;ApproximateReceiveCount&quot;: &quot;1&quot;,
+                &quot;SentTimestamp&quot;: &quot;1.49138142195e+12&quot;
+            },
+            &quot;ReceiptHandle&quot;: &quot;xuazrzyjcgpgzpzlxlyxmujbgzfkswixjkywshturlylrfwzyccutlumitgduyzddwkaoypcmswlkxrrjghdyztfewrpmkxdufptyketrfumwzicmggogdbaucwztvorplibccpfhirmalnixvfbklzrgncpisdsiuiajqwefxueqhuygfibmgqwx&quot;,
+            &quot;MD5OfBody&quot;: &quot;df69267381a60e476252c989db9ac8ad&quot;,
+            &quot;MessageId&quot;: &quot;a6ed436b-076a-0d8d-73e1-cc3291a19c28&quot;
+        }
+    ]
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;If you do this many times, the process seems to sleep. May be to simulate the message visibility? Here are 2 consecutive runs.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;real	0m15.185s
+user	0m0.291s
+sys	0m0.158s
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;real	0m26.829s
+user	0m0.291s
+sys	0m0.167s
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;delete-this-message&quot;&gt;Delete this message&lt;/h3&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws --endpoint-url=http://localhost:4576 sqs delete-message --queue-url http://localhost:4576/123456789012/test_queue --receipt-handle 'yugzzebhnnksfuvbjlibfnlejyqbulxqfegsnrgafjeabxaatxbmeiyfkfliedslohseosgjwkxhdzllpudhccjhorpkwbgjgyzeyzjwkfvqflathnvsmugeyevbqmfyqanuxetvdhcetseuwzrqpexogzggznndxmbqowtlalvqtffntdahhihel'
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;</content><author><name></name></author><summary type="html">Localstack is a really useful project by Atlassian, which allows for local development using the AWS cloud stack. In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against.</summary></entry></feed>
