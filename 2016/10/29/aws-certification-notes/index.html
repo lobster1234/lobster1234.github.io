@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  
+  
+  <title>2016 AWS Associate Level Certification Exam Notes</title>
+  <meta name="description" content="These are my notes on EC2 and VPC for the AWS Certified Associate Level exams. I attempted the AWS Certified Solution Architect - Associate and AWS Certified Developer - Associate and scored 78% and 90% respectively. It took me about a week (3-4 hours a day) to prepare for both, after being working professionally with AWS for over 3 years.">
+  
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="https://lobster1234.github.io/2016/10/29/aws-certification-notes/">
+  
+  
+  <link rel="alternate" type="application/rss+xml" title="My Blog" href="https://lobster1234.github.io/feed.xml">
+
+  
+
+  
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="lobster1234">
+  <meta name="twitter:title" content="2016 AWS Associate Level Certification Exam Notes">
+  <meta name="twitter:description" content="These are my notes on EC2 and VPC for the AWS Certified Associate Level exams. I attempted the AWS Certified Solution Architect - Associate and AWS Certified Developer - Associate and scored 78% an...">
+  
+    <meta name="twitter:creator" content="lobster1234">
+  
+  
+
+  <script type="text/javascript">
+  WebFontConfig = {
+    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
+  };
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+  })();
+</script>
+
+  
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-96931340-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">My Blog</a>
+
+    <nav class="site-nav">
+      
+        
+        <a class="page-link" href="/about/">About</a>
+      
+        
+        <a class="page-link" href="/archives/">Archives</a>
+      
+        
+        <a class="page-link" href="https://www.twitter.com/lobster1234">Twitter</a>
+      
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    
+      <h1 class="post-title" itemprop="name headline">2016 AWS Associate Level Certification Exam Notes</h1>
+    
+    <p class="post-meta"><time datetime="2016-10-29T02:05:22-07:00" itemprop="datePublished">Oct 29, 2016</time> • 
+  
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <a href="/categories/aws/">aws</a>,
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <a href="/categories/certification/">certification</a>
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>These are my notes on EC2 and VPC for the AWS Certified Associate Level exams. I attempted the <a href="https://aws.amazon.com/certification/certified-solutions-architect-associate/">AWS Certified Solution Architect - Associate</a> and <a href="https://aws.amazon.com/certification/certified-developer-associate/">AWS Certified Developer - Associate</a> and scored 78% and 90% respectively.</p>
+
+<p>It took me about a week (3-4 hours a day) to prepare for both, after being working professionally with AWS for over 3 years.</p>
+
+<!--more-->
+
+<h2 id="ec2">EC2</h2>
+
+<ul>
+  <li>Can start an AMI to create any number of on-demand instances by using the RunInstances call. Default max is 20 per account.</li>
+  <li>If the request is good, the RunInstances call returns success with a list of DNS names, and instances begin to launch within 10 minutes.</li>
+  <li>The launch request is associated with a reservation ID. One reservation ID can map to multiple instances which are all a part of one launch request.</li>
+  <li>The status can be checked via DescribeInstances call</li>
+  <li>Can be terminated using TerminateInstances call</li>
+  <li>If a running instances uses EBS-backed root volume (boot partition), it can be stopped by StopInstances call. This preserves the data.</li>
+  <li>The same can be done via CLI or the Console instead of REST APIs</li>
+  <li>EBS based root device store will preserve data, hence it is not tied to the life of the instance. Local instance based store persistence is tied to the life of the instance. There is no “stop” option.</li>
+  <li>Local instance store is inexpensive</li>
+  <li>An AMI (Amazon Machine Image) is a package with base operating system, and optional set of applications to boot an instance.</li>
+  <li>You can create a custom AMI, but have to bundle it with either EBS backed store or Instance backed store.</li>
+  <li>For instances backed with local instance store, the instances use S3</li>
+  <li>Reserved limit is 20 for all instance types</li>
+  <li>On demand limit varies, and is 20 for all T2, M1, M3 type instances. I plan to roll the dice on these questions, so won’t bother remembering them.</li>
+  <li>Some instance types are not available in all regions.</li>
+  <li>The instances can send emails, but have a fixed amount which needs to be requested to be increased if needed.</li>
+  <li>Currently supported operating systems are RHEL, Centos, Ubuntu, Oracle Linux, Amazon Linux, Gentoo, Suse, Fedora, Debian and Windows</li>
+  <li>All the underlying hardware in EC2 uses ECC memory (Error Correcting Code memory)</li>
+  <li>All instances are billed in hourly usage units. Even if the instance is up for a minute, you get billed for a full hour.</li>
+  <li>Data transferred between AWS services in different regions is charged on both ends.</li>
+  <li>Billing starts when the boot sequence of the instance is initiated.</li>
+  <li>Billing ends when the instance terminates or stops. If it is shut down, the instance hours aren’t billed but you pay for the EBS storage that has the root device data on it.</li>
+  <li>Data transfer rates apply between instances on both ends regardless of AZ (Regional Data Transfer) or region (Internet Data Transfer). The sender gets billed for outbound, the receiver gets billed for inbound data.</li>
+  <li>Tax is extra, it is not included in the pricing</li>
+  <li>There are 5 families of instances
+    <ol>
+      <li>General Purpose - M3 and M4 with fixed performance, and T2 for burstable.</li>
+      <li>Compute Optimized - C3 and C4</li>
+      <li>Memory Optimized - R3</li>
+      <li>GPU Optimized - P2 are Nvidia Tesla parallel processing GPU Compute, and G2 provide high performance 3D graphics (GPU Graphics)</li>
+      <li>Storage Optimized - I2 are SSD based for high IO, D2 are dense (also SSD based) for data intensive operations with sequential IO</li>
+    </ol>
+  </li>
+  <li>M3 are consistent and cheaper over M1 and also support SSD based instance storage. But if you need a larger disk, use M1.</li>
+  <li>The amount of CPU allocated to an instance is measured in EC2 Compute Units. It provides the relative measure of integer processing power of an instance.</li>
+  <li>To get a history of all EC2 API calls including VPC and EBS, use CloudTrail</li>
+  <li>There are 5 Elastic IPs per region in any account by default, because ipv4 is a scare resource</li>
+  <li>If the EIP isn’t associated with any running instance, you get charged an hourly penalty for hogging a scarce resource</li>
+  <li>By default, every instance comes with a Public IP and a Private IP.</li>
+  <li>When the instance stops or terminates, the private IP is released. So you may see a diff private IP when you boot it back up. The public IP behaves the same way but it can also be replaced with an EIP.</li>
+  <li>EIP remapping can take several minutes.</li>
+  <li>You can configure the reverse DNS record for the EIP by filling a form. But a forward DNS record (record -&gt; EIP) must exist.</li>
+  <li>Each AZ is physically distinct and independent.</li>
+  <li>The same AZ can mean a diff physical location for a different account. My us-east-1a could be in New York while your us-east-1a could be in Richmond, VA.</li>
+  <li>Enhanced networking is supported via single root IO Virtualization (SR-IOV). It allows for high Packet Per Second (PPS) on the network</li>
+  <li>This is achieved via Elastic Network Adapter (ENA) available in X1 and M4.16xlarge. Others use Intel Virtual Function Interface. The Amazon Linux AMI support both drivers.</li>
+  <li>There is no additional fee for enhanced networking, but it is not available in EC2-Classic, only in EC2-VPC.</li>
+  <li>If using instance store backed instance, for durable data, use S3. Use EBS backed if you need the data to be independent of the instance’s life.</li>
+  <li>3 Types of EBS volumes - General Purpose SSD, PIOPS SSD, Magnetic.</li>
+  <li>GP SSD EBS volumes provide ratio of 3 IOPS per GB, and can burst up to 3000 IOPS.</li>
+  <li>IOPS is measured as 256kBps for SSD, 1024kBps for Magnetic.</li>
+  <li>PIOPS EBS is good for large NoSQL and RDS databases</li>
+  <li>HDD or Magnetic is cheapest and fit for infrequently accessed data.</li>
+  <li>Once instance can have many volumes but one volume can only be tied to one instance.</li>
+  <li>EBS snapshots are only accessible via EC2 APIs even though they’re stored on S3</li>
+</ul>
+
+<h2 id="softhard-limits-on-stuff">Soft/Hard Limits on stuff</h2>
+<ul>
+  <li>5 VPCs per region</li>
+  <li>50 peering connections per VPC</li>
+  <li>Gateway Cached Volumes 32TB</li>
+  <li>Gateway Store Volumes  16TB</li>
+  <li>Gateway Cached Volumes Cache Size 16TB</li>
+  <li>5 EIPs per region</li>
+  <li>500 security groups per instance</li>
+  <li>200 subnets per VPC</li>
+  <li>5 internet gateways per region</li>
+  <li>50 customer gateways per region</li>
+  <li>5 Virtual Private Gateways per region</li>
+  <li>50 VPN connections per region</li>
+  <li>50 VPN peering connections per VPC</li>
+  <li>200 Route Tables per VPC</li>
+  <li>500 security groups per VPC</li>
+  <li>5 security groups per network interface</li>
+  <li>200 NACLs per VPC (same as subnets)</li>
+  <li>500 Hosted Zones in Route 53</li>
+  <li>50 Domains in Route 53</li>
+  <li>100 TB Total RDS storage</li>
+  <li>5000 IAM users per account</li>
+  <li>250 IAM Roles</li>
+  <li>100 IAM Groups</li>
+  <li>100 Instance Profiles</li>
+  <li>20 Load Balancers per region</li>
+  <li>10 listeners per load balancer</li>
+  <li>5 security groups per load balancer</li>
+  <li>1 route table per subnet</li>
+  <li>Multiple subnets per route table</li>
+  <li>1 subnet per AZ</li>
+  <li>Max VPC size is /16</li>
+  <li>Min VPC size is /28</li>
+  <li>5 IP addresses are always reserved in any subnet (251 for /24, 4091 for /20..)</li>
+  <li>6 replicas for AuroraDB in 3 AZs</li>
+  <li>100 S3 buckets per account (not region!)</li>
+  <li>5 TB max object size</li>
+  <li>5 GB max upload size per PUT operation</li>
+  <li>100 launch configurations</li>
+  <li>20 Auto Scaling Groups</li>
+  <li>200 Cloud Formation Stacks</li>
+  <li>200 Cloudfront Web distributions</li>
+  <li>100 Cloudfront RTMP distributions</li>
+  <li>25 origins per distribution</li>
+  <li>20 on-demand instances per region</li>
+  <li>5000 EBS volumes</li>
+  <li>10000 EBS Snapshots</li>
+</ul>
+
+<h2 id="creating-a-custom-vpc">Creating a custom VPC</h2>
+<ul>
+  <li>Use 10.0.0.0/16 CIDR, most commonly used</li>
+  <li>This creates a default route table allowing all traffic within this VPC to flow through (Destination 10.0.0.0/16 local</li>
+  <li>This creates a default NACL which allows all inbound and outbound traffic</li>
+  <li>If you create a new NACL, it is set to deny all inbound and outbound traffic</li>
+  <li>Create an IGW if you are going to build a public subnet.</li>
+  <li>Attach to your custom VPC</li>
+  <li>DO NOT Add a route in the VPC’s route table to direct internet bound traffic to this IGW (0.0.0.0/0 -&gt; IGW)</li>
+  <li>Create a new route table, call it public route. It will allow all traffic within the VPC.</li>
+  <li>Add a route in this route table (0.0.0.0/0 -&gt; IGW)</li>
+  <li>Next, we add 2 subnets, 1 public 1 private</li>
+  <li>Pick /24 CIDR block allowing for 251 IPs each</li>
+  <li>Public is 10.0.1.0/24 named as 10.0.1.0-public-us-east-1a</li>
+  <li>Private is 10.0.2.0/24 named as 10.0.2.0-private-us-east-1a</li>
+  <li>Note that both these subnets are associated with the default VPC NACL</li>
+  <li>Note that both these subnets are associated with the default route table</li>
+  <li>Now we change the route table of our public subnet to use the public route table</li>
+  <li>Go to route tables, pick the public route, look for subnet associations. Click edit and attach our public subnet with this route table</li>
+  <li>Next, we launch an instance in the public subnet, and make sure we can connect to it</li>
+  <li>While launching it, create a new security group called MyWebSG, allow 80 and 22 from 0.0.0.0/0 for now</li>
+  <li>Note the public IP and use it to ssh into this instance</li>
+  <li>Run yum update and you’ll see it goes through (internet connectivity outbound)</li>
+  <li>Launch an instance in private subnet this time. This is connected to a route which does not have internet connectivity.</li>
+  <li>While doing this, create a new security group, call it MyBackendSG allowing 8080 from MyWebSG</li>
+  <li>While still in the public instance, install apache and run it. Curl localhost to make sure it works, use the IP in the browser to verify also.</li>
+  <li>Notice that your private instance has no internet connectivity, you cannot ssh into it.</li>
+  <li>We need a bastion host to do so, we create it in the public Subnet. The security group will need to allow 22 from the internet. Call it bastionSG</li>
+</ul>
+
+  </div>
+
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <p>
+      
+
+&copy; Manish Pandit - Powered by <a href="https://jekyllrb.com">Jekyll</a> &amp; <a href="https://github.com/yous/whiteglass">whiteglass</a> - Subscribe via <a href="https://lobster1234.github.io/feed.xml">RSS</a>
+
+    </p>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

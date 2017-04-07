@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-04-06T21:27:18-07:00</updated>
+  <updated>2017-04-07T02:08:43-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -1330,6 +1330,192 @@ aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.co
 
       
         <summary type="html">It is much easier to make API/code multi-tenant, but it is a different story for databases. This problem exists at pretty much all SaaS based solutions, intending to provide data and service level isolation for many users/customers while trying to keep the code + database scalable. However, here are a few strategies that can be employed, based on the pros/cons and the freedom/constraints driving the solution.</summary>
+      
+
+      
+      
+    </entry>
+  
+  
+  
+    <entry>
+      
+      <title type="html">2016 AWS Associate Level Certification Exam Notes</title>
+      
+      <link href="https://lobster1234.github.io/2016/10/29/aws-certification-notes/" rel="alternate" type="text/html" title="2016 AWS Associate Level Certification Exam Notes" />
+      <published>2016-10-29T02:05:22-07:00</published>
+      <updated>2016-10-29T02:05:22-07:00</updated>
+      <id>https://lobster1234.github.io/2016/10/29/aws-certification-notes</id>
+      <content type="html" xml:base="https://lobster1234.github.io/2016/10/29/aws-certification-notes/">&lt;p&gt;These are my notes on EC2 and VPC for the AWS Certified Associate Level exams. I attempted the &lt;a href=&quot;https://aws.amazon.com/certification/certified-solutions-architect-associate/&quot;&gt;AWS Certified Solution Architect - Associate&lt;/a&gt; and &lt;a href=&quot;https://aws.amazon.com/certification/certified-developer-associate/&quot;&gt;AWS Certified Developer - Associate&lt;/a&gt; and scored 78% and 90% respectively.&lt;/p&gt;
+
+&lt;p&gt;It took me about a week (3-4 hours a day) to prepare for both, after being working professionally with AWS for over 3 years.&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h2 id=&quot;ec2&quot;&gt;EC2&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Can start an AMI to create any number of on-demand instances by using the RunInstances call. Default max is 20 per account.&lt;/li&gt;
+  &lt;li&gt;If the request is good, the RunInstances call returns success with a list of DNS names, and instances begin to launch within 10 minutes.&lt;/li&gt;
+  &lt;li&gt;The launch request is associated with a reservation ID. One reservation ID can map to multiple instances which are all a part of one launch request.&lt;/li&gt;
+  &lt;li&gt;The status can be checked via DescribeInstances call&lt;/li&gt;
+  &lt;li&gt;Can be terminated using TerminateInstances call&lt;/li&gt;
+  &lt;li&gt;If a running instances uses EBS-backed root volume (boot partition), it can be stopped by StopInstances call. This preserves the data.&lt;/li&gt;
+  &lt;li&gt;The same can be done via CLI or the Console instead of REST APIs&lt;/li&gt;
+  &lt;li&gt;EBS based root device store will preserve data, hence it is not tied to the life of the instance. Local instance based store persistence is tied to the life of the instance. There is no “stop” option.&lt;/li&gt;
+  &lt;li&gt;Local instance store is inexpensive&lt;/li&gt;
+  &lt;li&gt;An AMI (Amazon Machine Image) is a package with base operating system, and optional set of applications to boot an instance.&lt;/li&gt;
+  &lt;li&gt;You can create a custom AMI, but have to bundle it with either EBS backed store or Instance backed store.&lt;/li&gt;
+  &lt;li&gt;For instances backed with local instance store, the instances use S3&lt;/li&gt;
+  &lt;li&gt;Reserved limit is 20 for all instance types&lt;/li&gt;
+  &lt;li&gt;On demand limit varies, and is 20 for all T2, M1, M3 type instances. I plan to roll the dice on these questions, so won’t bother remembering them.&lt;/li&gt;
+  &lt;li&gt;Some instance types are not available in all regions.&lt;/li&gt;
+  &lt;li&gt;The instances can send emails, but have a fixed amount which needs to be requested to be increased if needed.&lt;/li&gt;
+  &lt;li&gt;Currently supported operating systems are RHEL, Centos, Ubuntu, Oracle Linux, Amazon Linux, Gentoo, Suse, Fedora, Debian and Windows&lt;/li&gt;
+  &lt;li&gt;All the underlying hardware in EC2 uses ECC memory (Error Correcting Code memory)&lt;/li&gt;
+  &lt;li&gt;All instances are billed in hourly usage units. Even if the instance is up for a minute, you get billed for a full hour.&lt;/li&gt;
+  &lt;li&gt;Data transferred between AWS services in different regions is charged on both ends.&lt;/li&gt;
+  &lt;li&gt;Billing starts when the boot sequence of the instance is initiated.&lt;/li&gt;
+  &lt;li&gt;Billing ends when the instance terminates or stops. If it is shut down, the instance hours aren’t billed but you pay for the EBS storage that has the root device data on it.&lt;/li&gt;
+  &lt;li&gt;Data transfer rates apply between instances on both ends regardless of AZ (Regional Data Transfer) or region (Internet Data Transfer). The sender gets billed for outbound, the receiver gets billed for inbound data.&lt;/li&gt;
+  &lt;li&gt;Tax is extra, it is not included in the pricing&lt;/li&gt;
+  &lt;li&gt;There are 5 families of instances
+    &lt;ol&gt;
+      &lt;li&gt;General Purpose - M3 and M4 with fixed performance, and T2 for burstable.&lt;/li&gt;
+      &lt;li&gt;Compute Optimized - C3 and C4&lt;/li&gt;
+      &lt;li&gt;Memory Optimized - R3&lt;/li&gt;
+      &lt;li&gt;GPU Optimized - P2 are Nvidia Tesla parallel processing GPU Compute, and G2 provide high performance 3D graphics (GPU Graphics)&lt;/li&gt;
+      &lt;li&gt;Storage Optimized - I2 are SSD based for high IO, D2 are dense (also SSD based) for data intensive operations with sequential IO&lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/li&gt;
+  &lt;li&gt;M3 are consistent and cheaper over M1 and also support SSD based instance storage. But if you need a larger disk, use M1.&lt;/li&gt;
+  &lt;li&gt;The amount of CPU allocated to an instance is measured in EC2 Compute Units. It provides the relative measure of integer processing power of an instance.&lt;/li&gt;
+  &lt;li&gt;To get a history of all EC2 API calls including VPC and EBS, use CloudTrail&lt;/li&gt;
+  &lt;li&gt;There are 5 Elastic IPs per region in any account by default, because ipv4 is a scare resource&lt;/li&gt;
+  &lt;li&gt;If the EIP isn’t associated with any running instance, you get charged an hourly penalty for hogging a scarce resource&lt;/li&gt;
+  &lt;li&gt;By default, every instance comes with a Public IP and a Private IP.&lt;/li&gt;
+  &lt;li&gt;When the instance stops or terminates, the private IP is released. So you may see a diff private IP when you boot it back up. The public IP behaves the same way but it can also be replaced with an EIP.&lt;/li&gt;
+  &lt;li&gt;EIP remapping can take several minutes.&lt;/li&gt;
+  &lt;li&gt;You can configure the reverse DNS record for the EIP by filling a form. But a forward DNS record (record -&amp;gt; EIP) must exist.&lt;/li&gt;
+  &lt;li&gt;Each AZ is physically distinct and independent.&lt;/li&gt;
+  &lt;li&gt;The same AZ can mean a diff physical location for a different account. My us-east-1a could be in New York while your us-east-1a could be in Richmond, VA.&lt;/li&gt;
+  &lt;li&gt;Enhanced networking is supported via single root IO Virtualization (SR-IOV). It allows for high Packet Per Second (PPS) on the network&lt;/li&gt;
+  &lt;li&gt;This is achieved via Elastic Network Adapter (ENA) available in X1 and M4.16xlarge. Others use Intel Virtual Function Interface. The Amazon Linux AMI support both drivers.&lt;/li&gt;
+  &lt;li&gt;There is no additional fee for enhanced networking, but it is not available in EC2-Classic, only in EC2-VPC.&lt;/li&gt;
+  &lt;li&gt;If using instance store backed instance, for durable data, use S3. Use EBS backed if you need the data to be independent of the instance’s life.&lt;/li&gt;
+  &lt;li&gt;3 Types of EBS volumes - General Purpose SSD, PIOPS SSD, Magnetic.&lt;/li&gt;
+  &lt;li&gt;GP SSD EBS volumes provide ratio of 3 IOPS per GB, and can burst up to 3000 IOPS.&lt;/li&gt;
+  &lt;li&gt;IOPS is measured as 256kBps for SSD, 1024kBps for Magnetic.&lt;/li&gt;
+  &lt;li&gt;PIOPS EBS is good for large NoSQL and RDS databases&lt;/li&gt;
+  &lt;li&gt;HDD or Magnetic is cheapest and fit for infrequently accessed data.&lt;/li&gt;
+  &lt;li&gt;Once instance can have many volumes but one volume can only be tied to one instance.&lt;/li&gt;
+  &lt;li&gt;EBS snapshots are only accessible via EC2 APIs even though they’re stored on S3&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;softhard-limits-on-stuff&quot;&gt;Soft/Hard Limits on stuff&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;5 VPCs per region&lt;/li&gt;
+  &lt;li&gt;50 peering connections per VPC&lt;/li&gt;
+  &lt;li&gt;Gateway Cached Volumes 32TB&lt;/li&gt;
+  &lt;li&gt;Gateway Store Volumes  16TB&lt;/li&gt;
+  &lt;li&gt;Gateway Cached Volumes Cache Size 16TB&lt;/li&gt;
+  &lt;li&gt;5 EIPs per region&lt;/li&gt;
+  &lt;li&gt;500 security groups per instance&lt;/li&gt;
+  &lt;li&gt;200 subnets per VPC&lt;/li&gt;
+  &lt;li&gt;5 internet gateways per region&lt;/li&gt;
+  &lt;li&gt;50 customer gateways per region&lt;/li&gt;
+  &lt;li&gt;5 Virtual Private Gateways per region&lt;/li&gt;
+  &lt;li&gt;50 VPN connections per region&lt;/li&gt;
+  &lt;li&gt;50 VPN peering connections per VPC&lt;/li&gt;
+  &lt;li&gt;200 Route Tables per VPC&lt;/li&gt;
+  &lt;li&gt;500 security groups per VPC&lt;/li&gt;
+  &lt;li&gt;5 security groups per network interface&lt;/li&gt;
+  &lt;li&gt;200 NACLs per VPC (same as subnets)&lt;/li&gt;
+  &lt;li&gt;500 Hosted Zones in Route 53&lt;/li&gt;
+  &lt;li&gt;50 Domains in Route 53&lt;/li&gt;
+  &lt;li&gt;100 TB Total RDS storage&lt;/li&gt;
+  &lt;li&gt;5000 IAM users per account&lt;/li&gt;
+  &lt;li&gt;250 IAM Roles&lt;/li&gt;
+  &lt;li&gt;100 IAM Groups&lt;/li&gt;
+  &lt;li&gt;100 Instance Profiles&lt;/li&gt;
+  &lt;li&gt;20 Load Balancers per region&lt;/li&gt;
+  &lt;li&gt;10 listeners per load balancer&lt;/li&gt;
+  &lt;li&gt;5 security groups per load balancer&lt;/li&gt;
+  &lt;li&gt;1 route table per subnet&lt;/li&gt;
+  &lt;li&gt;Multiple subnets per route table&lt;/li&gt;
+  &lt;li&gt;1 subnet per AZ&lt;/li&gt;
+  &lt;li&gt;Max VPC size is /16&lt;/li&gt;
+  &lt;li&gt;Min VPC size is /28&lt;/li&gt;
+  &lt;li&gt;5 IP addresses are always reserved in any subnet (251 for /24, 4091 for /20..)&lt;/li&gt;
+  &lt;li&gt;6 replicas for AuroraDB in 3 AZs&lt;/li&gt;
+  &lt;li&gt;100 S3 buckets per account (not region!)&lt;/li&gt;
+  &lt;li&gt;5 TB max object size&lt;/li&gt;
+  &lt;li&gt;5 GB max upload size per PUT operation&lt;/li&gt;
+  &lt;li&gt;100 launch configurations&lt;/li&gt;
+  &lt;li&gt;20 Auto Scaling Groups&lt;/li&gt;
+  &lt;li&gt;200 Cloud Formation Stacks&lt;/li&gt;
+  &lt;li&gt;200 Cloudfront Web distributions&lt;/li&gt;
+  &lt;li&gt;100 Cloudfront RTMP distributions&lt;/li&gt;
+  &lt;li&gt;25 origins per distribution&lt;/li&gt;
+  &lt;li&gt;20 on-demand instances per region&lt;/li&gt;
+  &lt;li&gt;5000 EBS volumes&lt;/li&gt;
+  &lt;li&gt;10000 EBS Snapshots&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;creating-a-custom-vpc&quot;&gt;Creating a custom VPC&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;Use 10.0.0.0/16 CIDR, most commonly used&lt;/li&gt;
+  &lt;li&gt;This creates a default route table allowing all traffic within this VPC to flow through (Destination 10.0.0.0/16 local&lt;/li&gt;
+  &lt;li&gt;This creates a default NACL which allows all inbound and outbound traffic&lt;/li&gt;
+  &lt;li&gt;If you create a new NACL, it is set to deny all inbound and outbound traffic&lt;/li&gt;
+  &lt;li&gt;Create an IGW if you are going to build a public subnet.&lt;/li&gt;
+  &lt;li&gt;Attach to your custom VPC&lt;/li&gt;
+  &lt;li&gt;DO NOT Add a route in the VPC’s route table to direct internet bound traffic to this IGW (0.0.0.0/0 -&amp;gt; IGW)&lt;/li&gt;
+  &lt;li&gt;Create a new route table, call it public route. It will allow all traffic within the VPC.&lt;/li&gt;
+  &lt;li&gt;Add a route in this route table (0.0.0.0/0 -&amp;gt; IGW)&lt;/li&gt;
+  &lt;li&gt;Next, we add 2 subnets, 1 public 1 private&lt;/li&gt;
+  &lt;li&gt;Pick /24 CIDR block allowing for 251 IPs each&lt;/li&gt;
+  &lt;li&gt;Public is 10.0.1.0/24 named as 10.0.1.0-public-us-east-1a&lt;/li&gt;
+  &lt;li&gt;Private is 10.0.2.0/24 named as 10.0.2.0-private-us-east-1a&lt;/li&gt;
+  &lt;li&gt;Note that both these subnets are associated with the default VPC NACL&lt;/li&gt;
+  &lt;li&gt;Note that both these subnets are associated with the default route table&lt;/li&gt;
+  &lt;li&gt;Now we change the route table of our public subnet to use the public route table&lt;/li&gt;
+  &lt;li&gt;Go to route tables, pick the public route, look for subnet associations. Click edit and attach our public subnet with this route table&lt;/li&gt;
+  &lt;li&gt;Next, we launch an instance in the public subnet, and make sure we can connect to it&lt;/li&gt;
+  &lt;li&gt;While launching it, create a new security group called MyWebSG, allow 80 and 22 from 0.0.0.0/0 for now&lt;/li&gt;
+  &lt;li&gt;Note the public IP and use it to ssh into this instance&lt;/li&gt;
+  &lt;li&gt;Run yum update and you’ll see it goes through (internet connectivity outbound)&lt;/li&gt;
+  &lt;li&gt;Launch an instance in private subnet this time. This is connected to a route which does not have internet connectivity.&lt;/li&gt;
+  &lt;li&gt;While doing this, create a new security group, call it MyBackendSG allowing 8080 from MyWebSG&lt;/li&gt;
+  &lt;li&gt;While still in the public instance, install apache and run it. Curl localhost to make sure it works, use the IP in the browser to verify also.&lt;/li&gt;
+  &lt;li&gt;Notice that your private instance has no internet connectivity, you cannot ssh into it.&lt;/li&gt;
+  &lt;li&gt;We need a bastion host to do so, we create it in the public Subnet. The security group will need to allow 22 from the internet. Call it bastionSG&lt;/li&gt;
+&lt;/ul&gt;</content>
+
+      
+      
+      
+      
+      
+
+      
+        <author>
+            <name>Manish Pandit</name>
+          
+          
+        </author>
+      
+
+      
+        <category term="aws" />
+      
+        <category term="certification" />
+      
+
+      
+
+      
+        <summary type="html">These are my notes on EC2 and VPC for the AWS Certified Associate Level exams. I attempted the AWS Certified Solution Architect - Associate and AWS Certified Developer - Associate and scored 78% and 90% respectively. It took me about a week (3-4 hours a day) to prepare for both, after being working professionally with AWS for over 3 years.</summary>
       
 
       

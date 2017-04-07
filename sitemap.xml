@@ -9,6 +9,10 @@
 <lastmod>2015-10-03T10:11:03-07:00</lastmod>
 </url>
 <url>
+<loc>https://lobster1234.github.io/2016/10/29/aws-certification-notes/</loc>
+<lastmod>2016-10-29T02:05:22-07:00</lastmod>
+</url>
+<url>
 <loc>https://lobster1234.github.io/2016/11/03/multitenant-mysql/</loc>
 <lastmod>2016-11-03T10:05:22-07:00</lastmod>
 </url>
@@ -62,10 +66,13 @@
 <loc>https://lobster1234.github.io/categories/openid/</loc>
 </url>
 <url>
-<loc>https://lobster1234.github.io/categories/data-structures/</loc>
+<loc>https://lobster1234.github.io/categories/aws/</loc>
 </url>
 <url>
-<loc>https://lobster1234.github.io/categories/aws/</loc>
+<loc>https://lobster1234.github.io/categories/certification/</loc>
+</url>
+<url>
+<loc>https://lobster1234.github.io/categories/data-structures/</loc>
 </url>
 <url>
 <loc>https://lobster1234.github.io/categories/sqs/</loc>
@@ -87,5 +94,8 @@
 </url>
 <url>
 <loc>https://lobster1234.github.io/posts/2/</loc>
+</url>
+<url>
+<loc>https://lobster1234.github.io/posts/3/</loc>
 </url>
 </urlset>
