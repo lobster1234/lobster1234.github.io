@@ -3,10 +3,10 @@
   <generator uri="http://jekyllrb.com" version="3.4.3">Jekyll</generator>
   
   
-  <link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" />
-  <link href="http://localhost:4000/" rel="alternate" type="text/html" />
-  <updated>2017-04-06T16:53:49-07:00</updated>
-  <id>http://localhost:4000//</id>
+  <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
+  <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
+  <updated>2017-04-06T17:25:13-07:00</updated>
+  <id>https://lobster1234.github.io//</id>
 
   
     <title type="html">My Blog</title>
@@ -18,6 +18,12 @@
   
 
   
+    <author>
+        <name>Manish Pandit</name>
+      
+      
+    </author>
+  
 
   
   
@@ -25,11 +31,11 @@
       
       <title type="html">Using localstack with AWS Command Line</title>
       
-      <link href="http://localhost:4000/2017/04/05/working-with-localstack-command-line/" rel="alternate" type="text/html" title="Using localstack with AWS Command Line" />
+      <link href="https://lobster1234.github.io/2017/04/05/working-with-localstack-command-line/" rel="alternate" type="text/html" title="Using localstack with AWS Command Line" />
       <published>2017-04-05T23:44:37-07:00</published>
       <updated>2017-04-05T23:44:37-07:00</updated>
-      <id>http://localhost:4000/2017/04/05/working-with-localstack-command-line</id>
-      <content type="html" xml:base="http://localhost:4000/2017/04/05/working-with-localstack-command-line/">&lt;p&gt;&lt;a href=&quot;https://github.com/atlassian/localstack&quot;&gt;Localstack&lt;/a&gt; is a really useful project by Atlassian, which allows for local development using the AWS cloud stack. In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against.In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against. This post is a quick and handy gist of using AWS command line to work with localstack.
+      <id>https://lobster1234.github.io/2017/04/05/working-with-localstack-command-line</id>
+      <content type="html" xml:base="https://lobster1234.github.io/2017/04/05/working-with-localstack-command-line/">&lt;p&gt;&lt;a href=&quot;https://github.com/atlassian/localstack&quot;&gt;Localstack&lt;/a&gt; is a really useful project by Atlassian, which allows for local development using the AWS cloud stack. In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against.In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against. This post is a quick and handy gist of using AWS command line to work with localstack.
 &lt;!--more--&gt;&lt;/p&gt;
 &lt;h1 id=&quot;starting-localstack&quot;&gt;Starting localstack&lt;/h1&gt;
 
@@ -224,6 +230,12 @@ sys	0m0.167s
       
 
       
+        <author>
+            <name>Manish Pandit</name>
+          
+          
+        </author>
+      
 
       
         <category term="aws" />
@@ -247,11 +259,11 @@ sys	0m0.167s
       
       <title type="html">AWS Lambda with Serverless Framework and Java/Maven - Part 1</title>
       
-      <link href="http://localhost:4000/2017/02/28/serverless-framework-java-maven-part-1/" rel="alternate" type="text/html" title="AWS Lambda with Serverless Framework and Java/Maven - Part 1" />
+      <link href="https://lobster1234.github.io/2017/02/28/serverless-framework-java-maven-part-1/" rel="alternate" type="text/html" title="AWS Lambda with Serverless Framework and Java/Maven - Part 1" />
       <published>2017-02-28T22:15:37-08:00</published>
       <updated>2017-02-28T22:15:37-08:00</updated>
-      <id>http://localhost:4000/2017/02/28/serverless-framework-java-maven-part-1</id>
-      <content type="html" xml:base="http://localhost:4000/2017/02/28/serverless-framework-java-maven-part-1/">&lt;p&gt;&lt;a href=&quot;https://serverless.com&quot;&gt;Serverless&lt;/a&gt; is a node.js based framework that makes creating, deploying, and managing serverless functions a breeze. We will use AWS as our FaaS (Function-as-a-Service) provider, although Serverless supports IBM OpenWhisk and Microsoft Azure as well.&lt;/p&gt;
+      <id>https://lobster1234.github.io/2017/02/28/serverless-framework-java-maven-part-1</id>
+      <content type="html" xml:base="https://lobster1234.github.io/2017/02/28/serverless-framework-java-maven-part-1/">&lt;p&gt;&lt;a href=&quot;https://serverless.com&quot;&gt;Serverless&lt;/a&gt; is a node.js based framework that makes creating, deploying, and managing serverless functions a breeze. We will use AWS as our FaaS (Function-as-a-Service) provider, although Serverless supports IBM OpenWhisk and Microsoft Azure as well.&lt;/p&gt;
 
 &lt;p&gt;In this tutorial, we will create and deploy a java-maven based AWS Lambda function. In Part-1 we will not modify any code, or even look at the generated code. We will focus on the deployment and the command line interface to manage lambda, provided out of the box by serverless framework.&lt;/p&gt;
 
@@ -546,6 +558,12 @@ Duration (avg.): 276.55ms
       
 
       
+        <author>
+            <name>Manish Pandit</name>
+          
+          
+        </author>
+      
 
       
         <category term="aws" />
@@ -571,11 +589,11 @@ Duration (avg.): 276.55ms
       
       <title type="html">Notes from AWS Lambda Deep Dive Webinar</title>
       
-      <link href="http://localhost:4000/2017/02/27/notes-from-aws-lambda-deep-dive-webinar/" rel="alternate" type="text/html" title="Notes from AWS Lambda Deep Dive Webinar" />
+      <link href="https://lobster1234.github.io/2017/02/27/notes-from-aws-lambda-deep-dive-webinar/" rel="alternate" type="text/html" title="Notes from AWS Lambda Deep Dive Webinar" />
       <published>2017-02-27T07:20:44-08:00</published>
       <updated>2017-02-27T07:20:44-08:00</updated>
-      <id>http://localhost:4000/2017/02/27/notes-from-aws-lambda-deep-dive-webinar</id>
-      <content type="html" xml:base="http://localhost:4000/2017/02/27/notes-from-aws-lambda-deep-dive-webinar/">&lt;p&gt;I’ve put together my notes from the AWS webinar, which can be seen &lt;a href=&quot;https://www.youtube.com/watch?v=dB4zJk_fqrU&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+      <id>https://lobster1234.github.io/2017/02/27/notes-from-aws-lambda-deep-dive-webinar</id>
+      <content type="html" xml:base="https://lobster1234.github.io/2017/02/27/notes-from-aws-lambda-deep-dive-webinar/">&lt;p&gt;I’ve put together my notes from the AWS webinar, which can be seen &lt;a href=&quot;https://www.youtube.com/watch?v=dB4zJk_fqrU&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;Lambda is the key enabler and a core AWS component for serverless computing. Lets you run the code you want, without worrying about the underlying infrastructure and provisioning. It is also cost efficient, as there are no instances that are in running state but idle. Lambda handles scaling up and scaling down as needed, transparently to the customer.&lt;/p&gt;
 
@@ -706,6 +724,12 @@ Duration (avg.): 276.55ms
       
 
       
+        <author>
+            <name>Manish Pandit</name>
+          
+          
+        </author>
+      
 
       
         <category term="aws" />
@@ -731,11 +755,11 @@ Duration (avg.): 276.55ms
       
       <title type="html">AWS Training at Marqeta : SQS Lab</title>
       
-      <link href="http://localhost:4000/2017/02/17/marqeta-aws-sqs-lab/" rel="alternate" type="text/html" title="AWS Training at Marqeta : SQS Lab" />
+      <link href="https://lobster1234.github.io/2017/02/17/marqeta-aws-sqs-lab/" rel="alternate" type="text/html" title="AWS Training at Marqeta : SQS Lab" />
       <published>2017-02-17T19:10:44-08:00</published>
       <updated>2017-02-17T19:10:44-08:00</updated>
-      <id>http://localhost:4000/2017/02/17/marqeta-aws-sqs-lab</id>
-      <content type="html" xml:base="http://localhost:4000/2017/02/17/marqeta-aws-sqs-lab/">&lt;p&gt;This post is the handout for the SQS Lab I ran as a part of hands-on AWS training to the Engineering + DevOps team at &lt;a href=&quot;https://www.marqeta.com&quot;&gt;Marqeta&lt;/a&gt;.&lt;/p&gt;
+      <id>https://lobster1234.github.io/2017/02/17/marqeta-aws-sqs-lab</id>
+      <content type="html" xml:base="https://lobster1234.github.io/2017/02/17/marqeta-aws-sqs-lab/">&lt;p&gt;This post is the handout for the SQS Lab I ran as a part of hands-on AWS training to the Engineering + DevOps team at &lt;a href=&quot;https://www.marqeta.com&quot;&gt;Marqeta&lt;/a&gt;.&lt;/p&gt;
 
 &lt;!--more--&gt;
 
@@ -867,6 +891,12 @@ aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.co
       
 
       
+        <author>
+            <name>Manish Pandit</name>
+          
+          
+        </author>
+      
 
       
         <category term="aws" />
@@ -890,11 +920,11 @@ aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.co
       
       <title type="html">AWS Primer and Quickstart Presentation</title>
       
-      <link href="http://localhost:4000/2017/02/01/aws-primer-and-quickstart/" rel="alternate" type="text/html" title="AWS Primer and Quickstart Presentation" />
+      <link href="https://lobster1234.github.io/2017/02/01/aws-primer-and-quickstart/" rel="alternate" type="text/html" title="AWS Primer and Quickstart Presentation" />
       <published>2017-02-01T07:22:10-08:00</published>
       <updated>2017-02-01T07:22:10-08:00</updated>
-      <id>http://localhost:4000/2017/02/01/aws-primer-and-quickstart</id>
-      <content type="html" xml:base="http://localhost:4000/2017/02/01/aws-primer-and-quickstart/">Slides from my introductory talk on AWS at Marqeta.
+      <id>https://lobster1234.github.io/2017/02/01/aws-primer-and-quickstart</id>
+      <content type="html" xml:base="https://lobster1234.github.io/2017/02/01/aws-primer-and-quickstart/">Slides from my introductory talk on AWS at Marqeta.
 
 &lt;!--more--&gt;
 &lt;script async class=&quot;speakerdeck-embed&quot; data-id=&quot;13c65dd7c1744c319001b4415e3ca439&quot; data-ratio=&quot;1.77777777777778&quot; src=&quot;//speakerdeck.com/assets/embed.js&quot;&gt;&lt;/script&gt;</content>
@@ -905,6 +935,12 @@ aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.co
       
       
 
+      
+        <author>
+            <name>Manish Pandit</name>
+          
+          
+        </author>
       
 
       
@@ -927,11 +963,11 @@ aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.co
       
       <title type="html">Balanced Brackets</title>
       
-      <link href="http://localhost:4000/2016/12/24/balance-brackets-o-n-solution/" rel="alternate" type="text/html" title="Balanced Brackets" />
+      <link href="https://lobster1234.github.io/2016/12/24/balance-brackets-o-n-solution/" rel="alternate" type="text/html" title="Balanced Brackets" />
       <published>2016-12-24T21:22:10-08:00</published>
       <updated>2016-12-24T21:22:10-08:00</updated>
-      <id>http://localhost:4000/2016/12/24/balance-brackets-o-n-solution</id>
-      <content type="html" xml:base="http://localhost:4000/2016/12/24/balance-brackets-o-n-solution/">&lt;p&gt;&lt;a href=&quot;https://www.hackerrank.com/challenges/balanced-brackets&quot;&gt;Here&lt;/a&gt; is the problem statement. Print YES if the brackets in a given string are balanced, else print NO. Here is my O(N) submission to the challenge.&lt;/p&gt;
+      <id>https://lobster1234.github.io/2016/12/24/balance-brackets-o-n-solution</id>
+      <content type="html" xml:base="https://lobster1234.github.io/2016/12/24/balance-brackets-o-n-solution/">&lt;p&gt;&lt;a href=&quot;https://www.hackerrank.com/challenges/balanced-brackets&quot;&gt;Here&lt;/a&gt; is the problem statement. Print YES if the brackets in a given string are balanced, else print NO. Here is my O(N) submission to the challenge.&lt;/p&gt;
 
 &lt;!--more--&gt;
 &lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;java.io.*&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
@@ -975,6 +1011,12 @@ aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.co
       
 
       
+        <author>
+            <name>Manish Pandit</name>
+          
+          
+        </author>
+      
 
       
         <category term="data-structures" />
@@ -996,11 +1038,11 @@ aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.co
       
       <title type="html">Multitenant MySQL Setup</title>
       
-      <link href="http://localhost:4000/2016/11/03/multitenant-mysql/" rel="alternate" type="text/html" title="Multitenant MySQL Setup" />
+      <link href="https://lobster1234.github.io/2016/11/03/multitenant-mysql/" rel="alternate" type="text/html" title="Multitenant MySQL Setup" />
       <published>2016-11-03T10:05:22-07:00</published>
       <updated>2016-11-03T10:05:22-07:00</updated>
-      <id>http://localhost:4000/2016/11/03/multitenant-mysql</id>
-      <content type="html" xml:base="http://localhost:4000/2016/11/03/multitenant-mysql/">&lt;p&gt;It is much easier to make API/code multi-tenant, but it is a different story for databases. This problem exists at pretty much all SaaS based solutions, intending to provide data and service level isolation for many users/customers while trying to keep the code + database scalable. However, here are a few strategies that can be employed, based on the pros/cons and the freedom/constraints driving the solution.&lt;/p&gt;
+      <id>https://lobster1234.github.io/2016/11/03/multitenant-mysql</id>
+      <content type="html" xml:base="https://lobster1234.github.io/2016/11/03/multitenant-mysql/">&lt;p&gt;It is much easier to make API/code multi-tenant, but it is a different story for databases. This problem exists at pretty much all SaaS based solutions, intending to provide data and service level isolation for many users/customers while trying to keep the code + database scalable. However, here are a few strategies that can be employed, based on the pros/cons and the freedom/constraints driving the solution.&lt;/p&gt;
 
 &lt;!--more--&gt;
 
@@ -1084,6 +1126,12 @@ aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.co
       
 
       
+        <author>
+            <name>Manish Pandit</name>
+          
+          
+        </author>
+      
 
       
         <category term="databases" />
@@ -1105,11 +1153,11 @@ aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.co
       
       <title type="html">Securing your APIs with OAuth, OpenID, and OpenID Connect</title>
       
-      <link href="http://localhost:4000/2015/10/03/securing-apis-with-oauth-openid-connect/" rel="alternate" type="text/html" title="Securing your APIs with OAuth, OpenID, and OpenID Connect" />
+      <link href="https://lobster1234.github.io/2015/10/03/securing-apis-with-oauth-openid-connect/" rel="alternate" type="text/html" title="Securing your APIs with OAuth, OpenID, and OpenID Connect" />
       <published>2015-10-03T10:11:03-07:00</published>
       <updated>2015-10-03T10:11:03-07:00</updated>
-      <id>http://localhost:4000/2015/10/03/securing-apis-with-oauth-openid-connect</id>
-      <content type="html" xml:base="http://localhost:4000/2015/10/03/securing-apis-with-oauth-openid-connect/">&lt;p&gt;As products and companies move towards IoT model, users and machines alike need to interact with various APIs. Securing these APIs in a connected world can be a challenge faced by many. Fortunately, there are open standards addressing even the most complex of use cases - OAuth, OpenID and OpenID Connect happen to be widely adopted and have a growing support across many API and Identity Providers. In this session I’ll talk about these standards, and walk through common use cases/flows from an API Provider as well as consumer’s side. We will explore how these standards come together to not only secure the APIs, but also manage identity.&lt;/p&gt;
+      <id>https://lobster1234.github.io/2015/10/03/securing-apis-with-oauth-openid-connect</id>
+      <content type="html" xml:base="https://lobster1234.github.io/2015/10/03/securing-apis-with-oauth-openid-connect/">&lt;p&gt;As products and companies move towards IoT model, users and machines alike need to interact with various APIs. Securing these APIs in a connected world can be a challenge faced by many. Fortunately, there are open standards addressing even the most complex of use cases - OAuth, OpenID and OpenID Connect happen to be widely adopted and have a growing support across many API and Identity Providers. In this session I’ll talk about these standards, and walk through common use cases/flows from an API Provider as well as consumer’s side. We will explore how these standards come together to not only secure the APIs, but also manage identity.&lt;/p&gt;
 
 &lt;!--more--&gt;
 &lt;script async=&quot;&quot; class=&quot;speakerdeck-embed&quot; data-id=&quot;703ba49666b644a2869ecf150409880a&quot; data-ratio=&quot;1.33333333333333&quot; src=&quot;//speakerdeck.com/assets/embed.js&quot;&gt;&lt;/script&gt;</content>
@@ -1120,6 +1168,12 @@ aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.co
       
       
 
+      
+        <author>
+            <name>Manish Pandit</name>
+          
+          
+        </author>
       
 
       
@@ -1132,6 +1186,53 @@ aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.co
 
       
         <summary type="html">As products and companies move towards IoT model, users and machines alike need to interact with various APIs. Securing these APIs in a connected world can be a challenge faced by many. Fortunately, there are open standards addressing even the most complex of use cases - OAuth, OpenID and OpenID Connect happen to be widely adopted and have a growing support across many API and Identity Providers. In this session I’ll talk about these standards, and walk through common use cases/flows from an API Provider as well as consumer’s side. We will explore how these standards come together to not only secure the APIs, but also manage identity.</summary>
+      
+
+      
+      
+    </entry>
+  
+  
+  
+    <entry>
+      
+      <title type="html">MongoSF : Using MongoDB for IGN’s Social Platform</title>
+      
+      <link href="https://lobster1234.github.io/2011/05/24/using-mongodb-for-ign-social-platform/" rel="alternate" type="text/html" title="MongoSF : Using MongoDB for IGN's Social Platform" />
+      <published>2011-05-24T13:44:37-07:00</published>
+      <updated>2011-05-24T13:44:37-07:00</updated>
+      <id>https://lobster1234.github.io/2011/05/24/using-mongodb-for-ign-social-platform</id>
+      <content type="html" xml:base="https://lobster1234.github.io/2011/05/24/using-mongodb-for-ign-social-platform/">&lt;p&gt;In this session, I will talk about IGN’s Social Platform Architecture in context of MongoDB utilization. The talk will cover the social platform modules where IGN evaluated NoSQL solutions and picked MongoDB. These modules include activity streams, activity comments, notifications and other read/write heavy components. I’ll also discuss the deployment, monitoring and future plans regarding MongoDB at IGN beyond the Social Platform.
+&lt;!--more--&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.mongodb.com/presentations/using-mongodb-igns-social-platform&quot;&gt;Video&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.slideshare.net/lobster1234/mongosf-2011-using-mongodb-for-igns-social-platform&quot;&gt;Slides&lt;/a&gt;&lt;/p&gt;</content>
+
+      
+      
+      
+      
+      
+
+      
+        <author>
+            <name>Manish Pandit</name>
+          
+          
+        </author>
+      
+
+      
+        <category term="databases" />
+      
+        <category term="mongodb" />
+      
+
+      
+
+      
+        <summary type="html">In this session, I will talk about IGN’s Social Platform Architecture in context of MongoDB utilization. The talk will cover the social platform modules where IGN evaluated NoSQL solutions and picked MongoDB. These modules include activity streams, activity comments, notifications and other read/write heavy components. I’ll also discuss the deployment, monitoring and future plans regarding MongoDB at IGN beyond the Social Platform.</summary>
       
 
       
