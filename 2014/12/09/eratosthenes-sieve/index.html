@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  
+  
+  <title>Prime Numbers: Sieve of Eratosthenes</title>
+  <meta name="description" content="My training wheels implementation of Sieve of Eratosthenes to generate prime numbers.">
+  
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="https://lobster1234.github.io/2014/12/09/eratosthenes-sieve/">
+  
+  
+  <link rel="alternate" type="application/rss+xml" title="My Blog" href="https://lobster1234.github.io/feed.xml">
+
+  
+
+  
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="lobster1234">
+  <meta name="twitter:title" content="Prime Numbers: Sieve of Eratosthenes">
+  <meta name="twitter:description" content="My training wheels implementation of Sieve of Eratosthenes to generate prime numbers.">
+  
+    <meta name="twitter:creator" content="lobster1234">
+  
+  
+
+  <script type="text/javascript">
+  WebFontConfig = {
+    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
+  };
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+  })();
+</script>
+
+  
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-96931340-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">My Blog</a>
+
+    <nav class="site-nav">
+      
+        
+        <a class="page-link" href="/about/">About</a>
+      
+        
+        <a class="page-link" href="/archives/">Archives</a>
+      
+        
+        <a class="page-link" href="https://www.twitter.com/lobster1234">Twitter</a>
+      
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    
+      <h1 class="post-title" itemprop="name headline">Prime Numbers: Sieve of Eratosthenes</h1>
+    
+    <p class="post-meta"><time datetime="2014-12-09T11:11:10-08:00" itemprop="datePublished">Dec 9, 2014</time> • 
+  
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <a href="/categories/data-structures/">data-structures</a>,
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <a href="/categories/algorithms/">algorithms</a>
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>My training wheels implementation of <a href="https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes">Sieve of Eratosthenes</a> to generate prime numbers.</p>
+
+<!--more-->
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="cm">/**
+ * Find prime numbers using Eratosthenes Sieve.
+ * Scala Gods - this is neither functional nor scala except the syntax.
+ * Think pseudocode that actually compiles and works.
+ */</span>
+<span class="n">object</span> <span class="n">EratosthenesSieve</span> <span class="kd">extends</span> <span class="n">App</span> <span class="o">{</span>
+  <span class="n">val</span> <span class="n">primes</span> <span class="o">=</span> <span class="n">getPrimes</span><span class="o">(</span><span class="mi">1000</span><span class="o">)</span>
+  <span class="n">println</span><span class="o">(</span><span class="n">primes</span><span class="o">.</span><span class="na">mkString</span><span class="o">(</span><span class="s">" ,"</span><span class="o">))</span>
+  <span class="n">def</span> <span class="nf">getPrimes</span><span class="o">(</span><span class="nl">x:</span> <span class="n">Int</span><span class="o">)</span> <span class="o">:</span> <span class="n">Seq</span><span class="o">[</span><span class="n">Int</span><span class="o">]=</span> <span class="o">{</span>
+    <span class="c1">//We use a single dimension array, we will use the index as the number.</span>
+    <span class="n">val</span> <span class="n">sieve</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Array</span><span class="o">[</span><span class="n">Int</span><span class="o">](</span><span class="n">x</span><span class="o">)</span>
+    <span class="c1">//we will flip these to 0 as we traverse. Initially, every number is prime.</span>
+    <span class="k">for</span> <span class="o">(</span><span class="n">i</span> <span class="o">&lt;-</span> <span class="mi">0</span> <span class="n">to</span> <span class="n">sieve</span><span class="o">.</span><span class="na">size</span><span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="n">sieve</span><span class="o">(</span><span class="n">i</span><span class="o">)</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="c1">//This is our pivot. We leave sieve(0) and sieve(1) alone. Sieve(2) has number 2 which is our first prime number.</span>
+    <span class="n">var</span> <span class="n">pivot</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">while</span><span class="o">(</span><span class="n">pivot</span> <span class="o">&lt;=</span> <span class="o">(</span><span class="n">x</span><span class="o">-</span><span class="mi">1</span><span class="o">)/</span><span class="n">pivot</span><span class="o">){</span>
+      <span class="c1">//we start with the pivot, and mark all its multiples except itself as non-prime.</span>
+      <span class="c1">//we do this till we reach the end of the array</span>
+      <span class="k">for</span><span class="o">(</span><span class="n">i</span> <span class="o">&lt;-</span> <span class="mi">2</span> <span class="n">to</span> <span class="o">(</span><span class="n">x</span><span class="o">-</span><span class="mi">1</span><span class="o">)/</span><span class="n">pivot</span><span class="o">){</span>
+        <span class="n">sieve</span><span class="o">(</span><span class="n">pivot</span><span class="o">*</span><span class="n">i</span><span class="o">)</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1">//not prime</span>
+      <span class="o">}</span>
+      <span class="c1">//now we find the next pivot which is the next in the array which is 1</span>
+      <span class="n">pivot</span> <span class="o">=</span> <span class="n">nextPivot</span><span class="o">(</span><span class="n">pivot</span><span class="o">,</span><span class="n">sieve</span><span class="o">)</span>
+    <span class="o">}</span>
+    <span class="c1">//filter our the primes, we use some real scala here, sorry. Kinda tired.</span>
+    <span class="k">for</span><span class="o">(</span><span class="n">s</span><span class="o">&lt;-</span><span class="mi">2</span> <span class="n">to</span> <span class="n">sieve</span><span class="o">.</span><span class="na">size</span><span class="o">-</span><span class="mi">1</span><span class="o">;</span> <span class="k">if</span><span class="o">(</span><span class="n">sieve</span><span class="o">(</span><span class="n">s</span><span class="o">)==</span><span class="mi">1</span><span class="o">))</span> <span class="n">yield</span><span class="o">(</span><span class="n">s</span><span class="o">)</span>
+  <span class="o">}</span>
+
+  <span class="n">def</span> <span class="nf">nextPivot</span><span class="o">(</span><span class="nl">currentPivot:</span><span class="n">Int</span><span class="o">,</span> <span class="nl">x:</span><span class="n">Array</span><span class="o">[</span><span class="n">Int</span><span class="o">])</span> <span class="o">:</span> <span class="n">Int</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="c1">//return the next pivot, which is the next index after currentPivot that is 1</span>
+    <span class="n">var</span> <span class="n">nextPivot</span> <span class="o">=</span> <span class="n">currentPivot</span><span class="o">+</span><span class="mi">1</span>
+    <span class="n">var</span> <span class="n">done</span> <span class="o">=</span> <span class="kc">false</span>
+    <span class="nf">while</span><span class="o">(!</span><span class="n">done</span><span class="o">){</span>
+      <span class="k">if</span><span class="o">(</span><span class="n">x</span><span class="o">(</span><span class="n">nextPivot</span><span class="o">)==</span><span class="mi">1</span><span class="o">)</span> <span class="n">done</span> <span class="o">=</span> <span class="kc">true</span>
+      <span class="k">else</span> <span class="n">nextPivot</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="o">}</span>
+    <span class="n">nextPivot</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+  </div>
+
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <p>
+      
+
+&copy; Manish Pandit - Powered by <a href="https://jekyllrb.com">Jekyll</a> &amp; <a href="https://github.com/yous/whiteglass">whiteglass</a> - Subscribe via <a href="https://lobster1234.github.io/feed.xml">RSS</a>
+
+    </p>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

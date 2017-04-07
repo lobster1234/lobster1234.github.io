@@ -9,6 +9,10 @@
 <lastmod>2014-05-28T11:44:37-07:00</lastmod>
 </url>
 <url>
+<loc>https://lobster1234.github.io/2014/12/09/eratosthenes-sieve/</loc>
+<lastmod>2014-12-09T11:11:10-08:00</lastmod>
+</url>
+<url>
 <loc>https://lobster1234.github.io/2015/10/03/securing-apis-with-oauth-openid-connect/</loc>
 <lastmod>2015-10-03T10:11:03-07:00</lastmod>
 </url>
@@ -70,6 +74,12 @@
 <loc>https://lobster1234.github.io/categories/api/</loc>
 </url>
 <url>
+<loc>https://lobster1234.github.io/categories/data-structures/</loc>
+</url>
+<url>
+<loc>https://lobster1234.github.io/categories/algorithms/</loc>
+</url>
+<url>
 <loc>https://lobster1234.github.io/categories/oauth/</loc>
 </url>
 <url>
@@ -80,9 +90,6 @@
 </url>
 <url>
 <loc>https://lobster1234.github.io/categories/certification/</loc>
-</url>
-<url>
-<loc>https://lobster1234.github.io/categories/data-structures/</loc>
 </url>
 <url>
 <loc>https://lobster1234.github.io/categories/sqs/</loc>
