@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-04-07T02:08:43-07:00</updated>
+  <updated>2017-04-07T02:42:09-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -1135,6 +1135,8 @@ aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.co
       
         <category term="aws" />
       
+        <category term="presentations" />
+      
 
       
 
@@ -1556,11 +1558,63 @@ aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.co
       
         <category term="openid" />
       
+        <category term="presentations" />
+      
 
       
 
       
         <summary type="html">As products and companies move towards IoT model, users and machines alike need to interact with various APIs. Securing these APIs in a connected world can be a challenge faced by many. Fortunately, there are open standards addressing even the most complex of use cases - OAuth, OpenID and OpenID Connect happen to be widely adopted and have a growing support across many API and Identity Providers. In this session I’ll talk about these standards, and walk through common use cases/flows from an API Provider as well as consumer’s side. We will explore how these standards come together to not only secure the APIs, but also manage identity.</summary>
+      
+
+      
+      
+    </entry>
+  
+  
+  
+    <entry>
+      
+      <title type="html">API Antipatterns : APICon SF</title>
+      
+      <link href="https://lobster1234.github.io/2014/05/28/api-antipatterns-apiconsf/" rel="alternate" type="text/html" title="API Antipatterns : APICon SF" />
+      <published>2014-05-28T11:44:37-07:00</published>
+      <updated>2014-05-28T11:44:37-07:00</updated>
+      <id>https://lobster1234.github.io/2014/05/28/api-antipatterns-apiconsf</id>
+      <content type="html" xml:base="https://lobster1234.github.io/2014/05/28/api-antipatterns-apiconsf/">&lt;p&gt;My talk at APICon San Francisco on API Antipatterns.&lt;/p&gt;
+
+&lt;p&gt;APIs have become a part of the product ecosystem - and help the businesses by extending their developer base, and offering seamless integration with other services or products. Sometimes, the APIs themselves are the product. However, with so many APIs around, patterns emerge. Patterns are repeatable, reusable solutions to commonly occurring problems. Where there are patterns, there are also antipatterns.&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;p&gt;While APIs are not a new paradigm - there are no set standards or specifications formed by a committees or governing bodies for APIs. On top of this, the APIs are often built at various stages of the product, and have a good chance of being disjoint as more are added. In this talk Netflix engineers will discuss various antipatterns that creep into the API design and implementation, and how to identify and avoid them. They will also share their experiences with building APIs. While the antipatterns do not pose as big a functional challenge, they can and do impact integration efforts, scalability and performance among other things. After this session, you should be able to get familiar with the best practices around solving the most common patterns, and make your engineers and API consumers happy!&lt;/p&gt;
+
+&lt;script async=&quot;&quot; class=&quot;speakerdeck-embed&quot; data-id=&quot;f5b38f30c8e201316e3a2eda2b59ba96&quot; data-ratio=&quot;1.33333333333333&quot; src=&quot;//speakerdeck.com/assets/embed.js&quot;&gt;&lt;/script&gt;</content>
+
+      
+      
+      
+      
+      
+
+      
+        <author>
+            <name>Manish Pandit</name>
+          
+          
+        </author>
+      
+
+      
+        <category term="api" />
+      
+        <category term="presentations" />
+      
+
+      
+
+      
+        <summary type="html">My talk at APICon San Francisco on API Antipatterns. APIs have become a part of the product ecosystem - and help the businesses by extending their developer base, and offering seamless integration with other services or products. Sometimes, the APIs themselves are the product. However, with so many APIs around, patterns emerge. Patterns are repeatable, reusable solutions to commonly occurring problems. Where there are patterns, there are also antipatterns.</summary>
       
 
       
@@ -1602,6 +1656,8 @@ aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.co
         <category term="databases" />
       
         <category term="mongodb" />
+      
+        <category term="presentations" />
       
 
       
