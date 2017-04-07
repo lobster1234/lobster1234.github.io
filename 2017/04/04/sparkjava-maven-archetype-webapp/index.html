@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  
+  
+  <title>SparkJava Maven Archetype with .war generation</title>
+  <meta name="description" content="Spark Java is a Java 8 based lightweight framework which I highly recommend for writing APIs. It is so simple that it comes with an embedded jetty. However, in real world production you’d want to run it in an external container like Tomcat, JBoss, or Jetty (external), etc. I found a SparkJava Hello World archetype, however, it uses the embedded jetty. I was able to fork the repo and add .war support to it. The fork is here This post walks through the usage.">
+  
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="https://lobster1234.github.io/2017/04/04/sparkjava-maven-archetype-webapp/">
+  
+  
+  <link rel="alternate" type="application/rss+xml" title="My Blog" href="https://lobster1234.github.io/feed.xml">
+
+  
+
+  
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="lobster1234">
+  <meta name="twitter:title" content="SparkJava Maven Archetype with .war generation">
+  <meta name="twitter:description" content="Spark Java is a Java 8 based lightweight framework which I highly recommend for writing APIs. It is so simple that it comes with an embedded jetty. However, in real world production you’d want to r...">
+  
+    <meta name="twitter:creator" content="lobster1234">
+  
+  
+
+  <script type="text/javascript">
+  WebFontConfig = {
+    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
+  };
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+  })();
+</script>
+
+  
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-96931340-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">My Blog</a>
+
+    <nav class="site-nav">
+      
+        
+        <a class="page-link" href="/about/">About</a>
+      
+        
+        <a class="page-link" href="/archives/">Archives</a>
+      
+        
+        <a class="page-link" href="https://www.twitter.com/lobster1234">Twitter</a>
+      
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    
+      <h1 class="post-title" itemprop="name headline">SparkJava Maven Archetype with .war generation</h1>
+    
+    <p class="post-meta"><time datetime="2017-04-04T01:11:03-07:00" itemprop="datePublished">Apr 4, 2017</time> • 
+  
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <a href="/categories/maven/">maven</a>,
+    
+  
+    
+  
+    
+  
+
+  
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <a href="/categories/sparkjava/">sparkjava</a>
+    
+  
+    
+  
+
+</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p><a href="http://sparkjava.com/">Spark Java</a> is a Java 8 based lightweight framework which I highly recommend for writing APIs. It is so simple that it comes with an embedded jetty. However, in real world production you’d want to run it in an external container like Tomcat, JBoss, or Jetty (external), etc.
+I found a <a href="https://github.com/ImaginateWayne/sparkjava-archetypes">SparkJava Hello World archetype</a>, however, it uses the embedded jetty. I was able to fork the repo and add .war support to it.</p>
+
+<p>The fork is <a href="https://github.com/marqeta/sparkjava-archetypes/tree/master/sparkjava-helloworld-archetype">here</a></p>
+
+<p>This post walks through the usage.</p>
+
+<!--more-->
+
+<h3 id="clone-the-fork">Clone the fork</h3>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>  C02STG51GTFM:work mpandit$ git clone https://github.com/marqeta/sparkjava-archetypes.git
+  Cloning into 'sparkjava-archetypes'...
+  remote: Counting objects: 115, done.
+  remote: Compressing objects: 100% (13/13), done.
+  remote: Total 115 (delta 3), reused 0 (delta 0), pack-reused 101
+  Receiving objects: 100% (115/115), 13.20 KiB | 0 bytes/s, done.
+  Resolving deltas: 100% (18/18), done.
+</code></pre>
+</div>
+<h3 id="install-the-archetype-in-your-local-m2">Install the archetype in your local .m2</h3>
+<div class="highlighter-rouge"><pre class="highlight"><code>  C02STG51GTFM:work mpandit$ cd sparkjava-archetypes/
+  C02STG51GTFM:sparkjava-archetypes mpandit$ cd sparkjava-helloworld-archetype/
+  C02STG51GTFM:sparkjava-helloworld-archetype mpandit$ mvn install
+  INFO] Scanning for projects...
+  [INFO]                                                                         
+  [INFO] ------------------------------------------------------------------------
+  [INFO] Building Spark Java Hello World Archetype 1.0.0
+  [INFO] ------------------------------------------------------------------------
+  [INFO] ....
+  [INFO] ....
+  [INFO] ------------------------------------------------------------------------
+  [INFO] BUILD SUCCESS
+  [INFO] ------------------------------------------------------------------------
+  [INFO] Total time: 7.029 s
+  [INFO] Finished at: 2017-04-06T20:47:41-07:00
+  [INFO] Final Memory: 13M/245M
+  [INFO] ------------------------------------------------------------------------
+</code></pre>
+</div>
+<h3 id="create-the-helloworld-project-using-this-archetype">Create the HelloWorld project using this archetype</h3>
+
+<p>You may want to replace the <code class="highlighter-rouge">groupId</code>, <code class="highlighter-rouge">artifactId</code>, and <code class="highlighter-rouge">package</code> to match your code structure.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>C02STG51GTFM:sparkjava-helloworld-archetype mpandit$ cd ~/work
+C02STG51GTFM:work mpandit$ mvn archetype:generate \
+&gt;     -DarchetypeGroupId=com.sparkjava \
+&gt;     -DarchetypeArtifactId=sparkjava-helloworld-archetype \
+&gt;     -DarchetypeVersion=1.0.0 \
+&gt;     -DgroupId=com.marqeta.mqpay \
+&gt;     -DartifactId=webhooks-api \
+&gt;     -Dversion=1.0-SNAPSHOT \
+&gt;     -Dpackage=com.marqeta.mqpay
+
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Spark Java Hello World Archetype 1.0.0
+[INFO] ------------------------------------------------------------------------
+[INFO]
+[INFO] &gt;&gt;&gt; maven-archetype-plugin:2.2:generate (default-cli) &gt; generate-sources @ sparkjava-helloworld-archetype &gt;&gt;&gt;
+[INFO]
+[INFO] &lt;&lt;&lt; maven-archetype-plugin:2.2:generate (default-cli) &lt; generate-sources @ sparkjava-helloworld-archetype &lt;&lt;&lt;
+[INFO]
+[INFO] --- maven-archetype-plugin:2.2:generate (default-cli) @ sparkjava-helloworld-archetype ---
+[INFO] Generating project in Interactive mode
+[INFO] Archetype repository missing. Using the one from [com.sparkjava:sparkjava-helloworld-archetype:1.0.0] found in catalog local
+[INFO] Using property: groupId = com.marqeta.mqpay
+[INFO] Using property: artifactId = webhooks-api
+[INFO] Using property: version = 1.0-SNAPSHOT
+[INFO] Using property: package = com.marqeta.mqpay
+Confirm properties configuration:
+groupId: com.marqeta.mqpay
+artifactId: webhooks-api
+version: 1.0-SNAPSHOT
+package: com.marqeta.mqpay
+ Y: :
+
+</code></pre>
+</div>
+<p>Hit enter, and you will notice a webhooks-api folder with the project in it.</p>
+
+<p>You can notice the generated files - Most importantly the Spark Application and web.xml.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>C02STG51GTFM:work mpandit$ cd webhooks-api
+C02STG51GTFM:webhooks-api mpandit$ tree
+.
+├── README.md
+├── pom.xml
+└── src
+    └── main
+        ├── java
+        │   └── com
+        │       └── marqeta
+        │           └── mqpay
+        │               └── SparkJavaHelloWorld.java
+        └── webapp
+            └── WEB-INF
+                └── web.xml
+
+8 directories, 4 files
+
+</code></pre>
+</div>
+<h3 id="build-the-project">Build the Project</h3>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>C02STG51GTFM:webhooks-api mpandit$ mvn install
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building webhooks-api 1.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ webhooks-api ---
+[INFO] ..
+[INFO] ..
+[INFO] ..
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 2.140 s
+[INFO] Finished at: 2017-04-06T20:52:07-07:00
+[INFO] Final Memory: 21M/308M
+[INFO] ------------------------------------------------------------------------
+</code></pre>
+</div>
+
+<h3 id="deploy-the-generated-war-file">Deploy the generated war file</h3>
+<p>I have tomcat under <code class="highlighter-rouge">~/Downloads/tomcat</code>. Replace it with your destination Servlet container’s webapp folder.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>C02STG51GTFM:webhooks-api mpandit$ cp target/webhooks-api-1.0-SNAPSHOT.war ~/Downloads/tomcat/webapps/
+</code></pre>
+</div>
+
+<h3 id="verify-if-it-all-worked">Verify if it all worked</h3>
+
+<p>We can do a simple curl, or browser to hit localhost.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>C02STG51GTFM:webhooks-api mpandit$ curl -i http://localhost:8080/webhooks-api-1.0-SNAPSHOT/hello
+HTTP/1.1 200
+Content-Type: text/html;charset=utf-8
+Transfer-Encoding: chunked
+Date: Fri, 07 Apr 2017 04:17:26 GMT
+
+Hello World!
+</code></pre>
+</div>
+
+<p>You can modify the code in <code class="highlighter-rouge">SparkJavaHelloWorld.java</code> to add more endpoints, or add new controllers (remember to add them to <code class="highlighter-rouge">web.xml</code> so Spark can process them).</p>
+
+  </div>
+
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <p>
+      
+
+&copy; Manish Pandit - Powered by <a href="https://jekyllrb.com">Jekyll</a> &amp; <a href="https://github.com/yous/whiteglass">whiteglass</a> - Subscribe via <a href="https://lobster1234.github.io/feed.xml">RSS</a>
+
+    </p>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
