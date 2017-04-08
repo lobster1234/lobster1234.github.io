@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-04-08T05:47:25-07:00</updated>
+  <updated>2017-04-08T05:54:09-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -104,13 +104,13 @@ Powerline fonts installed to /Users/mpandit/Library/Fonts
 
 &lt;h3 id=&quot;github-integration&quot;&gt;Github integration&lt;/h3&gt;
 
-&lt;p&gt;This image shows how the prompt changes as we make changes to a local git repo. I am using &lt;code class=&quot;highlighter-rouge&quot;&gt;bobthefish&lt;/code&gt; theme.&lt;/p&gt;
+&lt;p&gt;This image shows how the prompt changes as we make simple changes to a local git repo. I am using &lt;code class=&quot;highlighter-rouge&quot;&gt;bobthefish&lt;/code&gt; theme. See the theme details on how the prompt indicates various states like locally committed but un-pushed changes, etc.&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/fish-3.png&quot; alt=&quot;Fish-3&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;As you can see, it is super helpful, with no configuration to get this going. This to me is one of the most useful and powerful features of &lt;code class=&quot;highlighter-rouge&quot;&gt;fish&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;Now that you have &lt;code class=&quot;highlighter-rouge&quot;&gt;fish&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;omf&lt;/code&gt; set up, play with the many options and if you have never used it before, you’ll be surprised how modern and developer friendly this set up is. The depth of autocomplete going beyond just file names, history navigation, and syntax coloring makes working on the terminal so much productive and painless!&lt;/p&gt;</content>
+&lt;p&gt;Now that you have &lt;code class=&quot;highlighter-rouge&quot;&gt;fish&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;omf&lt;/code&gt; set up, play with the many options and if you have never used it before, you’ll be surprised how modern and developer friendly this set up is. The depth of autocomplete going beyond just file names, auto-suggestion, history navigation, and syntax coloring makes working on the terminal so much productive and painless!&lt;/p&gt;</content>
 
       
       
