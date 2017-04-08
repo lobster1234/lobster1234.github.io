@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  
+  
+  <title>Fish and iTerm2</title>
+  <meta name="description" content="So, out of boredom, I decided to upgrade my shell and terminal to something closer to 2017, instead of living in the early 90s. Clearly I’e been using bash all these years - mostly on Ubuntu and lately on OSX. But I’ve always been lazy and complacent with the terminal. I’ve always wanted to set up fish - Friendly Interactive SHell. for it’s git integration, and very rich interaction. Sure, all of this can be done on bash or zsh but I hate configuration, and combing hundreds of git repos for bashfiles and find what works for me. While at fish, I also decided to upgrade the default Mac terminal to iTerm2. This led me to a journey through installing fonts all the way to picking up the theme that works for me. But again, no configuration to mess with.">
+  
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="https://lobster1234.github.io/2017/04/08/setting-up-fish-and-iterm2/">
+  
+  
+  <link rel="alternate" type="application/rss+xml" title="My Blog" href="https://lobster1234.github.io/feed.xml">
+
+  
+
+  
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="lobster1234">
+  <meta name="twitter:title" content="Fish and iTerm2">
+  <meta name="twitter:description" content="So, out of boredom, I decided to upgrade my shell and terminal to something closer to 2017, instead of living in the early 90s. Clearly I’e been using bash all these years - mostly on Ubuntu and la...">
+  
+    <meta name="twitter:creator" content="lobster1234">
+  
+  
+
+  <script type="text/javascript">
+  WebFontConfig = {
+    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
+  };
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+  })();
+</script>
+
+  
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-96931340-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">My Blog</a>
+
+    <nav class="site-nav">
+      
+        
+        <a class="page-link" href="/about/">About</a>
+      
+        
+        <a class="page-link" href="/archives/">Archives</a>
+      
+        
+        <a class="page-link" href="https://www.twitter.com/lobster1234">Twitter</a>
+      
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    
+      <h1 class="post-title" itemprop="name headline">Fish and iTerm2</h1>
+    
+    <p class="post-meta"><time datetime="2017-04-08T04:44:37-07:00" itemprop="datePublished">Apr 8, 2017</time> • 
+  
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <a href="/categories/shell/">shell</a>
+    
+  
+
+</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>So, out of boredom, I decided to upgrade my shell and terminal to something closer to 2017, instead of living in the early 90s. Clearly I’e been using <code class="highlighter-rouge">bash</code> all these years - mostly on Ubuntu and lately on OSX. But I’ve always been <em>lazy and complacent</em> with the terminal. I’ve always wanted to set up <a href="http://fishshell.com" target="_blank"><code class="highlighter-rouge">fish</code></a> - <strong>Friendly Interactive SHell</strong>. for it’s git integration, and very rich interaction. Sure, all of this can be done on <code class="highlighter-rouge">bash</code> or <code class="highlighter-rouge">zsh</code> but I hate configuration, and combing hundreds of git repos for <code class="highlighter-rouge">bashfiles</code> and find what works for me.</p>
+
+<p>While at <code class="highlighter-rouge">fish</code>, I also decided to upgrade the default Mac <code class="highlighter-rouge">terminal</code> to <code class="highlighter-rouge">iTerm2</code>. This led me to a journey through installing fonts all the way to picking up the theme that works for me. But again, no configuration to mess with.</p>
+
+<!--more-->
+<h3 id="installing-fish">Installing fish</h3>
+
+<p>Since I have brew, I was able to simply do this</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>  bash-3.2$ brew install fish
+</code></pre>
+</div>
+
+<p>If you do not have brew, head over to <a href="http://fishshell.com" target="_blank">fishshell.com</a> for instructions on setting it up. They have MacPorts, Installer, and an executable.</p>
+
+<p>Once installed, the default theme supports git repositories, in that, the prompt indicates the local repository state, has nice syntax highlighting on the command line, and typical things you’d expect from the shell of the 21st century.</p>
+
+<p><img src="https://lobster1234.github.io/assets/fish-1.png" alt="Fish-1" /></p>
+
+<p>You can see the prompt change, as well as a timestamp show up to the right of the window. The timestamp is much lighter in color and is not as distracting as it is in this markdown.</p>
+
+<p>If you wish to make fish your default shell, add add <code class="highlighter-rouge">/usr/local/bin/fish</code> at the very top of <code class="highlighter-rouge">/etc/shells</code>, and execute <code class="highlighter-rouge">chsh -s /usr/local/bin/fish</code>. If not, then you can always type <code class="highlighter-rouge">fish</code> in <code class="highlighter-rouge">bash</code>.</p>
+
+<h3 id="installing-omf">Installing omf</h3>
+
+<p>Given the richness of fish with themes and plugins, it’s best to use <code class="highlighter-rouge">omf</code> - <a href="https://github.com/oh-my-fish/oh-my-fish" target="_blank">Oh My Fish</a>, which is more or less a package manager for fish.</p>
+
+<p>To install <code class="highlighter-rouge">omf</code> -</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ curl -L https://get.oh-my.fish | fish
+</code></pre>
+</div>
+
+<p>Once <code class="highlighter-rouge">omf</code> is installed, checking out themes etc. becomes a breeze. To do so, type <code class="highlighter-rouge">omf</code> on the prompt to see the options. Typing <code class="highlighter-rouge">omf theme</code> will show a big list, and in order to see what these themes look like, head over <a href="https://github.com/oh-my-fish/oh-my-fish/blob/master/docs/Themes.md" target="_blank">here</a> to preview them.</p>
+
+<p>I liked <code class="highlighter-rouge">bobthefish</code>, and installed it like so -</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>⋊&gt; ~/work omf install bobthefish                                          05:04:17
+Updating https://github.com/oh-my-fish/packages-main master... Done!
+Installing package bobthefish
+✔ bobthefish successfully installed.
+ ~/work                                          773ms   Sat Apr  8 05:07:06 2017
+</code></pre>
+</div>
+<p>You can always switch back to <code class="highlighter-rouge">default</code> by typing <code class="highlighter-rouge">omf theme default</code>. You can install many themes and switch back and forth between them till you’re comfortable with one of them.</p>
+
+<p>However, this theme (and many others) uses fonts that would need to be installed.</p>
+
+<h3 id="installing-powerline-patched-fonts">Installing Powerline Patched Fonts</h3>
+<div class="highlighter-rouge"><pre class="highlight"><code>~/work  git clone https://github.com/powerline/fonts.git
+~/work  cd fonts                               
+~/w/fonts   master  ./install.sh
+Copying fonts...
+Powerline fonts installed to /Users/mpandit/Library/Fonts
+</code></pre>
+</div>
+<p>Feel free to remove the <code class="highlighter-rouge">fonts</code> directory.</p>
+
+<h3 id="installing-iterm2">Installing iTerm2</h3>
+
+<p>Downloaded and installed <a href="https://www.iterm2.com/" target="_blank">iTerm2</a>, which is super simple to do.</p>
+
+<p>Take a look at the Font Book, and pick the powerline font of your choice. I like <code class="highlighter-rouge">Ubuntu Mono</code>. You can type <code class="highlighter-rouge">powerline</code> in the little search textbox in Font Book to shorten the list. Once picked, set the font here -</p>
+
+<p><img src="https://lobster1234.github.io/assets/fish-2.png" alt="Fish-2" /></p>
+
+<p>Restart iTerm2, and you should be all set!</p>
+
+<h3 id="github-integration">Github integration</h3>
+
+<p>This image shows how the prompt changes as we make changes to a local git repo. I am using <code class="highlighter-rouge">bobthefish</code> theme.</p>
+
+<p><img src="https://lobster1234.github.io/assets/fish-3.png" alt="Fish-3" /></p>
+
+<p>As you can see, it is super helpful, with no configuration to get this going. This to me is one of the most useful and powerful features of <code class="highlighter-rouge">fish</code>.</p>
+
+<p>Now that you have <code class="highlighter-rouge">fish</code> and <code class="highlighter-rouge">omf</code> set up, play with the many options and if you have never used it before, you’ll be surprised how modern and developer friendly this set up is. The depth of autocomplete going beyond just file names, history navigation, and syntax coloring makes working on the terminal so much productive and painless!</p>
+
+  </div>
+
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <p>
+      
+
+&copy; Manish Pandit - Powered by <a href="https://jekyllrb.com">Jekyll</a> &amp; <a href="https://github.com/yous/whiteglass">whiteglass</a> - Subscribe via <a href="https://lobster1234.github.io/feed.xml">RSS</a>
+
+    </p>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

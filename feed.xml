@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-04-07T11:29:00-07:00</updated>
+  <updated>2017-04-08T05:47:25-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -13,7 +13,7 @@
   
 
   
-    <subtitle>A tech blog with gists, code, presentations, tutorials, and all the awesome goodies around programming, devops, cloud architectures, aws, google cloud platform, and infrastructure.
+    <subtitle>Authored by Manish Pandit - A tech blog with gists, code, presentations, tutorials, and many goodies around programming, devops, cloud architectures, aws, google cloud platform, and infrastructure.
 </subtitle>
   
 
@@ -25,6 +25,121 @@
     </author>
   
 
+  
+  
+    <entry>
+      
+      <title type="html">Fish and iTerm2</title>
+      
+      <link href="https://lobster1234.github.io/2017/04/08/setting-up-fish-and-iterm2/" rel="alternate" type="text/html" title="Fish and iTerm2" />
+      <published>2017-04-08T04:44:37-07:00</published>
+      <updated>2017-04-08T04:44:37-07:00</updated>
+      <id>https://lobster1234.github.io/2017/04/08/setting-up-fish-and-iterm2</id>
+      <content type="html" xml:base="https://lobster1234.github.io/2017/04/08/setting-up-fish-and-iterm2/">&lt;p&gt;So, out of boredom, I decided to upgrade my shell and terminal to something closer to 2017, instead of living in the early 90s. Clearly I’e been using &lt;code class=&quot;highlighter-rouge&quot;&gt;bash&lt;/code&gt; all these years - mostly on Ubuntu and lately on OSX. But I’ve always been &lt;em&gt;lazy and complacent&lt;/em&gt; with the terminal. I’ve always wanted to set up &lt;a href=&quot;http://fishshell.com&quot; target=&quot;_blank&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;fish&lt;/code&gt;&lt;/a&gt; - &lt;strong&gt;Friendly Interactive SHell&lt;/strong&gt;. for it’s git integration, and very rich interaction. Sure, all of this can be done on &lt;code class=&quot;highlighter-rouge&quot;&gt;bash&lt;/code&gt; or &lt;code class=&quot;highlighter-rouge&quot;&gt;zsh&lt;/code&gt; but I hate configuration, and combing hundreds of git repos for &lt;code class=&quot;highlighter-rouge&quot;&gt;bashfiles&lt;/code&gt; and find what works for me.&lt;/p&gt;
+
+&lt;p&gt;While at &lt;code class=&quot;highlighter-rouge&quot;&gt;fish&lt;/code&gt;, I also decided to upgrade the default Mac &lt;code class=&quot;highlighter-rouge&quot;&gt;terminal&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;iTerm2&lt;/code&gt;. This led me to a journey through installing fonts all the way to picking up the theme that works for me. But again, no configuration to mess with.&lt;/p&gt;
+
+&lt;!--more--&gt;
+&lt;h3 id=&quot;installing-fish&quot;&gt;Installing fish&lt;/h3&gt;
+
+&lt;p&gt;Since I have brew, I was able to simply do this&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  bash-3.2$ brew install fish
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;If you do not have brew, head over to &lt;a href=&quot;http://fishshell.com&quot; target=&quot;_blank&quot;&gt;fishshell.com&lt;/a&gt; for instructions on setting it up. They have MacPorts, Installer, and an executable.&lt;/p&gt;
+
+&lt;p&gt;Once installed, the default theme supports git repositories, in that, the prompt indicates the local repository state, has nice syntax highlighting on the command line, and typical things you’d expect from the shell of the 21st century.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/fish-1.png&quot; alt=&quot;Fish-1&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;You can see the prompt change, as well as a timestamp show up to the right of the window. The timestamp is much lighter in color and is not as distracting as it is in this markdown.&lt;/p&gt;
+
+&lt;p&gt;If you wish to make fish your default shell, add add &lt;code class=&quot;highlighter-rouge&quot;&gt;/usr/local/bin/fish&lt;/code&gt; at the very top of &lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/shells&lt;/code&gt;, and execute &lt;code class=&quot;highlighter-rouge&quot;&gt;chsh -s /usr/local/bin/fish&lt;/code&gt;. If not, then you can always type &lt;code class=&quot;highlighter-rouge&quot;&gt;fish&lt;/code&gt; in &lt;code class=&quot;highlighter-rouge&quot;&gt;bash&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;installing-omf&quot;&gt;Installing omf&lt;/h3&gt;
+
+&lt;p&gt;Given the richness of fish with themes and plugins, it’s best to use &lt;code class=&quot;highlighter-rouge&quot;&gt;omf&lt;/code&gt; - &lt;a href=&quot;https://github.com/oh-my-fish/oh-my-fish&quot; target=&quot;_blank&quot;&gt;Oh My Fish&lt;/a&gt;, which is more or less a package manager for fish.&lt;/p&gt;
+
+&lt;p&gt;To install &lt;code class=&quot;highlighter-rouge&quot;&gt;omf&lt;/code&gt; -&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bash-3.2$ curl -L https://get.oh-my.fish | fish
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Once &lt;code class=&quot;highlighter-rouge&quot;&gt;omf&lt;/code&gt; is installed, checking out themes etc. becomes a breeze. To do so, type &lt;code class=&quot;highlighter-rouge&quot;&gt;omf&lt;/code&gt; on the prompt to see the options. Typing &lt;code class=&quot;highlighter-rouge&quot;&gt;omf theme&lt;/code&gt; will show a big list, and in order to see what these themes look like, head over &lt;a href=&quot;https://github.com/oh-my-fish/oh-my-fish/blob/master/docs/Themes.md&quot; target=&quot;_blank&quot;&gt;here&lt;/a&gt; to preview them.&lt;/p&gt;
+
+&lt;p&gt;I liked &lt;code class=&quot;highlighter-rouge&quot;&gt;bobthefish&lt;/code&gt;, and installed it like so -&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;⋊&amp;gt; ~/work omf install bobthefish                                          05:04:17
+Updating https://github.com/oh-my-fish/packages-main master... Done!
+Installing package bobthefish
+✔ bobthefish successfully installed.
+ ~/work                                          773ms   Sat Apr  8 05:07:06 2017
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;You can always switch back to &lt;code class=&quot;highlighter-rouge&quot;&gt;default&lt;/code&gt; by typing &lt;code class=&quot;highlighter-rouge&quot;&gt;omf theme default&lt;/code&gt;. You can install many themes and switch back and forth between them till you’re comfortable with one of them.&lt;/p&gt;
+
+&lt;p&gt;However, this theme (and many others) uses fonts that would need to be installed.&lt;/p&gt;
+
+&lt;h3 id=&quot;installing-powerline-patched-fonts&quot;&gt;Installing Powerline Patched Fonts&lt;/h3&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;~/work  git clone https://github.com/powerline/fonts.git
+~/work  cd fonts                               
+~/w/fonts   master  ./install.sh
+Copying fonts...
+Powerline fonts installed to /Users/mpandit/Library/Fonts
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Feel free to remove the &lt;code class=&quot;highlighter-rouge&quot;&gt;fonts&lt;/code&gt; directory.&lt;/p&gt;
+
+&lt;h3 id=&quot;installing-iterm2&quot;&gt;Installing iTerm2&lt;/h3&gt;
+
+&lt;p&gt;Downloaded and installed &lt;a href=&quot;https://www.iterm2.com/&quot; target=&quot;_blank&quot;&gt;iTerm2&lt;/a&gt;, which is super simple to do.&lt;/p&gt;
+
+&lt;p&gt;Take a look at the Font Book, and pick the powerline font of your choice. I like &lt;code class=&quot;highlighter-rouge&quot;&gt;Ubuntu Mono&lt;/code&gt;. You can type &lt;code class=&quot;highlighter-rouge&quot;&gt;powerline&lt;/code&gt; in the little search textbox in Font Book to shorten the list. Once picked, set the font here -&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/fish-2.png&quot; alt=&quot;Fish-2&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Restart iTerm2, and you should be all set!&lt;/p&gt;
+
+&lt;h3 id=&quot;github-integration&quot;&gt;Github integration&lt;/h3&gt;
+
+&lt;p&gt;This image shows how the prompt changes as we make changes to a local git repo. I am using &lt;code class=&quot;highlighter-rouge&quot;&gt;bobthefish&lt;/code&gt; theme.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/fish-3.png&quot; alt=&quot;Fish-3&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;As you can see, it is super helpful, with no configuration to get this going. This to me is one of the most useful and powerful features of &lt;code class=&quot;highlighter-rouge&quot;&gt;fish&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Now that you have &lt;code class=&quot;highlighter-rouge&quot;&gt;fish&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;omf&lt;/code&gt; set up, play with the many options and if you have never used it before, you’ll be surprised how modern and developer friendly this set up is. The depth of autocomplete going beyond just file names, history navigation, and syntax coloring makes working on the terminal so much productive and painless!&lt;/p&gt;</content>
+
+      
+      
+      
+      
+      
+
+      
+        <author>
+            <name>Manish Pandit</name>
+          
+          
+        </author>
+      
+
+      
+        <category term="shell" />
+      
+
+      
+
+      
+        <summary type="html">So, out of boredom, I decided to upgrade my shell and terminal to something closer to 2017, instead of living in the early 90s. Clearly I’e been using bash all these years - mostly on Ubuntu and lately on OSX. But I’ve always been lazy and complacent with the terminal. I’ve always wanted to set up fish - Friendly Interactive SHell. for it’s git integration, and very rich interaction. Sure, all of this can be done on bash or zsh but I hate configuration, and combing hundreds of git repos for bashfiles and find what works for me. While at fish, I also decided to upgrade the default Mac terminal to iTerm2. This led me to a journey through installing fonts all the way to picking up the theme that works for me. But again, no configuration to mess with.</summary>
+      
+
+      
+      
+    </entry>
+  
   
   
     <entry>
