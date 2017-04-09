@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-04-08T05:54:09-07:00</updated>
+  <updated>2017-04-09T01:52:39-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -54,7 +54,7 @@
 
 &lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/fish-1.png&quot; alt=&quot;Fish-1&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;You can see the prompt change, as well as a timestamp show up to the right of the window. The timestamp is much lighter in color and is not as distracting as it is in this markdown.&lt;/p&gt;
+&lt;p&gt;You can see the prompt change, as well as a timestamp show up to the right of the window.&lt;/p&gt;
 
 &lt;p&gt;If you wish to make fish your default shell, add add &lt;code class=&quot;highlighter-rouge&quot;&gt;/usr/local/bin/fish&lt;/code&gt; at the very top of &lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/shells&lt;/code&gt;, and execute &lt;code class=&quot;highlighter-rouge&quot;&gt;chsh -s /usr/local/bin/fish&lt;/code&gt;. If not, then you can always type &lt;code class=&quot;highlighter-rouge&quot;&gt;fish&lt;/code&gt; in &lt;code class=&quot;highlighter-rouge&quot;&gt;bash&lt;/code&gt;.&lt;/p&gt;
 
