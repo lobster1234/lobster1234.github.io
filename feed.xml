@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-04-10T03:17:32-07:00</updated>
+  <updated>2017-04-10T03:20:18-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -440,7 +440,8 @@ aws --endpoint-url=http://localhost:4569 dynamodb put-item --table-name test_tab
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;p&gt;### Scan Table&lt;/p&gt;
+&lt;h3 id=&quot;scan-table&quot;&gt;Scan Table&lt;/h3&gt;
+
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws --endpoint-url=http://localhost:4569 dynamodb scan --table-name test_table
 
  {
