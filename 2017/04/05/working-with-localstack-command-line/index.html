@@ -368,6 +368,138 @@ sys	0m0.167s
 </code></pre>
 </div>
 
+<h2 id="dynamodb">DynamoDB</h2>
+<h3 id="create-a-table">Create a table</h3>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>aws --endpoint-url=http://localhost:4569 dynamodb create-table --table-name test_table  --attribute-definitions AttributeName=first,AttributeType=S AttributeName=second,AttributeType=N --key-schema AttributeName=first,KeyType=HASH AttributeName=second,KeyType=RANGE --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5
+{
+   "TableDescription": {
+       "TableArn": "arn:aws:dynamodb:us-east-1:000000000000:table/test_table",
+       "AttributeDefinitions": [
+           {
+               "AttributeName": "first",
+               "AttributeType": "S"
+           },
+           {
+               "AttributeName": "second",
+               "AttributeType": "N"
+           }
+       ],
+       "ProvisionedThroughput": {
+           "NumberOfDecreasesToday": 0,
+           "WriteCapacityUnits": 5,
+           "ReadCapacityUnits": 5
+       },
+       "TableSizeBytes": 0,
+       "TableName": "test_table",
+       "TableStatus": "CREATING",
+       "KeySchema": [
+           {
+               "KeyType": "HASH",
+               "AttributeName": "first"
+           },
+           {
+               "KeyType": "RANGE",
+               "AttributeName": "second"
+           }
+       ],
+       "ItemCount": 0,
+       "CreationDateTime": 1491818083.66
+   }
+}
+
+</code></pre>
+</div>
+<p>We can verify our created table -</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>aws --endpoint-url=http://localhost:4569 dynamodb list-tables
+{
+    "TableNames": [
+        "test_table"
+    ]
+}
+</code></pre>
+</div>
+
+<p>and describe it too</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>aws --endpoint-url=http://localhost:4569 dynamodb describe-table --table-name test_table
+{
+   "Table": {
+       "TableArn": "arn:aws:dynamodb:us-east-1:000000000000:table/test_table",
+       "AttributeDefinitions": [
+           {
+               "AttributeName": "first",
+               "AttributeType": "S"
+           },
+           {
+               "AttributeName": "second",
+               "AttributeType": "N"
+           }
+       ],
+       "ProvisionedThroughput": {
+           "NumberOfDecreasesToday": 0,
+           "WriteCapacityUnits": 5,
+           "ReadCapacityUnits": 5
+       },
+       "TableSizeBytes": 0,
+       "TableName": "test_table",
+       "TableStatus": "ACTIVE",
+       "KeySchema": [
+           {
+               "KeyType": "HASH",
+               "AttributeName": "first"
+           },
+           {
+               "KeyType": "RANGE",
+               "AttributeName": "second"
+           }
+       ],
+       "ItemCount": 0,
+       "CreationDateTime": 1491818083.66
+   }
+}
+</code></pre>
+</div>
+
+<h3 id="put-items">Put items</h3>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>aws --endpoint-url=http://localhost:4569 dynamodb put-item --table-name test_table  --item '{"first":{"S":"Jack"},"second":{"N":"42"}}'
+
+aws --endpoint-url=http://localhost:4569 dynamodb put-item --table-name test_table  --item '{"first":{"S":"Manish"},"second":{"N":"40"}}'
+</code></pre>
+</div>
+
+<p>### Scan Table</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>aws --endpoint-url=http://localhost:4569 dynamodb scan --table-name test_table
+
+ {
+    "Count": 2,
+    "Items": [
+        {
+            "second": {
+                "N": "40"
+            },
+            "first": {
+                "S": "Manish"
+            }
+        },
+        {
+            "second": {
+                "N": "42"
+            },
+            "first": {
+                "S": "Jack"
+            }
+        }
+    ],
+    "ScannedCount": 2,
+    "ConsumedCapacity": null
+}
+
+</code></pre>
+</div>
+
   </div>
 
 </article>

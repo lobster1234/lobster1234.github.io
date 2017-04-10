@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-04-09T23:24:03-07:00</updated>
+  <updated>2017-04-10T03:17:32-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -334,6 +334,138 @@ sys	0m0.167s
 &lt;h3 id=&quot;delete-this-message&quot;&gt;Delete this message&lt;/h3&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws --endpoint-url=http://localhost:4576 sqs delete-message --queue-url http://localhost:4576/123456789012/test_queue --receipt-handle 'yugzzebhnnksfuvbjlibfnlejyqbulxqfegsnrgafjeabxaatxbmeiyfkfliedslohseosgjwkxhdzllpudhccjhorpkwbgjgyzeyzjwkfvqflathnvsmugeyevbqmfyqanuxetvdhcetseuwzrqpexogzggznndxmbqowtlalvqtffntdahhihel'
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h2 id=&quot;dynamodb&quot;&gt;DynamoDB&lt;/h2&gt;
+&lt;h3 id=&quot;create-a-table&quot;&gt;Create a table&lt;/h3&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws --endpoint-url=http://localhost:4569 dynamodb create-table --table-name test_table  --attribute-definitions AttributeName=first,AttributeType=S AttributeName=second,AttributeType=N --key-schema AttributeName=first,KeyType=HASH AttributeName=second,KeyType=RANGE --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5
+{
+   &quot;TableDescription&quot;: {
+       &quot;TableArn&quot;: &quot;arn:aws:dynamodb:us-east-1:000000000000:table/test_table&quot;,
+       &quot;AttributeDefinitions&quot;: [
+           {
+               &quot;AttributeName&quot;: &quot;first&quot;,
+               &quot;AttributeType&quot;: &quot;S&quot;
+           },
+           {
+               &quot;AttributeName&quot;: &quot;second&quot;,
+               &quot;AttributeType&quot;: &quot;N&quot;
+           }
+       ],
+       &quot;ProvisionedThroughput&quot;: {
+           &quot;NumberOfDecreasesToday&quot;: 0,
+           &quot;WriteCapacityUnits&quot;: 5,
+           &quot;ReadCapacityUnits&quot;: 5
+       },
+       &quot;TableSizeBytes&quot;: 0,
+       &quot;TableName&quot;: &quot;test_table&quot;,
+       &quot;TableStatus&quot;: &quot;CREATING&quot;,
+       &quot;KeySchema&quot;: [
+           {
+               &quot;KeyType&quot;: &quot;HASH&quot;,
+               &quot;AttributeName&quot;: &quot;first&quot;
+           },
+           {
+               &quot;KeyType&quot;: &quot;RANGE&quot;,
+               &quot;AttributeName&quot;: &quot;second&quot;
+           }
+       ],
+       &quot;ItemCount&quot;: 0,
+       &quot;CreationDateTime&quot;: 1491818083.66
+   }
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;We can verify our created table -&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws --endpoint-url=http://localhost:4569 dynamodb list-tables
+{
+    &quot;TableNames&quot;: [
+        &quot;test_table&quot;
+    ]
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;and describe it too&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws --endpoint-url=http://localhost:4569 dynamodb describe-table --table-name test_table
+{
+   &quot;Table&quot;: {
+       &quot;TableArn&quot;: &quot;arn:aws:dynamodb:us-east-1:000000000000:table/test_table&quot;,
+       &quot;AttributeDefinitions&quot;: [
+           {
+               &quot;AttributeName&quot;: &quot;first&quot;,
+               &quot;AttributeType&quot;: &quot;S&quot;
+           },
+           {
+               &quot;AttributeName&quot;: &quot;second&quot;,
+               &quot;AttributeType&quot;: &quot;N&quot;
+           }
+       ],
+       &quot;ProvisionedThroughput&quot;: {
+           &quot;NumberOfDecreasesToday&quot;: 0,
+           &quot;WriteCapacityUnits&quot;: 5,
+           &quot;ReadCapacityUnits&quot;: 5
+       },
+       &quot;TableSizeBytes&quot;: 0,
+       &quot;TableName&quot;: &quot;test_table&quot;,
+       &quot;TableStatus&quot;: &quot;ACTIVE&quot;,
+       &quot;KeySchema&quot;: [
+           {
+               &quot;KeyType&quot;: &quot;HASH&quot;,
+               &quot;AttributeName&quot;: &quot;first&quot;
+           },
+           {
+               &quot;KeyType&quot;: &quot;RANGE&quot;,
+               &quot;AttributeName&quot;: &quot;second&quot;
+           }
+       ],
+       &quot;ItemCount&quot;: 0,
+       &quot;CreationDateTime&quot;: 1491818083.66
+   }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;put-items&quot;&gt;Put items&lt;/h3&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws --endpoint-url=http://localhost:4569 dynamodb put-item --table-name test_table  --item '{&quot;first&quot;:{&quot;S&quot;:&quot;Jack&quot;},&quot;second&quot;:{&quot;N&quot;:&quot;42&quot;}}'
+
+aws --endpoint-url=http://localhost:4569 dynamodb put-item --table-name test_table  --item '{&quot;first&quot;:{&quot;S&quot;:&quot;Manish&quot;},&quot;second&quot;:{&quot;N&quot;:&quot;40&quot;}}'
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;### Scan Table&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws --endpoint-url=http://localhost:4569 dynamodb scan --table-name test_table
+
+ {
+    &quot;Count&quot;: 2,
+    &quot;Items&quot;: [
+        {
+            &quot;second&quot;: {
+                &quot;N&quot;: &quot;40&quot;
+            },
+            &quot;first&quot;: {
+                &quot;S&quot;: &quot;Manish&quot;
+            }
+        },
+        {
+            &quot;second&quot;: {
+                &quot;N&quot;: &quot;42&quot;
+            },
+            &quot;first&quot;: {
+                &quot;S&quot;: &quot;Jack&quot;
+            }
+        }
+    ],
+    &quot;ScannedCount&quot;: 2,
+    &quot;ConsumedCapacity&quot;: null
+}
 
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;</content>
