@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-04-10T03:20:18-07:00</updated>
+  <updated>2017-04-10T03:40:18-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -432,7 +432,7 @@ sys	0m0.167s
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;h3 id=&quot;put-items&quot;&gt;Put items&lt;/h3&gt;
+&lt;h3 id=&quot;put-item&quot;&gt;Put item&lt;/h3&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws --endpoint-url=http://localhost:4569 dynamodb put-item --table-name test_table  --item '{&quot;first&quot;:{&quot;S&quot;:&quot;Jack&quot;},&quot;second&quot;:{&quot;N&quot;:&quot;42&quot;}}'
 
@@ -468,6 +468,23 @@ aws --endpoint-url=http://localhost:4569 dynamodb put-item --table-name test_tab
     &quot;ConsumedCapacity&quot;: null
 }
 
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;get-item&quot;&gt;Get item&lt;/h3&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
+aws --endpoint-url=http://localhost:4569 dynamodb get-item --table-name test_table  --key '{&quot;first&quot;:{&quot;S&quot;:&quot;Manish&quot;},&quot;second&quot;:{&quot;N&quot;:&quot;40&quot;}}'
+
+{
+    &quot;Item&quot;: {
+        &quot;second&quot;: {
+            &quot;N&quot;: &quot;40&quot;
+        },
+        &quot;first&quot;: {
+            &quot;S&quot;: &quot;Manish&quot;
+        }
+    }
+}
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;</content>
 

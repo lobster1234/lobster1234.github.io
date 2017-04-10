@@ -462,7 +462,7 @@ sys	0m0.167s
 </code></pre>
 </div>
 
-<h3 id="put-items">Put items</h3>
+<h3 id="put-item">Put item</h3>
 
 <div class="highlighter-rouge"><pre class="highlight"><code>aws --endpoint-url=http://localhost:4569 dynamodb put-item --table-name test_table  --item '{"first":{"S":"Jack"},"second":{"N":"42"}}'
 
@@ -498,6 +498,23 @@ aws --endpoint-url=http://localhost:4569 dynamodb put-item --table-name test_tab
     "ConsumedCapacity": null
 }
 
+</code></pre>
+</div>
+
+<h3 id="get-item">Get item</h3>
+<div class="highlighter-rouge"><pre class="highlight"><code>
+aws --endpoint-url=http://localhost:4569 dynamodb get-item --table-name test_table  --key '{"first":{"S":"Manish"},"second":{"N":"40"}}'
+
+{
+    "Item": {
+        "second": {
+            "N": "40"
+        },
+        "first": {
+            "S": "Manish"
+        }
+    }
+}
 </code></pre>
 </div>
 
