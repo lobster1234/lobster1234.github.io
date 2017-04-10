@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-04-10T03:40:18-07:00</updated>
+  <updated>2017-04-10T16:27:18-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -152,9 +152,16 @@ Powerline fonts installed to /Users/mpandit/Library/Fonts
       <id>https://lobster1234.github.io/2017/04/05/working-with-localstack-command-line</id>
       <content type="html" xml:base="https://lobster1234.github.io/2017/04/05/working-with-localstack-command-line/">&lt;p&gt;&lt;a href=&quot;https://github.com/atlassian/localstack&quot; target=&quot;_blank&quot;&gt;Localstack&lt;/a&gt; is a really useful project by Atlassian, which allows for local development using the AWS cloud stack. In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against.In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against. This post is a quick and handy gist of using AWS command line to work with localstack.
 &lt;!--more--&gt;&lt;/p&gt;
-&lt;h1 id=&quot;starting-localstack&quot;&gt;Starting localstack&lt;/h1&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;C02STG51GTFM:localstack mpandit$ make infra
+&lt;h1 id=&quot;setting-up-localstack&quot;&gt;Setting up localstack&lt;/h1&gt;
+
+&lt;p&gt;Assuming you’re using an OSX/Linux base, check if you have &lt;code class=&quot;highlighter-rouge&quot;&gt;make&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;python 2.x&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;pip&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;npm&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;java&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;maven&lt;/code&gt; installed and in path.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
+git clone https://github.com/atlassian/localstack.git
+cd localstack
+make clean install test
+make infra
 . .venv/bin/activate; exec localstack/mock/infra.py
 Starting local dev environment. CTRL-C to quit.
 Starting local Elasticsearch (port 4571)...
@@ -173,9 +180,10 @@ Ready.
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;p&gt;Optionally, start the web interface (make sure you pull the latest code, as there were node compatibility issues up until 3/31/2017)&lt;/p&gt;
+&lt;p&gt;Optionally, start the web interface as well. It is not really feature rich at the moment but something to check out.&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;C02STG51GTFM:localstack mpandit$ make web
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;make install-web
+make web
 (. .venv/bin/activate; bin/localstack web --port=8080)
  * Running on http://0.0.0.0:8080/ (Press CTRL+C to quit)
  * Restarting with stat
@@ -183,6 +191,7 @@ Ready.
  * Debugger PIN: 272-228-949
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
+&lt;p&gt;Hit up http://localhost:8080 to see the console.&lt;/p&gt;
 
 &lt;h2 id=&quot;s3&quot;&gt;S3&lt;/h2&gt;
 

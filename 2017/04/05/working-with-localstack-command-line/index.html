@@ -182,9 +182,16 @@
   <div class="post-content" itemprop="articleBody">
     <p><a href="https://github.com/atlassian/localstack" target="_blank">Localstack</a> is a really useful project by Atlassian, which allows for local development using the AWS cloud stack. In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against.In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against. This post is a quick and handy gist of using AWS command line to work with localstack.
 <!--more--></p>
-<h1 id="starting-localstack">Starting localstack</h1>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>C02STG51GTFM:localstack mpandit$ make infra
+<h1 id="setting-up-localstack">Setting up localstack</h1>
+
+<p>Assuming you’re using an OSX/Linux base, check if you have <code class="highlighter-rouge">make</code>, <code class="highlighter-rouge">python 2.x</code>, <code class="highlighter-rouge">pip</code>, <code class="highlighter-rouge">npm</code>, <code class="highlighter-rouge">java</code> and <code class="highlighter-rouge">maven</code> installed and in path.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>
+git clone https://github.com/atlassian/localstack.git
+cd localstack
+make clean install test
+make infra
 . .venv/bin/activate; exec localstack/mock/infra.py
 Starting local dev environment. CTRL-C to quit.
 Starting local Elasticsearch (port 4571)...
@@ -203,9 +210,10 @@ Ready.
 </code></pre>
 </div>
 
-<p>Optionally, start the web interface (make sure you pull the latest code, as there were node compatibility issues up until 3/31/2017)</p>
+<p>Optionally, start the web interface as well. It is not really feature rich at the moment but something to check out.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>C02STG51GTFM:localstack mpandit$ make web
+<div class="highlighter-rouge"><pre class="highlight"><code>make install-web
+make web
 (. .venv/bin/activate; bin/localstack web --port=8080)
  * Running on http://0.0.0.0:8080/ (Press CTRL+C to quit)
  * Restarting with stat
@@ -213,6 +221,7 @@ Ready.
  * Debugger PIN: 272-228-949
 </code></pre>
 </div>
+<p>Hit up http://localhost:8080 to see the console.</p>
 
 <h2 id="s3">S3</h2>
 
