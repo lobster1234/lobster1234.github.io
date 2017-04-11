@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-04-10T21:59:35-07:00</updated>
+  <updated>2017-04-10T22:06:48-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -144,13 +144,13 @@ Powerline fonts installed to /Users/mpandit/Library/Fonts
   
     <entry>
       
-      <title type="html">Using localstack with AWS Command Line</title>
+      <title type="html">Using localstack with AWS CLI</title>
       
-      <link href="https://lobster1234.github.io/2017/04/05/working-with-localstack-command-line/" rel="alternate" type="text/html" title="Using localstack with AWS Command Line" />
+      <link href="https://lobster1234.github.io/2017/04/05/working-with-localstack-command-line/" rel="alternate" type="text/html" title="Using localstack with AWS CLI" />
       <published>2017-04-05T23:44:37-07:00</published>
       <updated>2017-04-05T23:44:37-07:00</updated>
       <id>https://lobster1234.github.io/2017/04/05/working-with-localstack-command-line</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2017/04/05/working-with-localstack-command-line/">&lt;p&gt;&lt;a href=&quot;https://github.com/atlassian/localstack&quot; target=&quot;_blank&quot;&gt;Localstack&lt;/a&gt; is a really useful project by Atlassian, which allows for local development using the AWS cloud stack. In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against.In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against. This post is a quick and handy gist of using AWS command line to work with localstack.
+      <content type="html" xml:base="https://lobster1234.github.io/2017/04/05/working-with-localstack-command-line/">&lt;p&gt;&lt;a href=&quot;https://github.com/atlassian/localstack&quot; target=&quot;_blank&quot;&gt;Localstack&lt;/a&gt; is a really useful project by Atlassian, which allows for local development using the AWS cloud stack. In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against. This post is a quick and handy gist of using AWS command line to work with localstack for S3, SNS, SQS, and DynamoDB.
 &lt;!--more--&gt;&lt;/p&gt;
 
 &lt;h1 id=&quot;setting-up-localstack&quot;&gt;Setting up localstack&lt;/h1&gt;
@@ -542,7 +542,7 @@ bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb get-item --table-nam
       
 
       
-        <summary type="html">Localstack is a really useful project by Atlassian, which allows for local development using the AWS cloud stack. In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against.In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against. This post is a quick and handy gist of using AWS command line to work with localstack.</summary>
+        <summary type="html">Localstack is a really useful project by Atlassian, which allows for local development using the AWS cloud stack. In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against. This post is a quick and handy gist of using AWS command line to work with localstack for S3, SNS, SQS, and DynamoDB.</summary>
       
 
       
