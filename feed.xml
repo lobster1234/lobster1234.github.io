@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-04-10T21:27:24-07:00</updated>
+  <updated>2017-04-10T21:59:35-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -493,6 +493,28 @@ bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb get-item --table-nam
             &quot;S&quot;: &quot;Manish&quot;
         }
     }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;query&quot;&gt;Query&lt;/h3&gt;
+&lt;p&gt;I &lt;strong&gt;hate&lt;/strong&gt; to query over CLI, and you can see why. Hope this can help you realize that the best way to deal with DynamoDB is via an SDK.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb query --table-name test_table --projection-expression &quot;#first, #second&quot; --key-condition-expression &quot;#first = :value&quot; --expression-attribute-values '{&quot;:value&quot; : {&quot;S&quot;:&quot;Manish&quot;}}' --expression-attribute-names '{&quot;#first&quot;:&quot;first&quot;, &quot;#second&quot;:&quot;second&quot;}'
+{
+    &quot;Count&quot;: 1,
+    &quot;Items&quot;: [
+        {
+            &quot;second&quot;: {
+                &quot;N&quot;: &quot;40&quot;
+            },
+            &quot;first&quot;: {
+                &quot;S&quot;: &quot;Manish&quot;
+            }
+        }
+    ],
+    &quot;ScannedCount&quot;: 1,
+    &quot;ConsumedCapacity&quot;: null
 }
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;</content>

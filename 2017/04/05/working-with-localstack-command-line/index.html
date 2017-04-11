@@ -527,6 +527,28 @@ bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb get-item --table-nam
 </code></pre>
 </div>
 
+<h3 id="query">Query</h3>
+<p>I <strong>hate</strong> to query over CLI, and you can see why. Hope this can help you realize that the best way to deal with DynamoDB is via an SDK.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb query --table-name test_table --projection-expression "#first, #second" --key-condition-expression "#first = :value" --expression-attribute-values '{":value" : {"S":"Manish"}}' --expression-attribute-names '{"#first":"first", "#second":"second"}'
+{
+    "Count": 1,
+    "Items": [
+        {
+            "second": {
+                "N": "40"
+            },
+            "first": {
+                "S": "Manish"
+            }
+        }
+    ],
+    "ScannedCount": 1,
+    "ConsumedCapacity": null
+}
+</code></pre>
+</div>
+
   </div>
 
 </article>
