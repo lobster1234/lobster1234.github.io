@@ -188,10 +188,10 @@
 <p>Assuming you’re using an OSX/Linux base, check if you have <code class="highlighter-rouge">make</code>, <code class="highlighter-rouge">python 2.x</code>, <code class="highlighter-rouge">pip</code>, <code class="highlighter-rouge">npm</code>, <code class="highlighter-rouge">java</code> and <code class="highlighter-rouge">maven</code> installed and in path.</p>
 
 <div class="highlighter-rouge"><pre class="highlight"><code>
-git clone https://github.com/atlassian/localstack.git
-cd localstack
-make clean install test
-make infra
+bash-3.2$ git clone https://github.com/atlassian/localstack.git
+bash-3.2$ cd localstack
+bash-3.2$ make clean install test
+bash-3.2$ make infra
 . .venv/bin/activate; exec localstack/mock/infra.py
 Starting local dev environment. CTRL-C to quit.
 Starting local Elasticsearch (port 4571)...
@@ -212,8 +212,8 @@ Ready.
 
 <p>Optionally, start the web interface as well. It is not really feature rich at the moment but something to check out.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>make install-web
-make web
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ make install-web
+bash-3.2$ make web
 (. .venv/bin/activate; bin/localstack web --port=8080)
  * Running on http://0.0.0.0:8080/ (Press CTRL+C to quit)
  * Restarting with stat
@@ -226,46 +226,46 @@ make web
 <h2 id="s3">S3</h2>
 
 <h3 id="create-a-bucket">Create a bucket</h3>
-<div class="highlighter-rouge"><pre class="highlight"><code>C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4572 s3 mb s3://mytestbucket
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4572 s3 mb s3://mytestbucket
 make_bucket: mytestbucket
 
-C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4572 s3 ls
+bash-3.2$ aws --endpoint-url=http://localhost:4572 s3 ls
 2006-02-03 08:45:09 mytestbucket
 </code></pre>
 </div>
 
 <h3 id="copy-a-file-over">Copy a file over</h3>
-<div class="highlighter-rouge"><pre class="highlight"><code>C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4572 s3 cp /tmp/mongo.log s3://mytestbucket
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4572 s3 cp /tmp/mongo.log s3://mytestbucket
 upload: ../../../../tmp/mongo.log to s3://mytestbucket/mongo.log
 
-C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4572 s3 ls s3://mytestbucket
+bash-3.2$ aws --endpoint-url=http://localhost:4572 s3 ls s3://mytestbucket
 2017-04-05 01:18:39       4789 mongo.log
 </code></pre>
 </div>
 <h3 id="delete-this-file">Delete this file</h3>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4572 s3 rm s3://mytestbucket/mongo.log
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4572 s3 rm s3://mytestbucket/mongo.log
 delete: s3://mytestbucket/mongo.log
 
-C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4572 s3 ls s3://mytestbucket
+bash-3.2$ aws --endpoint-url=http://localhost:4572 s3 ls s3://mytestbucket
 
-C02STG51GTFM:localstack mpandit$
+bash-3.2$
 </code></pre>
 </div>
 
 <h2 id="sns">SNS</h2>
 
 <h3 id="create-a-topic">Create a topic</h3>
-<div class="highlighter-rouge"><pre class="highlight"><code>C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4575 sns list-topics
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4575 sns list-topics
 {
     "Topics": []
 }
 
-C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4575 sns create-topic --name test-topic
+bash-3.2$ aws --endpoint-url=http://localhost:4575 sns create-topic --name test-topic
 {
     "TopicArn": "arn:aws:sns:us-east-1:123456789012:test-topic"
 }
-C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4575 sns list-topics
+bash-3.2$ aws --endpoint-url=http://localhost:4575 sns list-topics
 {
     "Topics": [
         {
@@ -280,12 +280,12 @@ C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4575 sns li
 
 <p>(use any random email)</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4575 sns subscribe --topic-arn arn:aws:sns:us-east-1:123456789012:test-topic --protocol email --notification-endpoint pibehatin@1rentcar.top
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4575 sns subscribe --topic-arn arn:aws:sns:us-east-1:123456789012:test-topic --protocol email --notification-endpoint pibehatin@1rentcar.top
 {
     "SubscriptionArn": "arn:aws:sns:us-east-1:123456789012:test-topic:5aacffbe-ccf7-40d5-be97-c55af7392935"
 }
 
-C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4575 sns list-subscriptions
+bash-3.2$ aws --endpoint-url=http://localhost:4575 sns list-subscriptions
 {
     "Subscriptions": [
         {
@@ -302,7 +302,7 @@ C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4575 sns li
 </div>
 <h3 id="publish-to-this-topic">Publish to this topic</h3>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4575 sns publish  --topic-arn arn:aws:sns:us-east-1:123456789012:test-topic --message 'Test Message!'
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4575 sns publish  --topic-arn arn:aws:sns:us-east-1:123456789012:test-topic --message 'Test Message!'
 {
     "MessageId": "n/a"
 }
@@ -312,12 +312,12 @@ C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4575 sns li
 <h2 id="sqs">SQS</h2>
 
 <h3 id="create-a-queue">Create a Queue</h3>
-<div class="highlighter-rouge"><pre class="highlight"><code>C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4576 sqs create-queue --queue-name test_queue
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4576 sqs create-queue --queue-name test_queue
 {
     "QueueUrl": "http://localhost:4576/123456789012/test_queue"
 }
 
-C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4576 sqs list-queues
+bash-3.2$ aws --endpoint-url=http://localhost:4576 sqs list-queues
 {
     "QueueUrls": [
         "http://localhost:4576/123456789012/test_queue"
@@ -326,7 +326,7 @@ C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4576 sqs li
 </code></pre>
 </div>
 <h3 id="send-a-message-to-this-queue">Send a message to this queue</h3>
-<div class="highlighter-rouge"><pre class="highlight"><code>C02STG51GTFM:localstack mpandit$  aws --endpoint-url=http://localhost:4576 sqs send-message --queue-url http://localhost:4576/123456789012/test_queue --message-body 'Test Message!'
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$  aws --endpoint-url=http://localhost:4576 sqs send-message --queue-url http://localhost:4576/123456789012/test_queue --message-body 'Test Message!'
 {
     "MD5OfMessageBody": "df69267381a60e476252c989db9ac8ad",
     "MessageId": "a6ed436b-076a-0d8d-73e1-cc3291a19c28"
@@ -335,7 +335,7 @@ C02STG51GTFM:localstack mpandit$ aws --endpoint-url=http://localhost:4576 sqs li
 </code></pre>
 </div>
 <h3 id="receive-the-message-from-this-queue">Receive the message from this queue</h3>
-<div class="highlighter-rouge"><pre class="highlight"><code>C02STG51GTFM:localstack mpandit$  aws --endpoint-url=http://localhost:4576 sqs receive-message --queue-url http://localhost:4576/123456789012/test_queue
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$  aws --endpoint-url=http://localhost:4576 sqs receive-message --queue-url http://localhost:4576/123456789012/test_queue
 {
     "Messages": [
         {
@@ -372,7 +372,7 @@ sys	0m0.167s
 
 <h3 id="delete-this-message">Delete this message</h3>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>aws --endpoint-url=http://localhost:4576 sqs delete-message --queue-url http://localhost:4576/123456789012/test_queue --receipt-handle 'yugzzebhnnksfuvbjlibfnlejyqbulxqfegsnrgafjeabxaatxbmeiyfkfliedslohseosgjwkxhdzllpudhccjhorpkwbgjgyzeyzjwkfvqflathnvsmugeyevbqmfyqanuxetvdhcetseuwzrqpexogzggznndxmbqowtlalvqtffntdahhihel'
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4576 sqs delete-message --queue-url http://localhost:4576/123456789012/test_queue --receipt-handle 'yugzzebhnnksfuvbjlibfnlejyqbulxqfegsnrgafjeabxaatxbmeiyfkfliedslohseosgjwkxhdzllpudhccjhorpkwbgjgyzeyzjwkfvqflathnvsmugeyevbqmfyqanuxetvdhcetseuwzrqpexogzggznndxmbqowtlalvqtffntdahhihel'
 
 </code></pre>
 </div>
@@ -380,7 +380,7 @@ sys	0m0.167s
 <h2 id="dynamodb">DynamoDB</h2>
 <h3 id="create-a-table">Create a table</h3>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>aws --endpoint-url=http://localhost:4569 dynamodb create-table --table-name test_table  --attribute-definitions AttributeName=first,AttributeType=S AttributeName=second,AttributeType=N --key-schema AttributeName=first,KeyType=HASH AttributeName=second,KeyType=RANGE --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb create-table --table-name test_table  --attribute-definitions AttributeName=first,AttributeType=S AttributeName=second,AttributeType=N --key-schema AttributeName=first,KeyType=HASH AttributeName=second,KeyType=RANGE --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5
 {
    "TableDescription": {
        "TableArn": "arn:aws:dynamodb:us-east-1:000000000000:table/test_table",
@@ -421,7 +421,7 @@ sys	0m0.167s
 </div>
 <p>We can verify our created table -</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>aws --endpoint-url=http://localhost:4569 dynamodb list-tables
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb list-tables
 {
     "TableNames": [
         "test_table"
@@ -432,7 +432,7 @@ sys	0m0.167s
 
 <p>and describe it too</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>aws --endpoint-url=http://localhost:4569 dynamodb describe-table --table-name test_table
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb describe-table --table-name test_table
 {
    "Table": {
        "TableArn": "arn:aws:dynamodb:us-east-1:000000000000:table/test_table",
@@ -473,15 +473,15 @@ sys	0m0.167s
 
 <h3 id="put-item">Put item</h3>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>aws --endpoint-url=http://localhost:4569 dynamodb put-item --table-name test_table  --item '{"first":{"S":"Jack"},"second":{"N":"42"}}'
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb put-item --table-name test_table  --item '{"first":{"S":"Jack"},"second":{"N":"42"}}'
 
-aws --endpoint-url=http://localhost:4569 dynamodb put-item --table-name test_table  --item '{"first":{"S":"Manish"},"second":{"N":"40"}}'
+bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb put-item --table-name test_table  --item '{"first":{"S":"Manish"},"second":{"N":"40"}}'
 </code></pre>
 </div>
 
 <h3 id="scan-table">Scan Table</h3>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>aws --endpoint-url=http://localhost:4569 dynamodb scan --table-name test_table
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb scan --table-name test_table
 
  {
     "Count": 2,
@@ -512,7 +512,7 @@ aws --endpoint-url=http://localhost:4569 dynamodb put-item --table-name test_tab
 
 <h3 id="get-item">Get item</h3>
 <div class="highlighter-rouge"><pre class="highlight"><code>
-aws --endpoint-url=http://localhost:4569 dynamodb get-item --table-name test_table  --key '{"first":{"S":"Manish"},"second":{"N":"40"}}'
+bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb get-item --table-name test_table  --key '{"first":{"S":"Manish"},"second":{"N":"40"}}'
 
 {
     "Item": {
