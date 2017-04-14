@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-04-14T03:34:24-07:00</updated>
+  <updated>2017-04-14T04:11:28-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -50,7 +50,7 @@
 &lt;p&gt;For the sake of simplicity, here is our schema - We have payment cards, every account has transactions, and every transaction has an amount a transaction ID, and a transaction date.&lt;/p&gt;
 
 &lt;blockquote&gt;
-  &lt;p&gt;The focus is here on simplicity of the example, as the actual process to get there is not that easy at all. &lt;strong&gt;Please be warned.&lt;/strong&gt;&lt;/p&gt;
+  &lt;p&gt;The focus is here on simplicity of the example, as the end-to-end flow is quite hard to comprehend, specially if you’re very new to AWS.&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;p&gt;The API will be super simple -&lt;/p&gt;
@@ -214,7 +214,7 @@ You will click &lt;code class=&quot;highlighter-rouge&quot;&gt;Open&lt;/code&gt;
 
 &lt;p&gt;Lets create the POJO we will need for our API. We use &lt;code class=&quot;highlighter-rouge&quot;&gt;com.serverless.data&lt;/code&gt; package to hold it. Please note that we use &lt;a href=&quot;http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBMapper.Annotations.html&quot; target=&quot;_blank&quot;&gt;DynamoDB annotations&lt;/a&gt; in this POJO to make our life easier.&lt;/p&gt;
 
-&lt;p&gt;Transaction.java - This POJO represents the DynamoDB Item. We will create separate POJOs for request/response.&lt;/p&gt;
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Transaction.java&lt;/code&gt; - This POJO represents the DynamoDB Item.&lt;/p&gt;
 
 &lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;com&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;serverless&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 
@@ -341,8 +341,6 @@ You will click &lt;code class=&quot;highlighter-rouge&quot;&gt;Open&lt;/code&gt;
 &lt;h3 id=&quot;lambda-function-handlers&quot;&gt;Lambda Function Handlers&lt;/h3&gt;
 
 &lt;p&gt;Now we get to the fun part - writing our lambda handler. We had copied the Handler that Serverless created for us. Let us start there.&lt;/p&gt;
-
-&lt;p&gt;Since we will be setting up our Lambda as a proxy, API Gateway will &lt;strong&gt;NOT&lt;/strong&gt; send us a JSON string but map. So, the input and output for our handler function has to change accordingly.&lt;/p&gt;
 
 &lt;p&gt;Referring to AWS Documentation, we can extract request parameters from the request that the API Gateway sends us “as is”.&lt;/p&gt;
 
@@ -471,7 +469,7 @@ functions:
 bash-3.2$
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
-&lt;p&gt;Unfortunately invoking this function will not be straightforward, as it expects the input request as a &lt;code class=&quot;highlighter-rouge&quot;&gt;Map&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Unfortunately invoking these 2 functions will not be straightforward via CLI, as it expects the input request as a &lt;code class=&quot;highlighter-rouge&quot;&gt;Map&amp;lt;String, Object&amp;gt;&lt;/code&gt;.&lt;/p&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bash-3.2$ serverless invoke -f get-transactions
 {

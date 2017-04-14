@@ -358,7 +358,7 @@
 <p>For the sake of simplicity, here is our schema - We have payment cards, every account has transactions, and every transaction has an amount a transaction ID, and a transaction date.</p>
 
 <blockquote>
-  <p>The focus is here on simplicity of the example, as the actual process to get there is not that easy at all. <strong>Please be warned.</strong></p>
+  <p>The focus is here on simplicity of the example, as the end-to-end flow is quite hard to comprehend, specially if you’re very new to AWS.</p>
 </blockquote>
 
 <p>The API will be super simple -</p>
@@ -522,7 +522,7 @@ You will click <code class="highlighter-rouge">Open</code>, then select the <cod
 
 <p>Lets create the POJO we will need for our API. We use <code class="highlighter-rouge">com.serverless.data</code> package to hold it. Please note that we use <a href="http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBMapper.Annotations.html" target="_blank">DynamoDB annotations</a> in this POJO to make our life easier.</p>
 
-<p>Transaction.java - This POJO represents the DynamoDB Item. We will create separate POJOs for request/response.</p>
+<p><code class="highlighter-rouge">Transaction.java</code> - This POJO represents the DynamoDB Item.</p>
 
 <div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kn">package</span> <span class="n">com</span><span class="o">.</span><span class="na">serverless</span><span class="o">.</span><span class="na">data</span><span class="o">;</span>
 
@@ -649,8 +649,6 @@ You will click <code class="highlighter-rouge">Open</code>, then select the <cod
 <h3 id="lambda-function-handlers">Lambda Function Handlers</h3>
 
 <p>Now we get to the fun part - writing our lambda handler. We had copied the Handler that Serverless created for us. Let us start there.</p>
-
-<p>Since we will be setting up our Lambda as a proxy, API Gateway will <strong>NOT</strong> send us a JSON string but map. So, the input and output for our handler function has to change accordingly.</p>
 
 <p>Referring to AWS Documentation, we can extract request parameters from the request that the API Gateway sends us “as is”.</p>
 
@@ -779,7 +777,7 @@ functions:
 bash-3.2$
 </code></pre>
 </div>
-<p>Unfortunately invoking this function will not be straightforward, as it expects the input request as a <code class="highlighter-rouge">Map</code>.</p>
+<p>Unfortunately invoking these 2 functions will not be straightforward via CLI, as it expects the input request as a <code class="highlighter-rouge">Map&lt;String, Object&gt;</code>.</p>
 
 <div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ serverless invoke -f get-transactions
 {
