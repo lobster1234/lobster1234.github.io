@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-04-14T03:31:47-07:00</updated>
+  <updated>2017-04-14T03:34:24-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -338,7 +338,7 @@ You will click &lt;code class=&quot;highlighter-rouge&quot;&gt;Open&lt;/code&gt;
 
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
-&lt;h3 id=&quot;post-transactions-lambda-function&quot;&gt;Post Transactions Lambda Function&lt;/h3&gt;
+&lt;h3 id=&quot;lambda-function-handlers&quot;&gt;Lambda Function Handlers&lt;/h3&gt;
 
 &lt;p&gt;Now we get to the fun part - writing our lambda handler. We had copied the Handler that Serverless created for us. Let us start there.&lt;/p&gt;
 
