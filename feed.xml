@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-04-14T04:11:28-07:00</updated>
+  <updated>2017-04-14T11:16:10-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -38,6 +38,10 @@
       <content type="html" xml:base="https://lobster1234.github.io/2017/04/12/serverless-framework-aws-apigateway/">&lt;p&gt;We continue to build our &lt;a href=&quot;https://aws.amazon.com/lambda/&quot; target=&quot;_blank&quot;&gt;Lambda&lt;/a&gt; functions beyond the hello world that we saw in the previous post. Our end goal is to build an API, and make it available via &lt;a href=&quot;https://aws.amazon.com/api-gateway/&quot; target=&quot;_blank&quot;&gt;Amazon API Gateway&lt;/a&gt;. We will build the foundation of our Lambda-API-Gateway set up in this tutorial. We will also set up &lt;a href=&quot;https://aws.amazon.com/dynamodb/&quot; target=&quot;_blank&quot;&gt;DynamoDB&lt;/a&gt;.&lt;/p&gt;
 
 &lt;!--more--&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;The source code from this post can be found &lt;a href=&quot;https://github.com/lobster1234/transactions-api&quot; target=&quot;_blank&quot;&gt;here&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
 
 &lt;h2 id=&quot;set-up-serverless-framework&quot;&gt;Set up Serverless Framework&lt;/h2&gt;
 
