@@ -10,7 +10,7 @@
   
   
   <title>AWS Lambda with Serverless Framework and Java/Maven - Part 2</title>
-  <meta name="description" content="We continue to build our Lambda functions beyond the hello world that we saw in the previous post. Our end goal is to build an API, and make it available via Amazon API Gateway. We will build the foundation of our Lambda-API-Gateway set up in this tutorial. We will also set up DynamoDB.">
+  <meta name="description" content="We continue to build our Lambda functions beyond the Hello World that we saw in the previous post. Our end goal is to build an API, and make it available via Amazon API Gateway. We will build the foundation of our Lambda-API-Gateway set up in this tutorial. We will also set up DynamoDB. Feel free to replace DynamoDB with any persistance layer, or even a mock.">
   
 
   <link rel="stylesheet" href="/assets/main.css">
@@ -25,7 +25,7 @@
   <meta name="twitter:card" content="summary">
   <meta name="twitter:site" content="lobster1234">
   <meta name="twitter:title" content="AWS Lambda with Serverless Framework and Java/Maven - Part 2">
-  <meta name="twitter:description" content="We continue to build our Lambda functions beyond the hello world that we saw in the previous post. Our end goal is to build an API, and make it available via Amazon API Gateway. We will build the f...">
+  <meta name="twitter:description" content="We continue to build our Lambda functions beyond the Hello World that we saw in the previous post. Our end goal is to build an API, and make it available via Amazon API Gateway. We will build the f...">
   
     <meta name="twitter:creator" content="lobster1234">
   
@@ -65,8 +65,8 @@
 <meta property="og:title" content="AWS Lambda with Serverless Framework and Java/Maven - Part 2" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="We continue to build our Lambda functions beyond the hello world that we saw in the previous post. Our end goal is to build an API, and make it available via Amazon API Gateway. We will build the foundation of our Lambda-API-Gateway set up in this tutorial. We will also set up DynamoDB." />
-<meta property="og:description" content="We continue to build our Lambda functions beyond the hello world that we saw in the previous post. Our end goal is to build an API, and make it available via Amazon API Gateway. We will build the foundation of our Lambda-API-Gateway set up in this tutorial. We will also set up DynamoDB." />
+<meta name="description" content="We continue to build our Lambda functions beyond the Hello World that we saw in the previous post. Our end goal is to build an API, and make it available via Amazon API Gateway. We will build the foundation of our Lambda-API-Gateway set up in this tutorial. We will also set up DynamoDB. Feel free to replace DynamoDB with any persistance layer, or even a mock." />
+<meta property="og:description" content="We continue to build our Lambda functions beyond the Hello World that we saw in the previous post. Our end goal is to build an API, and make it available via Amazon API Gateway. We will build the foundation of our Lambda-API-Gateway set up in this tutorial. We will also set up DynamoDB. Feel free to replace DynamoDB with any persistance layer, or even a mock." />
 <link rel="canonical" href="https://lobster1234.github.io/2017/04/12/serverless-framework-aws-apigateway/" />
 <meta property="og:url" content="https://lobster1234.github.io/2017/04/12/serverless-framework-aws-apigateway/" />
 <meta property="og:site_name" content="My Blog" />
@@ -79,7 +79,7 @@
 "author": {"@type": "Person",
 "name": "Manish Pandit"},
 "datePublished": "2017-04-12T23:44:37-07:00",
-"description": "We continue to build our Lambda functions beyond the hello world that we saw in the previous post. Our end goal is to build an API, and make it available via Amazon API Gateway. We will build the foundation of our Lambda-API-Gateway set up in this tutorial. We will also set up DynamoDB.",
+"description": "We continue to build our Lambda functions beyond the Hello World that we saw in the previous post. Our end goal is to build an API, and make it available via Amazon API Gateway. We will build the foundation of our Lambda-API-Gateway set up in this tutorial. We will also set up DynamoDB. Feel free to replace DynamoDB with any persistance layer, or even a mock.",
 "mainEntityOfPage": {"@type": "WebPage",
 "@id": "https://lobster1234.github.io/2017/04/12/serverless-framework-aws-apigateway/"},
 "url": "https://lobster1234.github.io/2017/04/12/serverless-framework-aws-apigateway/"}</script>
@@ -343,29 +343,29 @@
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <p>We continue to build our <a href="https://aws.amazon.com/lambda/" target="_blank">Lambda</a> functions beyond the hello world that we saw in the previous post. Our end goal is to build an API, and make it available via <a href="https://aws.amazon.com/api-gateway/" target="_blank">Amazon API Gateway</a>. We will build the foundation of our Lambda-API-Gateway set up in this tutorial. We will also set up <a href="https://aws.amazon.com/dynamodb/" target="_blank">DynamoDB</a>.</p>
+    <p>We continue to build our <a href="https://aws.amazon.com/lambda/" target="_blank">Lambda</a> functions beyond the Hello World that we saw in the previous post. Our end goal is to build an API, and make it available via <a href="https://aws.amazon.com/api-gateway/" target="_blank">Amazon API Gateway</a>. We will build the foundation of our Lambda-API-Gateway set up in this tutorial. We will also set up <a href="https://aws.amazon.com/dynamodb/" target="_blank">DynamoDB</a>. Feel free to replace DynamoDB with any persistance layer, or even a mock.</p>
 
 <!--more-->
 
 <blockquote>
-  <p>The source code from this post can be found <a href="https://github.com/lobster1234/transactions-api" target="_blank">here</a></p>
+  <p>The source code listed in this this post can be found <a href="https://github.com/lobster1234/transactions-api" target="_blank">here</a>.</p>
 </blockquote>
 
 <h2 id="set-up-serverless-framework">Set up Serverless Framework</h2>
 
 <p>Please refer to <a href="/2017/02/28/serverless-framework-java-maven-part-1" target="_blank">AWS Lambda with Serverless Framework and Java/Maven - Part 1</a>.</p>
 
-<p>Once serverless is set up, come back here to build a new project.</p>
+<p>Once serverless framework is set up, come back here to build a new project.</p>
 
-<h2 id="our-api">Our API</h2>
+<h2 id="the-api">The API</h2>
 
-<p>For the sake of simplicity, here is our schema - We have payment cards, every account has transactions, and every transaction has an amount a transaction ID, and a transaction date.</p>
+<p>For the sake of simplicity, here is the schema - There are payment accounts, every account has transactions, and every transaction has an amount, a transaction ID, and a transaction date.</p>
 
 <blockquote>
-  <p>The focus is here on simplicity of the example, as the end-to-end flow is quite hard to comprehend, specially if you’re very new to AWS.</p>
+  <p>The focus is here on simplicity of the example, as we focus on the AWS framework, deployment, and management.</p>
 </blockquote>
 
-<p>The API will be super simple -</p>
+<p>Here is the API Schema -</p>
 
 <p>POST <code class="highlighter-rouge">/accounts/:account_id/transactions</code></p>
 
@@ -378,7 +378,7 @@
 
 <p>GET <code class="highlighter-rouge">/accounts/:account_id/transactions</code></p>
 
-<p>The date is UTC milliseconds, as we are not doing any special JSON processing.</p>
+<p>The date is UTC milliseconds, as we are not bothering with dateformats and conversions here.</p>
 
 <div class="language-json highlighter-rouge"><pre class="highlight"><code><span class="p">[</span><span class="w">
    </span><span class="p">{</span><span class="w">
@@ -399,6 +399,8 @@
 
 <h2 id="create-a-serverless-project">Create a serverless project</h2>
 
+<p>Start by creating a new Serverless project, or you may re-use the one created during the Part-1 of this series.</p>
+
 <div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ mkdir transactions-api
 bash-3.2$ serverless create -t aws-java-maven -n transactions-api
 Serverless: Generating boilerplate...
@@ -416,7 +418,7 @@ Serverless: Successfully generated boilerplate for template: "aws-java-maven"
 
 <h2 id="update-the-pom-and-yaml">Update the POM and YAML</h2>
 
-<p>Since serverless creates a project called “hello”, lets go modify it to sound a bit more serious.</p>
+<p>Since serverless creates a project called “hello”, lets go modify it to sound a bit more…functional.</p>
 
 <p>First, change the <code class="highlighter-rouge">pom.xml</code></p>
 
@@ -437,7 +439,7 @@ Serverless: Successfully generated boilerplate for template: "aws-java-maven"
 </code></pre>
 </div>
 
-<p>Also, since we plan to use DynamoDB, lets add the AWS Java SDK dependency in <code class="highlighter-rouge">pom.xml</code>.</p>
+<p>Also, since the project will use DynamoDB, add the AWS Java DynamoDB SDK dependency in <code class="highlighter-rouge">pom.xml</code>.</p>
 
 <p>Add the below just before <code class="highlighter-rouge">&lt;/dependencies&gt;</code>.</p>
 
@@ -449,7 +451,7 @@ Serverless: Successfully generated boilerplate for template: "aws-java-maven"
 </code></pre>
 </div>
 
-<p>Next, in <code class="highlighter-rouge">serverless.yml</code>, change the following</p>
+<p>Next, in <code class="highlighter-rouge">serverless.yml</code>, we describe the lambda handlers, and the deployment artifact name. Change the following</p>
 
 <div class="highlighter-rouge"><pre class="highlight"><code># you can add packaging information here
 package:
@@ -475,13 +477,19 @@ functions:
 </code></pre>
 </div>
 
-<p>Since we’re also creating a DynamoDB Table, lets have serverless create it for us. We will also need to set permissions for our lambda function in order to access this table.</p>
+<h2 id="configure-dynamodb-resource-and-lambda-role">Configure DynamoDB Resource and Lambda Role</h2>
 
-<p>Serverless takes care of creating a lambda execution role, however, it only has CloudWatch Log permissions. So let us add permissions for this newly created table as well.</p>
+<p>Read more on DynamoDB <a href="http://docs.aws.amazon.com/amazondynamodb/latest/gettingstartedguide/Welcome.html" target="_blank">here</a> .</p>
 
-<p>Add the following to the file above the commented out section that says <code class="highlighter-rouge"># you can add statements to the Lambda function's IAM Role here</code>.</p>
+<p>Since we’re also creating a DynamoDB Table, lets have serverless create it for us. We will also need to set permissions for our lambda function in order to access this table (<em>execution role</em>).</p>
 
-<p><strong>Make sure this is under the <code class="highlighter-rouge">provider</code> section, so indent accordingly.</strong></p>
+<p>More details on Lambda Permissions Model <a href="http://docs.aws.amazon.com/lambda/latest/dg/intro-permission-model.html" target="_blank">here</a> .</p>
+
+<p>Serverless takes care of creating a basic lambda execution role, however, it only has CloudWatch Log permissions. So let us add permissions for DynamoDB as well.</p>
+
+<p>To do so, add the following to <code class="highlighter-rouge">serverless.yml</code> above the commented out section that says <code class="highlighter-rouge"># you can add statements to the Lambda function's IAM Role here</code>.</p>
+
+<p><strong>Make sure this is under the <code class="highlighter-rouge">provider</code> section, so indent accordingly.</strong>. Refer to the code in the github repo to verify.</p>
 
 <div class="highlighter-rouge"><pre class="highlight"><code>iamRoleStatements:
    - Effect: "Allow"
@@ -491,7 +499,7 @@ functions:
 </code></pre>
 </div>
 
-<p>To create our table, at the bottom of the <code class="highlighter-rouge">serverless.yml</code>, add this CloudFormation section. This represents our schema. Since our serverless user in IAM has CloudFormation permissions across all resources, the framework will be able to create this resource via CloudFormation. As you can see, we are using <code class="highlighter-rouge">account_id</code> as the <code class="highlighter-rouge">HASH</code> key, and <code class="highlighter-rouge">transaction_date</code> as our <code class="highlighter-rouge">RANGE</code> key. Other attributes like <code class="highlighter-rouge">transaction_id</code> and <code class="highlighter-rouge">amount</code> do not need to be declared.</p>
+<p>To create the table, at the bottom of the <code class="highlighter-rouge">serverless.yml</code>, add this CloudFormation section. This represents the schema. Since the serverless user (created in Part-1) in IAM has CloudFormation permissions across all resources, the framework will be able to create this resource via CloudFormation. As you can see, we are using <code class="highlighter-rouge">account_id</code> as the <code class="highlighter-rouge">HASH</code> key, and <code class="highlighter-rouge">transaction_date</code> as our <code class="highlighter-rouge">RANGE</code> key. Other attributes like <code class="highlighter-rouge">transaction_id</code> and <code class="highlighter-rouge">amount</code> do not need to be declared.</p>
 
 <div class="highlighter-rouge"><pre class="highlight"><code>resources:
   Resources:
@@ -517,10 +525,9 @@ functions:
 
 <h2 id="now-we-code">Now we code!</h2>
 
-<p>I use <a href="https://www.jetbrains.com/idea/" target="_blank">IntelliJ</a>, but any IDE that lets you work with a maven project will do. Pull this up as a Maven project in IntelliJ or any editor or IDE of your choice.
-You will click <code class="highlighter-rouge">Open</code>, then select the <code class="highlighter-rouge">pom.xml</code> and pick <code class="highlighter-rouge">Open as Project</code> for IntelliJ.</p>
+<p>I use <a href="https://www.jetbrains.com/idea/" target="_blank">IntelliJ</a>, but any IDE that works with a Maven project will do. In IntelliJ, click <code class="highlighter-rouge">Open</code>, then select the <code class="highlighter-rouge">pom.xml</code> and pick <code class="highlighter-rouge">Open as Project</code>.</p>
 
-<p>Since we declared 2 classes <code class="highlighter-rouge">GetTransactionsHandler.java</code> and <code class="highlighter-rouge">PostTransactionsHandler.java</code>, copy the auto-generated <code class="highlighter-rouge">Hander.java</code> as those two files. You should have 3 Java files now under <code class="highlighter-rouge">src/main/java/com/serverless</code>. We will modify the copied files to build our API.</p>
+<p>Since there are declared 2 handlers <code class="highlighter-rouge">GetTransactionsHandler.java</code> and <code class="highlighter-rouge">PostTransactionsHandler.java</code>, copy the auto-generated <code class="highlighter-rouge">Hander.java</code> as those two new files. There are now 3 Java files under <code class="highlighter-rouge">src/main/java/com/serverless</code>. We will modify the copied files to build our API.</p>
 
 <h3 id="dynamodb-pojo">DynamoDB POJO</h3>
 
@@ -656,11 +663,11 @@ You will click <code class="highlighter-rouge">Open</code>, then select the <cod
 
 <p>Referring to AWS Documentation, we can extract request parameters from the request that the API Gateway sends us “as is”.</p>
 
-<p><a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html#api-gateway-simple-proxy-for-lambda-output-format">API Gateway Proxy For Lambda I/O format</a></p>
+<p><a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html#api-gateway-simple-proxy-for-lambda-output-format" target="_blank">API Gateway Proxy For Lambda I/O format</a>.</p>
 
 <p>We need to extract our path parameter, <code class="highlighter-rouge">account_id</code> for the POST (and GET) request from <code class="highlighter-rouge">pathParameters</code> element in this JSON.</p>
 
-<p>This part is a little screwy, as some elements are strings to be parsed as JSONs, others are serialized HashMaps. Please be sure to read the documentation linked above.</p>
+<p>This part is a little tricky, as some elements are strings to be parsed as JSONs, others are serialized HashMaps. Please be sure to read the documentation linked above.</p>
 
 <p>Here is the code for <code class="highlighter-rouge">PostTransactionsHandler</code>’s <code class="highlighter-rouge">handleRequest</code> function.</p>
 
@@ -700,7 +707,7 @@ You will click <code class="highlighter-rouge">Open</code>, then select the <cod
 </code></pre>
 </div>
 
-<p>In the code above, we’re getting the <code class="highlighter-rouge">pathParameters</code> as a <code class="highlighter-rouge">Map</code> and extracting <code class="highlighter-rouge">account_id</code> from it. Then we create a <code class="highlighter-rouge">Transaction</code> object and populate it, and call our <code class="highlighter-rouge">DynamoDBAdapter</code> to persist the object. We parse the body using Jackson, which is already available to us via AWS Java SDK.</p>
+<p>In the code above, we’re getting the <code class="highlighter-rouge">pathParameters</code> as a <code class="highlighter-rouge">Map</code> and extracting <code class="highlighter-rouge">account_id</code> from it. Then we create a <code class="highlighter-rouge">Transaction</code> object and populate it, and call the <code class="highlighter-rouge">DynamoDBAdapter</code> to persist the object. We parse the body using Jackson, which is already available to us via AWS Java SDK.</p>
 
 <p>Similarly, we code our <code class="highlighter-rouge">GetTransactionsHandler</code>’s <code class="highlighter-rouge">handleRequest</code> function.</p>
 
@@ -730,15 +737,16 @@ You will click <code class="highlighter-rouge">Open</code>, then select the <cod
 <span class="o">}</span>
 </code></pre>
 </div>
+
 <p>In this case, we’re calling <code class="highlighter-rouge">DynamoDBAdapter</code> to get the transactions for an account, and passing it as response body. We are not converting it to JSON or anything, hence you notice the <code class="highlighter-rouge">transaction_date</code> as a <code class="highlighter-rouge">long</code>.</p>
 
 <p>We are done with coding now. Lets deploy this!</p>
 
 <h2 id="deploying-the-two-lambda-functions">Deploying the two lambda functions</h2>
 
-<p>This is where Serverless shines. We do not have to worry about creating resources, Lambda execution roles, packaging, etc.</p>
+<p>This is where Serverless shines - it takes care of uploading the artifact, creating the AWS resources and IAM roles, CloudWatch Logs, etc.</p>
 
-<p>First we build the jar, which will be the deployable artifact.</p>
+<p>Build the jar, which will be the deployable artifact.</p>
 
 <div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ mvn clean install
 [INFO] Scanning for projects...
@@ -781,7 +789,19 @@ functions:
 bash-3.2$
 </code></pre>
 </div>
-<p>Unfortunately invoking these 2 functions will not be straightforward via CLI, as it expects the input request as a <code class="highlighter-rouge">Map&lt;String, Object&gt;</code>.</p>
+<p>If you want to dive deeper, check out the contents of <code class="highlighter-rouge">.serverless</code> folder. This has 2 CloudFormation templates that did the heavy lifting via Serverless Framework.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ tree .serverless/
+.serverless/
+├── cloudformation-template-create-stack.json
+└── cloudformation-template-update-stack.json
+
+0 directories, 2 files
+</code></pre>
+</div>
+<p>The <code class="highlighter-rouge">create</code> templte creates the S3 bucket to upload the artifact, and <code class="highlighter-rouge">update</code> template takes care of everything else. More details on CloudFormation <a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/GettingStarted.html" target="_blank">here</a> .</p>
+
+<p>Unfortunately invoking these 2 functions will not be straightforward via CLI, as they expects the input request as a <code class="highlighter-rouge">Map&lt;String, Object&gt;</code>.</p>
 
 <div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ serverless invoke -f get-transactions
 {
@@ -794,7 +814,7 @@ bash-3.2$
 }
 </code></pre>
 </div>
-<p>Feel free to log into the console, and look at the lambda we have just set up. You can test it by creating a body similar to the AWS Lambda Proxy request from the documentation link above.</p>
+<p>Feel free to log into the AWS console, and look at the lambda just set up under Lambda section. Also, take a look at CloudFormation stacks. We can test it by creating a body similar to the AWS Lambda Proxy request from the documentation link above in the Console.</p>
 
 <p>In the next and final part, we will wire up these 2 lambda functions to act as API endpoints.</p>
 

@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-04-14T11:16:10-07:00</updated>
+  <updated>2017-04-15T15:42:43-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -35,29 +35,29 @@
       <published>2017-04-12T23:44:37-07:00</published>
       <updated>2017-04-12T23:44:37-07:00</updated>
       <id>https://lobster1234.github.io/2017/04/12/serverless-framework-aws-apigateway</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2017/04/12/serverless-framework-aws-apigateway/">&lt;p&gt;We continue to build our &lt;a href=&quot;https://aws.amazon.com/lambda/&quot; target=&quot;_blank&quot;&gt;Lambda&lt;/a&gt; functions beyond the hello world that we saw in the previous post. Our end goal is to build an API, and make it available via &lt;a href=&quot;https://aws.amazon.com/api-gateway/&quot; target=&quot;_blank&quot;&gt;Amazon API Gateway&lt;/a&gt;. We will build the foundation of our Lambda-API-Gateway set up in this tutorial. We will also set up &lt;a href=&quot;https://aws.amazon.com/dynamodb/&quot; target=&quot;_blank&quot;&gt;DynamoDB&lt;/a&gt;.&lt;/p&gt;
+      <content type="html" xml:base="https://lobster1234.github.io/2017/04/12/serverless-framework-aws-apigateway/">&lt;p&gt;We continue to build our &lt;a href=&quot;https://aws.amazon.com/lambda/&quot; target=&quot;_blank&quot;&gt;Lambda&lt;/a&gt; functions beyond the Hello World that we saw in the previous post. Our end goal is to build an API, and make it available via &lt;a href=&quot;https://aws.amazon.com/api-gateway/&quot; target=&quot;_blank&quot;&gt;Amazon API Gateway&lt;/a&gt;. We will build the foundation of our Lambda-API-Gateway set up in this tutorial. We will also set up &lt;a href=&quot;https://aws.amazon.com/dynamodb/&quot; target=&quot;_blank&quot;&gt;DynamoDB&lt;/a&gt;. Feel free to replace DynamoDB with any persistance layer, or even a mock.&lt;/p&gt;
 
 &lt;!--more--&gt;
 
 &lt;blockquote&gt;
-  &lt;p&gt;The source code from this post can be found &lt;a href=&quot;https://github.com/lobster1234/transactions-api&quot; target=&quot;_blank&quot;&gt;here&lt;/a&gt;&lt;/p&gt;
+  &lt;p&gt;The source code listed in this this post can be found &lt;a href=&quot;https://github.com/lobster1234/transactions-api&quot; target=&quot;_blank&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;h2 id=&quot;set-up-serverless-framework&quot;&gt;Set up Serverless Framework&lt;/h2&gt;
 
 &lt;p&gt;Please refer to &lt;a href=&quot;/2017/02/28/serverless-framework-java-maven-part-1&quot; target=&quot;_blank&quot;&gt;AWS Lambda with Serverless Framework and Java/Maven - Part 1&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;Once serverless is set up, come back here to build a new project.&lt;/p&gt;
+&lt;p&gt;Once serverless framework is set up, come back here to build a new project.&lt;/p&gt;
 
-&lt;h2 id=&quot;our-api&quot;&gt;Our API&lt;/h2&gt;
+&lt;h2 id=&quot;the-api&quot;&gt;The API&lt;/h2&gt;
 
-&lt;p&gt;For the sake of simplicity, here is our schema - We have payment cards, every account has transactions, and every transaction has an amount a transaction ID, and a transaction date.&lt;/p&gt;
+&lt;p&gt;For the sake of simplicity, here is the schema - There are payment accounts, every account has transactions, and every transaction has an amount, a transaction ID, and a transaction date.&lt;/p&gt;
 
 &lt;blockquote&gt;
-  &lt;p&gt;The focus is here on simplicity of the example, as the end-to-end flow is quite hard to comprehend, specially if you’re very new to AWS.&lt;/p&gt;
+  &lt;p&gt;The focus is here on simplicity of the example, as we focus on the AWS framework, deployment, and management.&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;The API will be super simple -&lt;/p&gt;
+&lt;p&gt;Here is the API Schema -&lt;/p&gt;
 
 &lt;p&gt;POST &lt;code class=&quot;highlighter-rouge&quot;&gt;/accounts/:account_id/transactions&lt;/code&gt;&lt;/p&gt;
 
@@ -70,7 +70,7 @@
 
 &lt;p&gt;GET &lt;code class=&quot;highlighter-rouge&quot;&gt;/accounts/:account_id/transactions&lt;/code&gt;&lt;/p&gt;
 
-&lt;p&gt;The date is UTC milliseconds, as we are not doing any special JSON processing.&lt;/p&gt;
+&lt;p&gt;The date is UTC milliseconds, as we are not bothering with dateformats and conversions here.&lt;/p&gt;
 
 &lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
@@ -91,6 +91,8 @@
 
 &lt;h2 id=&quot;create-a-serverless-project&quot;&gt;Create a serverless project&lt;/h2&gt;
 
+&lt;p&gt;Start by creating a new Serverless project, or you may re-use the one created during the Part-1 of this series.&lt;/p&gt;
+
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bash-3.2$ mkdir transactions-api
 bash-3.2$ serverless create -t aws-java-maven -n transactions-api
 Serverless: Generating boilerplate...
@@ -108,7 +110,7 @@ Serverless: Successfully generated boilerplate for template: &quot;aws-java-mave
 
 &lt;h2 id=&quot;update-the-pom-and-yaml&quot;&gt;Update the POM and YAML&lt;/h2&gt;
 
-&lt;p&gt;Since serverless creates a project called “hello”, lets go modify it to sound a bit more serious.&lt;/p&gt;
+&lt;p&gt;Since serverless creates a project called “hello”, lets go modify it to sound a bit more…functional.&lt;/p&gt;
 
 &lt;p&gt;First, change the &lt;code class=&quot;highlighter-rouge&quot;&gt;pom.xml&lt;/code&gt;&lt;/p&gt;
 
@@ -129,7 +131,7 @@ Serverless: Successfully generated boilerplate for template: &quot;aws-java-mave
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;p&gt;Also, since we plan to use DynamoDB, lets add the AWS Java SDK dependency in &lt;code class=&quot;highlighter-rouge&quot;&gt;pom.xml&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Also, since the project will use DynamoDB, add the AWS Java DynamoDB SDK dependency in &lt;code class=&quot;highlighter-rouge&quot;&gt;pom.xml&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;Add the below just before &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;/dependencies&amp;gt;&lt;/code&gt;.&lt;/p&gt;
 
@@ -141,7 +143,7 @@ Serverless: Successfully generated boilerplate for template: &quot;aws-java-mave
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;p&gt;Next, in &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless.yml&lt;/code&gt;, change the following&lt;/p&gt;
+&lt;p&gt;Next, in &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless.yml&lt;/code&gt;, we describe the lambda handlers, and the deployment artifact name. Change the following&lt;/p&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# you can add packaging information here
 package:
@@ -167,13 +169,19 @@ functions:
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;p&gt;Since we’re also creating a DynamoDB Table, lets have serverless create it for us. We will also need to set permissions for our lambda function in order to access this table.&lt;/p&gt;
+&lt;h2 id=&quot;configure-dynamodb-resource-and-lambda-role&quot;&gt;Configure DynamoDB Resource and Lambda Role&lt;/h2&gt;
 
-&lt;p&gt;Serverless takes care of creating a lambda execution role, however, it only has CloudWatch Log permissions. So let us add permissions for this newly created table as well.&lt;/p&gt;
+&lt;p&gt;Read more on DynamoDB &lt;a href=&quot;http://docs.aws.amazon.com/amazondynamodb/latest/gettingstartedguide/Welcome.html&quot; target=&quot;_blank&quot;&gt;here&lt;/a&gt; .&lt;/p&gt;
 
-&lt;p&gt;Add the following to the file above the commented out section that says &lt;code class=&quot;highlighter-rouge&quot;&gt;# you can add statements to the Lambda function's IAM Role here&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Since we’re also creating a DynamoDB Table, lets have serverless create it for us. We will also need to set permissions for our lambda function in order to access this table (&lt;em&gt;execution role&lt;/em&gt;).&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;Make sure this is under the &lt;code class=&quot;highlighter-rouge&quot;&gt;provider&lt;/code&gt; section, so indent accordingly.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;More details on Lambda Permissions Model &lt;a href=&quot;http://docs.aws.amazon.com/lambda/latest/dg/intro-permission-model.html&quot; target=&quot;_blank&quot;&gt;here&lt;/a&gt; .&lt;/p&gt;
+
+&lt;p&gt;Serverless takes care of creating a basic lambda execution role, however, it only has CloudWatch Log permissions. So let us add permissions for DynamoDB as well.&lt;/p&gt;
+
+&lt;p&gt;To do so, add the following to &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless.yml&lt;/code&gt; above the commented out section that says &lt;code class=&quot;highlighter-rouge&quot;&gt;# you can add statements to the Lambda function's IAM Role here&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Make sure this is under the &lt;code class=&quot;highlighter-rouge&quot;&gt;provider&lt;/code&gt; section, so indent accordingly.&lt;/strong&gt;. Refer to the code in the github repo to verify.&lt;/p&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;iamRoleStatements:
    - Effect: &quot;Allow&quot;
@@ -183,7 +191,7 @@ functions:
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;p&gt;To create our table, at the bottom of the &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless.yml&lt;/code&gt;, add this CloudFormation section. This represents our schema. Since our serverless user in IAM has CloudFormation permissions across all resources, the framework will be able to create this resource via CloudFormation. As you can see, we are using &lt;code class=&quot;highlighter-rouge&quot;&gt;account_id&lt;/code&gt; as the &lt;code class=&quot;highlighter-rouge&quot;&gt;HASH&lt;/code&gt; key, and &lt;code class=&quot;highlighter-rouge&quot;&gt;transaction_date&lt;/code&gt; as our &lt;code class=&quot;highlighter-rouge&quot;&gt;RANGE&lt;/code&gt; key. Other attributes like &lt;code class=&quot;highlighter-rouge&quot;&gt;transaction_id&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;amount&lt;/code&gt; do not need to be declared.&lt;/p&gt;
+&lt;p&gt;To create the table, at the bottom of the &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless.yml&lt;/code&gt;, add this CloudFormation section. This represents the schema. Since the serverless user (created in Part-1) in IAM has CloudFormation permissions across all resources, the framework will be able to create this resource via CloudFormation. As you can see, we are using &lt;code class=&quot;highlighter-rouge&quot;&gt;account_id&lt;/code&gt; as the &lt;code class=&quot;highlighter-rouge&quot;&gt;HASH&lt;/code&gt; key, and &lt;code class=&quot;highlighter-rouge&quot;&gt;transaction_date&lt;/code&gt; as our &lt;code class=&quot;highlighter-rouge&quot;&gt;RANGE&lt;/code&gt; key. Other attributes like &lt;code class=&quot;highlighter-rouge&quot;&gt;transaction_id&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;amount&lt;/code&gt; do not need to be declared.&lt;/p&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;resources:
   Resources:
@@ -209,10 +217,9 @@ functions:
 
 &lt;h2 id=&quot;now-we-code&quot;&gt;Now we code!&lt;/h2&gt;
 
-&lt;p&gt;I use &lt;a href=&quot;https://www.jetbrains.com/idea/&quot; target=&quot;_blank&quot;&gt;IntelliJ&lt;/a&gt;, but any IDE that lets you work with a maven project will do. Pull this up as a Maven project in IntelliJ or any editor or IDE of your choice.
-You will click &lt;code class=&quot;highlighter-rouge&quot;&gt;Open&lt;/code&gt;, then select the &lt;code class=&quot;highlighter-rouge&quot;&gt;pom.xml&lt;/code&gt; and pick &lt;code class=&quot;highlighter-rouge&quot;&gt;Open as Project&lt;/code&gt; for IntelliJ.&lt;/p&gt;
+&lt;p&gt;I use &lt;a href=&quot;https://www.jetbrains.com/idea/&quot; target=&quot;_blank&quot;&gt;IntelliJ&lt;/a&gt;, but any IDE that works with a Maven project will do. In IntelliJ, click &lt;code class=&quot;highlighter-rouge&quot;&gt;Open&lt;/code&gt;, then select the &lt;code class=&quot;highlighter-rouge&quot;&gt;pom.xml&lt;/code&gt; and pick &lt;code class=&quot;highlighter-rouge&quot;&gt;Open as Project&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;Since we declared 2 classes &lt;code class=&quot;highlighter-rouge&quot;&gt;GetTransactionsHandler.java&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;PostTransactionsHandler.java&lt;/code&gt;, copy the auto-generated &lt;code class=&quot;highlighter-rouge&quot;&gt;Hander.java&lt;/code&gt; as those two files. You should have 3 Java files now under &lt;code class=&quot;highlighter-rouge&quot;&gt;src/main/java/com/serverless&lt;/code&gt;. We will modify the copied files to build our API.&lt;/p&gt;
+&lt;p&gt;Since there are declared 2 handlers &lt;code class=&quot;highlighter-rouge&quot;&gt;GetTransactionsHandler.java&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;PostTransactionsHandler.java&lt;/code&gt;, copy the auto-generated &lt;code class=&quot;highlighter-rouge&quot;&gt;Hander.java&lt;/code&gt; as those two new files. There are now 3 Java files under &lt;code class=&quot;highlighter-rouge&quot;&gt;src/main/java/com/serverless&lt;/code&gt;. We will modify the copied files to build our API.&lt;/p&gt;
 
 &lt;h3 id=&quot;dynamodb-pojo&quot;&gt;DynamoDB POJO&lt;/h3&gt;
 
@@ -348,11 +355,11 @@ You will click &lt;code class=&quot;highlighter-rouge&quot;&gt;Open&lt;/code&gt;
 
 &lt;p&gt;Referring to AWS Documentation, we can extract request parameters from the request that the API Gateway sends us “as is”.&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html#api-gateway-simple-proxy-for-lambda-output-format&quot;&gt;API Gateway Proxy For Lambda I/O format&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html#api-gateway-simple-proxy-for-lambda-output-format&quot; target=&quot;_blank&quot;&gt;API Gateway Proxy For Lambda I/O format&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;We need to extract our path parameter, &lt;code class=&quot;highlighter-rouge&quot;&gt;account_id&lt;/code&gt; for the POST (and GET) request from &lt;code class=&quot;highlighter-rouge&quot;&gt;pathParameters&lt;/code&gt; element in this JSON.&lt;/p&gt;
 
-&lt;p&gt;This part is a little screwy, as some elements are strings to be parsed as JSONs, others are serialized HashMaps. Please be sure to read the documentation linked above.&lt;/p&gt;
+&lt;p&gt;This part is a little tricky, as some elements are strings to be parsed as JSONs, others are serialized HashMaps. Please be sure to read the documentation linked above.&lt;/p&gt;
 
 &lt;p&gt;Here is the code for &lt;code class=&quot;highlighter-rouge&quot;&gt;PostTransactionsHandler&lt;/code&gt;’s &lt;code class=&quot;highlighter-rouge&quot;&gt;handleRequest&lt;/code&gt; function.&lt;/p&gt;
 
@@ -392,7 +399,7 @@ You will click &lt;code class=&quot;highlighter-rouge&quot;&gt;Open&lt;/code&gt;
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;p&gt;In the code above, we’re getting the &lt;code class=&quot;highlighter-rouge&quot;&gt;pathParameters&lt;/code&gt; as a &lt;code class=&quot;highlighter-rouge&quot;&gt;Map&lt;/code&gt; and extracting &lt;code class=&quot;highlighter-rouge&quot;&gt;account_id&lt;/code&gt; from it. Then we create a &lt;code class=&quot;highlighter-rouge&quot;&gt;Transaction&lt;/code&gt; object and populate it, and call our &lt;code class=&quot;highlighter-rouge&quot;&gt;DynamoDBAdapter&lt;/code&gt; to persist the object. We parse the body using Jackson, which is already available to us via AWS Java SDK.&lt;/p&gt;
+&lt;p&gt;In the code above, we’re getting the &lt;code class=&quot;highlighter-rouge&quot;&gt;pathParameters&lt;/code&gt; as a &lt;code class=&quot;highlighter-rouge&quot;&gt;Map&lt;/code&gt; and extracting &lt;code class=&quot;highlighter-rouge&quot;&gt;account_id&lt;/code&gt; from it. Then we create a &lt;code class=&quot;highlighter-rouge&quot;&gt;Transaction&lt;/code&gt; object and populate it, and call the &lt;code class=&quot;highlighter-rouge&quot;&gt;DynamoDBAdapter&lt;/code&gt; to persist the object. We parse the body using Jackson, which is already available to us via AWS Java SDK.&lt;/p&gt;
 
 &lt;p&gt;Similarly, we code our &lt;code class=&quot;highlighter-rouge&quot;&gt;GetTransactionsHandler&lt;/code&gt;’s &lt;code class=&quot;highlighter-rouge&quot;&gt;handleRequest&lt;/code&gt; function.&lt;/p&gt;
 
@@ -422,15 +429,16 @@ You will click &lt;code class=&quot;highlighter-rouge&quot;&gt;Open&lt;/code&gt;
 &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
+
 &lt;p&gt;In this case, we’re calling &lt;code class=&quot;highlighter-rouge&quot;&gt;DynamoDBAdapter&lt;/code&gt; to get the transactions for an account, and passing it as response body. We are not converting it to JSON or anything, hence you notice the &lt;code class=&quot;highlighter-rouge&quot;&gt;transaction_date&lt;/code&gt; as a &lt;code class=&quot;highlighter-rouge&quot;&gt;long&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;We are done with coding now. Lets deploy this!&lt;/p&gt;
 
 &lt;h2 id=&quot;deploying-the-two-lambda-functions&quot;&gt;Deploying the two lambda functions&lt;/h2&gt;
 
-&lt;p&gt;This is where Serverless shines. We do not have to worry about creating resources, Lambda execution roles, packaging, etc.&lt;/p&gt;
+&lt;p&gt;This is where Serverless shines - it takes care of uploading the artifact, creating the AWS resources and IAM roles, CloudWatch Logs, etc.&lt;/p&gt;
 
-&lt;p&gt;First we build the jar, which will be the deployable artifact.&lt;/p&gt;
+&lt;p&gt;Build the jar, which will be the deployable artifact.&lt;/p&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bash-3.2$ mvn clean install
 [INFO] Scanning for projects...
@@ -473,7 +481,19 @@ functions:
 bash-3.2$
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
-&lt;p&gt;Unfortunately invoking these 2 functions will not be straightforward via CLI, as it expects the input request as a &lt;code class=&quot;highlighter-rouge&quot;&gt;Map&amp;lt;String, Object&amp;gt;&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;If you want to dive deeper, check out the contents of &lt;code class=&quot;highlighter-rouge&quot;&gt;.serverless&lt;/code&gt; folder. This has 2 CloudFormation templates that did the heavy lifting via Serverless Framework.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bash-3.2$ tree .serverless/
+.serverless/
+├── cloudformation-template-create-stack.json
+└── cloudformation-template-update-stack.json
+
+0 directories, 2 files
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;create&lt;/code&gt; templte creates the S3 bucket to upload the artifact, and &lt;code class=&quot;highlighter-rouge&quot;&gt;update&lt;/code&gt; template takes care of everything else. More details on CloudFormation &lt;a href=&quot;http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/GettingStarted.html&quot; target=&quot;_blank&quot;&gt;here&lt;/a&gt; .&lt;/p&gt;
+
+&lt;p&gt;Unfortunately invoking these 2 functions will not be straightforward via CLI, as they expects the input request as a &lt;code class=&quot;highlighter-rouge&quot;&gt;Map&amp;lt;String, Object&amp;gt;&lt;/code&gt;.&lt;/p&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bash-3.2$ serverless invoke -f get-transactions
 {
@@ -486,7 +506,7 @@ bash-3.2$
 }
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
-&lt;p&gt;Feel free to log into the console, and look at the lambda we have just set up. You can test it by creating a body similar to the AWS Lambda Proxy request from the documentation link above.&lt;/p&gt;
+&lt;p&gt;Feel free to log into the AWS console, and look at the lambda just set up under Lambda section. Also, take a look at CloudFormation stacks. We can test it by creating a body similar to the AWS Lambda Proxy request from the documentation link above in the Console.&lt;/p&gt;
 
 &lt;p&gt;In the next and final part, we will wire up these 2 lambda functions to act as API endpoints.&lt;/p&gt;
 
@@ -521,7 +541,7 @@ bash-3.2$
       
 
       
-        <summary type="html">We continue to build our Lambda functions beyond the hello world that we saw in the previous post. Our end goal is to build an API, and make it available via Amazon API Gateway. We will build the foundation of our Lambda-API-Gateway set up in this tutorial. We will also set up DynamoDB.</summary>
+        <summary type="html">We continue to build our Lambda functions beyond the Hello World that we saw in the previous post. Our end goal is to build an API, and make it available via Amazon API Gateway. We will build the foundation of our Lambda-API-Gateway set up in this tutorial. We will also set up DynamoDB. Feel free to replace DynamoDB with any persistance layer, or even a mock.</summary>
       
 
       
