@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-04-15T15:42:43-07:00</updated>
+  <updated>2017-04-15T15:46:07-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -89,7 +89,7 @@
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;h2 id=&quot;create-a-serverless-project&quot;&gt;Create a serverless project&lt;/h2&gt;
+&lt;h2 id=&quot;create-a-serverless-project&quot;&gt;Create a Serverless Project&lt;/h2&gt;
 
 &lt;p&gt;Start by creating a new Serverless project, or you may re-use the one created during the Part-1 of this series.&lt;/p&gt;
 
