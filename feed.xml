@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-04-15T15:46:07-07:00</updated>
+  <updated>2017-04-16T02:47:49-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -25,6 +25,233 @@
     </author>
   
 
+  
+  
+    <entry>
+      
+      <title type="html">AWS Lambda with Serverless Framework and Java/Maven - Part 3</title>
+      
+      <link href="https://lobster1234.github.io/2017/04/15/serverless-framework-api-gateway-lambda-proxy/" rel="alternate" type="text/html" title="AWS Lambda with Serverless Framework and Java/Maven - Part 3" />
+      <published>2017-04-15T23:44:37-07:00</published>
+      <updated>2017-04-15T23:44:37-07:00</updated>
+      <id>https://lobster1234.github.io/2017/04/15/serverless-framework-api-gateway-lambda-proxy</id>
+      <content type="html" xml:base="https://lobster1234.github.io/2017/04/15/serverless-framework-api-gateway-lambda-proxy/">&lt;p&gt;In this final post of the series on Java-based Serverless Lambda API, we will invoke the Transactions API using the &lt;a href=&quot;https://aws.amazon.com/api-gateway/getting-started/&quot; target=&quot;_blank_&quot;&gt;Amazon API Gateway&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;As Lambda is &lt;em&gt;evented&lt;/em&gt;, the HTTP endpoints exposed via the Amazon API Gateway will act as the event to trigger the function &lt;em&gt;synchronously&lt;/em&gt;. If you have been following the earlier two posts, by the end of this post you will be comfortable building RESTful APIs using AWS Lambda, Java, DynamoDB (or any persistence layer), API Gateway - all put together using simple configuration in &lt;a href=&quot;https://www.serverless.com&quot; target=&quot;_blank_&quot;&gt;Serverless Framework&lt;/a&gt;.&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h2 id=&quot;set-up-serverless-framework&quot;&gt;Set up Serverless Framework&lt;/h2&gt;
+
+&lt;p&gt;Please refer to &lt;a href=&quot;/2017/02/28/serverless-framework-java-maven-part-1&quot; target=&quot;_blank_&quot;&gt;AWS Lambda with Serverless Framework and Java/Maven - Part 1&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;build-and-deploy-the-transactions-api-lambdas&quot;&gt;Build and deploy the Transactions API Lambdas&lt;/h2&gt;
+
+&lt;p&gt;Please refer to &lt;a href=&quot;/2017/04/12/serverless-framework-aws-apigateway/&quot; target=&quot;_blank_&quot;&gt;AWS Lambda with Serverless Framework and Java/Maven - Part 2&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;using-amazon-api-gateway&quot;&gt;Using Amazon API Gateway&lt;/h2&gt;
+
+&lt;p&gt;Now that we have our two functions deployed, we can use API Gateway to trigger, or invoke them. The Amazon API Gateway is a service that lets you expose many supported AWS offerings via RESTful API over HTTP. While in this case we will only use the API Gateway to expose and invoke our lambda as an HTTP endpoint, it only covers a fraction of the API Gateway’s capability. I highly recommend reading the &lt;a href=&quot;http://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html&quot;&gt;Amazon API Gateway Developer Guide&lt;/a&gt; and this &lt;a href=&quot;https://www.youtube.com/watch?v=FcH8ovrNd9k&quot; target=&quot;_blank_&quot;&gt;video from AWS Summit&lt;/a&gt; to get familiar with full potential of the API Gateway product.&lt;/p&gt;
+
+&lt;h3 id=&quot;lambda-proxy-integration&quot;&gt;Lambda Proxy Integration&lt;/h3&gt;
+
+&lt;p&gt;We will be integrating the lambdas in an integration pattern commonly referred to as &lt;a href=&quot;http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html#api-gateway-proxy-integration-types&quot; target=&quot;_blank_&quot;&gt;Lambda Proxy Integration&lt;/a&gt;, which means that the function(s) will get entire HTTP request &lt;em&gt;as-is&lt;/em&gt; in the form of then input payload. This payload contains the entire request including the headers, query parameters, path parameters, and the body, as documented &lt;a href=&quot;http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html#api-gateway-simple-proxy-for-lambda-input-format&quot; target=&quot;_blank_&quot;&gt;here&lt;/a&gt;. While the function has full control on rendering the response body, code, and headers, the response is expected to be in a particular format, as documented &lt;a href=&quot;http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html#api-gateway-simple-proxy-for-lambda-output-format&quot; target=&quot;_blank_&quot;&gt;here&lt;/a&gt;. Serverless Framework created an &lt;code class=&quot;highlighter-rouge&quot;&gt;ApiGatewayResponse&lt;/code&gt; class as a part of the scaffolding which does exactly that. If you notice, the Transactions API code uses that class to marshal the response.&lt;/p&gt;
+
+&lt;p&gt;By default, Serverless Framework uses the Lambda Proxy Integration for API Gateway.&lt;/p&gt;
+
+&lt;h3 id=&quot;configuring-serverless-to-define-endpoints&quot;&gt;Configuring Serverless To Define Endpoints&lt;/h3&gt;
+
+&lt;p&gt;The API endpoints will need to be defined in &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless.yml&lt;/code&gt;, where we have defined the function resources, IAM permissions, and handlers among other things. The API Gateway configuration is a part of the function definition. Add the following under the &lt;code class=&quot;highlighter-rouge&quot;&gt;handler&lt;/code&gt; section for the two functions.&lt;/p&gt;
+
+&lt;p&gt;For the &lt;code class=&quot;highlighter-rouge&quot;&gt;GET /accounts/:account_id/transactions&lt;/code&gt; endpoint -&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;get-transactions:
+    handler: com.serverless.GetTransactionsHandler
+    events:
+      - http:
+          path: /accounts/{account_id}/transactions
+          method: get
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;For the &lt;code class=&quot;highlighter-rouge&quot;&gt;POST /accounts/account_id/transactions&lt;/code&gt; endpoint -&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;post-transaction:
+  handler: com.serverless.PostTransactionsHandler
+  events:
+    - http:
+        path: /accounts/{account_id}/transactions
+        method: post
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;A Lambda functions need an event to be triggered. The API Gateway invocation is one of the many events supported by AWS Lambda. Hence, we define &lt;code class=&quot;highlighter-rouge&quot;&gt;http&lt;/code&gt; as the event under the function definition. Note that we can add more such events in the configuration, but for now we focus on HTTP invocation via the API Gateway. The endpoints will be &lt;code class=&quot;highlighter-rouge&quot;&gt;https&lt;/code&gt;, so do not worry about calling the event as &lt;code class=&quot;highlighter-rouge&quot;&gt;http&lt;/code&gt; here. Next, we provide more information about the &lt;code class=&quot;highlighter-rouge&quot;&gt;http&lt;/code&gt; integration, namely the &lt;code class=&quot;highlighter-rouge&quot;&gt;path&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;method&lt;/code&gt;. Notice the path parameter, &lt;code class=&quot;highlighter-rouge&quot;&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;account_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt; in the &lt;code class=&quot;highlighter-rouge&quot;&gt;path&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;For more details on the &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless.yml&lt;/code&gt; configuration for API Gateway, refer to Serverless Framework API Gateway documentation &lt;a href=&quot;https://serverless.com/framework/docs/providers/aws/events/apigateway/&quot; target=&quot;_blank_&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;deploying-the-api&quot;&gt;Deploying the API&lt;/h3&gt;
+
+&lt;p&gt;Now that we have configured the event and the endpoint, we are all set to deploy the Serverless project. Before we do that, we need to attach the IAM policy to the &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless&lt;/code&gt; user in order to administer the API Gateway. Remember, we are using this user’s credentials for the Serverless Framework.&lt;/p&gt;
+
+&lt;p&gt;Log in to the console, and click the &lt;code class=&quot;highlighter-rouge&quot;&gt;Serverless&lt;/code&gt; group we had created in Part-1. Click on &lt;code class=&quot;highlighter-rouge&quot;&gt;Attach Policy&lt;/code&gt;, Search for &lt;code class=&quot;highlighter-rouge&quot;&gt;APIGateway&lt;/code&gt;, and add the &lt;code class=&quot;highlighter-rouge&quot;&gt;AmazonAPIGatewayAdministrator&lt;/code&gt; policy to the group.&lt;/p&gt;
+
+&lt;p&gt;The final set of policies should look like this -&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/serverless-group.png&quot; alt=&quot;IAM Group&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Once done, we run the now familiar &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless deploy&lt;/code&gt; command.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bash-3.2$ serverless deploy
+Serverless: Uploading CloudFormation file to S3...
+Serverless: Uploading service .zip file to S3 (7.57 MB)...
+Serverless: Updating Stack...
+Serverless: Checking Stack update progress...
+..........................................
+Serverless: Stack update finished...
+Service Information
+service: transactions-api
+stage: dev
+region: us-east-1
+api keys:
+  None
+endpoints:
+  GET - https://aaaaaa.execute-api.us-east-1.amazonaws.com/dev/accounts/{account_id}/transactions
+  POST - https://aaaaaa.execute-api.us-east-1.amazonaws.com/dev/accounts/{account_id}/transactions
+functions:
+  get-transactions: transactions-api-dev-get-transactions
+  post-transaction: transactions-api-dev-post-transaction
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;If we compare the output of this command to the one we got during deploying just the functions, we see that we get additional information in terms of the endpoints. I’ve masked the endpoint with &lt;code class=&quot;highlighter-rouge&quot;&gt;aaaaaa&lt;/code&gt;. This is referred to as an &lt;code class=&quot;highlighter-rouge&quot;&gt;appID&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;testing-the-endpoints&quot;&gt;Testing the endpoints&lt;/h3&gt;
+
+&lt;p&gt;We can use &lt;code class=&quot;highlighter-rouge&quot;&gt;curl&lt;/code&gt; or any handly HTTP client to hit the two endpoints.&lt;/p&gt;
+
+&lt;p&gt;First we POST a transaction.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bash-3.2$ curl -X POST https://aaaaaa.execute-api.us-east-1.amazonaws.com/dev/accounts/1234/transactions -d '{&quot;transaction_id&quot;:&quot;foo&quot;, &quot;amount&quot;: 20.50}'
+
+{&quot;message&quot;:&quot;Transaction added successfully!&quot;,&quot;input&quot;:{&quot;resource&quot;:&quot;/accounts/{account_id}/transactions&quot;,&quot;path&quot;:&quot;/accounts/1234/transactions&quot;,&quot;httpMethod&quot;:&quot;POST&quot;,&quot;headers&quot;:{&quot;Accept&quot;:&quot;*/*&quot;,&quot;CloudFront-Forwarded-Proto&quot;:&quot;https&quot;,&quot;CloudFront-Is-Desktop-Viewer&quot;:&quot;true&quot;,&quot;CloudFront-Is-Mobile-Viewer&quot;:&quot;false&quot;,&quot;CloudFront-Is-SmartTV-Viewer&quot;:&quot;false&quot;,&quot;CloudFront-Is-Tablet-Viewer&quot;:&quot;false&quot;,&quot;CloudFront-Viewer-Country&quot;:&quot;US&quot;,&quot;Content-Type&quot;:&quot;application/x-www-form-urlencoded&quot;,&quot;Host&quot;:&quot;aaaaaa.execute-api.us-east-1.amazonaws.com&quot;,&quot;User-Agent&quot;:&quot;curl/7.51.0&quot;,&quot;Via&quot;:&quot;1.1 939ea9d62ec616846d41b16cea0dc65b.cloudfront.net (CloudFront)&quot;,&quot;X-Amz-Cf-Id&quot;:&quot;YFSlfpQhMoyUk7xw1MwaHrC55oS-kL68gc9Of-hIa68bSr_61eK2Jw==&quot;,&quot;X-Amzn-Trace-Id&quot;:&quot;Root=1-58f327f0-5c9c884966463c313adaf2b5&quot;,&quot;X-Forwarded-For&quot;:&quot;73.111.62.170, 54.239.203.116&quot;,&quot;X-Forwarded-Port&quot;:&quot;443&quot;,&quot;X-Forwarded-Proto&quot;:&quot;https&quot;},&quot;queryStringParameters&quot;:null,&quot;pathParameters&quot;:{&quot;account_id&quot;:&quot;1234&quot;},&quot;stageVariables&quot;:null,&quot;requestContext&quot;:{&quot;accountId&quot;:&quot;123456789012&quot;,&quot;resourceId&quot;:&quot;6otyx5&quot;,&quot;stage&quot;:&quot;dev&quot;,&quot;requestId&quot;:&quot;bd4b3165-227c-11e7-baa4-61d7c2f92db9&quot;,&quot;identity&quot;:{&quot;cognitoIdentityPoolId&quot;:null,&quot;accountId&quot;:null,&quot;cognitoIdentityId&quot;:null,&quot;caller&quot;:null,&quot;apiKey&quot;:null,&quot;sourceIp&quot;:&quot;73.111.62.170&quot;,&quot;accessKey&quot;:null,&quot;cognitoAuthenticationType&quot;:null,&quot;cognitoAuthenticationProvider&quot;:null,&quot;userArn&quot;:null,&quot;userAgent&quot;:&quot;curl/7.51.0&quot;,&quot;user&quot;:null},&quot;resourcePath&quot;:&quot;/accounts/{account_id}/transactions&quot;,&quot;httpMethod&quot;:&quot;POST&quot;,&quot;apiId&quot;:&quot;aaaaaa&quot;},&quot;body&quot;:&quot;{\&quot;transaction_id\&quot;:\&quot;foo\&quot;, \&quot;amount\&quot;: 20.50}&quot;,&quot;isBase64Encoded&quot;:false}}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Notice the long response - this is because in the code for &lt;code class=&quot;highlighter-rouge&quot;&gt;PutTransactionsHandler.java&lt;/code&gt;, we’re adding the input as a part of the response (for troubleshooting). This input should also confirm our understanding of Lambda Proxy Integration. Formatted correctly, this is what the function got as a input from the AWS API Gateway -&lt;/p&gt;
+
+&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+   &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;resource&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;/accounts/{account_id}/transactions&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+   &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;path&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;/accounts/1234/transactions&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+   &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;httpMethod&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;POST&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+   &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;headers&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;Accept&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;*/*&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;CloudFront-Forwarded-Proto&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;https&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;CloudFront-Is-Desktop-Viewer&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;true&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;CloudFront-Is-Mobile-Viewer&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;false&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;CloudFront-Is-SmartTV-Viewer&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;false&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;CloudFront-Is-Tablet-Viewer&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;false&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;CloudFront-Viewer-Country&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;US&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;Content-Type&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;application/x-www-form-urlencoded&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;Host&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;aaaaaa.execute-api.us-east-1.amazonaws.com&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;User-Agent&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;curl/7.51.0&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;Via&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;1.1 939ea9d62ec616846d41b16cea0dc65b.cloudfront.net (CloudFront)&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;X-Amz-Cf-Id&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;YFSlfpQhMoyUk7xw1MwaHrC55oS-kL68gc9Of-hIa68bSr_61eK2Jw==&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;X-Amzn-Trace-Id&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Root=1-58f327f0-5c9c884966463c313adaf2b5&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;X-Forwarded-For&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;73.111.62.170, 54.239.203.116&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;X-Forwarded-Port&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;443&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;X-Forwarded-Proto&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;https&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+   &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+   &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;queryStringParameters&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+   &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;pathParameters&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;account_id&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;1234&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+   &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+   &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;stageVariables&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+   &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;requestContext&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;accountId&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;123456789012&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;resourceId&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;6otyx5&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;stage&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;dev&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;requestId&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;bd4b3165-227c-11e7-baa4-61d7c2f92db9&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;identity&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+         &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;cognitoIdentityPoolId&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+         &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;accountId&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+         &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;cognitoIdentityId&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+         &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;caller&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+         &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;apiKey&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+         &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;sourceIp&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;73.111.62.170&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+         &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;accessKey&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+         &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;cognitoAuthenticationType&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+         &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;cognitoAuthenticationProvider&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+         &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;userArn&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+         &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;userAgent&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;curl/7.51.0&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+         &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;user&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;resourcePath&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;/accounts/{account_id}/transactions&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;httpMethod&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;POST&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;apiId&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;aaaaaa&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+   &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+   &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;body&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;{\&quot;transaction_id\&quot;:\&quot;foo\&quot;, \&quot;amount\&quot;: 20.50}&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+   &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;isBase64Encoded&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Lets get the transaction that has just posted, via &lt;code class=&quot;highlighter-rouge&quot;&gt;curl&lt;/code&gt; again.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bash-3.2$ curl  https://aaaaaa.execute-api.us-east-1.amazonaws.com/dev/accounts/1234/transactions
+[{&quot;account_id&quot;:&quot;1234&quot;,&quot;transaction_date&quot;:1492330481722,&quot;transaction_id&quot;:&quot;foo&quot;,&quot;amount&quot;:20.5}]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Since we are not passing the &lt;code class=&quot;highlighter-rouge&quot;&gt;input&lt;/code&gt; as a part of the output in &lt;code class=&quot;highlighter-rouge&quot;&gt;GetTransactionsHandler&lt;/code&gt;, we do not see the extra information. However, we do return the input in case of an exception, again, for troubleshooting purposes.&lt;/p&gt;
+
+&lt;p&gt;You will also notice a delay (as much as 5-10 seconds) for the first invocation. This is called the &lt;code class=&quot;highlighter-rouge&quot;&gt;cold start&lt;/code&gt; time, and as developers we’ve to be aware of this. Specially with compiled languages like Java and C#, the start/boot time for a lambda may exceed the SLA you may have - something to be mindful about.&lt;/p&gt;
+
+&lt;p&gt;The more &lt;em&gt;infrequently&lt;/em&gt; the lambda is invoked, &lt;em&gt;greater&lt;/em&gt; the cold start cost. There are plenty of &lt;em&gt;workarounds&lt;/em&gt; to address the cold start problem, I will cover some in a separate post as well.&lt;/p&gt;
+
+&lt;h2 id=&quot;summary&quot;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;In this series, we have built what is essentially a scaled-down version of a Microservices based architecture. We built 2 lambda functions, both of which can scale independent of each other. We learnt about the IAM permissions, and most importantly, about the Serverless Framework which let us focus on the functionality instead of worrying about deployment and management of the infrastructure like IAM, DynamoDB, API Gateway, S3, and the Lambda itself.&lt;/p&gt;
+
+&lt;p&gt;This is nowhere close to what you’d imagine for a Production system, but it is my hope and confidence that the series has you more informed and familiar with Serverless Applictions in AWS.&lt;/p&gt;
+
+&lt;p&gt;Please &lt;a href=&quot;https://www.twitter.com/lobster1234&quot; target=&quot;_blank_&quot;&gt;DM/tweet&lt;/a&gt; me your feedback, and thanks again for stopping by!&lt;/p&gt;</content>
+
+      
+      
+      
+      
+      
+
+      
+        <author>
+            <name>Manish Pandit</name>
+          
+          
+        </author>
+      
+
+      
+        <category term="aws" />
+      
+        <category term="api-gateway" />
+      
+        <category term="lambda" />
+      
+        <category term="serverless" />
+      
+        <category term="dynamodb" />
+      
+
+      
+
+      
+        <summary type="html">In this final post of the series on Java-based Serverless Lambda API, we will invoke the Transactions API using the Amazon API Gateway. As Lambda is evented, the HTTP endpoints exposed via the Amazon API Gateway will act as the event to trigger the function synchronously. If you have been following the earlier two posts, by the end of this post you will be comfortable building RESTful APIs using AWS Lambda, Java, DynamoDB (or any persistence layer), API Gateway - all put together using simple configuration in Serverless Framework.</summary>
+      
+
+      
+      
+    </entry>
+  
   
   
     <entry>
@@ -89,7 +316,7 @@
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;h2 id=&quot;create-a-serverless-project&quot;&gt;Create a Serverless Project&lt;/h2&gt;
+&lt;h2 id=&quot;create-a-serverless-project&quot;&gt;Create a serverless project&lt;/h2&gt;
 
 &lt;p&gt;Start by creating a new Serverless project, or you may re-use the one created during the Part-1 of this series.&lt;/p&gt;
 
@@ -508,7 +735,7 @@ bash-3.2$
 &lt;/div&gt;
 &lt;p&gt;Feel free to log into the AWS console, and look at the lambda just set up under Lambda section. Also, take a look at CloudFormation stacks. We can test it by creating a body similar to the AWS Lambda Proxy request from the documentation link above in the Console.&lt;/p&gt;
 
-&lt;p&gt;In the next and final part, we will wire up these 2 lambda functions to act as API endpoints.&lt;/p&gt;
+&lt;p&gt;In the &lt;a href=&quot;/2017/04/15/serverless-framework-api-gateway-lambda-proxy/&quot; target=&quot;_blank_&quot;&gt;next and final part&lt;/a&gt;, we will wire up these 2 lambda functions to act as API endpoints.&lt;/p&gt;
 
 &lt;p&gt;Thanks for staying with me so far!&lt;/p&gt;</content>
 
