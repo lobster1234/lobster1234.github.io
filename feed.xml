@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-04-16T15:39:59-07:00</updated>
+  <updated>2017-04-16T16:09:45-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -93,7 +93,7 @@
 
 &lt;h3 id=&quot;deploying-the-api&quot;&gt;Deploying the API&lt;/h3&gt;
 
-&lt;p&gt;Now that we have configured the event and the endpoint, we are all set to deploy the Serverless project. Before we do that, we need to attach the IAM policy to the &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless&lt;/code&gt; user in order to administer the API Gateway. Remember, we are using this user’s credentials for the Serverless Framework. This is different than the &lt;a href=&quot;http://docs.aws.amazon.com/Lambda/latest/dg/intro-permission-model.html&quot; target=&quot;_blank_&quot;&gt;Lambda Execution Role&lt;/a&gt; that was configured in the last post.&lt;/p&gt;
+&lt;p&gt;Now that we have configured the event and the endpoint, we are all set to deploy the Serverless project. Before we do that, we need to attach the IAM policy to the &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless&lt;/code&gt; user in order to administer the API Gateway. Remember, we are using this user’s credentials for the Serverless Framework. This is different than the &lt;a href=&quot;http://docs.aws.amazon.com/lambda/latest/dg/intro-permission-model.html&quot; target=&quot;_blank_&quot;&gt;Lambda Execution Role&lt;/a&gt; that was configured in the last post.&lt;/p&gt;
 
 &lt;p&gt;Log in to the AWS console, and click the &lt;code class=&quot;highlighter-rouge&quot;&gt;Serverless&lt;/code&gt; group we had created in Part-1. Click on &lt;code class=&quot;highlighter-rouge&quot;&gt;Attach Policy&lt;/code&gt;, Search for &lt;code class=&quot;highlighter-rouge&quot;&gt;APIGateway&lt;/code&gt;, and add the &lt;code class=&quot;highlighter-rouge&quot;&gt;AmazonAPIGatewayAdministrator&lt;/code&gt; policy to the group.&lt;/p&gt;
 
