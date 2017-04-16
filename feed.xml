@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-04-16T02:47:49-07:00</updated>
+  <updated>2017-04-16T12:20:50-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -40,6 +40,8 @@
 &lt;p&gt;As Lambda is &lt;em&gt;evented&lt;/em&gt;, the HTTP endpoints exposed via the Amazon API Gateway will act as the event to trigger the function &lt;em&gt;synchronously&lt;/em&gt;. If you have been following the earlier two posts, by the end of this post you will be comfortable building RESTful APIs using AWS Lambda, Java, DynamoDB (or any persistence layer), API Gateway - all put together using simple configuration in &lt;a href=&quot;https://www.serverless.com&quot; target=&quot;_blank_&quot;&gt;Serverless Framework&lt;/a&gt;.&lt;/p&gt;
 
 &lt;!--more--&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/serverless_blog.png&quot; alt=&quot;Serverless Blog&quot; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&quot;set-up-serverless-framework&quot;&gt;Set up Serverless Framework&lt;/h2&gt;
 
@@ -207,6 +209,21 @@ functions:
 &lt;p&gt;You will also notice a delay (as much as 5-10 seconds) for the first invocation. This is called the &lt;code class=&quot;highlighter-rouge&quot;&gt;cold start&lt;/code&gt; time, and as developers we’ve to be aware of this. Specially with compiled languages like Java and C#, the start/boot time for a lambda may exceed the SLA you may have - something to be mindful about.&lt;/p&gt;
 
 &lt;p&gt;The more &lt;em&gt;infrequently&lt;/em&gt; the lambda is invoked, &lt;em&gt;greater&lt;/em&gt; the cold start cost. There are plenty of &lt;em&gt;workarounds&lt;/em&gt; to address the cold start problem, I will cover some in a separate post as well.&lt;/p&gt;
+
+&lt;h3 id=&quot;cleanup&quot;&gt;Cleanup&lt;/h3&gt;
+
+&lt;p&gt;If you wish to remove the AWS infrastructure created as a part of this project, use the following command to do so.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bash-3.2$ serverless remove
+Serverless: Getting all objects in S3 bucket...
+Serverless: Removing objects in S3 bucket...
+Serverless: Removing Stack...
+Serverless: Checking Stack removal progress...
+..................................
+Serverless: Stack removal finished...
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
 &lt;h2 id=&quot;summary&quot;&gt;Summary&lt;/h2&gt;
 

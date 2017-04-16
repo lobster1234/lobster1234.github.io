@@ -349,6 +349,8 @@
 
 <!--more-->
 
+<p><img src="https://lobster1234.github.io/assets/serverless_blog.png" alt="Serverless Blog" /></p>
+
 <h2 id="set-up-serverless-framework">Set up Serverless Framework</h2>
 
 <p>Please refer to <a href="/2017/02/28/serverless-framework-java-maven-part-1" target="_blank_">AWS Lambda with Serverless Framework and Java/Maven - Part 1</a>.</p>
@@ -515,6 +517,21 @@ functions:
 <p>You will also notice a delay (as much as 5-10 seconds) for the first invocation. This is called the <code class="highlighter-rouge">cold start</code> time, and as developers we’ve to be aware of this. Specially with compiled languages like Java and C#, the start/boot time for a lambda may exceed the SLA you may have - something to be mindful about.</p>
 
 <p>The more <em>infrequently</em> the lambda is invoked, <em>greater</em> the cold start cost. There are plenty of <em>workarounds</em> to address the cold start problem, I will cover some in a separate post as well.</p>
+
+<h3 id="cleanup">Cleanup</h3>
+
+<p>If you wish to remove the AWS infrastructure created as a part of this project, use the following command to do so.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ serverless remove
+Serverless: Getting all objects in S3 bucket...
+Serverless: Removing objects in S3 bucket...
+Serverless: Removing Stack...
+Serverless: Checking Stack removal progress...
+..................................
+Serverless: Stack removal finished...
+
+</code></pre>
+</div>
 
 <h2 id="summary">Summary</h2>
 
