@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-04-16T12:46:08-07:00</updated>
+  <updated>2017-04-16T14:06:58-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -37,11 +37,11 @@
       <id>https://lobster1234.github.io/2017/04/15/serverless-framework-api-gateway-lambda-proxy</id>
       <content type="html" xml:base="https://lobster1234.github.io/2017/04/15/serverless-framework-api-gateway-lambda-proxy/">&lt;p&gt;In this final post of the series on Java-based Serverless Lambda API, we will invoke the Transactions API using the &lt;a href=&quot;https://aws.amazon.com/api-gateway/getting-started/&quot; target=&quot;_blank_&quot;&gt;Amazon API Gateway&lt;/a&gt;.&lt;/p&gt;
 
+&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/serverless_blog.png&quot; alt=&quot;Serverless Blog&quot; /&gt;&lt;/p&gt;
+
 &lt;p&gt;As Lambda is &lt;em&gt;evented&lt;/em&gt;, the HTTP endpoints exposed via the Amazon API Gateway will act as the event to trigger the function &lt;em&gt;synchronously&lt;/em&gt;. If you have been following the earlier two posts, by the end of this post you will be comfortable building RESTful APIs using AWS Lambda, Java, DynamoDB (or any persistence layer), API Gateway - all put together using simple configuration in &lt;a href=&quot;https://www.serverless.com&quot; target=&quot;_blank_&quot;&gt;Serverless Framework&lt;/a&gt;.&lt;/p&gt;
 
 &lt;!--more--&gt;
-
-&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/serverless-blog.jpg&quot; alt=&quot;Serverless Blog&quot; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&quot;set-up-serverless-framework&quot;&gt;Set up Serverless Framework&lt;/h2&gt;
 
