@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-04-16T14:06:58-07:00</updated>
+  <updated>2017-04-16T15:39:59-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -53,11 +53,11 @@
 
 &lt;h2 id=&quot;using-amazon-api-gateway&quot;&gt;Using Amazon API Gateway&lt;/h2&gt;
 
-&lt;p&gt;Now that we have our two functions deployed, we can use API Gateway to trigger, or invoke them. The Amazon API Gateway is a service that lets you expose many supported AWS offerings via RESTful API over HTTP. While in this case we will only use the API Gateway to expose and invoke our lambda as an HTTP endpoint, it only covers a fraction of the API Gateway’s capability. I highly recommend reading the &lt;a href=&quot;http://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html&quot;&gt;Amazon API Gateway Developer Guide&lt;/a&gt; and this &lt;a href=&quot;https://www.youtube.com/watch?v=FcH8ovrNd9k&quot; target=&quot;_blank_&quot;&gt;video from AWS Summit&lt;/a&gt; to get familiar with full potential of the API Gateway product.&lt;/p&gt;
+&lt;p&gt;Now that we have our two functions deployed, we can use API Gateway to trigger, or &lt;em&gt;invoke&lt;/em&gt; them. The Amazon API Gateway is a service that lets us expose many supported AWS offerings via RESTful API over HTTP. While in this case we will only use the API Gateway to expose and invoke our Lambda as an HTTP endpoint, this only covers a fraction of the API Gateway’s capability. I highly recommend reading the &lt;a href=&quot;http://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html&quot;&gt;Amazon API Gateway Developer Guide&lt;/a&gt; and this &lt;a href=&quot;https://www.youtube.com/watch?v=FcH8ovrNd9k&quot; target=&quot;_blank_&quot;&gt;video from AWS Summit&lt;/a&gt; to get familiar with full potential of the API Gateway product.&lt;/p&gt;
 
 &lt;h3 id=&quot;lambda-proxy-integration&quot;&gt;Lambda Proxy Integration&lt;/h3&gt;
 
-&lt;p&gt;We will be integrating the lambdas in an integration pattern commonly referred to as &lt;a href=&quot;http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html#api-gateway-proxy-integration-types&quot; target=&quot;_blank_&quot;&gt;Lambda Proxy Integration&lt;/a&gt;, which means that the function(s) will get entire HTTP request &lt;em&gt;as-is&lt;/em&gt; in the form of then input payload. This payload contains the entire request including the headers, query parameters, path parameters, and the body, as documented &lt;a href=&quot;http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html#api-gateway-simple-proxy-for-lambda-input-format&quot; target=&quot;_blank_&quot;&gt;here&lt;/a&gt;. While the function has full control on rendering the response body, code, and headers, the response is expected to be in a particular format, as documented &lt;a href=&quot;http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html#api-gateway-simple-proxy-for-lambda-output-format&quot; target=&quot;_blank_&quot;&gt;here&lt;/a&gt;. Serverless Framework created an &lt;code class=&quot;highlighter-rouge&quot;&gt;ApiGatewayResponse&lt;/code&gt; class as a part of the scaffolding which does exactly that. If you notice, the Transactions API code uses that class to marshal the response.&lt;/p&gt;
+&lt;p&gt;We will be integrating the Lambdas in an integration pattern commonly referred to as &lt;a href=&quot;http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html#api-gateway-proxy-integration-types&quot; target=&quot;_blank_&quot;&gt;Lambda Proxy Integration&lt;/a&gt;, which means that the function(s) will get entire HTTP request &lt;em&gt;as-is&lt;/em&gt; in the form of the input payload. This payload contains the entire request including the headers, query parameters, path parameters, and the body, as documented &lt;a href=&quot;http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html#api-gateway-simple-proxy-for-Lambda-input-format&quot; target=&quot;_blank_&quot;&gt;here&lt;/a&gt;. While the function has full control on rendering the response body, code, and headers, the response is expected to be in a particular format, as documented &lt;a href=&quot;http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html#api-gateway-simple-proxy-for-Lambda-output-format&quot; target=&quot;_blank_&quot;&gt;here&lt;/a&gt;. Serverless Framework creates an &lt;code class=&quot;highlighter-rouge&quot;&gt;ApiGatewayResponse&lt;/code&gt; class as a part of the scaffolding which does exactly that. If you notice, the Transactions API code uses that class to marshal the response.&lt;/p&gt;
 
 &lt;p&gt;By default, Serverless Framework uses the Lambda Proxy Integration for API Gateway.&lt;/p&gt;
 
@@ -87,15 +87,15 @@
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;p&gt;A Lambda functions need an event to be triggered. The API Gateway invocation is one of the many events supported by AWS Lambda. Hence, we define &lt;code class=&quot;highlighter-rouge&quot;&gt;http&lt;/code&gt; as the event under the function definition. Note that we can add more such events in the configuration, but for now we focus on HTTP invocation via the API Gateway. The endpoints will be &lt;code class=&quot;highlighter-rouge&quot;&gt;https&lt;/code&gt;, so do not worry about calling the event as &lt;code class=&quot;highlighter-rouge&quot;&gt;http&lt;/code&gt; here. Next, we provide more information about the &lt;code class=&quot;highlighter-rouge&quot;&gt;http&lt;/code&gt; integration, namely the &lt;code class=&quot;highlighter-rouge&quot;&gt;path&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;method&lt;/code&gt;. Notice the path parameter, &lt;code class=&quot;highlighter-rouge&quot;&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;account_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt; in the &lt;code class=&quot;highlighter-rouge&quot;&gt;path&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Lambda functions need an event to be triggered. The API Gateway invocation is one of the many events supported by AWS Lambda. Hence, we define &lt;code class=&quot;highlighter-rouge&quot;&gt;http&lt;/code&gt; as the event under the function definition. Note that we can add more such events in the configuration, but for now we focus on HTTP invocation via the API Gateway. The endpoints will be &lt;code class=&quot;highlighter-rouge&quot;&gt;https&lt;/code&gt;, so do not worry about calling the event as &lt;code class=&quot;highlighter-rouge&quot;&gt;http&lt;/code&gt; here. Next, we provide more information about the &lt;code class=&quot;highlighter-rouge&quot;&gt;http&lt;/code&gt; integration, namely the &lt;code class=&quot;highlighter-rouge&quot;&gt;path&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;method&lt;/code&gt;. Notice the path parameter, &lt;code class=&quot;highlighter-rouge&quot;&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;account_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt; in the &lt;code class=&quot;highlighter-rouge&quot;&gt;path&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;For more details on the &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless.yml&lt;/code&gt; configuration for API Gateway, refer to Serverless Framework API Gateway documentation &lt;a href=&quot;https://serverless.com/framework/docs/providers/aws/events/apigateway/&quot; target=&quot;_blank_&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
 
 &lt;h3 id=&quot;deploying-the-api&quot;&gt;Deploying the API&lt;/h3&gt;
 
-&lt;p&gt;Now that we have configured the event and the endpoint, we are all set to deploy the Serverless project. Before we do that, we need to attach the IAM policy to the &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless&lt;/code&gt; user in order to administer the API Gateway. Remember, we are using this user’s credentials for the Serverless Framework.&lt;/p&gt;
+&lt;p&gt;Now that we have configured the event and the endpoint, we are all set to deploy the Serverless project. Before we do that, we need to attach the IAM policy to the &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless&lt;/code&gt; user in order to administer the API Gateway. Remember, we are using this user’s credentials for the Serverless Framework. This is different than the &lt;a href=&quot;http://docs.aws.amazon.com/Lambda/latest/dg/intro-permission-model.html&quot; target=&quot;_blank_&quot;&gt;Lambda Execution Role&lt;/a&gt; that was configured in the last post.&lt;/p&gt;
 
-&lt;p&gt;Log in to the console, and click the &lt;code class=&quot;highlighter-rouge&quot;&gt;Serverless&lt;/code&gt; group we had created in Part-1. Click on &lt;code class=&quot;highlighter-rouge&quot;&gt;Attach Policy&lt;/code&gt;, Search for &lt;code class=&quot;highlighter-rouge&quot;&gt;APIGateway&lt;/code&gt;, and add the &lt;code class=&quot;highlighter-rouge&quot;&gt;AmazonAPIGatewayAdministrator&lt;/code&gt; policy to the group.&lt;/p&gt;
+&lt;p&gt;Log in to the AWS console, and click the &lt;code class=&quot;highlighter-rouge&quot;&gt;Serverless&lt;/code&gt; group we had created in Part-1. Click on &lt;code class=&quot;highlighter-rouge&quot;&gt;Attach Policy&lt;/code&gt;, Search for &lt;code class=&quot;highlighter-rouge&quot;&gt;APIGateway&lt;/code&gt;, and add the &lt;code class=&quot;highlighter-rouge&quot;&gt;AmazonAPIGatewayAdministrator&lt;/code&gt; policy to the group.&lt;/p&gt;
 
 &lt;p&gt;The final set of policies should look like this -&lt;/p&gt;
 
@@ -127,11 +127,11 @@ functions:
 &lt;/div&gt;
 &lt;p&gt;If we compare the output of this command to the one we got during deploying just the functions, we see that we get additional information in terms of the endpoints. I’ve masked the endpoint with &lt;code class=&quot;highlighter-rouge&quot;&gt;aaaaaa&lt;/code&gt;. This is referred to as an &lt;code class=&quot;highlighter-rouge&quot;&gt;appID&lt;/code&gt;.&lt;/p&gt;
 
-&lt;h3 id=&quot;testing-the-endpoints&quot;&gt;Testing the endpoints&lt;/h3&gt;
+&lt;h3 id=&quot;testing-the-endpoints&quot;&gt;Testing the Endpoints&lt;/h3&gt;
 
-&lt;p&gt;We can use &lt;code class=&quot;highlighter-rouge&quot;&gt;curl&lt;/code&gt; or any handly HTTP client to hit the two endpoints.&lt;/p&gt;
+&lt;p&gt;We can use &lt;code class=&quot;highlighter-rouge&quot;&gt;curl&lt;/code&gt; or any handy HTTP client to hit the two endpoints.&lt;/p&gt;
 
-&lt;p&gt;First we POST a transaction.&lt;/p&gt;
+&lt;p&gt;First we &lt;code class=&quot;highlighter-rouge&quot;&gt;POST&lt;/code&gt; a transaction.&lt;/p&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bash-3.2$ curl -X POST https://aaaaaa.execute-api.us-east-1.amazonaws.com/dev/accounts/1234/transactions -d '{&quot;transaction_id&quot;:&quot;foo&quot;, &quot;amount&quot;: 20.50}'
 
@@ -198,7 +198,7 @@ functions:
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;p&gt;Lets get the transaction that has just posted, via &lt;code class=&quot;highlighter-rouge&quot;&gt;curl&lt;/code&gt; again.&lt;/p&gt;
+&lt;p&gt;Lets &lt;code class=&quot;highlighter-rouge&quot;&gt;GET&lt;/code&gt; the transaction that has just posted, via &lt;code class=&quot;highlighter-rouge&quot;&gt;curl&lt;/code&gt; again.&lt;/p&gt;
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bash-3.2$ curl  https://aaaaaa.execute-api.us-east-1.amazonaws.com/dev/accounts/1234/transactions
 [{&quot;account_id&quot;:&quot;1234&quot;,&quot;transaction_date&quot;:1492330481722,&quot;transaction_id&quot;:&quot;foo&quot;,&quot;amount&quot;:20.5}]
 &lt;/code&gt;&lt;/pre&gt;
@@ -206,13 +206,13 @@ functions:
 
 &lt;p&gt;Since we are not passing the &lt;code class=&quot;highlighter-rouge&quot;&gt;input&lt;/code&gt; as a part of the output in &lt;code class=&quot;highlighter-rouge&quot;&gt;GetTransactionsHandler&lt;/code&gt;, we do not see the extra information. However, we do return the input in case of an exception, again, for troubleshooting purposes.&lt;/p&gt;
 
-&lt;p&gt;You will also notice a delay (as much as 5-10 seconds) for the first invocation. This is called the &lt;code class=&quot;highlighter-rouge&quot;&gt;cold start&lt;/code&gt; time, and as developers we’ve to be aware of this. Specially with compiled languages like Java and C#, the start/boot time for a lambda may exceed the SLA you may have - something to be mindful about.&lt;/p&gt;
+&lt;p&gt;You will also notice a delay (as much as 5-10 seconds) for the first invocation. This is called the &lt;code class=&quot;highlighter-rouge&quot;&gt;cold start&lt;/code&gt; time, and as developers we’ve to be aware of this. Specially with compiled languages like Java and C#, the start/boot time for a Lambda may exceed the SLA you may have - something to be mindful about.&lt;/p&gt;
 
-&lt;p&gt;The more &lt;em&gt;infrequently&lt;/em&gt; the lambda is invoked, &lt;em&gt;greater&lt;/em&gt; the cold start cost. There are plenty of &lt;em&gt;workarounds&lt;/em&gt; to address the cold start problem, I will cover some in a separate post as well.&lt;/p&gt;
+&lt;p&gt;The more &lt;em&gt;infrequently&lt;/em&gt; the Lambda is invoked, &lt;em&gt;greater&lt;/em&gt; the cold start cost. There are plenty of &lt;em&gt;workarounds&lt;/em&gt; to address the cold start problem, I will cover some in a separate post as well.&lt;/p&gt;
 
 &lt;h3 id=&quot;cleanup&quot;&gt;Cleanup&lt;/h3&gt;
 
-&lt;p&gt;If you wish to remove the AWS infrastructure created as a part of this project, use the following command to do so.&lt;/p&gt;
+&lt;p&gt;If you wish to remove the AWS infrastructure created as a part of this project, use the following command to do so. This will remove the IAM roles, any resources defined in &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless.yml&lt;/code&gt;, and destroy the CloudFormation stack.&lt;/p&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bash-3.2$ serverless remove
 Serverless: Getting all objects in S3 bucket...
@@ -227,7 +227,7 @@ Serverless: Stack removal finished...
 
 &lt;h2 id=&quot;summary&quot;&gt;Summary&lt;/h2&gt;
 
-&lt;p&gt;In this series, we have built what is essentially a scaled-down version of a Microservices based architecture. We built 2 lambda functions, both of which can scale independent of each other. We learnt about the IAM permissions, and most importantly, about the Serverless Framework which let us focus on the functionality instead of worrying about deployment and management of the infrastructure like IAM, DynamoDB, API Gateway, S3, and the Lambda itself.&lt;/p&gt;
+&lt;p&gt;In this series, we have built what is essentially a scaled-down version of a Microservices based architecture. We built 2 Lambda functions, both of which can scale independent of each other. We learnt about the IAM permissions, and most importantly, about the Serverless Framework which let us focus on the functionality instead of worrying about deployment and management of the infrastructure like IAM, DynamoDB, API Gateway, S3, and the Lambda itself.&lt;/p&gt;
 
 &lt;p&gt;This is nowhere close to what you’d imagine for a Production system, but it is my hope and confidence that the series has you more informed and familiar with Serverless Applictions in AWS.&lt;/p&gt;
 
