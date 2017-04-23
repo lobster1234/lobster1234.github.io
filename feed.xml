@@ -3,10 +3,10 @@
   <generator uri="http://jekyllrb.com" version="3.4.3">Jekyll</generator>
   
   
-  <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
-  <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-04-22T03:51:27-07:00</updated>
-  <id>https://lobster1234.github.io//</id>
+  <link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" />
+  <link href="http://localhost:4000/" rel="alternate" type="text/html" />
+  <updated>2017-04-23T03:31:05-07:00</updated>
+  <id>http://localhost:4000//</id>
 
   
     <title type="html">Manish Pandit’s Blog</title>
@@ -31,13 +31,13 @@
       
       <title type="html">AWS Lambda with Serverless Framework and Java/Maven - Part 3</title>
       
-      <link href="https://lobster1234.github.io/2017/04/15/serverless-framework-api-gateway-lambda-proxy/" rel="alternate" type="text/html" title="AWS Lambda with Serverless Framework and Java/Maven - Part 3" />
+      <link href="http://localhost:4000/2017/04/15/serverless-framework-api-gateway-lambda-proxy/" rel="alternate" type="text/html" title="AWS Lambda with Serverless Framework and Java/Maven - Part 3" />
       <published>2017-04-15T23:44:37-07:00</published>
       <updated>2017-04-15T23:44:37-07:00</updated>
-      <id>https://lobster1234.github.io/2017/04/15/serverless-framework-api-gateway-lambda-proxy</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2017/04/15/serverless-framework-api-gateway-lambda-proxy/">&lt;p&gt;In this final post of the series on Java-based Serverless Lambda API, we will invoke the Transactions API using the &lt;a href=&quot;https://aws.amazon.com/api-gateway/getting-started/&quot; target=&quot;_blank_&quot;&gt;Amazon API Gateway&lt;/a&gt;.&lt;/p&gt;
+      <id>http://localhost:4000/2017/04/15/serverless-framework-api-gateway-lambda-proxy</id>
+      <content type="html" xml:base="http://localhost:4000/2017/04/15/serverless-framework-api-gateway-lambda-proxy/">&lt;p&gt;In this final post of the series on Java-based Serverless Lambda API, we will invoke the Transactions API using the &lt;a href=&quot;https://aws.amazon.com/api-gateway/getting-started/&quot; target=&quot;_blank_&quot;&gt;Amazon API Gateway&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/serverless_blog.png&quot; alt=&quot;Serverless Blog&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://localhost:4000/assets/serverless_blog.png&quot; alt=&quot;Serverless Blog&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;As Lambda is &lt;em&gt;evented&lt;/em&gt;, the HTTP endpoints exposed via the Amazon API Gateway will act as the event to trigger the function &lt;em&gt;synchronously&lt;/em&gt;. If you have been following the earlier two posts, by the end of this post you will be comfortable building RESTful APIs using AWS Lambda, Java, DynamoDB (or any persistence layer), API Gateway - all put together using simple configuration in &lt;a href=&quot;https://www.serverless.com&quot; target=&quot;_blank_&quot;&gt;Serverless Framework&lt;/a&gt;.&lt;/p&gt;
 
@@ -99,7 +99,7 @@
 
 &lt;p&gt;The final set of policies should look like this -&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/serverless-group.png&quot; alt=&quot;IAM Group&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://localhost:4000/assets/serverless-group.png&quot; alt=&quot;IAM Group&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Once done, we run the now familiar &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless deploy&lt;/code&gt; command.&lt;/p&gt;
 
@@ -275,11 +275,11 @@ Serverless: Stack removal finished...
       
       <title type="html">AWS Lambda with Serverless Framework and Java/Maven - Part 2</title>
       
-      <link href="https://lobster1234.github.io/2017/04/12/serverless-framework-aws-apigateway/" rel="alternate" type="text/html" title="AWS Lambda with Serverless Framework and Java/Maven - Part 2" />
+      <link href="http://localhost:4000/2017/04/12/serverless-framework-aws-apigateway/" rel="alternate" type="text/html" title="AWS Lambda with Serverless Framework and Java/Maven - Part 2" />
       <published>2017-04-12T23:44:37-07:00</published>
       <updated>2017-04-12T23:44:37-07:00</updated>
-      <id>https://lobster1234.github.io/2017/04/12/serverless-framework-aws-apigateway</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2017/04/12/serverless-framework-aws-apigateway/">&lt;p&gt;We continue to build our &lt;a href=&quot;https://aws.amazon.com/lambda/&quot; target=&quot;_blank&quot;&gt;Lambda&lt;/a&gt; functions beyond the Hello World that we saw in the previous post. Our end goal is to build an API, and make it available via &lt;a href=&quot;https://aws.amazon.com/api-gateway/&quot; target=&quot;_blank&quot;&gt;Amazon API Gateway&lt;/a&gt;. We will build the foundation of our Lambda-API-Gateway set up in this tutorial. We will also set up &lt;a href=&quot;https://aws.amazon.com/dynamodb/&quot; target=&quot;_blank&quot;&gt;DynamoDB&lt;/a&gt;. Feel free to replace DynamoDB with any persistance layer, or even a mock.&lt;/p&gt;
+      <id>http://localhost:4000/2017/04/12/serverless-framework-aws-apigateway</id>
+      <content type="html" xml:base="http://localhost:4000/2017/04/12/serverless-framework-aws-apigateway/">&lt;p&gt;We continue to build our &lt;a href=&quot;https://aws.amazon.com/lambda/&quot; target=&quot;_blank&quot;&gt;Lambda&lt;/a&gt; functions beyond the Hello World that we saw in the previous post. Our end goal is to build an API, and make it available via &lt;a href=&quot;https://aws.amazon.com/api-gateway/&quot; target=&quot;_blank&quot;&gt;Amazon API Gateway&lt;/a&gt;. We will build the foundation of our Lambda-API-Gateway set up in this tutorial. We will also set up &lt;a href=&quot;https://aws.amazon.com/dynamodb/&quot; target=&quot;_blank&quot;&gt;DynamoDB&lt;/a&gt;. Feel free to replace DynamoDB with any persistance layer, or even a mock.&lt;/p&gt;
 
 &lt;!--more--&gt;
 
@@ -798,11 +798,11 @@ bash-3.2$
       
       <title type="html">Fish and iTerm2</title>
       
-      <link href="https://lobster1234.github.io/2017/04/08/setting-up-fish-and-iterm2/" rel="alternate" type="text/html" title="Fish and iTerm2" />
+      <link href="http://localhost:4000/2017/04/08/setting-up-fish-and-iterm2/" rel="alternate" type="text/html" title="Fish and iTerm2" />
       <published>2017-04-08T04:44:37-07:00</published>
       <updated>2017-04-08T04:44:37-07:00</updated>
-      <id>https://lobster1234.github.io/2017/04/08/setting-up-fish-and-iterm2</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2017/04/08/setting-up-fish-and-iterm2/">&lt;p&gt;So, out of boredom, I decided to upgrade my shell and terminal to something closer to 2017, instead of living in the early 90s. Clearly I’e been using &lt;code class=&quot;highlighter-rouge&quot;&gt;bash&lt;/code&gt; all these years - mostly on Ubuntu and lately on OSX. But I’ve always been &lt;em&gt;lazy and complacent&lt;/em&gt; with the terminal. I’ve always wanted to set up &lt;a href=&quot;http://fishshell.com&quot; target=&quot;_blank&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;fish&lt;/code&gt;&lt;/a&gt; - &lt;strong&gt;Friendly Interactive SHell&lt;/strong&gt;. for it’s git integration, and very rich interaction. Sure, all of this can be done on &lt;code class=&quot;highlighter-rouge&quot;&gt;bash&lt;/code&gt; or &lt;code class=&quot;highlighter-rouge&quot;&gt;zsh&lt;/code&gt; but I hate configuration, and combing hundreds of git repos for &lt;code class=&quot;highlighter-rouge&quot;&gt;bashfiles&lt;/code&gt; and find what works for me.&lt;/p&gt;
+      <id>http://localhost:4000/2017/04/08/setting-up-fish-and-iterm2</id>
+      <content type="html" xml:base="http://localhost:4000/2017/04/08/setting-up-fish-and-iterm2/">&lt;p&gt;So, out of boredom, I decided to upgrade my shell and terminal to something closer to 2017, instead of living in the early 90s. Clearly I’e been using &lt;code class=&quot;highlighter-rouge&quot;&gt;bash&lt;/code&gt; all these years - mostly on Ubuntu and lately on OSX. But I’ve always been &lt;em&gt;lazy and complacent&lt;/em&gt; with the terminal. I’ve always wanted to set up &lt;a href=&quot;http://fishshell.com&quot; target=&quot;_blank&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;fish&lt;/code&gt;&lt;/a&gt; - &lt;strong&gt;Friendly Interactive SHell&lt;/strong&gt;. for it’s git integration, and very rich interaction. Sure, all of this can be done on &lt;code class=&quot;highlighter-rouge&quot;&gt;bash&lt;/code&gt; or &lt;code class=&quot;highlighter-rouge&quot;&gt;zsh&lt;/code&gt; but I hate configuration, and combing hundreds of git repos for &lt;code class=&quot;highlighter-rouge&quot;&gt;bashfiles&lt;/code&gt; and find what works for me.&lt;/p&gt;
 
 &lt;p&gt;While at &lt;code class=&quot;highlighter-rouge&quot;&gt;fish&lt;/code&gt;, I also decided to upgrade the default Mac &lt;code class=&quot;highlighter-rouge&quot;&gt;terminal&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;iTerm2&lt;/code&gt;. This led me to a journey through installing fonts all the way to picking up the theme that works for me. But again, no configuration to mess with.&lt;/p&gt;
 
@@ -819,7 +819,7 @@ bash-3.2$
 
 &lt;p&gt;Once installed, the default theme supports git repositories, in that, the prompt indicates the local repository state, has nice syntax highlighting on the command line, and typical things you’d expect from the shell of the 21st century.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/fish-1.png&quot; alt=&quot;Fish-1&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://localhost:4000/assets/fish-1.png&quot; alt=&quot;Fish-1&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;You can see the prompt change, as well as a timestamp show up to the right of the window.&lt;/p&gt;
 
@@ -865,7 +865,7 @@ Powerline fonts installed to /Users/mpandit/Library/Fonts
 
 &lt;p&gt;Take a look at the Font Book, and pick the powerline font of your choice. I like &lt;code class=&quot;highlighter-rouge&quot;&gt;Ubuntu Mono&lt;/code&gt;. You can type &lt;code class=&quot;highlighter-rouge&quot;&gt;powerline&lt;/code&gt; in the little search textbox in Font Book to shorten the list. Once picked, set the font here -&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/fish-2.png&quot; alt=&quot;Fish-2&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://localhost:4000/assets/fish-2.png&quot; alt=&quot;Fish-2&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Restart iTerm2, and you should be all set!&lt;/p&gt;
 
@@ -873,7 +873,7 @@ Powerline fonts installed to /Users/mpandit/Library/Fonts
 
 &lt;p&gt;This image shows how the prompt changes as we make simple changes to a local git repo. I am using &lt;code class=&quot;highlighter-rouge&quot;&gt;bobthefish&lt;/code&gt; theme. See the theme details on how the prompt indicates various states like locally committed but un-pushed changes, etc.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/fish-3.png&quot; alt=&quot;Fish-3&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://localhost:4000/assets/fish-3.png&quot; alt=&quot;Fish-3&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;As you can see, it is super helpful, with no configuration to get this going. This to me is one of the most useful and powerful features of &lt;code class=&quot;highlighter-rouge&quot;&gt;fish&lt;/code&gt;.&lt;/p&gt;
 
@@ -913,11 +913,11 @@ Powerline fonts installed to /Users/mpandit/Library/Fonts
       
       <title type="html">Using localstack with AWS CLI</title>
       
-      <link href="https://lobster1234.github.io/2017/04/05/working-with-localstack-command-line/" rel="alternate" type="text/html" title="Using localstack with AWS CLI" />
+      <link href="http://localhost:4000/2017/04/05/working-with-localstack-command-line/" rel="alternate" type="text/html" title="Using localstack with AWS CLI" />
       <published>2017-04-05T23:44:37-07:00</published>
       <updated>2017-04-05T23:44:37-07:00</updated>
-      <id>https://lobster1234.github.io/2017/04/05/working-with-localstack-command-line</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2017/04/05/working-with-localstack-command-line/">&lt;p&gt;&lt;a href=&quot;https://github.com/atlassian/localstack&quot; target=&quot;_blank&quot;&gt;Localstack&lt;/a&gt; is a really useful project by Atlassian, which allows for local development using the AWS cloud stack. In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against. This post is a quick and handy gist of using AWS command line to work with localstack for S3, SNS, SQS, and DynamoDB.
+      <id>http://localhost:4000/2017/04/05/working-with-localstack-command-line</id>
+      <content type="html" xml:base="http://localhost:4000/2017/04/05/working-with-localstack-command-line/">&lt;p&gt;&lt;a href=&quot;https://github.com/atlassian/localstack&quot; target=&quot;_blank&quot;&gt;Localstack&lt;/a&gt; is a really useful project by Atlassian, which allows for local development using the AWS cloud stack. In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against. This post is a quick and handy gist of using AWS command line to work with localstack for S3, SNS, SQS, and DynamoDB.
 &lt;!--more--&gt;&lt;/p&gt;
 
 &lt;h1 id=&quot;setting-up-localstack&quot;&gt;Setting up localstack&lt;/h1&gt;
@@ -1322,11 +1322,11 @@ bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb get-item --table-nam
       
       <title type="html">SparkJava Maven Archetype with .war generation</title>
       
-      <link href="https://lobster1234.github.io/2017/04/04/sparkjava-maven-archetype-webapp/" rel="alternate" type="text/html" title="SparkJava Maven Archetype with .war generation" />
+      <link href="http://localhost:4000/2017/04/04/sparkjava-maven-archetype-webapp/" rel="alternate" type="text/html" title="SparkJava Maven Archetype with .war generation" />
       <published>2017-04-04T01:11:03-07:00</published>
       <updated>2017-04-04T01:11:03-07:00</updated>
-      <id>https://lobster1234.github.io/2017/04/04/sparkjava-maven-archetype-webapp</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2017/04/04/sparkjava-maven-archetype-webapp/">&lt;p&gt;&lt;a href=&quot;http://sparkjava.com/&quot; target=&quot;_blank&quot;&gt;Spark Java&lt;/a&gt; is a Java 8 based lightweight framework which I highly recommend for writing APIs. It is so simple that it comes with an embedded jetty. However, in real world production you’d want to run it in an external container like Tomcat, JBoss, or Jetty (external), etc.
+      <id>http://localhost:4000/2017/04/04/sparkjava-maven-archetype-webapp</id>
+      <content type="html" xml:base="http://localhost:4000/2017/04/04/sparkjava-maven-archetype-webapp/">&lt;p&gt;&lt;a href=&quot;http://sparkjava.com/&quot; target=&quot;_blank&quot;&gt;Spark Java&lt;/a&gt; is a Java 8 based lightweight framework which I highly recommend for writing APIs. It is so simple that it comes with an embedded jetty. However, in real world production you’d want to run it in an external container like Tomcat, JBoss, or Jetty (external), etc.
 I found a &lt;a href=&quot;https://github.com/ImaginateWayne/sparkjava-archetypes&quot; target=&quot;_blank&quot;&gt;SparkJava Hello World archetype&lt;/a&gt;, however, it uses the embedded jetty. I was able to fork the repo and add .war support to it.&lt;/p&gt;
 
 &lt;p&gt;The fork is &lt;a href=&quot;https://github.com/marqeta/sparkjava-archetypes/tree/master/sparkjava-helloworld-archetype&quot; target=&quot;_blank&quot;&gt;here&lt;/a&gt;&lt;/p&gt;
@@ -1511,11 +1511,11 @@ Hello World!
       
       <title type="html">AWS Lambda with Serverless Framework and Java/Maven - Part 1</title>
       
-      <link href="https://lobster1234.github.io/2017/02/28/serverless-framework-java-maven-part-1/" rel="alternate" type="text/html" title="AWS Lambda with Serverless Framework and Java/Maven - Part 1" />
+      <link href="http://localhost:4000/2017/02/28/serverless-framework-java-maven-part-1/" rel="alternate" type="text/html" title="AWS Lambda with Serverless Framework and Java/Maven - Part 1" />
       <published>2017-02-28T22:15:37-08:00</published>
       <updated>2017-02-28T22:15:37-08:00</updated>
-      <id>https://lobster1234.github.io/2017/02/28/serverless-framework-java-maven-part-1</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2017/02/28/serverless-framework-java-maven-part-1/">&lt;p&gt;&lt;a href=&quot;https://serverless.com&quot; target=&quot;_blank&quot;&gt;Serverless&lt;/a&gt; is a node.js based framework that makes creating, deploying, and managing serverless functions a breeze. We will use AWS as our FaaS (Function-as-a-Service) provider, although Serverless supports IBM OpenWhisk and Microsoft Azure as well.&lt;/p&gt;
+      <id>http://localhost:4000/2017/02/28/serverless-framework-java-maven-part-1</id>
+      <content type="html" xml:base="http://localhost:4000/2017/02/28/serverless-framework-java-maven-part-1/">&lt;p&gt;&lt;a href=&quot;https://serverless.com&quot; target=&quot;_blank&quot;&gt;Serverless&lt;/a&gt; is a node.js based framework that makes creating, deploying, and managing serverless functions a breeze. We will use AWS as our FaaS (Function-as-a-Service) provider, although Serverless supports IBM OpenWhisk and Microsoft Azure as well.&lt;/p&gt;
 
 &lt;p&gt;In this tutorial, we will create and deploy a java-maven based AWS Lambda function. In Part-1 we will not modify any code, or even look at the generated code. We will focus on the deployment and the command line interface to manage lambda, provided out of the box by serverless framework.&lt;/p&gt;
 
@@ -1841,11 +1841,11 @@ Duration (avg.): 276.55ms
       
       <title type="html">Notes from AWS Lambda Deep Dive Webinar</title>
       
-      <link href="https://lobster1234.github.io/2017/02/27/notes-from-aws-lambda-deep-dive-webinar/" rel="alternate" type="text/html" title="Notes from AWS Lambda Deep Dive Webinar" />
+      <link href="http://localhost:4000/2017/02/27/notes-from-aws-lambda-deep-dive-webinar/" rel="alternate" type="text/html" title="Notes from AWS Lambda Deep Dive Webinar" />
       <published>2017-02-27T07:20:44-08:00</published>
       <updated>2017-02-27T07:20:44-08:00</updated>
-      <id>https://lobster1234.github.io/2017/02/27/notes-from-aws-lambda-deep-dive-webinar</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2017/02/27/notes-from-aws-lambda-deep-dive-webinar/">&lt;p&gt;I’ve put together my notes from the AWS webinar, which can be seen &lt;a href=&quot;https://www.youtube.com/watch?v=dB4zJk_fqrU&quot; target=&quot;_blank&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+      <id>http://localhost:4000/2017/02/27/notes-from-aws-lambda-deep-dive-webinar</id>
+      <content type="html" xml:base="http://localhost:4000/2017/02/27/notes-from-aws-lambda-deep-dive-webinar/">&lt;p&gt;I’ve put together my notes from the AWS webinar, which can be seen &lt;a href=&quot;https://www.youtube.com/watch?v=dB4zJk_fqrU&quot; target=&quot;_blank&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;Lambda is the key enabler and a core AWS component for serverless computing. Lets you run the code you want, without worrying about the underlying infrastructure and provisioning. It is also cost efficient, as there are no instances that are in running state but idle. Lambda handles scaling up and scaling down as needed, transparently to the customer.&lt;/p&gt;
 
@@ -2007,11 +2007,11 @@ Duration (avg.): 276.55ms
       
       <title type="html">AWS Training at Marqeta : SQS Lab</title>
       
-      <link href="https://lobster1234.github.io/2017/02/17/marqeta-aws-sqs-lab/" rel="alternate" type="text/html" title="AWS Training at Marqeta : SQS Lab" />
+      <link href="http://localhost:4000/2017/02/17/marqeta-aws-sqs-lab/" rel="alternate" type="text/html" title="AWS Training at Marqeta : SQS Lab" />
       <published>2017-02-17T19:10:44-08:00</published>
       <updated>2017-02-17T19:10:44-08:00</updated>
-      <id>https://lobster1234.github.io/2017/02/17/marqeta-aws-sqs-lab</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2017/02/17/marqeta-aws-sqs-lab/">&lt;p&gt;This post is the handout for the SQS Lab I ran as a part of hands-on AWS training to the Engineering + DevOps team at &lt;a href=&quot;https://www.marqeta.com&quot; target=&quot;_blank&quot;&gt;Marqeta&lt;/a&gt;.&lt;/p&gt;
+      <id>http://localhost:4000/2017/02/17/marqeta-aws-sqs-lab</id>
+      <content type="html" xml:base="http://localhost:4000/2017/02/17/marqeta-aws-sqs-lab/">&lt;p&gt;This post is the handout for the SQS Lab I ran as a part of hands-on AWS training to the Engineering + DevOps team at &lt;a href=&quot;https://www.marqeta.com&quot; target=&quot;_blank&quot;&gt;Marqeta&lt;/a&gt;.&lt;/p&gt;
 
 &lt;!--more--&gt;
 
@@ -2172,11 +2172,11 @@ aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.co
       
       <title type="html">AWS Primer and Quickstart Presentation</title>
       
-      <link href="https://lobster1234.github.io/2017/02/01/aws-primer-and-quickstart/" rel="alternate" type="text/html" title="AWS Primer and Quickstart Presentation" />
+      <link href="http://localhost:4000/2017/02/01/aws-primer-and-quickstart/" rel="alternate" type="text/html" title="AWS Primer and Quickstart Presentation" />
       <published>2017-02-01T07:22:10-08:00</published>
       <updated>2017-02-01T07:22:10-08:00</updated>
-      <id>https://lobster1234.github.io/2017/02/01/aws-primer-and-quickstart</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2017/02/01/aws-primer-and-quickstart/">Slides from my introductory talk on AWS at Marqeta.
+      <id>http://localhost:4000/2017/02/01/aws-primer-and-quickstart</id>
+      <content type="html" xml:base="http://localhost:4000/2017/02/01/aws-primer-and-quickstart/">Slides from my introductory talk on AWS at Marqeta.
 
 &lt;!--more--&gt;
 &lt;script async class=&quot;speakerdeck-embed&quot; data-id=&quot;13c65dd7c1744c319001b4415e3ca439&quot; data-ratio=&quot;1.77777777777778&quot; src=&quot;//speakerdeck.com/assets/embed.js&quot;&gt;&lt;/script&gt;</content>
@@ -2217,11 +2217,11 @@ aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.co
       
       <title type="html">Balanced Brackets</title>
       
-      <link href="https://lobster1234.github.io/2016/12/24/balance-brackets-o-n-solution/" rel="alternate" type="text/html" title="Balanced Brackets" />
+      <link href="http://localhost:4000/2016/12/24/balance-brackets-o-n-solution/" rel="alternate" type="text/html" title="Balanced Brackets" />
       <published>2016-12-24T21:22:10-08:00</published>
       <updated>2016-12-24T21:22:10-08:00</updated>
-      <id>https://lobster1234.github.io/2016/12/24/balance-brackets-o-n-solution</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2016/12/24/balance-brackets-o-n-solution/">&lt;p&gt;&lt;a href=&quot;https://www.hackerrank.com/challenges/balanced-brackets&quot; target=&quot;_blank&quot;&gt;Here&lt;/a&gt; is the problem statement. Print YES if the brackets in a given string are balanced, else print NO. Here is my O(N) submission to the challenge.&lt;/p&gt;
+      <id>http://localhost:4000/2016/12/24/balance-brackets-o-n-solution</id>
+      <content type="html" xml:base="http://localhost:4000/2016/12/24/balance-brackets-o-n-solution/">&lt;p&gt;&lt;a href=&quot;https://www.hackerrank.com/challenges/balanced-brackets&quot; target=&quot;_blank&quot;&gt;Here&lt;/a&gt; is the problem statement. Print YES if the brackets in a given string are balanced, else print NO. Here is my O(N) submission to the challenge.&lt;/p&gt;
 
 &lt;!--more--&gt;
 &lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;java.io.*&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
@@ -2294,11 +2294,11 @@ aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.co
       
       <title type="html">Multitenant MySQL Setup</title>
       
-      <link href="https://lobster1234.github.io/2016/11/03/multitenant-mysql/" rel="alternate" type="text/html" title="Multitenant MySQL Setup" />
+      <link href="http://localhost:4000/2016/11/03/multitenant-mysql/" rel="alternate" type="text/html" title="Multitenant MySQL Setup" />
       <published>2016-11-03T10:05:22-07:00</published>
       <updated>2016-11-03T10:05:22-07:00</updated>
-      <id>https://lobster1234.github.io/2016/11/03/multitenant-mysql</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2016/11/03/multitenant-mysql/">&lt;p&gt;It is much easier to make API/code multi-tenant, but it is a different story for databases. This problem exists at pretty much all SaaS based solutions, intending to provide data and service level isolation for many users/customers while trying to keep the code + database scalable. However, here are a few strategies that can be employed, based on the pros/cons and the freedom/constraints driving the solution.&lt;/p&gt;
+      <id>http://localhost:4000/2016/11/03/multitenant-mysql</id>
+      <content type="html" xml:base="http://localhost:4000/2016/11/03/multitenant-mysql/">&lt;p&gt;It is much easier to make API/code multi-tenant, but it is a different story for databases. This problem exists at pretty much all SaaS based solutions, intending to provide data and service level isolation for many users/customers while trying to keep the code + database scalable. However, here are a few strategies that can be employed, based on the pros/cons and the freedom/constraints driving the solution.&lt;/p&gt;
 
 &lt;!--more--&gt;
 
@@ -2409,11 +2409,11 @@ aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.co
       
       <title type="html">2016 AWS Associate Level Certification Exam Notes</title>
       
-      <link href="https://lobster1234.github.io/2016/10/29/aws-certification-notes/" rel="alternate" type="text/html" title="2016 AWS Associate Level Certification Exam Notes" />
+      <link href="http://localhost:4000/2016/10/29/aws-certification-notes/" rel="alternate" type="text/html" title="2016 AWS Associate Level Certification Exam Notes" />
       <published>2016-10-29T02:05:22-07:00</published>
       <updated>2016-10-29T02:05:22-07:00</updated>
-      <id>https://lobster1234.github.io/2016/10/29/aws-certification-notes</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2016/10/29/aws-certification-notes/">&lt;p&gt;These are my notes on EC2 and VPC for the AWS Certified Associate Level exams. I attempted the &lt;a href=&quot;https://aws.amazon.com/certification/certified-solutions-architect-associate&quot; target=&quot;_blank&quot;&gt;AWS Certified Solution Architect - Associate&lt;/a&gt; and &lt;a href=&quot;https://aws.amazon.com/certification/certified-developer-associate/&quot; target=&quot;_blank&quot;&gt;AWS Certified Developer - Associate&lt;/a&gt; and scored 78% and 90% respectively.&lt;/p&gt;
+      <id>http://localhost:4000/2016/10/29/aws-certification-notes</id>
+      <content type="html" xml:base="http://localhost:4000/2016/10/29/aws-certification-notes/">&lt;p&gt;These are my notes on EC2 and VPC for the AWS Certified Associate Level exams. I attempted the &lt;a href=&quot;https://aws.amazon.com/certification/certified-solutions-architect-associate&quot; target=&quot;_blank&quot;&gt;AWS Certified Solution Architect - Associate&lt;/a&gt; and &lt;a href=&quot;https://aws.amazon.com/certification/certified-developer-associate/&quot; target=&quot;_blank&quot;&gt;AWS Certified Developer - Associate&lt;/a&gt; and scored 78% and 90% respectively.&lt;/p&gt;
 
 &lt;p&gt;It took me about a week (3-4 hours a day) to prepare for both, after being working professionally with AWS for over 3 years.&lt;/p&gt;
 
@@ -2595,11 +2595,11 @@ aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.co
       
       <title type="html">Decimal to Binary</title>
       
-      <link href="https://lobster1234.github.io/2016/01/10/decimal-to-binary/" rel="alternate" type="text/html" title="Decimal to Binary" />
+      <link href="http://localhost:4000/2016/01/10/decimal-to-binary/" rel="alternate" type="text/html" title="Decimal to Binary" />
       <published>2016-01-10T11:43:20-08:00</published>
       <updated>2016-01-10T11:43:20-08:00</updated>
-      <id>https://lobster1234.github.io/2016/01/10/decimal-to-binary</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2016/01/10/decimal-to-binary/">&lt;p&gt;A Decimal to Binary conversion algorithm implementation.&lt;/p&gt;
+      <id>http://localhost:4000/2016/01/10/decimal-to-binary</id>
+      <content type="html" xml:base="http://localhost:4000/2016/01/10/decimal-to-binary/">&lt;p&gt;A Decimal to Binary conversion algorithm implementation.&lt;/p&gt;
 
 &lt;!--more--&gt;
 &lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;binary&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;){&lt;/span&gt;
@@ -2658,11 +2658,11 @@ aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.co
       
       <title type="html">Securing your APIs with OAuth, OpenID, and OpenID Connect</title>
       
-      <link href="https://lobster1234.github.io/2015/10/03/securing-apis-with-oauth-openid-connect/" rel="alternate" type="text/html" title="Securing your APIs with OAuth, OpenID, and OpenID Connect" />
+      <link href="http://localhost:4000/2015/10/03/securing-apis-with-oauth-openid-connect/" rel="alternate" type="text/html" title="Securing your APIs with OAuth, OpenID, and OpenID Connect" />
       <published>2015-10-03T10:11:03-07:00</published>
       <updated>2015-10-03T10:11:03-07:00</updated>
-      <id>https://lobster1234.github.io/2015/10/03/securing-apis-with-oauth-openid-connect</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2015/10/03/securing-apis-with-oauth-openid-connect/">&lt;p&gt;As products and companies move towards IoT model, users and machines alike need to interact with various APIs. Securing these APIs in a connected world can be a challenge faced by many. Fortunately, there are open standards addressing even the most complex of use cases - OAuth, OpenID and OpenID Connect happen to be widely adopted and have a growing support across many API and Identity Providers. In this session I’ll talk about these standards, and walk through common use cases/flows from an API Provider as well as consumer’s side. We will explore how these standards come together to not only secure the APIs, but also manage identity.&lt;/p&gt;
+      <id>http://localhost:4000/2015/10/03/securing-apis-with-oauth-openid-connect</id>
+      <content type="html" xml:base="http://localhost:4000/2015/10/03/securing-apis-with-oauth-openid-connect/">&lt;p&gt;As products and companies move towards IoT model, users and machines alike need to interact with various APIs. Securing these APIs in a connected world can be a challenge faced by many. Fortunately, there are open standards addressing even the most complex of use cases - OAuth, OpenID and OpenID Connect happen to be widely adopted and have a growing support across many API and Identity Providers. In this session I’ll talk about these standards, and walk through common use cases/flows from an API Provider as well as consumer’s side. We will explore how these standards come together to not only secure the APIs, but also manage identity.&lt;/p&gt;
 
 &lt;!--more--&gt;
 &lt;script async=&quot;&quot; class=&quot;speakerdeck-embed&quot; data-id=&quot;703ba49666b644a2869ecf150409880a&quot; data-ratio=&quot;1.33333333333333&quot; src=&quot;//speakerdeck.com/assets/embed.js&quot;&gt;&lt;/script&gt;</content>
@@ -2705,11 +2705,11 @@ aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.co
       
       <title type="html">Prime Numbers: Sieve of Eratosthenes</title>
       
-      <link href="https://lobster1234.github.io/2014/12/09/eratosthenes-sieve/" rel="alternate" type="text/html" title="Prime Numbers: Sieve of Eratosthenes" />
+      <link href="http://localhost:4000/2014/12/09/eratosthenes-sieve/" rel="alternate" type="text/html" title="Prime Numbers: Sieve of Eratosthenes" />
       <published>2014-12-09T11:11:10-08:00</published>
       <updated>2014-12-09T11:11:10-08:00</updated>
-      <id>https://lobster1234.github.io/2014/12/09/eratosthenes-sieve</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2014/12/09/eratosthenes-sieve/">&lt;p&gt;My training wheels implementation of &lt;a href=&quot;https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes&quot; target=&quot;_blank&quot;&gt;Sieve of Eratosthenes&lt;/a&gt; to generate prime numbers.&lt;/p&gt;
+      <id>http://localhost:4000/2014/12/09/eratosthenes-sieve</id>
+      <content type="html" xml:base="http://localhost:4000/2014/12/09/eratosthenes-sieve/">&lt;p&gt;My training wheels implementation of &lt;a href=&quot;https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes&quot; target=&quot;_blank&quot;&gt;Sieve of Eratosthenes&lt;/a&gt; to generate prime numbers.&lt;/p&gt;
 
 &lt;!--more--&gt;
 &lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cm&quot;&gt;/**
@@ -2790,11 +2790,11 @@ aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.co
       
       <title type="html">API Antipatterns : APICon SF</title>
       
-      <link href="https://lobster1234.github.io/2014/05/28/api-antipatterns-apiconsf/" rel="alternate" type="text/html" title="API Antipatterns : APICon SF" />
+      <link href="http://localhost:4000/2014/05/28/api-antipatterns-apiconsf/" rel="alternate" type="text/html" title="API Antipatterns : APICon SF" />
       <published>2014-05-28T11:44:37-07:00</published>
       <updated>2014-05-28T11:44:37-07:00</updated>
-      <id>https://lobster1234.github.io/2014/05/28/api-antipatterns-apiconsf</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2014/05/28/api-antipatterns-apiconsf/">&lt;p&gt;My talk at APICon San Francisco on API Antipatterns.&lt;/p&gt;
+      <id>http://localhost:4000/2014/05/28/api-antipatterns-apiconsf</id>
+      <content type="html" xml:base="http://localhost:4000/2014/05/28/api-antipatterns-apiconsf/">&lt;p&gt;My talk at APICon San Francisco on API Antipatterns.&lt;/p&gt;
 
 &lt;p&gt;APIs have become a part of the product ecosystem - and help the businesses by extending their developer base, and offering seamless integration with other services or products. Sometimes, the APIs themselves are the product. However, with so many APIs around, patterns emerge. Patterns are repeatable, reusable solutions to commonly occurring problems. Where there are patterns, there are also antipatterns.&lt;/p&gt;
 
@@ -2840,11 +2840,11 @@ aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.co
       
       <title type="html">MongoSF : Using MongoDB for IGN’s Social Platform</title>
       
-      <link href="https://lobster1234.github.io/2011/05/24/using-mongodb-for-ign-social-platform/" rel="alternate" type="text/html" title="MongoSF : Using MongoDB for IGN's Social Platform" />
+      <link href="http://localhost:4000/2011/05/24/using-mongodb-for-ign-social-platform/" rel="alternate" type="text/html" title="MongoSF : Using MongoDB for IGN's Social Platform" />
       <published>2011-05-24T13:44:37-07:00</published>
       <updated>2011-05-24T13:44:37-07:00</updated>
-      <id>https://lobster1234.github.io/2011/05/24/using-mongodb-for-ign-social-platform</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2011/05/24/using-mongodb-for-ign-social-platform/">&lt;p&gt;In this session, I will talk about IGN’s Social Platform Architecture in context of MongoDB utilization. The talk will cover the social platform modules where IGN evaluated NoSQL solutions and picked MongoDB. These modules include activity streams, activity comments, notifications and other read/write heavy components. I’ll also discuss the deployment, monitoring and future plans regarding MongoDB at IGN beyond the Social Platform.
+      <id>http://localhost:4000/2011/05/24/using-mongodb-for-ign-social-platform</id>
+      <content type="html" xml:base="http://localhost:4000/2011/05/24/using-mongodb-for-ign-social-platform/">&lt;p&gt;In this session, I will talk about IGN’s Social Platform Architecture in context of MongoDB utilization. The talk will cover the social platform modules where IGN evaluated NoSQL solutions and picked MongoDB. These modules include activity streams, activity comments, notifications and other read/write heavy components. I’ll also discuss the deployment, monitoring and future plans regarding MongoDB at IGN beyond the Social Platform.
 &lt;!--more--&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://www.mongodb.com/presentations/using-mongodb-igns-social-platform&quot; target=&quot;_blank&quot;&gt;Video&lt;/a&gt;&lt;/p&gt;
