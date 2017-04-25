@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-04-24T22:39:50-07:00</updated>
+  <updated>2017-04-24T22:45:37-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -65,7 +65,7 @@
 
 &lt;p&gt;In the real world, the WAR will be a real service, and the artifact would have been uploaded to Nexus or Artifactory after successfully passing pre-release test cycle. In this case, the war is available as a &lt;code class=&quot;highlighter-rouge&quot;&gt;release&lt;/code&gt; in this github repo.&lt;/p&gt;
 
-&lt;p&gt;Download Packer from &lt;a href=&quot;https://www.packer.io/downloads.html&quot;&gt;packer.io&lt;/a&gt;. It would be ideal to have it run on your Jenkins node, as we will be using Jenkins to create an AMI.&lt;/p&gt;
+&lt;p&gt;Download Packer from &lt;a href=&quot;https://www.packer.io/downloads.html&quot; target=&quot;_blank_&quot;&gt;packer.io&lt;/a&gt;. It would be ideal to have it run on your Jenkins node, as we will be using Jenkins to create an AMI.&lt;/p&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bash-3.2$ packer                               
 Usage: packer [--version] [--help] &amp;lt;command&amp;gt; [&amp;lt;args&amp;gt;]
