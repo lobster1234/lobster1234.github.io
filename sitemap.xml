@@ -69,6 +69,10 @@
 <lastmod>2017-04-15T23:44:37-07:00</lastmod>
 </url>
 <url>
+<loc>https://lobster1234.github.io/2017/04/23/packer-your-AMIs-for-immutable-aws-deployments/</loc>
+<lastmod>2017-04-23T23:44:37-07:00</lastmod>
+</url>
+<url>
 <loc>https://lobster1234.github.io/about/</loc>
 </url>
 <url>
@@ -133,6 +137,12 @@
 </url>
 <url>
 <loc>https://lobster1234.github.io/categories/dynamodb/</loc>
+</url>
+<url>
+<loc>https://lobster1234.github.io/categories/packer/</loc>
+</url>
+<url>
+<loc>https://lobster1234.github.io/categories/ci-cd/</loc>
 </url>
 <url>
 <loc>https://lobster1234.github.io/posts/2/</loc>
