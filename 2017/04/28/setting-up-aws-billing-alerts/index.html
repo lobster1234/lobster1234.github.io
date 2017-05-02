@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  
+  
+  <title>Setting up AWS Billing Alerts</title>
+  <meta name="description" content="For beginners, Amazon Web Services has a Free Tier, which is very generous. However, as you start to stretch the free tier to it’s limits, it’s good to have billing alerts set up. Essentially you’ll get an email when your bill approaches a certain amount. Setting up billing alerts uses CloudWatch, which is not really the first service the beginners run into. This post shows how to set up AWS Billing Alerts, with screenshots, so you do not have to be familiar with CloudWatch to set one up. I strongly recommend setting the Billing Alerts up, regardless of free tier - having heard and seen horror stories in the recent past.">
+  
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="https://lobster1234.github.io/2017/04/28/setting-up-aws-billing-alerts/">
+  
+  
+  <link rel="alternate" type="application/rss+xml" title="Manish Pandit&#39;s Blog" href="https://lobster1234.github.io/feed.xml">
+
+  
+
+  
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="lobster1234">
+  <meta name="twitter:title" content="Setting up AWS Billing Alerts">
+  <meta name="twitter:description" content="For beginners, Amazon Web Services has a Free Tier, which is very generous. However, as you start to stretch the free tier to it’s limits, it’s good to have billing alerts set up. Essentially you’l...">
+  
+    <meta name="twitter:creator" content="lobster1234">
+  
+  
+
+  <script type="text/javascript">
+  WebFontConfig = {
+    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
+  };
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+  })();
+</script>
+
+  
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-96931340-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+
+  <!-- Begin Jekyll SEO tag v2.2.0 -->
+<title>Setting up AWS Billing Alerts | Manish Pandit’s Blog</title>
+<meta property="og:title" content="Setting up AWS Billing Alerts" />
+<meta name="author" content="Manish Pandit" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="For beginners, Amazon Web Services has a Free Tier, which is very generous. However, as you start to stretch the free tier to it’s limits, it’s good to have billing alerts set up. Essentially you’ll get an email when your bill approaches a certain amount. Setting up billing alerts uses CloudWatch, which is not really the first service the beginners run into. This post shows how to set up AWS Billing Alerts, with screenshots, so you do not have to be familiar with CloudWatch to set one up. I strongly recommend setting the Billing Alerts up, regardless of free tier - having heard and seen horror stories in the recent past." />
+<meta property="og:description" content="For beginners, Amazon Web Services has a Free Tier, which is very generous. However, as you start to stretch the free tier to it’s limits, it’s good to have billing alerts set up. Essentially you’ll get an email when your bill approaches a certain amount. Setting up billing alerts uses CloudWatch, which is not really the first service the beginners run into. This post shows how to set up AWS Billing Alerts, with screenshots, so you do not have to be familiar with CloudWatch to set one up. I strongly recommend setting the Billing Alerts up, regardless of free tier - having heard and seen horror stories in the recent past." />
+<link rel="canonical" href="https://lobster1234.github.io/2017/04/28/setting-up-aws-billing-alerts/" />
+<meta property="og:url" content="https://lobster1234.github.io/2017/04/28/setting-up-aws-billing-alerts/" />
+<meta property="og:site_name" content="Manish Pandit’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2017-04-28T23:44:37-07:00" />
+<script type="application/ld+json">
+{"@context": "http://schema.org",
+"@type": "BlogPosting",
+"headline": "Setting up AWS Billing Alerts",
+"author": {"@type": "Person",
+"name": "Manish Pandit"},
+"datePublished": "2017-04-28T23:44:37-07:00",
+"description": "For beginners, Amazon Web Services has a Free Tier, which is very generous. However, as you start to stretch the free tier to it’s limits, it’s good to have billing alerts set up. Essentially you’ll get an email when your bill approaches a certain amount. Setting up billing alerts uses CloudWatch, which is not really the first service the beginners run into. This post shows how to set up AWS Billing Alerts, with screenshots, so you do not have to be familiar with CloudWatch to set one up. I strongly recommend setting the Billing Alerts up, regardless of free tier - having heard and seen horror stories in the recent past.",
+"mainEntityOfPage": {"@type": "WebPage",
+"@id": "https://lobster1234.github.io/2017/04/28/setting-up-aws-billing-alerts/"},
+"url": "https://lobster1234.github.io/2017/04/28/setting-up-aws-billing-alerts/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Home</a>
+
+    <nav class="site-nav">
+      
+        
+        <a class="page-link" href="/about/">About</a>
+      
+        
+        <a class="page-link" href="/archives/">Archives</a>
+      
+        
+        <a class="page-link" href="https://www.twitter.com/lobster1234">Twitter</a>
+      
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    
+      <h1 class="post-title" itemprop="name headline">Setting up AWS Billing Alerts</h1>
+    
+    <p class="post-meta"><time datetime="2017-04-28T23:44:37-07:00" itemprop="datePublished">Apr 28, 2017</time> • 
+  
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <a href="/categories/aws/">aws</a>
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>For beginners, Amazon Web Services has a <a href="https://aws.amazon.com/s/dm/optimization/server-side-test/free-tier/free_np/" target="_blank_">Free Tier</a>, which is <em>very generous</em>. However, as you start to stretch the free tier to it’s limits, it’s good to have billing alerts set up. Essentially you’ll get an email when your bill approaches a certain amount.</p>
+
+<p>Setting up billing alerts uses <a href="https://aws.amazon.com/cloudwatch/" target="_blank_">CloudWatch</a>, which is not really the first service the beginners run into. This post shows how to set up AWS Billing Alerts, with screenshots, so you do not have to be familiar with CloudWatch to set one up. I strongly recommend setting the Billing Alerts up, regardless of free tier - having heard and seen horror stories in the recent past.</p>
+
+<!--more-->
+<p>Log in to the <a href="https://console.aws.amazon.com" target="_blank_">AWS Console</a>.</p>
+
+<p>Next, search for <em>CloudWatch</em>, and select it. You should see something like this -</p>
+
+<p><img src="https://lobster1234.github.io/assets/billing-1.png" alt="Cloudwatch-1" /></p>
+
+<p>Click <strong>Billing</strong> from the left menu, which will show the below -</p>
+
+<p><img src="https://lobster1234.github.io/assets/billing-2.png" alt="Cloudwatch-2" /></p>
+
+<p>On this screen, click <strong>Create Alarm</strong>.</p>
+
+<p>This will open up a form, where we will be able to set up threshold, as well as an email address to get notified on.</p>
+
+<p>First, we set the dollar amount. The image below shows <code class="highlighter-rouge">$5</code> as the threshold.</p>
+
+<p><img src="https://lobster1234.github.io/assets/billing-3.png" alt="Cloudwatch-3" /></p>
+
+<p>Next, on the same screen, we set the notification. Under <strong>Actions</strong>, click <strong>New List</strong>. When the text field shows up, enter your email. Then click <strong>Create Alarm</strong>.</p>
+
+<p><img src="https://lobster1234.github.io/assets/billing-4.png" alt="Cloudwatch-4" /></p>
+
+<p>Once you do, this popup would prompt to confirm the email address that had just been entered.</p>
+
+<p><img src="https://lobster1234.github.io/assets/billing-5.png" alt="Cloudwatch-5" /></p>
+
+<p>Look for a confirmation email in your inbox, and click the subscription confirmation link. The page would look something like this -</p>
+
+<p><img src="https://lobster1234.github.io/assets/billing-6.png" alt="Cloudwatch-6" /></p>
+
+<p>Click View Alarm, and you will see this page with the new alarm created. Initially the Alarm State will be <strong><code class="highlighter-rouge">INSUFFICIENT_DATA</code></strong>, which means the alarm has just been started, and cloudwatch needs to gather more data around this metric to determine the correct state.</p>
+
+<p><img src="https://lobster1234.github.io/assets/billing-7.png" alt="Cloudwatch-7" /></p>
+
+<p>Give it a minute or two, and refresh the page, you will that the alarm is now in <strong><code class="highlighter-rouge">OK</code></strong> state.</p>
+
+<p><img src="https://lobster1234.github.io/assets/billing-8.png" alt="Cloudwatch-8" /></p>
+
+<p>If the billing exceeds the threshold, the alarm state will be <strong><code class="highlighter-rouge">ALARM</code></strong>, and a notification will be triggered. The state will remain <strong><code class="highlighter-rouge">ALARM</code></strong> unless a value satisfying the threshold is achieved.</p>
+
+<p>Hope this post helps you keep a closer eye on your AWS account charges, and avoid any surprises. I’ve seen cases from runaway lambdas, to accidentally leaving expensive instance types running for weeks. Protection is the key!</p>
+
+  </div>
+
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <p>
+      
+
+&copy; Manish Pandit - Powered by <a href="https://jekyllrb.com">Jekyll</a> &amp; <a href="https://github.com/yous/whiteglass">whiteglass</a> - Subscribe via <a href="https://lobster1234.github.io/feed.xml">RSS</a>
+
+    </p>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
