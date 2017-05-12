@@ -70,6 +70,7 @@
 <link rel="canonical" href="https://lobster1234.github.io/2017/05/10/migrating-a-domain-to-amazon-route53/" />
 <meta property="og:url" content="https://lobster1234.github.io/2017/05/10/migrating-a-domain-to-amazon-route53/" />
 <meta property="og:site_name" content="Manish Pandit’s Blog" />
+<meta property="og:image" content="https://lobster1234.github.io/assets/route53_post_image.png" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2017-05-10T23:44:37-07:00" />
 <script type="application/ld+json">
@@ -78,6 +79,7 @@
 "headline": "Migrating a Domain to Amazon Route53",
 "author": {"@type": "Person",
 "name": "Manish Pandit"},
+"image": "https://lobster1234.github.io/assets/route53_post_image.png",
 "datePublished": "2017-05-10T23:44:37-07:00",
 "description": "Amazon Route53 is a highly available and scalable DNS service. Route53 provides Domain Registrations and Transfers, DNS service to route traffic to the infrastructure (either within AWS or non-AWS), advanced routing policies like weighted and geo, and health check services that can be leveraged to perform traffic routing to different destination in the event of a failure. It provides more flexibility and seamless integration with AWS Services than any other DNS host can. One of the most common scenarios is the need to send traffic from a site registered at non-Route53 providers to an ELB, which Route53 supports via an Alias Record. In this post we will discuss moving the DNS - where requests to a domain hosted on a non-Route53 provider would resolve to Route53, and then point to an ELB which could be hosting a web property. However, the destination does not have to be an ELB, it can be any public IP. The other part is that of the Domain Registration itself, which can be transferred to Route53 if needed.",
 "mainEntityOfPage": {"@type": "WebPage",
