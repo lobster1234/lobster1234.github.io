@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-05-12T01:18:17-07:00</updated>
+  <updated>2017-05-12T01:23:19-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -111,7 +111,7 @@
 Click &lt;strong&gt;Save&lt;/strong&gt;.&lt;/p&gt;
   &lt;/li&gt;
   &lt;li&gt;
-    &lt;p&gt;For ELB - Come back to the &lt;strong&gt;Route 53&lt;/strong&gt; page, and click the &lt;strong&gt;A&lt;/strong&gt; Type. On the right side, it will show an IPv4 Address. If you wish to change that to an ELB DNS, check the box that says &lt;strong&gt;Alias&lt;/strong&gt;, and enter your ELB’s DNS name (A Record) there. If there is no ELB, then the imported &lt;strong&gt;A&lt;/strong&gt; type record should already have a public IP address of your site.
+    &lt;p&gt;For ELB - Come back to the &lt;strong&gt;Route 53&lt;/strong&gt; page, and click the &lt;strong&gt;A&lt;/strong&gt; Type. On the right side, it will show an IPv4 Address. If you wish to change that to an ELB DNS, check the box that says &lt;strong&gt;Yes&lt;/strong&gt; for &lt;strong&gt;Alias&lt;/strong&gt;, and enter your ELB’s DNS name (A Record) as the &lt;strong&gt;Alias Target&lt;/strong&gt;. If there is no ELB, then the imported &lt;strong&gt;A&lt;/strong&gt; type record should already have a public IP address of your site, and no changes are needed.
 &lt;img src=&quot;https://lobster1234.github.io/assets/dns-12.png&quot; alt=&quot;dns-12&quot; /&gt;&lt;/p&gt;
   &lt;/li&gt;
   &lt;li&gt;
