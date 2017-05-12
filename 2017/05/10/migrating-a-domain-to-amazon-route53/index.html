@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  
+  
+  <title>Migrating a Domain to Amazon Route53</title>
+  <meta name="description" content="Amazon Route53 is a highly available and scalable DNS service. Route53 provides Domain Registrations and Transfers, DNS service to route traffic to the infrastructure (either within AWS or non-AWS), advanced routing policies like weighted and geo, and health check services that can be leveraged to perform traffic routing to different destination in the event of a failure. It provides more flexibility and seamless integration with AWS Services than any other DNS host can. One of the most common scenarios is the need to send traffic from a site registered at non-Route53 providers to an ELB, which Route53 supports via an Alias Record. In this post we will discuss moving the DNS - where requests to a domain hosted on a non-Route53 provider would resolve to Route53, and then point to an ELB which could be hosting a web property. However, the destination does not have to be an ELB, it can be any public IP. The other part is that of the Domain Registration itself, which can be transferred to Route53 if needed.">
+  <meta name="keywords" content="aws, route53">
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="https://lobster1234.github.io/2017/05/10/migrating-a-domain-to-amazon-route53/">
+  
+  
+  <link rel="alternate" type="application/rss+xml" title="Manish Pandit&#39;s Blog" href="https://lobster1234.github.io/feed.xml">
+
+  
+
+  
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="lobster1234">
+  <meta name="twitter:title" content="Migrating a Domain to Amazon Route53">
+  <meta name="twitter:description" content="Amazon Route53 is a highly available and scalable DNS service. Route53 provides Domain Registrations and Transfers, DNS service to route traffic to the infrastructure (either within AWS or non-AWS)...">
+  
+    <meta name="twitter:creator" content="lobster1234">
+  
+  
+
+  <script type="text/javascript">
+  WebFontConfig = {
+    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
+  };
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+  })();
+</script>
+
+  
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-96931340-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+
+  <!-- Begin Jekyll SEO tag v2.2.0 -->
+<title>Migrating a Domain to Amazon Route53 | Manish Pandit’s Blog</title>
+<meta property="og:title" content="Migrating a Domain to Amazon Route53" />
+<meta name="author" content="Manish Pandit" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Amazon Route53 is a highly available and scalable DNS service. Route53 provides Domain Registrations and Transfers, DNS service to route traffic to the infrastructure (either within AWS or non-AWS), advanced routing policies like weighted and geo, and health check services that can be leveraged to perform traffic routing to different destination in the event of a failure. It provides more flexibility and seamless integration with AWS Services than any other DNS host can. One of the most common scenarios is the need to send traffic from a site registered at non-Route53 providers to an ELB, which Route53 supports via an Alias Record. In this post we will discuss moving the DNS - where requests to a domain hosted on a non-Route53 provider would resolve to Route53, and then point to an ELB which could be hosting a web property. However, the destination does not have to be an ELB, it can be any public IP. The other part is that of the Domain Registration itself, which can be transferred to Route53 if needed." />
+<meta property="og:description" content="Amazon Route53 is a highly available and scalable DNS service. Route53 provides Domain Registrations and Transfers, DNS service to route traffic to the infrastructure (either within AWS or non-AWS), advanced routing policies like weighted and geo, and health check services that can be leveraged to perform traffic routing to different destination in the event of a failure. It provides more flexibility and seamless integration with AWS Services than any other DNS host can. One of the most common scenarios is the need to send traffic from a site registered at non-Route53 providers to an ELB, which Route53 supports via an Alias Record. In this post we will discuss moving the DNS - where requests to a domain hosted on a non-Route53 provider would resolve to Route53, and then point to an ELB which could be hosting a web property. However, the destination does not have to be an ELB, it can be any public IP. The other part is that of the Domain Registration itself, which can be transferred to Route53 if needed." />
+<link rel="canonical" href="https://lobster1234.github.io/2017/05/10/migrating-a-domain-to-amazon-route53/" />
+<meta property="og:url" content="https://lobster1234.github.io/2017/05/10/migrating-a-domain-to-amazon-route53/" />
+<meta property="og:site_name" content="Manish Pandit’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2017-05-10T23:44:37-07:00" />
+<script type="application/ld+json">
+{"@context": "http://schema.org",
+"@type": "BlogPosting",
+"headline": "Migrating a Domain to Amazon Route53",
+"author": {"@type": "Person",
+"name": "Manish Pandit"},
+"datePublished": "2017-05-10T23:44:37-07:00",
+"description": "Amazon Route53 is a highly available and scalable DNS service. Route53 provides Domain Registrations and Transfers, DNS service to route traffic to the infrastructure (either within AWS or non-AWS), advanced routing policies like weighted and geo, and health check services that can be leveraged to perform traffic routing to different destination in the event of a failure. It provides more flexibility and seamless integration with AWS Services than any other DNS host can. One of the most common scenarios is the need to send traffic from a site registered at non-Route53 providers to an ELB, which Route53 supports via an Alias Record. In this post we will discuss moving the DNS - where requests to a domain hosted on a non-Route53 provider would resolve to Route53, and then point to an ELB which could be hosting a web property. However, the destination does not have to be an ELB, it can be any public IP. The other part is that of the Domain Registration itself, which can be transferred to Route53 if needed.",
+"mainEntityOfPage": {"@type": "WebPage",
+"@id": "https://lobster1234.github.io/2017/05/10/migrating-a-domain-to-amazon-route53/"},
+"url": "https://lobster1234.github.io/2017/05/10/migrating-a-domain-to-amazon-route53/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Home</a>
+
+    <nav class="site-nav">
+      
+        
+        <a class="page-link" href="/about/">About</a>
+      
+        
+        <a class="page-link" href="/archives/">Archives</a>
+      
+        
+        <a class="page-link" href="https://www.twitter.com/lobster1234">Twitter</a>
+      
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    
+      <h1 class="post-title" itemprop="name headline">Migrating a Domain to Amazon Route53</h1>
+    
+    <p class="post-meta"><time datetime="2017-05-10T23:44:37-07:00" itemprop="datePublished">May 10, 2017</time> • 
+  
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <a href="/categories/aws/">aws</a>,
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <a href="/categories/route53/">route53</a>
+    
+  
+
+</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p><a href="https://aws.amazon.com/route53/" target="_blank_">Amazon Route53</a> is a highly available and scalable DNS service. Route53 provides Domain Registrations and Transfers, DNS service to route traffic to the infrastructure (either within AWS or non-AWS), advanced routing policies like weighted and geo, and health check services that can be leveraged to perform traffic routing to different destination in the event of a failure. It provides more flexibility and seamless integration with AWS Services than any other DNS host can.</p>
+
+<p>One of the most common scenarios is the need to send traffic from a site registered at non-Route53 providers to an ELB, which Route53 supports via an <a href="http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resource-record-sets-choosing-alias-non-alias.html" target="_blank_">Alias Record</a>.</p>
+
+<p>In this post we will discuss moving the DNS - where requests to a domain hosted on a non-Route53 provider would resolve to Route53, and then point to an ELB which could be hosting a web property. However, the destination does not have to be an ELB, it can be any public IP. The other part is that of the Domain Registration itself, which can be transferred to Route53 if needed.</p>
+
+<!--more-->
+
+<blockquote>
+  <p><strong>Always move DNS before transferring the domain registration to avoid any outage during the transition.</strong></p>
+</blockquote>
+
+<p>We will use a GoDaddy registered domain, which needs to resolve to an ELB which is fronting a Web Application.</p>
+
+<p>If your provider is different, then these steps may not match 1:1 but will be similar.</p>
+
+<ol>
+  <li>
+    <p>Log in to the AWS Console, and search for <strong>Route53</strong> on the landing page. Click the service name.
+<img src="https://lobster1234.github.io/assets/dns-1.png" alt="dns-1" /></p>
+  </li>
+  <li>
+    <p>Click the <strong>Get Started Now</strong> under the <strong>DNS Management</strong> section.
+<img src="https://lobster1234.github.io/assets/dns-2.png" alt="dns-2" /></p>
+  </li>
+  <li>
+    <p>Click the <strong>Create Hosted Zone</strong> Button.
+<img src="https://lobster1234.github.io/assets/dns-3.png" alt="dns-3" /></p>
+  </li>
+  <li>
+    <p>A form will show up in the right panel. Enter your domain name (skip the <code class="highlighter-rouge">www</code>), and an optional description. Keep the <code class="highlighter-rouge">Public Hosted Zone</code> selected. Click <strong>Create</strong>.
+<img src="https://lobster1234.github.io/assets/dns-4.png" alt="dns-4" /></p>
+  </li>
+  <li>
+    <p>Once done, you will see the zone details, with only an <code class="highlighter-rouge">NS</code> record set and a <code class="highlighter-rouge">SOA</code> record set. <code class="highlighter-rouge">NS</code> has a list of name servers, and <code class="highlighter-rouge">SOA</code> is the <code class="highlighter-rouge">Start of Authority</code> record, which at a minimum contains the primary name server host name. You will notice this is usually the first name server address from the <code class="highlighter-rouge">NS</code> record record set. You can read more information on various DNS record set types <a href="https://en.wikipedia.org/wiki/List_of_DNS_record_types" target="_blank_">here</a>.
+<img src="https://lobster1234.github.io/assets/dns-5.png" alt="dns-5" /></p>
+  </li>
+  <li>
+    <p>Next, we need to add our record sets from GoDaddy to this hosted zone. To do this, we login to GoDaddy, click on <strong>Manage DNS</strong> under the <strong>Domain</strong> being moved.
+<img src="https://lobster1234.github.io/assets/dns-13.png" alt="dns-13" /></p>
+  </li>
+  <li>
+    <p>Scroll all the way down and notice a section called <strong>Advanced Features</strong>. Click the link that says <strong>Export Zone File (Unix)</strong>.
+<img src="https://lobster1234.github.io/assets/dns-6.png" alt="dns-6" /></p>
+  </li>
+  <li>
+    <p>Notice a file <code class="highlighter-rouge">your_domain_name.txt</code> that has been downloaded. Open that file in any text editor of your choice.</p>
+  </li>
+  <li>
+    <p>Now come back to the <strong>Route 53</strong> page with the <strong>Hosted Zone</strong>, and click <strong>Import Zone File</strong> at the top. A form will open up on the right. Copy and paste the contents of the <code class="highlighter-rouge">your_domain_name.txt</code> file in this section, and click <strong>Import</strong> button.</p>
+  </li>
+  <li>
+    <p>Click refresh at the top right or just refresh your browser and you’ll notice a much bigger list of record sets in the hosted domain. These have been imported from the GoDaddy Zone File.
+<img src="https://lobster1234.github.io/assets/dns-7.png" alt="dns-7" /></p>
+  </li>
+  <li>
+    <p>Now, we just need to point the Name Servers listed in GoDaddy for our Domain to Amazon’s. To do this, go to GoDaddy, and just above <strong>Advanced Features</strong>, look for a section called <strong>Nameservers</strong>.
+<img src="https://lobster1234.github.io/assets/dns-9.png" alt="dns-9" /></p>
+  </li>
+  <li>
+    <p>Click <strong>Change</strong></p>
+  </li>
+  <li>
+    <p>Select <strong>Custom</strong>
+<img src="https://lobster1234.github.io/assets/dns-10.png" alt="dns-10" /></p>
+  </li>
+  <li>
+    <p>Go back to <strong>Route 53</strong>, and Notice the <strong>NS</strong> type record in the Route53 recordset list.
+<img src="https://lobster1234.github.io/assets/dns-8.png" alt="dns-8" /></p>
+  </li>
+  <li>
+    <p>Copy paste the name servers from the <strong>NS</strong> Type recordset one by one in the GoDaddy custom list. You will need to click <strong>Add Nameserver</strong> twice to add 2 more rows for a total of 4 Amazon Nameservers.
+<img src="https://lobster1234.github.io/assets/dns-11.png" alt="dns-11" />
+Click <strong>Save</strong>.</p>
+  </li>
+  <li>
+    <p>For ELB - Come back to the <strong>Route 53</strong> page, and click the <strong>A</strong> Type. On the right side, it will show an IPv4 Address. If you wish to change that to an ELB DNS, check the box that says <strong>Alias</strong>, and enter your ELB’s DNS name (A Record) there. If there is no ELB, then the imported <strong>A</strong> type record should already have a public IP address of your site.
+<img src="https://lobster1234.github.io/assets/dns-12.png" alt="dns-12" /></p>
+  </li>
+  <li>
+    <p>Give it a few minutes and keep verifying the name server change by using <a href="http://dnscheck.pingdom.com/" target="_blank_">this excellent service by Pingdom</a>. Enter your domain name, and if everything worked, you will notice the Amazon Nameservers show up under the <strong>Nameservers</strong> section on the test results page. If you still see Godaddy’s <code class="highlighter-rouge">*.domaincontrol.com</code> then give it a while and retry.</p>
+  </li>
+  <li>
+    <p>Once you see the Amazon Nameservers in this test, You should be all set! You can now choose to transfer your domain ownership from GoDaddy to Route53, but that is entirely optional.</p>
+  </li>
+  <li>
+    <p><strong>Pricing</strong> - You will pay 50 cents a month for the first 25 hosted zones, and 40 cents for a billion DNS queries a month. More advanced features (healthchecks, routing policies) carry extra configuration and costs.</p>
+  </li>
+</ol>
+
+  </div>
+
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <p>
+      
+
+&copy; Manish Pandit - Powered by <a href="https://jekyllrb.com">Jekyll</a> &amp; <a href="https://github.com/yous/whiteglass">whiteglass</a> - Subscribe via <a href="https://lobster1234.github.io/feed.xml">RSS</a>
+
+    </p>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
