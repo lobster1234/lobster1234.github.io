@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-05-16T02:25:07-07:00</updated>
+  <updated>2017-05-16T02:40:13-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -35,7 +35,7 @@
       <published>2017-05-14T23:44:37-07:00</published>
       <updated>2017-05-14T23:44:37-07:00</updated>
       <id>https://lobster1234.github.io/2017/05/14/get-started-on-google-cloud-with-cli</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2017/05/14/get-started-on-google-cloud-with-cli/">&lt;p&gt;After working with &lt;a href=&quot;https://aws.amazon.com/&quot; target=&quot;_blank_&quot;&gt;Amazon Web Services&lt;/a&gt; for a few years, I decided to take &lt;a href=&quot;https://cloud.google.com/&quot; target=&quot;_blank_&quot;&gt;Google Cloud Platform&lt;/a&gt; for a spin. I plan to put together a compare-and-contrast post once I feel I’ve learned GCP to a certain depth - however, for now I thought of using the Command Line Interface instead of the Console to dive in to the world of GCP. In this post we will learn about getting started with Google Cloud Platform (GCP), and will use the CLI to interact with it in a very basic use case (launch an instance). I will also refer to AWS stack counterpart(s) as and when it makes sense. The idea is to conceptualize automated creation and teardown of an entire environments using the concept of &lt;em&gt;projects&lt;/em&gt; in GCP.&lt;/p&gt;
+      <content type="html" xml:base="https://lobster1234.github.io/2017/05/14/get-started-on-google-cloud-with-cli/">&lt;p&gt;After working with &lt;a href=&quot;https://aws.amazon.com/&quot; target=&quot;_blank_&quot;&gt;Amazon Web Services&lt;/a&gt; for a few years, I decided to take &lt;a href=&quot;https://cloud.google.com/&quot; target=&quot;_blank_&quot;&gt;Google Cloud Platform&lt;/a&gt; for a spin. In this post we will get set up with Google Cloud Platform (GCP), and use the CLI to interact with it for a very basic use case (launch, delete an instance). I will also refer to AWS counterpart(s) as and when it makes sense. The idea is to conceptualize automated creation and teardown of entire environments using the idea of &lt;em&gt;projects&lt;/em&gt; in GCP.&lt;/p&gt;
 
 &lt;!--more--&gt;
 
@@ -423,7 +423,7 @@ gcloud&amp;gt;
       
 
       
-        <summary type="html">After working with Amazon Web Services for a few years, I decided to take Google Cloud Platform for a spin. I plan to put together a compare-and-contrast post once I feel I’ve learned GCP to a certain depth - however, for now I thought of using the Command Line Interface instead of the Console to dive in to the world of GCP. In this post we will learn about getting started with Google Cloud Platform (GCP), and will use the CLI to interact with it in a very basic use case (launch an instance). I will also refer to AWS stack counterpart(s) as and when it makes sense. The idea is to conceptualize automated creation and teardown of an entire environments using the concept of projects in GCP.</summary>
+        <summary type="html">After working with Amazon Web Services for a few years, I decided to take Google Cloud Platform for a spin. In this post we will get set up with Google Cloud Platform (GCP), and use the CLI to interact with it for a very basic use case (launch, delete an instance). I will also refer to AWS counterpart(s) as and when it makes sense. The idea is to conceptualize automated creation and teardown of entire environments using the idea of projects in GCP.</summary>
       
 
       
