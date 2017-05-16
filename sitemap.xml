@@ -81,6 +81,10 @@
 <lastmod>2017-05-10T23:44:37-07:00</lastmod>
 </url>
 <url>
+<loc>https://lobster1234.github.io/2017/05/14/get-started-on-google-cloud-with-cli/</loc>
+<lastmod>2017-05-14T23:44:37-07:00</lastmod>
+</url>
+<url>
 <loc>https://lobster1234.github.io/about/</loc>
 </url>
 <url>
@@ -156,6 +160,12 @@
 <loc>https://lobster1234.github.io/categories/route53/</loc>
 </url>
 <url>
+<loc>https://lobster1234.github.io/categories/gcloud/</loc>
+</url>
+<url>
+<loc>https://lobster1234.github.io/categories/gcp/</loc>
+</url>
+<url>
 <loc>https://lobster1234.github.io/posts/2/</loc>
 </url>
 <url>
@@ -163,5 +173,8 @@
 </url>
 <url>
 <loc>https://lobster1234.github.io/posts/4/</loc>
+</url>
+<url>
+<loc>https://lobster1234.github.io/posts/5/</loc>
 </url>
 </urlset>
