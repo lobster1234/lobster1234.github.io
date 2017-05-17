@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-05-16T02:40:13-07:00</updated>
+  <updated>2017-05-17T11:18:23-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -219,7 +219,7 @@ gcloud&amp;gt;
 
 &lt;h2 id=&quot;creating-an-instance&quot;&gt;Creating an Instance&lt;/h2&gt;
 
-&lt;p&gt;Next, we will create an instance. This is much easier compared to AWS, as gcould defaults pretty much everything except for the name and zone of the instance.&lt;/p&gt;
+&lt;p&gt;Next, we will create an instance. This is much easier compared to AWS, as gcloud defaults pretty much everything except for the name and zone of the instance.&lt;/p&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;gcloud&amp;gt; compute instances create first-gcloud-instance --zone us-west1-a
 Created [https://www.googleapis.com/compute/v1/projects/project-for-my-blog/zones/us-west1-a/instances/first-gcloud-instance].
