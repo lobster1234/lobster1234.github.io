@@ -484,7 +484,17 @@ If n is even and greater than 20 , print Not Weird
 </div>
 <h3 id="exceptions-and-errors">Exceptions and Errors</h3>
 <h4 id="java-9">Java</h4>
-<div class="language-java highlighter-rouge"><pre class="highlight"><code></code></pre>
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="k">try</span><span class="o">{</span>
+  <span class="n">doSomething</span><span class="o">();</span>
+<span class="o">}</span><span class="k">catch</span><span class="o">(</span><span class="n">SomeException</span> <span class="n">e</span><span class="o">){</span>
+  <span class="c1">//do something</span>
+<span class="o">}</span><span class="k">catch</span><span class="o">(</span><span class="n">SomeOtherException</span> <span class="n">e</span><span class="o">){</span>
+  <span class="c1">//so something more</span>
+<span class="o">}</span><span class="k">finally</span><span class="o">{</span>
+  <span class="c1">//always executes</span>
+<span class="o">}</span>
+
+</code></pre>
 </div>
 <h4 id="python-9">Python</h4>
 <div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="k">try</span><span class="p">:</span>
