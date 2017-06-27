@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-06-26T18:05:47-07:00</updated>
+  <updated>2017-06-26T23:30:16-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -72,9 +72,7 @@ License: Apache License 2.0
 Location: /Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages
 Requires: s3transfer, jmespath, botocore
 &lt;/code&gt;&lt;/pre&gt;
-&lt;ol&gt;
-  &lt;li&gt;We will use a standard queue, for &lt;a href=&quot;http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues.html&quot; target=&quot;_blank_&quot;&gt;FIFO Queues&lt;/a&gt;, see notes in the comments below.&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;We will use a standard queue, for &lt;a href=&quot;http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues.html&quot; target=&quot;_blank_&quot;&gt;FIFO Queues&lt;/a&gt;, see notes in the comments below.&lt;/p&gt;
 
 &lt;h3 id=&quot;the-code&quot;&gt;The Code&lt;/h3&gt;
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#!/usr/local/bin/python3&lt;/span&gt;
