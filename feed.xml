@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-07-07T01:44:03-07:00</updated>
+  <updated>2017-07-07T02:00:23-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -43,7 +43,7 @@
 
 &lt;p&gt;By definition, a &lt;em&gt;cache&lt;/em&gt; is a storage which stores the result from a previous data access, in order to make it available more efficiently for future accesses. Cached data usually has a defined &lt;em&gt;time to live&lt;/em&gt;, or &lt;em&gt;TTL&lt;/em&gt; so it can be evicted, and replaced with more recent state. When data is found in the cache, it is called a &lt;em&gt;hit&lt;/em&gt;, and a failure results in a &lt;em&gt;miss&lt;/em&gt;. When a &lt;em&gt;miss&lt;/em&gt; happens, the underlying data store is accessed, and the result is placed in the cache with a &lt;em&gt;TTL&lt;/em&gt;, and the cycle goes on.&lt;/p&gt;
 
-&lt;p&gt;&lt;em&gt;Hit ratio&lt;/em&gt; (&lt;code class=&quot;highlighter-rouge&quot;&gt;nHits:nMisses&lt;/code&gt;) is a metric used to measure caching efficiency - a higher &lt;em&gt;hit ratio&lt;/em&gt; would mean efficient caching, while a lower &lt;em&gt;hit ratio&lt;/em&gt; would mean the cache is not really being used. This is the case when the cached data is highly mutable, and gets &lt;em&gt;invalidated&lt;/em&gt; way too often to be of any value for future requests.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Hit ratio&lt;/em&gt; (&lt;code class=&quot;highlighter-rouge&quot;&gt;nHits:nMisses&lt;/code&gt;) is a metric used to measure caching efficiency - a higher &lt;em&gt;hit ratio&lt;/em&gt; would mean efficient caching, while a lower &lt;em&gt;hit ratio&lt;/em&gt; would mean the cache is not really helping as much as it should. This is the case when the cached data is highly mutable, and gets &lt;em&gt;invalidated&lt;/em&gt; way too often to be of any value for future requests.&lt;/p&gt;
 
 &lt;p&gt;With this introduction, here are the lessons learned, and best practices:&lt;/p&gt;
 

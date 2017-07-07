@@ -264,7 +264,7 @@
 
 <p>By definition, a <em>cache</em> is a storage which stores the result from a previous data access, in order to make it available more efficiently for future accesses. Cached data usually has a defined <em>time to live</em>, or <em>TTL</em> so it can be evicted, and replaced with more recent state. When data is found in the cache, it is called a <em>hit</em>, and a failure results in a <em>miss</em>. When a <em>miss</em> happens, the underlying data store is accessed, and the result is placed in the cache with a <em>TTL</em>, and the cycle goes on.</p>
 
-<p><em>Hit ratio</em> (<code class="highlighter-rouge">nHits:nMisses</code>) is a metric used to measure caching efficiency - a higher <em>hit ratio</em> would mean efficient caching, while a lower <em>hit ratio</em> would mean the cache is not really being used. This is the case when the cached data is highly mutable, and gets <em>invalidated</em> way too often to be of any value for future requests.</p>
+<p><em>Hit ratio</em> (<code class="highlighter-rouge">nHits:nMisses</code>) is a metric used to measure caching efficiency - a higher <em>hit ratio</em> would mean efficient caching, while a lower <em>hit ratio</em> would mean the cache is not really helping as much as it should. This is the case when the cached data is highly mutable, and gets <em>invalidated</em> way too often to be of any value for future requests.</p>
 
 <p>With this introduction, here are the lessons learned, and best practices:</p>
 
