@@ -93,6 +93,10 @@
 <lastmod>2017-06-25T23:44:37-07:00</lastmod>
 </url>
 <url>
+<loc>https://lobster1234.github.io/2017/07/05/caching-gotchas-and-lessons-learned/</loc>
+<lastmod>2017-07-05T23:44:37-07:00</lastmod>
+</url>
+<url>
 <loc>https://lobster1234.github.io/about/</loc>
 </url>
 <url>
@@ -181,6 +185,12 @@
 </url>
 <url>
 <loc>https://lobster1234.github.io/categories/boto/</loc>
+</url>
+<url>
+<loc>https://lobster1234.github.io/categories/architecture/</loc>
+</url>
+<url>
+<loc>https://lobster1234.github.io/categories/caching/</loc>
 </url>
 <url>
 <loc>https://lobster1234.github.io/posts/2/</loc>

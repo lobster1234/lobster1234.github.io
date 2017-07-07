@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-06-26T23:30:16-07:00</updated>
+  <updated>2017-07-07T01:44:03-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -25,6 +25,102 @@
     </author>
   
 
+  
+  
+    <entry>
+      
+      <title type="html">Caching - Gotchas &amp;amp; Lessons Learned</title>
+      
+      <link href="https://lobster1234.github.io/2017/07/05/caching-gotchas-and-lessons-learned/" rel="alternate" type="text/html" title="Caching - Gotchas &amp; Lessons Learned" />
+      <published>2017-07-05T23:44:37-07:00</published>
+      <updated>2017-07-05T23:44:37-07:00</updated>
+      <id>https://lobster1234.github.io/2017/07/05/caching-gotchas-and-lessons-learned</id>
+      <content type="html" xml:base="https://lobster1234.github.io/2017/07/05/caching-gotchas-and-lessons-learned/">&lt;p&gt;It has been said &lt;a href=&quot;https://martinfowler.com/bliki/TwoHardThings.html&quot; target=&quot;_blank_&quot;&gt;time and again&lt;/a&gt; - &lt;em&gt;“There are only two hard things in Computer Science: cache invalidation and naming things”.&lt;/em&gt; Having run into both of these problems in my professional career, I figured I could write a post, summarizing the lessons I have learned along the way by seeing and building various caching architectures across many companies, big and small.&lt;/p&gt;
+
+&lt;p&gt;Just like threading, caching is easy to code, but often creates more problems than it intends to solve. These problems can arise from - you guessed it - invalidation,  sub-par efficiency, inconsistency, and many more. It is also one of my favorite topics for technical interviews :)
+&lt;!--more--&gt;&lt;/p&gt;
+&lt;h1 id=&quot;caching---an-oversimplified-introduction&quot;&gt;Caching - An Oversimplified Introduction&lt;/h1&gt;
+
+&lt;p&gt;By definition, a &lt;em&gt;cache&lt;/em&gt; is a storage which stores the result from a previous data access, in order to make it available more efficiently for future accesses. Cached data usually has a defined &lt;em&gt;time to live&lt;/em&gt;, or &lt;em&gt;TTL&lt;/em&gt; so it can be evicted, and replaced with more recent state. When data is found in the cache, it is called a &lt;em&gt;hit&lt;/em&gt;, and a failure results in a &lt;em&gt;miss&lt;/em&gt;. When a &lt;em&gt;miss&lt;/em&gt; happens, the underlying data store is accessed, and the result is placed in the cache with a &lt;em&gt;TTL&lt;/em&gt;, and the cycle goes on.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Hit ratio&lt;/em&gt; (&lt;code class=&quot;highlighter-rouge&quot;&gt;nHits:nMisses&lt;/code&gt;) is a metric used to measure caching efficiency - a higher &lt;em&gt;hit ratio&lt;/em&gt; would mean efficient caching, while a lower &lt;em&gt;hit ratio&lt;/em&gt; would mean the cache is not really being used. This is the case when the cached data is highly mutable, and gets &lt;em&gt;invalidated&lt;/em&gt; way too often to be of any value for future requests.&lt;/p&gt;
+
+&lt;p&gt;With this introduction, here are the lessons learned, and best practices:&lt;/p&gt;
+
+&lt;h1 id=&quot;1-take-it-easy&quot;&gt;1. Take it easy&lt;/h1&gt;
+&lt;p&gt;Caching is super easy to implement. It also has the charm that attracts many architects and developers, giving a false impression of being a low hanging fruit. However, do not get carried away. Identify the immutable vs. mutable objects in your application, as having a large imbalance between these may make caching a blessing or a curse. Identify the usage patterns around your data. Start small by caching the immutable data, and monitor the performance of the application. Measure the &lt;em&gt;hit ratio&lt;/em&gt; before moving on to the more aggressive approaches. Make data-driven decisions.&lt;/p&gt;
+
+&lt;h1 id=&quot;2-not-all-caches-are-alike&quot;&gt;2. Not all caches are alike&lt;/h1&gt;
+&lt;p&gt;A cache can be &lt;em&gt;in-process&lt;/em&gt; (taking the memory space of the application server), or &lt;em&gt;global&lt;/em&gt; (out-of-process). For example, &lt;a href=&quot;http://www.ehcache.org/&quot; target=&quot;_blank_&quot;&gt;EHCache&lt;/a&gt; is an in-process cache, while &lt;a href=&quot;https://memcached.org/&quot; target=&quot;_blank_&quot;&gt;Memcached&lt;/a&gt; or &lt;a href=&quot;https://redis.io&quot; target=&quot;_blank_&quot;&gt;Redis&lt;/a&gt; are global cache servers. There are pros and cons to these. Some architectures also do a mix-and-match, which is why knowing your data usage patterns is the first step in designing a good caching strategy. The in-process cache will add state to the server, and, if in a cluster, there is a good chance each instance will end up with a different state of the data, causing inconsistency. However, for immutable data, in-process caches work great. As does a simple Map. Global caches hold a &lt;em&gt;shared state&lt;/em&gt; of the application, but need extra infrastructure. Global caches can be clustered, and provide a single, consistent view of cached data.&lt;/p&gt;
+
+&lt;h1 id=&quot;3-design-for-high-availability&quot;&gt;3. Design for High Availability&lt;/h1&gt;
+&lt;p&gt;In-process caches are more available than global caches if we mitigate the consistency issues. Global caches are a different story. In the event of global caches failures, based on the client, the connections will time out, thereby taking up network time and locking threads. A failure will also cause a huge load on the back end, snowballing into increased database contention, possibly rippling across multiple applications which are relying on your application’s API. Highly available caching is implemented via cache replication and/or persistent caches. This replication can happen via shards, and/or in a master/slave type configuration. &lt;a href=&quot;https://www.couchbase.com&quot; target=&quot;_blank_&quot;&gt;Couchbase&lt;/a&gt; provides replication via Couchbase cluster. Redis provides a highly available &lt;a href=&quot;https://redis.io/topics/sentinel&quot; target=&quot;_blank_&quot;&gt;Redis Sentinel&lt;/a&gt;. Consider these servers instead of inventing one of your own, unless absolutely necessary. &lt;a href=&quot;https://varnish-cache.org/&quot; target=&quot;_blank_&quot;&gt;Varnish HTTP Cache&lt;/a&gt; is an HTTP cache, useful for caching HTTP responses with a built in &lt;code class=&quot;highlighter-rouge&quot;&gt;grace period&lt;/code&gt;, where the cache serves stale data for an amount of time even if the back-end is unavailable.&lt;/p&gt;
+
+&lt;h1 id=&quot;4-beware-of-cache-hotspots&quot;&gt;4. Beware of Cache Hotspots&lt;/h1&gt;
+&lt;p&gt;Hotspots are created when a value tied to key becomes all too popular. An example can be a breaking news story cached in one of the servers. In this event, the global server containing the key being accessed heavily ends up degrading performance for other keys on the same server. This can be avoided via a &lt;em&gt;near/far cache architecture&lt;/em&gt;, where a cache server with &lt;em&gt;very low TTL&lt;/em&gt; runs on the local instance (localhost), and the application looks up the key in the &lt;em&gt;near server&lt;/em&gt; first, and in the event of a miss, reaches out to the &lt;em&gt;far server&lt;/em&gt;. The low TTL (few seconds) ensures that the data is not too stale, while the far cache server does not have to get hit that hard in a hotspot situation.&lt;/p&gt;
+
+&lt;h1 id=&quot;5-namespace-your-keys&quot;&gt;5. Namespace your Keys&lt;/h1&gt;
+&lt;p&gt;Keys are the identifiers against which the values are stored in the cache. Key collisions can have nightmarish results. Have a good naming strategy for the keys, especially when sharing a global cache cluster across multiple application servers. Have a common function to take the application name, object name, and object ID and spit out a key. This is particularly important for multi-tenant servers, where they’d need to cache multiple, identical key names. Tenant A’s person_1234 is not the same as Tenant B’s person_1234. If all the IDs are GUIDs, that can offer some help, but most often the IDs are auto-inc numeric primary keys. The keys are also distributed via a hash functions, usually implemented in the client (like spymemcached). This ensures consistent key distribution across the members of a cache cluster. You may want to write your own hash function if the one provided by the cache provider is not up to the requirements.&lt;/p&gt;
+
+&lt;h1 id=&quot;6-do-not-update&quot;&gt;6. Do not Update&lt;/h1&gt;
+&lt;p&gt;Do not bother updating the cache on state changes. Just delete the key from the cache, and let the next read take care of caching the value. It may seem like a good idea to update the cache with the fresh data in the event of a state change, but it is not worth the effort. Not only this tends to have race conditions in a clustered environment, in write-heavy scenarios, data consistency becomes an issue as well. Just have your state change methods invalidate the key.&lt;/p&gt;
+
+&lt;h1 id=&quot;7-build-a-secure-auditable-invalidation-mechanism&quot;&gt;7. Build a secure, auditable, invalidation mechanism&lt;/h1&gt;
+&lt;p&gt;Realistically, no one should update the database directly while bypassing the API or the server code. However, this is an all too common scenario in the real world. This creates a situation where the cache does not hold the right state that the database has. The options are limited - delete the key, or wait for the key to expire. These options may not work if the keys are hashed (vs. human readable like &lt;code class=&quot;highlighter-rouge&quot;&gt;myapp.myperson.1234&lt;/code&gt;), or the TTL is too high. I have seen cache servers having to be bounced after this, causing a snowball effect as the database gets overloaded, akin to a complete failure of a cache server. To avoid this, create an API endpoint that would take basic parameters to form a key, create and hash the key, and delete that key from the cache. Best way is to have a &lt;em&gt;parameterized jenkins job&lt;/em&gt; for this operation - which provides security and auditing out of the box.&lt;/p&gt;
+
+&lt;h1 id=&quot;8-be-aware-of-the-key-and-value-size-limits&quot;&gt;8. Be aware of the key and value size limits&lt;/h1&gt;
+&lt;p&gt;Different cache servers have different limits. Memcached key names cannot be greater than 250 bytes, and values cannot be larger than 1 MB. Redis has much larger limits, 512 MB for key and value. For memcached, keep this in mind when namespacing. A good idea is to MD5 or hash the key name to ensure consistent and unique key of acceptable length. Similarly, based on the efficiency trade-offs, you may want to compress or change the serialization format of the values as appropriate.&lt;/p&gt;
+
+&lt;h1 id=&quot;9-http-cache-is-not-the-same-as-application-cache&quot;&gt;9. HTTP Cache is not the same as Application Cache&lt;/h1&gt;
+&lt;p&gt;While so far we have discussed objets from the database being cached, there are cases where it makes a lot of sense to cache at the HTTP level, i.e. the HTTP response from an API, or an entire HTML response from a webserver. CDNs (Content Delivery Networks) are giant HTTP Caches. This is a also common scenario in &lt;em&gt;edge caching&lt;/em&gt;, where the cache sits at the HTTP layer to cache static content with much larger TTLs. In case of APIs, the HTTP GET API URL is used as the key name. If going this route, be aware of the query strings that may have been used to modify the response. If the API supports features like field filtering, projections, sort, etc - the URL based caching may have a lower hit ratio, or inconsistent results. A good idea to account for these features while constructing the key. Caching the response for &lt;code class=&quot;highlighter-rouge&quot;&gt;?expand=address,business&lt;/code&gt; should also result in a &lt;em&gt;hit&lt;/em&gt; for &lt;code class=&quot;highlighter-rouge&quot;&gt;?expand=business,address&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h1 id=&quot;10-use-http-cache-headers-for-http-responses&quot;&gt;10. Use HTTP Cache Headers for HTTP Responses&lt;/h1&gt;
+&lt;p&gt;This is where we move caching from the server, to the client. In other words, we can instruct the requester of our APIs or HTTP Content to cache the response at their end. Instead of building our own vernacular for these instructions, use the standard HTTP Spec. The &lt;a href=&quot;https://tools.ietf.org/html/rfc7234&quot; target=&quot;_blank_&quot;&gt;HTTP RFC 7234&lt;/a&gt; describes how HTTP content caching should behave, particularly when the client is a browser. The same directives and headers should also be used for all HTTP responses. For example, the directive &lt;code class=&quot;highlighter-rouge&quot;&gt;no-cache&lt;/code&gt; would instruct the client to never cache the response, while &lt;code class=&quot;highlighter-rouge&quot;&gt;max-age&lt;/code&gt; would instruct the client to safely re-use the response till it expires (as defined by the &lt;code class=&quot;highlighter-rouge&quot;&gt;max-age&lt;/code&gt; value, or the TTL in seconds). Regardless of a webpage or a JSON response from an API, it is a good idea to adhere to HTTP Spec.&lt;/p&gt;
+
+&lt;p&gt;Here is an example of cache headers returned by Google -&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  bash-3.2$ curl --head https://www.google.com
+  HTTP/1.1 200 OK
+  Expires: -1
+  Cache-Control: private, max-age=0
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h1 id=&quot;11-centralize-the-cache-interface-and-keep-it-simple&quot;&gt;11. Centralize the Cache Interface, and keep it simple&lt;/h1&gt;
+&lt;p&gt;Last but not the least, design all the cache operations to go through a single class instead of spreading it everywhere. This has many benefits, like centralizing the the logic for key name creation, providing vendor independent method for the rest of the application to interact with the cache, and also, optimize the serialization of the objects (like replacing Java Object Serialization with Kyro or protobuf). This also provides a way for cache key lookups and invalidations with human-friendly key names, despite the cache having hashed key names. For instance, in Java, this can be a &lt;code class=&quot;highlighter-rouge&quot;&gt;Singleton&lt;/code&gt; sitting in a commons-jar used across all the applications sharing a cache cluster.&lt;/p&gt;
+
+&lt;p&gt;In conclusion, while no solution is wrong, it is best to apply caching to get the biggest bang for the buck, reduce infrastructure overhead, and satisfy the consistency and availability requirements. Caching strategy for a Financial Application will be entirely different than that of a Social Networking App, which will be entirely different than a Content/Media Application. Caching is not a one size fits all proposition. However, I hope that by using the notes above, you can design an efficient, data-driven caching strategy for across all tiers of your application.&lt;/p&gt;</content>
+
+      
+      
+      
+      
+      
+
+      
+        <author>
+            <name>Manish Pandit</name>
+          
+          
+        </author>
+      
+
+      
+        <category term="architecture" />
+      
+        <category term="caching" />
+      
+
+      
+
+      
+        <summary type="html">It has been said time and again - “There are only two hard things in Computer Science: cache invalidation and naming things”. Having run into both of these problems in my professional career, I figured I could write a post, summarizing the lessons I have learned along the way by seeing and building various caching architectures across many companies, big and small. Just like threading, caching is easy to code, but often creates more problems than it intends to solve. These problems can arise from - you guessed it - invalidation, sub-par efficiency, inconsistency, and many more. It is also one of my favorite topics for technical interviews :)</summary>
+      
+
+      
+      
+    </entry>
+  
   
   
     <entry>
@@ -4207,53 +4303,6 @@ aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.co
 
       
         <summary type="html">A Decimal to Binary conversion algorithm implementation.</summary>
-      
-
-      
-      
-    </entry>
-  
-  
-  
-    <entry>
-      
-      <title type="html">Securing your APIs with OAuth, OpenID, and OpenID Connect</title>
-      
-      <link href="https://lobster1234.github.io/2015/10/03/securing-apis-with-oauth-openid-connect/" rel="alternate" type="text/html" title="Securing your APIs with OAuth, OpenID, and OpenID Connect" />
-      <published>2015-10-03T10:11:03-07:00</published>
-      <updated>2015-10-03T10:11:03-07:00</updated>
-      <id>https://lobster1234.github.io/2015/10/03/securing-apis-with-oauth-openid-connect</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2015/10/03/securing-apis-with-oauth-openid-connect/">&lt;p&gt;As products and companies move towards IoT model, users and machines alike need to interact with various APIs. Securing these APIs in a connected world can be a challenge faced by many. Fortunately, there are open standards addressing even the most complex of use cases - OAuth, OpenID and OpenID Connect happen to be widely adopted and have a growing support across many API and Identity Providers. In this session I’ll talk about these standards, and walk through common use cases/flows from an API Provider as well as consumer’s side. We will explore how these standards come together to not only secure the APIs, but also manage identity.&lt;/p&gt;
-
-&lt;!--more--&gt;
-&lt;script async=&quot;&quot; class=&quot;speakerdeck-embed&quot; data-id=&quot;703ba49666b644a2869ecf150409880a&quot; data-ratio=&quot;1.33333333333333&quot; src=&quot;//speakerdeck.com/assets/embed.js&quot;&gt;&lt;/script&gt;</content>
-
-      
-      
-      
-      
-      
-
-      
-        <author>
-            <name>Manish Pandit</name>
-          
-          
-        </author>
-      
-
-      
-        <category term="oauth" />
-      
-        <category term="openid" />
-      
-        <category term="presentations" />
-      
-
-      
-
-      
-        <summary type="html">As products and companies move towards IoT model, users and machines alike need to interact with various APIs. Securing these APIs in a connected world can be a challenge faced by many. Fortunately, there are open standards addressing even the most complex of use cases - OAuth, OpenID and OpenID Connect happen to be widely adopted and have a growing support across many API and Identity Providers. In this session I’ll talk about these standards, and walk through common use cases/flows from an API Provider as well as consumer’s side. We will explore how these standards come together to not only secure the APIs, but also manage identity.</summary>
       
 
       
