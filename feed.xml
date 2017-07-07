@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-07-07T02:00:23-07:00</updated>
+  <updated>2017-07-07T12:57:45-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -89,7 +89,39 @@
 &lt;h1 id=&quot;11-centralize-the-cache-interface-and-keep-it-simple&quot;&gt;11. Centralize the Cache Interface, and keep it simple&lt;/h1&gt;
 &lt;p&gt;Last but not the least, design all the cache operations to go through a single class instead of spreading it everywhere. This has many benefits, like centralizing the the logic for key name creation, providing vendor independent method for the rest of the application to interact with the cache, and also, optimize the serialization of the objects (like replacing Java Object Serialization with Kyro or protobuf). This also provides a way for cache key lookups and invalidations with human-friendly key names, despite the cache having hashed key names. For instance, in Java, this can be a &lt;code class=&quot;highlighter-rouge&quot;&gt;Singleton&lt;/code&gt; sitting in a commons-jar used across all the applications sharing a cache cluster.&lt;/p&gt;
 
-&lt;p&gt;In conclusion, while no solution is wrong, it is best to apply caching to get the biggest bang for the buck, reduce infrastructure overhead, and satisfy the consistency and availability requirements. Caching strategy for a Financial Application will be entirely different than that of a Social Networking App, which will be entirely different than a Content/Media Application. Caching is not a one size fits all proposition. However, I hope that by using the notes above, you can design an efficient, data-driven caching strategy for across all tiers of your application.&lt;/p&gt;</content>
+&lt;p&gt;In conclusion, while no solution is wrong, it is best to apply caching to get the biggest bang for the buck, reduce infrastructure overhead, and satisfy the consistency and availability requirements. Caching strategy for a Financial Application will be entirely different than that of a Social Networking App, which will be entirely different than a Content/Media Application. Caching is not a one size fits all proposition. However, I hope that by using the notes above, you can design an efficient, data-driven caching strategy for across all tiers of your application.&lt;/p&gt;
+
+&lt;h1 style=&quot;text-align: center&quot; id=&quot;comments&quot;&gt;Comments&lt;/h1&gt;
+
+&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = &quot;https://lobster1234.github.io/2017/07/05/caching-gotchas-and-lessons-learned/&quot;;  
+this.page.identifier = &quot;/2017/07/05/caching-gotchas-and-lessons-learned&quot;;
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://lobster1234.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+&lt;/script&gt;
+
+&lt;noscript&gt;Please enable JavaScript to view the &lt;a href=&quot;https://disqus.com/?ref_noscript&quot;&gt;comments powered by Disqus.&lt;/a&gt;&lt;/noscript&gt;
+
+&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+
+
+      
+
+&lt;/script&gt;</content>
 
       
       
