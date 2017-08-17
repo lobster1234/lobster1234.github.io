@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  
+  
+  <title>Apache Nutch - Step by Step</title>
+  <meta name="description" content="Search is one of the most fantastic areas of the technology industry, and has been addressed many, many times with different algorithms, producing varying degrees of success. We get so used to it, that often times I wish I had a Cmd-F while reading a real book. Recently we had our Quarterly Hack Week at Marqeta, and one of the ideas was to build search around our public pages. These pages would include the public website assets, as well as the the API developer guides and documentation. This post is a quick summary of the infrastructure, setup, and gotchas of using Nutch 2.3.1 to build a site search - essentially notes from this hack week project.">
+  <meta name="keywords" content="architecture, search, mongodb, solr, nutch">
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="https://lobster1234.github.io/2017/08/14/search-with-nutch-mongodb-solr/">
+  
+  
+  <link rel="alternate" type="application/rss+xml" title="Manish Pandit&#39;s Blog" href="https://lobster1234.github.io/feed.xml">
+
+  
+
+  
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="lobster1234">
+  <meta name="twitter:title" content="Apache Nutch - Step by Step">
+  <meta name="twitter:description" content="Search is one of the most fantastic areas of the technology industry, and has been addressed many, many times with different algorithms, producing varying degrees of success. We get so used to it, ...">
+  
+    <meta name="twitter:creator" content="lobster1234">
+  
+  
+
+  <script type="text/javascript">
+  WebFontConfig = {
+    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
+  };
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+  })();
+</script>
+
+  
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-96931340-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+
+  <!-- Begin Jekyll SEO tag v2.2.0 -->
+<title>Apache Nutch - Step by Step | Manish Pandit’s Blog</title>
+<meta property="og:title" content="Apache Nutch - Step by Step" />
+<meta name="author" content="Manish Pandit" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Search is one of the most fantastic areas of the technology industry, and has been addressed many, many times with different algorithms, producing varying degrees of success. We get so used to it, that often times I wish I had a Cmd-F while reading a real book. Recently we had our Quarterly Hack Week at Marqeta, and one of the ideas was to build search around our public pages. These pages would include the public website assets, as well as the the API developer guides and documentation. This post is a quick summary of the infrastructure, setup, and gotchas of using Nutch 2.3.1 to build a site search - essentially notes from this hack week project." />
+<meta property="og:description" content="Search is one of the most fantastic areas of the technology industry, and has been addressed many, many times with different algorithms, producing varying degrees of success. We get so used to it, that often times I wish I had a Cmd-F while reading a real book. Recently we had our Quarterly Hack Week at Marqeta, and one of the ideas was to build search around our public pages. These pages would include the public website assets, as well as the the API developer guides and documentation. This post is a quick summary of the infrastructure, setup, and gotchas of using Nutch 2.3.1 to build a site search - essentially notes from this hack week project." />
+<link rel="canonical" href="https://lobster1234.github.io/2017/08/14/search-with-nutch-mongodb-solr/" />
+<meta property="og:url" content="https://lobster1234.github.io/2017/08/14/search-with-nutch-mongodb-solr/" />
+<meta property="og:site_name" content="Manish Pandit’s Blog" />
+<meta property="og:image" content="https://lobster1234.github.io/assets/search.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2017-08-14T23:44:37-07:00" />
+<script type="application/ld+json">
+{"@context": "http://schema.org",
+"@type": "BlogPosting",
+"headline": "Apache Nutch - Step by Step",
+"author": {"@type": "Person",
+"name": "Manish Pandit"},
+"image": "https://lobster1234.github.io/assets/search.png",
+"datePublished": "2017-08-14T23:44:37-07:00",
+"description": "Search is one of the most fantastic areas of the technology industry, and has been addressed many, many times with different algorithms, producing varying degrees of success. We get so used to it, that often times I wish I had a Cmd-F while reading a real book. Recently we had our Quarterly Hack Week at Marqeta, and one of the ideas was to build search around our public pages. These pages would include the public website assets, as well as the the API developer guides and documentation. This post is a quick summary of the infrastructure, setup, and gotchas of using Nutch 2.3.1 to build a site search - essentially notes from this hack week project.",
+"mainEntityOfPage": {"@type": "WebPage",
+"@id": "https://lobster1234.github.io/2017/08/14/search-with-nutch-mongodb-solr/"},
+"url": "https://lobster1234.github.io/2017/08/14/search-with-nutch-mongodb-solr/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Home</a>
+
+    <nav class="site-nav">
+      
+        
+        <a class="page-link" href="/about/">About</a>
+      
+        
+        <a class="page-link" href="/archives/">Archives</a>
+      
+        
+        <a class="page-link" href="https://www.twitter.com/lobster1234">Twitter</a>
+      
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    
+      <h1 class="post-title" itemprop="name headline">Apache Nutch - Step by Step</h1>
+    
+    <p class="post-meta"><time datetime="2017-08-14T23:44:37-07:00" itemprop="datePublished">Aug 14, 2017</time> • 
+  
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <a href="/categories/architecture/">architecture</a>,
+    
+  
+    
+  
+    
+  
+
+  
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <a href="/categories/search/">search</a>
+    
+  
+
+</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>Search is one of the most fantastic areas of the technology industry, and has been addressed many, many times with different algorithms, producing varying degrees of success. We get so used to it, that often times I wish I had a Cmd-F while reading a real book.</p>
+
+<p>Recently we had our Quarterly Hack Week at <a href="https://www.marqeta.com" target="_blank_">Marqeta</a>, and one of the ideas was to build search around our public pages. These pages would include the public website assets, as well as the the API developer guides and documentation. This post is a quick summary of the infrastructure, setup, and gotchas of using Nutch 2.3.1 to build a site search - essentially notes from this hack week project.</p>
+
+<p><img src="https://lobster1234.github.io/assets/search.png" alt="Search" /></p>
+
+<!--more-->
+
+<p>If you are not familiar with Apache Nutch Crawler, please visit <a href="http://nutch.apache.org/" target="_blank_">here</a>. Nutch 2.x and Nutch 1.x are fairly different in terms of set up, execution, and architecture. Nutch 2.x uses <a href="http://gora.apache.org/" target="_blank_">Apache Gora</a> to manage NoSQL persistence over many db stores. However, Nutch 1.x has been around much longer, has more features, and has many bug fixes compared to Nutch 2.x. If your search needs are far more advanced, consider Nutch 1.x. If flexibility of db stores is important, then pick Nutch 2.x.</p>
+
+<h1 id="versions">Versions</h1>
+<p>We will use <a href="http://nutch.apache.org/downloads.html" target="_blank_">Apache Nutch 2.3.1</a>, <a href="https://www.mongodb.com/download-center#community" target="_blank_">MongoDB 3.4.7</a>, and <a href="http://lucene.apache.org/solr/" target="_blank_">Solr 6.5.1</a>. I tried using ElasticSearch, but as a simple Google Search will reveal, Nutch ElasticSearch Indexing plugins depend on fairly old versions. Even Solr 6.6.0 did not work due to a field deprecation, so we will stick to the next latest version, 6.5.1. And yes, there are a few hacks we’d need to do to get Solr 6.5.1 working as well.</p>
+
+<h1 id="operating-system">Operating System</h1>
+<p>I’ve used Ubuntu 16.04 LTS on Amazon Web Services, and also Debian 8 on Vagrant with minor differences. Your flavor of Linux may vary, as long as you have the correct versions of the main components like MongoDB, Nutch, and Solr, you should be good. I did not try setting this up on the Mac though. We will stick to Ubuntu 16.04 LTS for the rest of this tutorial.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code> ubuntu@ip-1*2-3*-**-**:~$ uname -a
+ Linux ip-1*2-3*-**-** 4.4.0-1022-aws #31-Ubuntu SMP Tue Jun 27 11:27:55 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
+</code></pre>
+</div>
+
+<h1 id="java">Java</h1>
+<p>We will use OpenJDK8, but you can also use Oracle JDK 8.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>$ sudo apt-get install openjdk-8-jdk
+$ java -version
+openjdk version "1.8.0_131"
+OpenJDK Runtime Environment (build 1.8.0_131-8u131-b11-2ubuntu1.16.04.3-b11)
+OpenJDK 64-Bit Server VM (build 25.131-b11, mixed mode)
+</code></pre>
+</div>
+
+<h1 id="mongodb">MongoDB</h1>
+<div class="highlighter-rouge"><pre class="highlight"><code>$ wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1604-3.4.7.tgz
+$ mkdir data
+$ mkdir logs
+$ tar xvfz mongodb-linux-x86_64-ubuntu1604-3.4.7.tgz
+$ cd mongodb-linux-x86_64-ubuntu1604-3.4.7/bin
+$ ./mongod --dbpath ~/data/  --logpath ~/logs/mongodb.log --fork
+</code></pre>
+</div>
+<h1 id="nutch">Nutch</h1>
+
+<p>Nutch 2.x is only available as a source bundle, so it will need to be built using <code class="highlighter-rouge">ant</code> after configuring.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>$ wget http://www-eu.apache.org/dist/nutch/2.3.1/apache-nutch-2.3.1-src.tar.gz
+$ tar xvfz apache-nutch-2.3.1-src.tar.gz
+$ cd apache-nutch-2.3.1/conf
+</code></pre>
+</div>
+<p>Next, we configure Nutch by editing <code class="highlighter-rouge">$NUTCH_HOME/conf/nutch-site.xml</code>. This is where we define the crawldb database driver, enable plugins, and the crawl behavior, to restrict it to only the domain defined.</p>
+
+<script src="https://gist.github.com/lobster1234/ef8e9f6fbea6154da720d2534d490706.js"></script>
+
+<p>We then instruct Nutch to use MongoDB via the <code class="highlighter-rouge">$NUTCH_HOME/conf/gora.properties</code> file. Nutch 2.x uses Apache Gora to manage persistence.</p>
+
+<script src="https://gist.github.com/lobster1234/60a4422b398c029dca0e3ee452c5dd2a.js"></script>
+
+<p>We also change <code class="highlighter-rouge">$NUTCH_HOME/conf/ivy/ivy.xml</code> to enable MongoDB driver which will be used by Apache Gora. This is done by uncommenting the MongoDB line in the file.</p>
+
+<div class="language-xml highlighter-rouge"><pre class="highlight"><code><span class="c">&lt;!-- Uncomment this to use MongoDB as Gora backend. --&gt;</span>
+<span class="nt">&lt;dependency</span> <span class="na">org=</span><span class="s">"org.apache.gora"</span> <span class="na">name=</span><span class="s">"gora-mongodb"</span> <span class="na">rev=</span><span class="s">"0.6.1"</span> <span class="na">conf=</span><span class="s">"*-&gt;default"</span> <span class="nt">/&gt;</span>
+</code></pre>
+</div>
+
+<p>Here is the gist for <a href="https://gist.github.com/lobster1234/7edffdff1410102013b3d271f6e22c35" target="_blank_">ivy.xml</a></p>
+
+<p>Now we build Nutch. Install <code class="highlighter-rouge">ant</code> if it is not installed already.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code> $ sudo apt-get install ant
+</code></pre>
+</div>
+<p>And we build Nutch from <code class="highlighter-rouge">$NUTCH_HOME</code> folder.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>$ pwd
+/home/ubuntu/apache-nutch-2.3.1
+$ ant runtime
+</code></pre>
+</div>
+<p>This will take a while (about 4-5 mins).</p>
+
+<h1 id="solr">Solr</h1>
+
+<p>Let us get Solr 6.5.1 set up.</p>
+
+<p>We will download and install Solr, and create a <em>core</em> named <code class="highlighter-rouge">nutch</code> to index the crawled pages. Then, we will copy the <code class="highlighter-rouge">schema.xml</code> from Nutch configuration to this newly created core.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ wget http://archive.apache.org/dist/lucene/solr/6.5.1/solr-6.5.1.tgz
+$ tar xvfz solr-6.5.1.tgz
+$ cd solr-6.5.1/bin
+$ ./solr start
+$ ./solr create_core -c nutch -d basic_configs
+$ ./solr stop
+$ cd ../server/solr/nutch/conf
+$ cp ~/apache-nutch-2.3.1/conf/schema.xml .
+
+</code></pre>
+</div>
+<p>Here comes the skullduggery. We will need to “fix” <code class="highlighter-rouge">schema.xml</code> and <code class="highlighter-rouge">solrconfig.xml</code> in this folder. We will also remove the <code class="highlighter-rouge">managed-schema</code> file, as we’re providing the schema configuration externally.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ rm managed-schema
+$ vi schema.xml
+</code></pre>
+</div>
+<p>It is important to remove all instances of <code class="highlighter-rouge">enablePositionIncrements="true"</code> from every <code class="highlighter-rouge">&lt;filter class="solr.StopFilterFactory"</code> declaration. If not removed, the core will fail to initialize.</p>
+
+<p>Here is the gist for <a href="https://gist.github.com/lobster1234/35078e4fc1df30e249b986e19fd67202" target="_blank_">schema.xml</a></p>
+
+<p>Next, we have to fix the <code class="highlighter-rouge">solrconfig.xml</code></p>
+<div class="highlighter-rouge"><pre class="highlight"><code>$ vi solrconfig.xml
+</code></pre>
+</div>
+<p>Locate the section for <code class="highlighter-rouge">AddSchemaFieldsUpdateProcessorFactory</code> and comment out the <code class="highlighter-rouge">&lt;lst&gt;</code> elements, like so-</p>
+
+<div class="language-xml highlighter-rouge"><pre class="highlight"><code><span class="nt">&lt;processor</span> <span class="na">class=</span><span class="s">"solr.AddSchemaFieldsUpdateProcessorFactory"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;str</span> <span class="na">name=</span><span class="s">"defaultFieldType"</span><span class="nt">&gt;</span>strings<span class="nt">&lt;/str&gt;</span>
+<span class="c">&lt;!--
+  &lt;lst name="typeMapping"&gt;
+    &lt;str name="valueClass"&gt;java.lang.Boolean&lt;/str&gt;
+    &lt;str name="fieldType"&gt;booleans&lt;/str&gt;
+  &lt;/lst&gt;
+  &lt;lst name="typeMapping"&gt;
+    &lt;str name="valueClass"&gt;java.util.Date&lt;/str&gt;
+    &lt;str name="fieldType"&gt;tdates&lt;/str&gt;
+  &lt;/lst&gt;
+  &lt;lst name="typeMapping"&gt;
+    &lt;str name="valueClass"&gt;java.lang.Long&lt;/str&gt;
+    &lt;str name="valueClass"&gt;java.lang.Integer&lt;/str&gt;
+    &lt;str name="fieldType"&gt;tlongs&lt;/str&gt;
+  &lt;/lst&gt;
+  &lt;lst name="typeMapping"&gt;
+    &lt;str name="valueClass"&gt;java.lang.Number&lt;/str&gt;
+    &lt;str name="fieldType"&gt;tdoubles&lt;/str&gt;
+  &lt;/lst&gt; --&gt;</span>
+<span class="nt">&lt;/processor&gt;</span>
+</code></pre>
+</div>
+<p>Now, we start solr.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ cd ~/solr-6.5.1/bin
+$ ./solr start
+</code></pre>
+</div>
+
+<h1 id="crawl-and-index">Crawl and Index</h1>
+<p>Now that we have everything set up, we are ready to put Nutch in action.</p>
+
+<p>First, tell nutch what URL(s) to crawl. We do this by creating a simple text file, and pointing Nutch to it.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ cd ~/apache-nutch-2.3.1/
+$ mkdir urls
+$ vi urls/seeds.text
+</code></pre>
+</div>
+<p>Enter the URL(s) in this file, for example. <code class="highlighter-rouge">https://www.wikipedia.org</code>. One URL per line.</p>
+
+<p>Once the seed file is set up, run the following -</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ runtime/local/bin/nutch inject urls/
+InjectorJob: starting at 2017-08-14 07:43:22
+InjectorJob: Injecting urlDir: urls
+InjectorJob: Using class org.apache.gora.mongodb.store.MongoStore as the Gora storage class.
+InjectorJob: total number of urls rejected by filters: 0
+InjectorJob: total number of urls injected after normalization and filtering: 1
+Injector: finished at 2017-08-14 07:43:25, elapsed: 00:00:03
+</code></pre>
+</div>
+<p>This has initialized the crawl database - we can use the MongoDB CLI to check out the resulting database and collection.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&gt; show dbs
+local    0.000GB
+nutchdb  0.005GB
+&gt; use nutchdb
+switched to db nutchdb
+&gt; show collections
+webpage
+</code></pre>
+</div>
+
+<p>Next, we generate the top 50 URLs. Do not worry if you see a different number like 20 below.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ runtime/local/bin/nutch generate -topN 50
+GeneratorJob: starting at 2017-08-14 08:56:36
+GeneratorJob: Selecting best-scoring urls due for fetch.
+GeneratorJob: starting
+GeneratorJob: filtering: true
+GeneratorJob: normalizing: true
+GeneratorJob: topN: 50
+GeneratorJob: finished at 2017-08-14 08:56:38, time elapsed: 00:00:02
+GeneratorJob: generated batch id: 1502528196-1091715892 containing 20 URLs
+</code></pre>
+</div>
+
+<p>Now that Nutch has selected N URLs, we go ahead fetch them.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ runtime/local/bin/nutch fetch -all
+</code></pre>
+</div>
+<p>This will fetch the N URLs, and we’ll see a ton of output.</p>
+
+<p>Once fetched, the content needs to be parsed.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ runtime/local/bin/nutch parse -all
+</code></pre>
+</div>
+<p>Next, we update the DB with the current status.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>$ runtime/local/bin/nutch updatedb -all
+</code></pre>
+</div>
+<p>Finally, we index these pages in Solr</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>$ runtime/local/bin/nutch solrindex http://localhost:8983/solr/nutch -all
+IndexingJob: starting
+Active IndexWriters :
+SOLRIndexWriter
+	solr.server.url : URL of the SOLR instance (mandatory)
+	solr.commit.size : buffer size when sending to SOLR (default 1000)
+	solr.mapping.file : name of the mapping file for fields (default solrindex-mapping.xml)
+	solr.auth : use authentication (default false)
+	solr.auth.username : username for authentication
+	solr.auth.password : password for authentication
+</code></pre>
+</div>
+
+<p>If you have access to the Solr console (http://host:8983), fire it up in a browser.</p>
+
+<blockquote>
+  <p>If this is an AWS EC2 instance, you’ll need to ensure HTTP access is allowed on port 8983 via the Security Groups + NACL, and if this is in Vagrant, use the port mapper in <code class="highlighter-rouge">Vagrantfile</code> to map guest port 8983 to any host port you’d like to use.</p>
+</blockquote>
+
+<p>Once in Solr admin console, we can try firing up queries. If unable to access the admin UX, the same can be done via curls, like so:</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>$ curl "http://localhost:8983/solr/nutch/select?fl=url,%20meta_description,%20anchor,%20title&amp;indent=on&amp;q=content:test&amp;wt=json"
+</code></pre>
+</div>
+<p>Here, we’re querying Solr for any <code class="highlighter-rouge">content</code> that matches <code class="highlighter-rouge">test</code> (hence <code class="highlighter-rouge">q=content:test</code>) and only return the <code class="highlighter-rouge">url</code>, <code class="highlighter-rouge">meta_description</code>, and <code class="highlighter-rouge">anchor</code> (hence <code class="highlighter-rouge">fl=url,%20meta_description,%20anchor,%20title</code>). We will get a list of at most 10 results in a JSON format. You may want to play with different values for different fields either via the Solr Console or curl. Refer to Solr query syntax <a href="">here</a>.</p>
+
+<p>There we have it - a fully functional, end to end crawler and indexer setup!</p>
+
+<blockquote>
+  <p>Please note that the <em>generate-fetch-parse-updatedb-index</em> steps will need to be run frequently. It is a good idea to set up a cron job to execute these steps on a desired interval (based on the velocity of the site being indexed).</p>
+</blockquote>
+
+<p>In this post, I did not cover alternatives like <a href="https://scrapy.org/" target="_blank_">Scrapy</a>, <a href="https://www.crummy.com/software/BeautifulSoup/" target="_blank_">Beautiful Soup</a>, <a href="https://github.com/yasserg/crawler4j" target="_blank_">crawler4j</a>, etc. but I would encourage you to check them out if in discovery/research phase before deciding on Nutch.</p>
+
+<p>Thoughts, feedback, ideas? Please let me know in the comments below.</p>
+
+<h1 style="text-align: center" id="comments">Comments</h1>
+
+<div id="disqus_thread"></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = "https://lobster1234.github.io/2017/08/14/search-with-nutch-mongodb-solr/";  
+this.page.identifier = "/2017/08/14/search-with-nutch-mongodb-solr";
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://lobster1234.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+<div id="disqus_thread"></div>
+<script>
+
+
+      
+
+</script>
+
+  </div>
+
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <p>
+      
+
+&copy; Manish Pandit - Powered by <a href="https://jekyllrb.com">Jekyll</a> &amp; <a href="https://github.com/yous/whiteglass">whiteglass</a> - Subscribe via <a href="https://lobster1234.github.io/feed.xml">RSS</a>
+
+    </p>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-07-14T10:14:49-07:00</updated>
+  <updated>2017-08-16T19:03:47-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -25,6 +25,320 @@
     </author>
   
 
+  
+  
+    <entry>
+      
+      <title type="html">Apache Nutch - Step by Step</title>
+      
+      <link href="https://lobster1234.github.io/2017/08/14/search-with-nutch-mongodb-solr/" rel="alternate" type="text/html" title="Apache Nutch - Step by Step" />
+      <published>2017-08-14T23:44:37-07:00</published>
+      <updated>2017-08-14T23:44:37-07:00</updated>
+      <id>https://lobster1234.github.io/2017/08/14/search-with-nutch-mongodb-solr</id>
+      <content type="html" xml:base="https://lobster1234.github.io/2017/08/14/search-with-nutch-mongodb-solr/">&lt;p&gt;Search is one of the most fantastic areas of the technology industry, and has been addressed many, many times with different algorithms, producing varying degrees of success. We get so used to it, that often times I wish I had a Cmd-F while reading a real book.&lt;/p&gt;
+
+&lt;p&gt;Recently we had our Quarterly Hack Week at &lt;a href=&quot;https://www.marqeta.com&quot; target=&quot;_blank_&quot;&gt;Marqeta&lt;/a&gt;, and one of the ideas was to build search around our public pages. These pages would include the public website assets, as well as the the API developer guides and documentation. This post is a quick summary of the infrastructure, setup, and gotchas of using Nutch 2.3.1 to build a site search - essentially notes from this hack week project.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/search.png&quot; alt=&quot;Search&quot; /&gt;&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;p&gt;If you are not familiar with Apache Nutch Crawler, please visit &lt;a href=&quot;http://nutch.apache.org/&quot; target=&quot;_blank_&quot;&gt;here&lt;/a&gt;. Nutch 2.x and Nutch 1.x are fairly different in terms of set up, execution, and architecture. Nutch 2.x uses &lt;a href=&quot;http://gora.apache.org/&quot; target=&quot;_blank_&quot;&gt;Apache Gora&lt;/a&gt; to manage NoSQL persistence over many db stores. However, Nutch 1.x has been around much longer, has more features, and has many bug fixes compared to Nutch 2.x. If your search needs are far more advanced, consider Nutch 1.x. If flexibility of db stores is important, then pick Nutch 2.x.&lt;/p&gt;
+
+&lt;h1 id=&quot;versions&quot;&gt;Versions&lt;/h1&gt;
+&lt;p&gt;We will use &lt;a href=&quot;http://nutch.apache.org/downloads.html&quot; target=&quot;_blank_&quot;&gt;Apache Nutch 2.3.1&lt;/a&gt;, &lt;a href=&quot;https://www.mongodb.com/download-center#community&quot; target=&quot;_blank_&quot;&gt;MongoDB 3.4.7&lt;/a&gt;, and &lt;a href=&quot;http://lucene.apache.org/solr/&quot; target=&quot;_blank_&quot;&gt;Solr 6.5.1&lt;/a&gt;. I tried using ElasticSearch, but as a simple Google Search will reveal, Nutch ElasticSearch Indexing plugins depend on fairly old versions. Even Solr 6.6.0 did not work due to a field deprecation, so we will stick to the next latest version, 6.5.1. And yes, there are a few hacks we’d need to do to get Solr 6.5.1 working as well.&lt;/p&gt;
+
+&lt;h1 id=&quot;operating-system&quot;&gt;Operating System&lt;/h1&gt;
+&lt;p&gt;I’ve used Ubuntu 16.04 LTS on Amazon Web Services, and also Debian 8 on Vagrant with minor differences. Your flavor of Linux may vary, as long as you have the correct versions of the main components like MongoDB, Nutch, and Solr, you should be good. I did not try setting this up on the Mac though. We will stick to Ubuntu 16.04 LTS for the rest of this tutorial.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; ubuntu@ip-1*2-3*-**-**:~$ uname -a
+ Linux ip-1*2-3*-**-** 4.4.0-1022-aws #31-Ubuntu SMP Tue Jun 27 11:27:55 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h1 id=&quot;java&quot;&gt;Java&lt;/h1&gt;
+&lt;p&gt;We will use OpenJDK8, but you can also use Oracle JDK 8.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ sudo apt-get install openjdk-8-jdk
+$ java -version
+openjdk version &quot;1.8.0_131&quot;
+OpenJDK Runtime Environment (build 1.8.0_131-8u131-b11-2ubuntu1.16.04.3-b11)
+OpenJDK 64-Bit Server VM (build 25.131-b11, mixed mode)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h1 id=&quot;mongodb&quot;&gt;MongoDB&lt;/h1&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1604-3.4.7.tgz
+$ mkdir data
+$ mkdir logs
+$ tar xvfz mongodb-linux-x86_64-ubuntu1604-3.4.7.tgz
+$ cd mongodb-linux-x86_64-ubuntu1604-3.4.7/bin
+$ ./mongod --dbpath ~/data/  --logpath ~/logs/mongodb.log --fork
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h1 id=&quot;nutch&quot;&gt;Nutch&lt;/h1&gt;
+
+&lt;p&gt;Nutch 2.x is only available as a source bundle, so it will need to be built using &lt;code class=&quot;highlighter-rouge&quot;&gt;ant&lt;/code&gt; after configuring.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ wget http://www-eu.apache.org/dist/nutch/2.3.1/apache-nutch-2.3.1-src.tar.gz
+$ tar xvfz apache-nutch-2.3.1-src.tar.gz
+$ cd apache-nutch-2.3.1/conf
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Next, we configure Nutch by editing &lt;code class=&quot;highlighter-rouge&quot;&gt;$NUTCH_HOME/conf/nutch-site.xml&lt;/code&gt;. This is where we define the crawldb database driver, enable plugins, and the crawl behavior, to restrict it to only the domain defined.&lt;/p&gt;
+
+&lt;script src=&quot;https://gist.github.com/lobster1234/ef8e9f6fbea6154da720d2534d490706.js&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;We then instruct Nutch to use MongoDB via the &lt;code class=&quot;highlighter-rouge&quot;&gt;$NUTCH_HOME/conf/gora.properties&lt;/code&gt; file. Nutch 2.x uses Apache Gora to manage persistence.&lt;/p&gt;
+
+&lt;script src=&quot;https://gist.github.com/lobster1234/60a4422b398c029dca0e3ee452c5dd2a.js&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;We also change &lt;code class=&quot;highlighter-rouge&quot;&gt;$NUTCH_HOME/conf/ivy/ivy.xml&lt;/code&gt; to enable MongoDB driver which will be used by Apache Gora. This is done by uncommenting the MongoDB line in the file.&lt;/p&gt;
+
+&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;&amp;lt;!-- Uncomment this to use MongoDB as Gora backend. --&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;dependency&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;org=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;org.apache.gora&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;gora-mongodb&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;rev=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;0.6.1&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;conf=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;*-&amp;gt;default&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Here is the gist for &lt;a href=&quot;https://gist.github.com/lobster1234/7edffdff1410102013b3d271f6e22c35&quot; target=&quot;_blank_&quot;&gt;ivy.xml&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Now we build Nutch. Install &lt;code class=&quot;highlighter-rouge&quot;&gt;ant&lt;/code&gt; if it is not installed already.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; $ sudo apt-get install ant
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;And we build Nutch from &lt;code class=&quot;highlighter-rouge&quot;&gt;$NUTCH_HOME&lt;/code&gt; folder.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ pwd
+/home/ubuntu/apache-nutch-2.3.1
+$ ant runtime
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;This will take a while (about 4-5 mins).&lt;/p&gt;
+
+&lt;h1 id=&quot;solr&quot;&gt;Solr&lt;/h1&gt;
+
+&lt;p&gt;Let us get Solr 6.5.1 set up.&lt;/p&gt;
+
+&lt;p&gt;We will download and install Solr, and create a &lt;em&gt;core&lt;/em&gt; named &lt;code class=&quot;highlighter-rouge&quot;&gt;nutch&lt;/code&gt; to index the crawled pages. Then, we will copy the &lt;code class=&quot;highlighter-rouge&quot;&gt;schema.xml&lt;/code&gt; from Nutch configuration to this newly created core.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ wget http://archive.apache.org/dist/lucene/solr/6.5.1/solr-6.5.1.tgz
+$ tar xvfz solr-6.5.1.tgz
+$ cd solr-6.5.1/bin
+$ ./solr start
+$ ./solr create_core -c nutch -d basic_configs
+$ ./solr stop
+$ cd ../server/solr/nutch/conf
+$ cp ~/apache-nutch-2.3.1/conf/schema.xml .
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Here comes the skullduggery. We will need to “fix” &lt;code class=&quot;highlighter-rouge&quot;&gt;schema.xml&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;solrconfig.xml&lt;/code&gt; in this folder. We will also remove the &lt;code class=&quot;highlighter-rouge&quot;&gt;managed-schema&lt;/code&gt; file, as we’re providing the schema configuration externally.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ rm managed-schema
+$ vi schema.xml
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;It is important to remove all instances of &lt;code class=&quot;highlighter-rouge&quot;&gt;enablePositionIncrements=&quot;true&quot;&lt;/code&gt; from every &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;filter class=&quot;solr.StopFilterFactory&quot;&lt;/code&gt; declaration. If not removed, the core will fail to initialize.&lt;/p&gt;
+
+&lt;p&gt;Here is the gist for &lt;a href=&quot;https://gist.github.com/lobster1234/35078e4fc1df30e249b986e19fd67202&quot; target=&quot;_blank_&quot;&gt;schema.xml&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Next, we have to fix the &lt;code class=&quot;highlighter-rouge&quot;&gt;solrconfig.xml&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ vi solrconfig.xml
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Locate the section for &lt;code class=&quot;highlighter-rouge&quot;&gt;AddSchemaFieldsUpdateProcessorFactory&lt;/code&gt; and comment out the &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;lst&amp;gt;&lt;/code&gt; elements, like so-&lt;/p&gt;
+
+&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;processor&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;solr.AddSchemaFieldsUpdateProcessorFactory&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;str&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;defaultFieldType&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;strings&lt;span class=&quot;nt&quot;&gt;&amp;lt;/str&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;&amp;lt;!--
+  &amp;lt;lst name=&quot;typeMapping&quot;&amp;gt;
+    &amp;lt;str name=&quot;valueClass&quot;&amp;gt;java.lang.Boolean&amp;lt;/str&amp;gt;
+    &amp;lt;str name=&quot;fieldType&quot;&amp;gt;booleans&amp;lt;/str&amp;gt;
+  &amp;lt;/lst&amp;gt;
+  &amp;lt;lst name=&quot;typeMapping&quot;&amp;gt;
+    &amp;lt;str name=&quot;valueClass&quot;&amp;gt;java.util.Date&amp;lt;/str&amp;gt;
+    &amp;lt;str name=&quot;fieldType&quot;&amp;gt;tdates&amp;lt;/str&amp;gt;
+  &amp;lt;/lst&amp;gt;
+  &amp;lt;lst name=&quot;typeMapping&quot;&amp;gt;
+    &amp;lt;str name=&quot;valueClass&quot;&amp;gt;java.lang.Long&amp;lt;/str&amp;gt;
+    &amp;lt;str name=&quot;valueClass&quot;&amp;gt;java.lang.Integer&amp;lt;/str&amp;gt;
+    &amp;lt;str name=&quot;fieldType&quot;&amp;gt;tlongs&amp;lt;/str&amp;gt;
+  &amp;lt;/lst&amp;gt;
+  &amp;lt;lst name=&quot;typeMapping&quot;&amp;gt;
+    &amp;lt;str name=&quot;valueClass&quot;&amp;gt;java.lang.Number&amp;lt;/str&amp;gt;
+    &amp;lt;str name=&quot;fieldType&quot;&amp;gt;tdoubles&amp;lt;/str&amp;gt;
+  &amp;lt;/lst&amp;gt; --&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/processor&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Now, we start solr.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ cd ~/solr-6.5.1/bin
+$ ./solr start
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h1 id=&quot;crawl-and-index&quot;&gt;Crawl and Index&lt;/h1&gt;
+&lt;p&gt;Now that we have everything set up, we are ready to put Nutch in action.&lt;/p&gt;
+
+&lt;p&gt;First, tell nutch what URL(s) to crawl. We do this by creating a simple text file, and pointing Nutch to it.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ cd ~/apache-nutch-2.3.1/
+$ mkdir urls
+$ vi urls/seeds.text
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Enter the URL(s) in this file, for example. &lt;code class=&quot;highlighter-rouge&quot;&gt;https://www.wikipedia.org&lt;/code&gt;. One URL per line.&lt;/p&gt;
+
+&lt;p&gt;Once the seed file is set up, run the following -&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ runtime/local/bin/nutch inject urls/
+InjectorJob: starting at 2017-08-14 07:43:22
+InjectorJob: Injecting urlDir: urls
+InjectorJob: Using class org.apache.gora.mongodb.store.MongoStore as the Gora storage class.
+InjectorJob: total number of urls rejected by filters: 0
+InjectorJob: total number of urls injected after normalization and filtering: 1
+Injector: finished at 2017-08-14 07:43:25, elapsed: 00:00:03
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;This has initialized the crawl database - we can use the MongoDB CLI to check out the resulting database and collection.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt; show dbs
+local    0.000GB
+nutchdb  0.005GB
+&amp;gt; use nutchdb
+switched to db nutchdb
+&amp;gt; show collections
+webpage
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Next, we generate the top 50 URLs. Do not worry if you see a different number like 20 below.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ runtime/local/bin/nutch generate -topN 50
+GeneratorJob: starting at 2017-08-14 08:56:36
+GeneratorJob: Selecting best-scoring urls due for fetch.
+GeneratorJob: starting
+GeneratorJob: filtering: true
+GeneratorJob: normalizing: true
+GeneratorJob: topN: 50
+GeneratorJob: finished at 2017-08-14 08:56:38, time elapsed: 00:00:02
+GeneratorJob: generated batch id: 1502528196-1091715892 containing 20 URLs
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Now that Nutch has selected N URLs, we go ahead fetch them.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ runtime/local/bin/nutch fetch -all
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;This will fetch the N URLs, and we’ll see a ton of output.&lt;/p&gt;
+
+&lt;p&gt;Once fetched, the content needs to be parsed.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ runtime/local/bin/nutch parse -all
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Next, we update the DB with the current status.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ runtime/local/bin/nutch updatedb -all
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Finally, we index these pages in Solr&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ runtime/local/bin/nutch solrindex http://localhost:8983/solr/nutch -all
+IndexingJob: starting
+Active IndexWriters :
+SOLRIndexWriter
+	solr.server.url : URL of the SOLR instance (mandatory)
+	solr.commit.size : buffer size when sending to SOLR (default 1000)
+	solr.mapping.file : name of the mapping file for fields (default solrindex-mapping.xml)
+	solr.auth : use authentication (default false)
+	solr.auth.username : username for authentication
+	solr.auth.password : password for authentication
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;If you have access to the Solr console (http://host:8983), fire it up in a browser.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;If this is an AWS EC2 instance, you’ll need to ensure HTTP access is allowed on port 8983 via the Security Groups + NACL, and if this is in Vagrant, use the port mapper in &lt;code class=&quot;highlighter-rouge&quot;&gt;Vagrantfile&lt;/code&gt; to map guest port 8983 to any host port you’d like to use.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Once in Solr admin console, we can try firing up queries. If unable to access the admin UX, the same can be done via curls, like so:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ curl &quot;http://localhost:8983/solr/nutch/select?fl=url,%20meta_description,%20anchor,%20title&amp;amp;indent=on&amp;amp;q=content:test&amp;amp;wt=json&quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Here, we’re querying Solr for any &lt;code class=&quot;highlighter-rouge&quot;&gt;content&lt;/code&gt; that matches &lt;code class=&quot;highlighter-rouge&quot;&gt;test&lt;/code&gt; (hence &lt;code class=&quot;highlighter-rouge&quot;&gt;q=content:test&lt;/code&gt;) and only return the &lt;code class=&quot;highlighter-rouge&quot;&gt;url&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;meta_description&lt;/code&gt;, and &lt;code class=&quot;highlighter-rouge&quot;&gt;anchor&lt;/code&gt; (hence &lt;code class=&quot;highlighter-rouge&quot;&gt;fl=url,%20meta_description,%20anchor,%20title&lt;/code&gt;). We will get a list of at most 10 results in a JSON format. You may want to play with different values for different fields either via the Solr Console or curl. Refer to Solr query syntax &lt;a href=&quot;&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;There we have it - a fully functional, end to end crawler and indexer setup!&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Please note that the &lt;em&gt;generate-fetch-parse-updatedb-index&lt;/em&gt; steps will need to be run frequently. It is a good idea to set up a cron job to execute these steps on a desired interval (based on the velocity of the site being indexed).&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;In this post, I did not cover alternatives like &lt;a href=&quot;https://scrapy.org/&quot; target=&quot;_blank_&quot;&gt;Scrapy&lt;/a&gt;, &lt;a href=&quot;https://www.crummy.com/software/BeautifulSoup/&quot; target=&quot;_blank_&quot;&gt;Beautiful Soup&lt;/a&gt;, &lt;a href=&quot;https://github.com/yasserg/crawler4j&quot; target=&quot;_blank_&quot;&gt;crawler4j&lt;/a&gt;, etc. but I would encourage you to check them out if in discovery/research phase before deciding on Nutch.&lt;/p&gt;
+
+&lt;p&gt;Thoughts, feedback, ideas? Please let me know in the comments below.&lt;/p&gt;
+
+&lt;h1 style=&quot;text-align: center&quot; id=&quot;comments&quot;&gt;Comments&lt;/h1&gt;
+
+&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = &quot;https://lobster1234.github.io/2017/08/14/search-with-nutch-mongodb-solr/&quot;;  
+this.page.identifier = &quot;/2017/08/14/search-with-nutch-mongodb-solr&quot;;
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://lobster1234.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+&lt;/script&gt;
+
+&lt;noscript&gt;Please enable JavaScript to view the &lt;a href=&quot;https://disqus.com/?ref_noscript&quot;&gt;comments powered by Disqus.&lt;/a&gt;&lt;/noscript&gt;
+
+&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+
+
+      
+
+&lt;/script&gt;</content>
+
+      
+      
+      
+      
+      
+
+      
+        <author>
+            <name>Manish Pandit</name>
+          
+          
+        </author>
+      
+
+      
+        <category term="architecture" />
+      
+        <category term="search" />
+      
+
+      
+
+      
+        <summary type="html">Search is one of the most fantastic areas of the technology industry, and has been addressed many, many times with different algorithms, producing varying degrees of success. We get so used to it, that often times I wish I had a Cmd-F while reading a real book. Recently we had our Quarterly Hack Week at Marqeta, and one of the ideas was to build search around our public pages. These pages would include the public website assets, as well as the the API developer guides and documentation. This post is a quick summary of the infrastructure, setup, and gotchas of using Nutch 2.3.1 to build a site search - essentially notes from this hack week project.</summary>
+      
+
+      
+      
+    </entry>
+  
   
   
     <entry>
@@ -4272,69 +4586,6 @@ aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.co
 
       
         <summary type="html">These are my notes on EC2 and VPC for the AWS Certified Associate Level exams. I attempted the AWS Certified Solution Architect - Associate and AWS Certified Developer - Associate and scored 78% and 90% respectively. It took me about a week (3-4 hours a day) to prepare for both, after being working professionally with AWS for over 3 years.</summary>
-      
-
-      
-      
-    </entry>
-  
-  
-  
-    <entry>
-      
-      <title type="html">Decimal to Binary</title>
-      
-      <link href="https://lobster1234.github.io/2016/01/10/decimal-to-binary/" rel="alternate" type="text/html" title="Decimal to Binary" />
-      <published>2016-01-10T11:43:20-08:00</published>
-      <updated>2016-01-10T11:43:20-08:00</updated>
-      <id>https://lobster1234.github.io/2016/01/10/decimal-to-binary</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2016/01/10/decimal-to-binary/">&lt;p&gt;A Decimal to Binary conversion algorithm implementation.&lt;/p&gt;
-
-&lt;!--more--&gt;
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;binary&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;){&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;StringBuilder&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;builder&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;StringBuilder&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-        &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;numerator&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;){&lt;/span&gt;
-            &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;divisor&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;numerator&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-            &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;remainder&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;numerator&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;builder&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;remainder&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;numerator&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;divisor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;divisor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;==&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;){&lt;/span&gt;
-                &lt;span class=&quot;n&quot;&gt;builder&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;1&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-                &lt;span class=&quot;k&quot;&gt;break&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-            &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;divisor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;==&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;){&lt;/span&gt;
-                &lt;span class=&quot;n&quot;&gt;builder&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;0&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-                &lt;span class=&quot;k&quot;&gt;break&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-            &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-        &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;builder&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;reverse&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;toString&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-  &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;</content>
-
-      
-      
-      
-      
-      
-
-      
-        <author>
-            <name>Manish Pandit</name>
-          
-          
-        </author>
-      
-
-      
-        <category term="algorithms" />
-      
-
-      
-
-      
-        <summary type="html">A Decimal to Binary conversion algorithm implementation.</summary>
       
 
       
