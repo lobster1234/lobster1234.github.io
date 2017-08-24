@@ -101,6 +101,10 @@
 <lastmod>2017-08-14T23:44:37-07:00</lastmod>
 </url>
 <url>
+<loc>https://lobster1234.github.io/2017/08/22/aws-ecs-notes/</loc>
+<lastmod>2017-08-22T23:44:37-07:00</lastmod>
+</url>
+<url>
 <loc>https://lobster1234.github.io/about/</loc>
 </url>
 <url>
@@ -200,6 +204,12 @@
 <loc>https://lobster1234.github.io/categories/search/</loc>
 </url>
 <url>
+<loc>https://lobster1234.github.io/categories/docker/</loc>
+</url>
+<url>
+<loc>https://lobster1234.github.io/categories/ecs/</loc>
+</url>
+<url>
 <loc>https://lobster1234.github.io/posts/2/</loc>
 </url>
 <url>
@@ -210,5 +220,8 @@
 </url>
 <url>
 <loc>https://lobster1234.github.io/posts/5/</loc>
+</url>
+<url>
+<loc>https://lobster1234.github.io/posts/6/</loc>
 </url>
 </urlset>

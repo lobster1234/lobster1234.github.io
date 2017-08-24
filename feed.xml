@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-08-16T19:03:47-07:00</updated>
+  <updated>2017-08-23T23:30:56-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -25,6 +25,251 @@
     </author>
   
 
+  
+  
+    <entry>
+      
+      <title type="html">Using Amazon EC2 Container Service</title>
+      
+      <link href="https://lobster1234.github.io/2017/08/22/aws-ecs-notes/" rel="alternate" type="text/html" title="Using Amazon EC2 Container Service" />
+      <published>2017-08-22T23:44:37-07:00</published>
+      <updated>2017-08-22T23:44:37-07:00</updated>
+      <id>https://lobster1234.github.io/2017/08/22/aws-ecs-notes</id>
+      <content type="html" xml:base="https://lobster1234.github.io/2017/08/22/aws-ecs-notes/">&lt;p&gt;&lt;a href=&quot;https://aws.amazon.com/ecs/&quot; target=&quot;_blank_&quot;&gt;Amazon ECS&lt;/a&gt;, or EC2 Container Service is a Container Management Service for Docker containers. Similar to &lt;a href=&quot;https://kubernetes.io/&quot; target=&quot;_blank_&quot;&gt;Kubernetes&lt;/a&gt; in intent, the service allows users to provision Docker containers in a fully managed cluster of EC2s. This post is a quick summary of how to get up and running with your own ECS cluster.&lt;/p&gt;
+
+&lt;p&gt;The motivation behind containers is to optimize the usage of underlying resources like CPU and Memory. Containerized infrastructure provides a dense compute environment, allowing us to pack more usage without having to spend $$ for idle/underutilized resources.&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h1 id=&quot;setup&quot;&gt;Setup&lt;/h1&gt;
+&lt;p&gt;Make sure you have an AWS Account, and the Default VPC. The purpose of this post is a quick start with ECS, and not to suggest a production deployment. Things like VPCs, Security Groups, AMIs, IAM roles, etc. will be completely different in the real world. We will use the default VPC (which has all public subnets), and wide open default Security Groups for Load Balancers and Instances. I am using &lt;code class=&quot;highlighter-rouge&quot;&gt;us-east-1&lt;/code&gt; as reflected by many URLs in this post.&lt;/p&gt;
+
+&lt;p&gt;Good familiarity with Docker will be helpful as well.&lt;/p&gt;
+
+&lt;h1 id=&quot;terminology&quot;&gt;Terminology&lt;/h1&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;a href=&quot;https://www.docker.com/&quot; target=&quot;_blank_&quot;&gt;Docker&lt;/a&gt; is a container platform, which &lt;em&gt;contains&lt;/em&gt; a process in a Docker Image. They’re lightweight in terms of provisioning, are ephemeral, and an ideal platform for microservices. Imagine 10 microservices modeled as 10 container images, each hosted under Tomcat. Each container does 1 job, and 1 job only.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;These containers form the building blocks for &lt;em&gt;tasks&lt;/em&gt;. So, 5 running tasks for the same Docker Image would translate to 5 JVMs running the same service on 5 EC2s in the non-docker world. Typical &lt;code class=&quot;highlighter-rouge&quot;&gt;ASG=EC2+ELB&lt;/code&gt; scenario for a highly available deployment. Often times &lt;em&gt;tasks&lt;/em&gt; and &lt;em&gt;containers&lt;/em&gt; are used interchangeably.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;A &lt;em&gt;cluster&lt;/em&gt; is a collection of EC2 instances. These instances run ECS optimized AMIs, and I like to call them &lt;em&gt;hosts&lt;/em&gt; to avoid confusion. An instance is a very overloaded term - it could mean an EC2 in a cluster, or a task in the EC2, or an EC2 by itself. The number and type of instances is defined during creation of the cluster. A cluster has the exact same EC2 Instance Type. In other words, we cannot have a ECS cluster with an &lt;code class=&quot;highlighter-rouge&quot;&gt;m3.medium&lt;/code&gt; and a &lt;code class=&quot;highlighter-rouge&quot;&gt;r4.xlarge&lt;/code&gt;. A cluster can spread across multiple AZs, and for high availability, it should. However, it cannot span across VPCs.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;A &lt;em&gt;task&lt;/em&gt; can be wrapped in a &lt;em&gt;service&lt;/em&gt;. A &lt;em&gt;service&lt;/em&gt; is a configuration over the task - how many tasks, how to distribute the various tasks within the &lt;em&gt;cluster&lt;/em&gt;, autoscaling, and an ALB association. So, a microservice can be &lt;em&gt;instantiated&lt;/em&gt; N times in a cluster, creating N containers, where some of those containers can run on the host in &lt;code class=&quot;highlighter-rouge&quot;&gt;us-east-1a&lt;/code&gt;, some on the one in &lt;code class=&quot;highlighter-rouge&quot;&gt;us-east-1b&lt;/code&gt;. A service looks like an ASG configuration.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;An &lt;a href=&quot;https://aws.amazon.com/elasticloadbalancing/applicationloadbalancer/&quot; target=&quot;_blank_&quot;&gt;&lt;em&gt;ALB&lt;/em&gt;&lt;/a&gt; is needed for the service, as the &lt;em&gt;task&lt;/em&gt; can shift within the hosts in a cluster. Also, based on autoscaling settings on the service, new containers for this service can be spun up. A classic ELB will not work as it has hardwired mapping to the back-end EC2 instances. Imagine 5 completely different &lt;em&gt;tasks&lt;/em&gt; running on the same &lt;em&gt;host&lt;/em&gt;, each listening to port 8080. In a classic ELB it’d be impossible to port-map dynamically. However, an &lt;em&gt;ALB&lt;/em&gt; is associated with a &lt;em&gt;target group&lt;/em&gt;, and ECS automatically manages the ALB registry/de-registry of containers.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;An &lt;em&gt;ECR&lt;/em&gt; is &lt;a href=&quot;https://aws.amazon.com/ecr/&quot; target=&quot;_blank_&quot;&gt;EC2 Container Registry&lt;/a&gt;, think of it as a private &lt;a href=&quot;https://hub.docker.com/&quot; target=&quot;_blank_&quot;&gt;Dockerhub&lt;/a&gt;. It works exactly the same way. You build a docker image with &lt;code class=&quot;highlighter-rouge&quot;&gt;docker build&lt;/code&gt;, tag it, and push it to a repo in ECR. The repository URI is used to refer the &lt;em&gt;container&lt;/em&gt; in the &lt;em&gt;task&lt;/em&gt; configuration.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&quot;lets-roll&quot;&gt;Lets Roll!&lt;/h1&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;First off, we create a Docker image. I have one ready, which runs Tomcat. In the real world, it’d be a &lt;code class=&quot;highlighter-rouge&quot;&gt;war&lt;/code&gt; deployed in Tomcat, or a python or node server.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;We can just use the one here -&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ docker pull lobster1234/tomcat:8.5.20
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;Create a repository in ECR by going to https://console.aws.amazon.com/ecs/home?region=us-east-1#/repositories and clicking &lt;strong&gt;Create Repository&lt;/strong&gt;.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Push this image onto ECR by creating a new repository, and following the steps on the AWS ECR Console.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Once this image is pushed (could take a while to upload 200+ MB), you’ll notice the image show up on ECR. Note the Repository URI as we’ll need it.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Now we will create a &lt;em&gt;cluster&lt;/em&gt;. Go to https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters and click &lt;strong&gt;Clusters&lt;/strong&gt; -&amp;gt; &lt;strong&gt;Create Cluster&lt;/strong&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Cluster name = &lt;code class=&quot;highlighter-rouge&quot;&gt;my-first-cluster&lt;/code&gt;, Model = &lt;code class=&quot;highlighter-rouge&quot;&gt;On-Demand Instance&lt;/code&gt;, Instance Type = &lt;code class=&quot;highlighter-rouge&quot;&gt;m3.medium&lt;/code&gt;, Number of instances = &lt;code class=&quot;highlighter-rouge&quot;&gt;2&lt;/code&gt;, VPC = &lt;code class=&quot;highlighter-rouge&quot;&gt;Default VPC&lt;/code&gt;, Subnets = &lt;code class=&quot;highlighter-rouge&quot;&gt;us-east-1a, us-east-1b&lt;/code&gt;, Security Group = &lt;code class=&quot;highlighter-rouge&quot;&gt;Default&lt;/code&gt;. Leave other settings as-is. Click &lt;strong&gt;Create&lt;/strong&gt;.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;View the cluster here - https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/my-first-cluster/services. Check out the &lt;strong&gt;ECS Instances&lt;/strong&gt; tab and you’ll notice the 2 EC2 instances running in there in different AZs. They’re m3.mediums - do not get shocked seeing 1024 CPU. They are running AWS ECS agent as well as the Docker agent, as you can tell from the &lt;strong&gt;Agent Version&lt;/strong&gt; and &lt;strong&gt;Docker Version&lt;/strong&gt; columns.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Next, we will create a &lt;em&gt;task definition&lt;/em&gt; - this is where the &lt;em&gt;container image&lt;/em&gt; we pushed comes in. From the left menu, click &lt;strong&gt;Task Definitions&lt;/strong&gt;, and then click &lt;strong&gt;Create new Task Definition&lt;/strong&gt;.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Task Definition Name = &lt;code class=&quot;highlighter-rouge&quot;&gt;my-first-task-definition&lt;/code&gt;, leave the rest, and click &lt;strong&gt;Add Container&lt;/strong&gt;.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Container Name = &lt;code class=&quot;highlighter-rouge&quot;&gt;my-first-tomcat-container&lt;/code&gt;, Image = enter the &lt;code class=&quot;highlighter-rouge&quot;&gt;ECR Repository URI&lt;/code&gt; (NOT ARN), Hard Limit = &lt;code class=&quot;highlighter-rouge&quot;&gt;128&lt;/code&gt;, Port Mappings = host &lt;code class=&quot;highlighter-rouge&quot;&gt;0&lt;/code&gt; container &lt;code class=&quot;highlighter-rouge&quot;&gt;8080&lt;/code&gt;, Protocol = &lt;code class=&quot;highlighter-rouge&quot;&gt;tcp&lt;/code&gt;.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Click &lt;strong&gt;Advanced Container Configuration&lt;/strong&gt; - CPU Units = &lt;code class=&quot;highlighter-rouge&quot;&gt;1&lt;/code&gt;, Essential = &lt;code class=&quot;highlighter-rouge&quot;&gt;true&lt;/code&gt;, and leave the rest of the settings as-is. Click &lt;strong&gt;Add&lt;/strong&gt;. On the Task Definition page, click &lt;strong&gt;Create&lt;/strong&gt; after verifying the newly added container shows up. Notice there can be multiple, different containers per task.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Now you should see https://console.aws.amazon.com/ecs/home?region=us-east-1#/taskDefinitions/my-first-task-definition/1 where there is an option to create a new revision, and an &lt;strong&gt;Actions&lt;/strong&gt; drop down.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Next we will create a &lt;em&gt;service&lt;/em&gt; using this &lt;em&gt;task definition&lt;/em&gt;. Imagine the container image was indeed hosting a real service instead of a just a tomcat installation. We would want this service available across multiple AZs, and also multiple instances of this service within each of the &lt;em&gt;host&lt;/em&gt;. So we will do just that. Let us create a service by clicking &lt;strong&gt;Create Service&lt;/strong&gt; from the &lt;strong&gt;Actions&lt;/strong&gt; dropdown.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Service Name = &lt;code class=&quot;highlighter-rouge&quot;&gt;my-first-service&lt;/code&gt;, Number of Tasks = &lt;code class=&quot;highlighter-rouge&quot;&gt;5&lt;/code&gt;. Leave everything else as-is. In the Task Placement section, pick &lt;code class=&quot;highlighter-rouge&quot;&gt;AZ Balanced Spread&lt;/code&gt; (this would mean the &lt;em&gt;tasks&lt;/em&gt;, or &lt;em&gt;containers&lt;/em&gt; for this service will get spread out across the AZs the &lt;em&gt;hosts&lt;/em&gt; are running in).&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Now we will associate this service with a Load Balancer. Like I mentioned earlier, &lt;em&gt;Classic Load Balancer&lt;/em&gt; will not work, so we have to create an &lt;em&gt;Application Load Balancer&lt;/em&gt;.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Leave the service tab we’re in. Open up a new tab, and point to the EC2 Console https://console.aws.amazon.com/ec2/v2/home?region=us-east-1#LoadBalancers&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Click &lt;strong&gt;Create Load Balancer&lt;/strong&gt; and pick &lt;strong&gt;Application Load Balancer&lt;/strong&gt;.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Name = &lt;code class=&quot;highlighter-rouge&quot;&gt;my-first-ecs-lb&lt;/code&gt;, Scheme = &lt;code class=&quot;highlighter-rouge&quot;&gt;Internet Facing&lt;/code&gt;, IP Address Type = &lt;code class=&quot;highlighter-rouge&quot;&gt;ipv4&lt;/code&gt;, Listeners = &lt;code class=&quot;highlighter-rouge&quot;&gt;HTTP&lt;/code&gt;, Port &lt;code class=&quot;highlighter-rouge&quot;&gt;80&lt;/code&gt;, Availability Zones = &lt;code class=&quot;highlighter-rouge&quot;&gt;us-east-1a&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;us-east-1b&lt;/code&gt;, and click &lt;strong&gt;Configure Security Settings&lt;/strong&gt;.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Click &lt;strong&gt;Next: Configure Security Groups&lt;/strong&gt;. Select the &lt;code class=&quot;highlighter-rouge&quot;&gt;default&lt;/code&gt; security group. Click &lt;strong&gt;Next: Configure Routing&lt;/strong&gt;.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Target Group = &lt;code class=&quot;highlighter-rouge&quot;&gt;New target group&lt;/code&gt;, Name = &lt;code class=&quot;highlighter-rouge&quot;&gt;my-first-ecs-tg&lt;/code&gt;, leave everything else as-is. Click &lt;strong&gt;Register Targets&lt;/strong&gt;. This is where we will pick the EC2s running our containers. Select the 2 EC2 instances which are the part of our cluster, and click &lt;strong&gt;Add to Registered&lt;/strong&gt;. Leave the port as &lt;code class=&quot;highlighter-rouge&quot;&gt;80&lt;/code&gt;. Once the selected Instances show up under &lt;strong&gt;Registered Targets&lt;/strong&gt;, click &lt;strong&gt;Next: Review&lt;/strong&gt;.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;On the review page, click &lt;strong&gt;Create&lt;/strong&gt;. Click &lt;strong&gt;Close&lt;/strong&gt; on the next screen, and give it a minute to provision the ALB.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;At this point we go back to the &lt;strong&gt;Create Service&lt;/strong&gt; tab, and click &lt;strong&gt;Configure ELB&lt;/strong&gt;.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Select &lt;code class=&quot;highlighter-rouge&quot;&gt;ecsServiceRole&lt;/code&gt; for &lt;strong&gt;IAM Role for Service&lt;/strong&gt;. The ALB we just created should show up under the ELB Name. If it does not, click the little button to refresh the drop down. Once the ALB shows up, select it. Then, In the &lt;strong&gt;Select a Container&lt;/strong&gt;, pick the container &lt;code class=&quot;highlighter-rouge&quot;&gt;my-first-tomcat-container:0:8080&lt;/code&gt; and click &lt;strong&gt;Add to ELB&lt;/strong&gt;.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;This opens up a new section. In the &lt;strong&gt;Target Group Name&lt;/strong&gt; section, select &lt;code class=&quot;highlighter-rouge&quot;&gt;my-first-ecs-tg&lt;/code&gt;. Click &lt;strong&gt;Save&lt;/strong&gt;.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Review settings, and click &lt;strong&gt;Create Service&lt;/strong&gt;. You’ll see a page showing the Launch Status. Click &lt;strong&gt;View Service&lt;/strong&gt; when it is enabled.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;On the View Service page, it should show 5 running tasks. Refresh the page if you do not see all 5, as it does take a few seconds for containers to launch.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;To view the cluster, go to this URL - https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/my-first-cluster/services. You’ll be able to click the ECS Instances Tab to check how the containers are distributed across the cluster (2 and 3).&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;To verify, go to the ALB https://us-east-1.console.aws.amazon.com/ec2/v2/home?region=us-east-1#LoadBalancers: and click on &lt;code class=&quot;highlighter-rouge&quot;&gt;my-first-ecs-lb&lt;/code&gt;. From the description tab, copy the &lt;strong&gt;DNS Name&lt;/strong&gt;, and paste it in the browser. You should see the Tomcat welcome page.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Feel free to play around with this setup, including setting up autoscaling for the service. The service console can be found here https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/my-first-cluster/services/my-first-service/tasks&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Now we have a fully functional ECS Cluster with a service running across all nodes of the cluster, available via an ALB.&lt;/p&gt;
+
+&lt;h1 id=&quot;teardown&quot;&gt;Teardown&lt;/h1&gt;
+
+&lt;p&gt;The fast and easy way is to click &lt;strong&gt;Delete Cluster&lt;/strong&gt; from the Cluster Details page. However, I’ll walk you through the steps that will need some tinkering around and help better understand what goes under the hood.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;To stop all containers and remove this service, click &lt;strong&gt;Update&lt;/strong&gt;, and change the number of tasks from &lt;code class=&quot;highlighter-rouge&quot;&gt;5&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;0&lt;/code&gt;. Click &lt;strong&gt;Update Service&lt;/strong&gt;. You’ll immediately notice that the Tomcat Welcome Page no longer works. In fact, this update process deregisters the containers from the ALB and then begins to drain connections. So although the tasks will show up as running, the ALB DNS URL will return a 503. All of this action can be seen Under &lt;strong&gt;Events&lt;/strong&gt; tab in the &lt;strong&gt;Service Detail&lt;/strong&gt; page. The default draining time is &lt;code class=&quot;highlighter-rouge&quot;&gt;300 seconds&lt;/code&gt;, so expect to wait that long.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Next, we delete the ALB. From the LB page, https://us-east-1.console.aws.amazon.com/ec2/v2/home?region=us-east-1#LoadBalancers:, select the LB and select &lt;strong&gt;Delete&lt;/strong&gt; from the &lt;strong&gt;Actions&lt;/strong&gt; drop down.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Now we delete the target group we had created. On the target groups page at https://us-east-1.console.aws.amazon.com/ec2/v2/home?region=us-east-1#TargetGroups:, select &lt;code class=&quot;highlighter-rouge&quot;&gt;my-first-ecs-tg&lt;/code&gt; and pick &lt;strong&gt;Delete&lt;/strong&gt; from the &lt;strong&gt;Actions&lt;/strong&gt; dropdown.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Next, we delete the service. Come back to the service page at https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/my-first-cluster/services/my-first-service/tasks and click &lt;strong&gt;Delete&lt;/strong&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Finally, we delete the cluster. Go to cluster page at https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/my-first-cluster/services and click &lt;strong&gt;Delete Cluster&lt;/strong&gt;. Verify by going to EC2 Console that the EC2 hosts are terminated.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&quot;summary&quot;&gt;Summary&lt;/h1&gt;
+&lt;p&gt;In this post, we learnt how to -&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Create an ECR Repository, and push a Tomcat Docker image to it&lt;/li&gt;
+  &lt;li&gt;Create an muti-AZ ECS Cluster&lt;/li&gt;
+  &lt;li&gt;Create a Task Definition using this image&lt;/li&gt;
+  &lt;li&gt;Create a Service using this Task Definition&lt;/li&gt;
+  &lt;li&gt;Create a Target Group and ALB for this service&lt;/li&gt;
+  &lt;li&gt;Launch this service in the ECS Cluster using the Balanced Placement Policy&lt;/li&gt;
+  &lt;li&gt;Tear down the ECS Cluster&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Thoughts, feedback, ideas? Please let me know in the comments below.&lt;/p&gt;
+
+&lt;h1 style=&quot;text-align: center&quot; id=&quot;comments&quot;&gt;Comments&lt;/h1&gt;
+
+&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = &quot;https://lobster1234.github.io/2017/08/22/aws-ecs-notes/&quot;;  
+this.page.identifier = &quot;/2017/08/22/aws-ecs-notes&quot;;
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://lobster1234.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+&lt;/script&gt;
+
+&lt;noscript&gt;Please enable JavaScript to view the &lt;a href=&quot;https://disqus.com/?ref_noscript&quot;&gt;comments powered by Disqus.&lt;/a&gt;&lt;/noscript&gt;
+
+&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+
+
+      
+
+&lt;/script&gt;</content>
+
+      
+      
+      
+      
+      
+
+      
+        <author>
+            <name>Manish Pandit</name>
+          
+          
+        </author>
+      
+
+      
+        <category term="aws" />
+      
+        <category term="docker" />
+      
+        <category term="ecs" />
+      
+
+      
+
+      
+        <summary type="html">Amazon ECS, or EC2 Container Service is a Container Management Service for Docker containers. Similar to Kubernetes in intent, the service allows users to provision Docker containers in a fully managed cluster of EC2s. This post is a quick summary of how to get up and running with your own ECS cluster. The motivation behind containers is to optimize the usage of underlying resources like CPU and Memory. Containerized infrastructure provides a dense compute environment, allowing us to pack more usage without having to spend $$ for idle/underutilized resources.</summary>
+      
+
+      
+      
+    </entry>
+  
   
   
     <entry>
@@ -4400,192 +4645,6 @@ aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.co
 
       
         <summary type="html">It is much easier to make API/code multi-tenant, but it is a different story for databases. This problem exists at pretty much all SaaS based solutions, intending to provide data and service level isolation for many users/customers while trying to keep the code + database scalable. However, here are a few strategies that can be employed, based on the pros/cons and the freedom/constraints driving the solution.</summary>
-      
-
-      
-      
-    </entry>
-  
-  
-  
-    <entry>
-      
-      <title type="html">2016 AWS Associate Level Certification Exam Notes</title>
-      
-      <link href="https://lobster1234.github.io/2016/10/29/aws-certification-notes/" rel="alternate" type="text/html" title="2016 AWS Associate Level Certification Exam Notes" />
-      <published>2016-10-29T02:05:22-07:00</published>
-      <updated>2016-10-29T02:05:22-07:00</updated>
-      <id>https://lobster1234.github.io/2016/10/29/aws-certification-notes</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2016/10/29/aws-certification-notes/">&lt;p&gt;These are my notes on EC2 and VPC for the AWS Certified Associate Level exams. I attempted the &lt;a href=&quot;https://aws.amazon.com/certification/certified-solutions-architect-associate&quot; target=&quot;_blank&quot;&gt;AWS Certified Solution Architect - Associate&lt;/a&gt; and &lt;a href=&quot;https://aws.amazon.com/certification/certified-developer-associate/&quot; target=&quot;_blank&quot;&gt;AWS Certified Developer - Associate&lt;/a&gt; and scored 78% and 90% respectively.&lt;/p&gt;
-
-&lt;p&gt;It took me about a week (3-4 hours a day) to prepare for both, after being working professionally with AWS for over 3 years.&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;h2 id=&quot;ec2&quot;&gt;EC2&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Can start an AMI to create any number of on-demand instances by using the RunInstances call. Default max is 20 per account.&lt;/li&gt;
-  &lt;li&gt;If the request is good, the RunInstances call returns success with a list of DNS names, and instances begin to launch within 10 minutes.&lt;/li&gt;
-  &lt;li&gt;The launch request is associated with a reservation ID. One reservation ID can map to multiple instances which are all a part of one launch request.&lt;/li&gt;
-  &lt;li&gt;The status can be checked via DescribeInstances call&lt;/li&gt;
-  &lt;li&gt;Can be terminated using TerminateInstances call&lt;/li&gt;
-  &lt;li&gt;If a running instances uses EBS-backed root volume (boot partition), it can be stopped by StopInstances call. This preserves the data.&lt;/li&gt;
-  &lt;li&gt;The same can be done via CLI or the Console instead of REST APIs&lt;/li&gt;
-  &lt;li&gt;EBS based root device store will preserve data, hence it is not tied to the life of the instance. Local instance based store persistence is tied to the life of the instance. There is no “stop” option.&lt;/li&gt;
-  &lt;li&gt;Local instance store is inexpensive&lt;/li&gt;
-  &lt;li&gt;An AMI (Amazon Machine Image) is a package with base operating system, and optional set of applications to boot an instance.&lt;/li&gt;
-  &lt;li&gt;You can create a custom AMI, but have to bundle it with either EBS backed store or Instance backed store.&lt;/li&gt;
-  &lt;li&gt;For instances backed with local instance store, the instances use S3&lt;/li&gt;
-  &lt;li&gt;Reserved limit is 20 for all instance types&lt;/li&gt;
-  &lt;li&gt;On demand limit varies, and is 20 for all T2, M1, M3 type instances. I plan to roll the dice on these questions, so won’t bother remembering them.&lt;/li&gt;
-  &lt;li&gt;Some instance types are not available in all regions.&lt;/li&gt;
-  &lt;li&gt;The instances can send emails, but have a fixed amount which needs to be requested to be increased if needed.&lt;/li&gt;
-  &lt;li&gt;Currently supported operating systems are RHEL, Centos, Ubuntu, Oracle Linux, Amazon Linux, Gentoo, Suse, Fedora, Debian and Windows&lt;/li&gt;
-  &lt;li&gt;All the underlying hardware in EC2 uses ECC memory (Error Correcting Code memory)&lt;/li&gt;
-  &lt;li&gt;All instances are billed in hourly usage units. Even if the instance is up for a minute, you get billed for a full hour.&lt;/li&gt;
-  &lt;li&gt;Data transferred between AWS services in different regions is charged on both ends.&lt;/li&gt;
-  &lt;li&gt;Billing starts when the boot sequence of the instance is initiated.&lt;/li&gt;
-  &lt;li&gt;Billing ends when the instance terminates or stops. If it is shut down, the instance hours aren’t billed but you pay for the EBS storage that has the root device data on it.&lt;/li&gt;
-  &lt;li&gt;Data transfer rates apply between instances on both ends regardless of AZ (Regional Data Transfer) or region (Internet Data Transfer). The sender gets billed for outbound, the receiver gets billed for inbound data.&lt;/li&gt;
-  &lt;li&gt;Tax is extra, it is not included in the pricing&lt;/li&gt;
-  &lt;li&gt;There are 5 families of instances
-    &lt;ol&gt;
-      &lt;li&gt;General Purpose - M3 and M4 with fixed performance, and T2 for burstable.&lt;/li&gt;
-      &lt;li&gt;Compute Optimized - C3 and C4&lt;/li&gt;
-      &lt;li&gt;Memory Optimized - R3&lt;/li&gt;
-      &lt;li&gt;GPU Optimized - P2 are Nvidia Tesla parallel processing GPU Compute, and G2 provide high performance 3D graphics (GPU Graphics)&lt;/li&gt;
-      &lt;li&gt;Storage Optimized - I2 are SSD based for high IO, D2 are dense (also SSD based) for data intensive operations with sequential IO&lt;/li&gt;
-    &lt;/ol&gt;
-  &lt;/li&gt;
-  &lt;li&gt;M3 are consistent and cheaper over M1 and also support SSD based instance storage. But if you need a larger disk, use M1.&lt;/li&gt;
-  &lt;li&gt;The amount of CPU allocated to an instance is measured in EC2 Compute Units. It provides the relative measure of integer processing power of an instance.&lt;/li&gt;
-  &lt;li&gt;To get a history of all EC2 API calls including VPC and EBS, use CloudTrail&lt;/li&gt;
-  &lt;li&gt;There are 5 Elastic IPs per region in any account by default, because ipv4 is a scare resource&lt;/li&gt;
-  &lt;li&gt;If the EIP isn’t associated with any running instance, you get charged an hourly penalty for hogging a scarce resource&lt;/li&gt;
-  &lt;li&gt;By default, every instance comes with a Public IP and a Private IP.&lt;/li&gt;
-  &lt;li&gt;When the instance stops or terminates, the private IP is released. So you may see a diff private IP when you boot it back up. The public IP behaves the same way but it can also be replaced with an EIP.&lt;/li&gt;
-  &lt;li&gt;EIP remapping can take several minutes.&lt;/li&gt;
-  &lt;li&gt;You can configure the reverse DNS record for the EIP by filling a form. But a forward DNS record (record -&amp;gt; EIP) must exist.&lt;/li&gt;
-  &lt;li&gt;Each AZ is physically distinct and independent.&lt;/li&gt;
-  &lt;li&gt;The same AZ can mean a diff physical location for a different account. My us-east-1a could be in New York while your us-east-1a could be in Richmond, VA.&lt;/li&gt;
-  &lt;li&gt;Enhanced networking is supported via single root IO Virtualization (SR-IOV). It allows for high Packet Per Second (PPS) on the network&lt;/li&gt;
-  &lt;li&gt;This is achieved via Elastic Network Adapter (ENA) available in X1 and M4.16xlarge. Others use Intel Virtual Function Interface. The Amazon Linux AMI support both drivers.&lt;/li&gt;
-  &lt;li&gt;There is no additional fee for enhanced networking, but it is not available in EC2-Classic, only in EC2-VPC.&lt;/li&gt;
-  &lt;li&gt;If using instance store backed instance, for durable data, use S3. Use EBS backed if you need the data to be independent of the instance’s life.&lt;/li&gt;
-  &lt;li&gt;3 Types of EBS volumes - General Purpose SSD, PIOPS SSD, Magnetic.&lt;/li&gt;
-  &lt;li&gt;GP SSD EBS volumes provide ratio of 3 IOPS per GB, and can burst up to 3000 IOPS.&lt;/li&gt;
-  &lt;li&gt;IOPS is measured as 256kBps for SSD, 1024kBps for Magnetic.&lt;/li&gt;
-  &lt;li&gt;PIOPS EBS is good for large NoSQL and RDS databases&lt;/li&gt;
-  &lt;li&gt;HDD or Magnetic is cheapest and fit for infrequently accessed data.&lt;/li&gt;
-  &lt;li&gt;Once instance can have many volumes but one volume can only be tied to one instance.&lt;/li&gt;
-  &lt;li&gt;EBS snapshots are only accessible via EC2 APIs even though they’re stored on S3&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;softhard-limits-on-stuff&quot;&gt;Soft/Hard Limits on stuff&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;5 VPCs per region&lt;/li&gt;
-  &lt;li&gt;50 peering connections per VPC&lt;/li&gt;
-  &lt;li&gt;Gateway Cached Volumes 32TB&lt;/li&gt;
-  &lt;li&gt;Gateway Store Volumes  16TB&lt;/li&gt;
-  &lt;li&gt;Gateway Cached Volumes Cache Size 16TB&lt;/li&gt;
-  &lt;li&gt;5 EIPs per region&lt;/li&gt;
-  &lt;li&gt;500 security groups per instance&lt;/li&gt;
-  &lt;li&gt;200 subnets per VPC&lt;/li&gt;
-  &lt;li&gt;5 internet gateways per region&lt;/li&gt;
-  &lt;li&gt;50 customer gateways per region&lt;/li&gt;
-  &lt;li&gt;5 Virtual Private Gateways per region&lt;/li&gt;
-  &lt;li&gt;50 VPN connections per region&lt;/li&gt;
-  &lt;li&gt;50 VPN peering connections per VPC&lt;/li&gt;
-  &lt;li&gt;200 Route Tables per VPC&lt;/li&gt;
-  &lt;li&gt;500 security groups per VPC&lt;/li&gt;
-  &lt;li&gt;5 security groups per network interface&lt;/li&gt;
-  &lt;li&gt;200 NACLs per VPC (same as subnets)&lt;/li&gt;
-  &lt;li&gt;500 Hosted Zones in Route 53&lt;/li&gt;
-  &lt;li&gt;50 Domains in Route 53&lt;/li&gt;
-  &lt;li&gt;100 TB Total RDS storage&lt;/li&gt;
-  &lt;li&gt;5000 IAM users per account&lt;/li&gt;
-  &lt;li&gt;250 IAM Roles&lt;/li&gt;
-  &lt;li&gt;100 IAM Groups&lt;/li&gt;
-  &lt;li&gt;100 Instance Profiles&lt;/li&gt;
-  &lt;li&gt;20 Load Balancers per region&lt;/li&gt;
-  &lt;li&gt;10 listeners per load balancer&lt;/li&gt;
-  &lt;li&gt;5 security groups per load balancer&lt;/li&gt;
-  &lt;li&gt;1 route table per subnet&lt;/li&gt;
-  &lt;li&gt;Multiple subnets per route table&lt;/li&gt;
-  &lt;li&gt;1 subnet per AZ&lt;/li&gt;
-  &lt;li&gt;Max VPC size is /16&lt;/li&gt;
-  &lt;li&gt;Min VPC size is /28&lt;/li&gt;
-  &lt;li&gt;5 IP addresses are always reserved in any subnet (251 for /24, 4091 for /20..)&lt;/li&gt;
-  &lt;li&gt;6 replicas for AuroraDB in 3 AZs&lt;/li&gt;
-  &lt;li&gt;100 S3 buckets per account (not region!)&lt;/li&gt;
-  &lt;li&gt;5 TB max object size&lt;/li&gt;
-  &lt;li&gt;5 GB max upload size per PUT operation&lt;/li&gt;
-  &lt;li&gt;100 launch configurations&lt;/li&gt;
-  &lt;li&gt;20 Auto Scaling Groups&lt;/li&gt;
-  &lt;li&gt;200 Cloud Formation Stacks&lt;/li&gt;
-  &lt;li&gt;200 Cloudfront Web distributions&lt;/li&gt;
-  &lt;li&gt;100 Cloudfront RTMP distributions&lt;/li&gt;
-  &lt;li&gt;25 origins per distribution&lt;/li&gt;
-  &lt;li&gt;20 on-demand instances per region&lt;/li&gt;
-  &lt;li&gt;5000 EBS volumes&lt;/li&gt;
-  &lt;li&gt;10000 EBS Snapshots&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;creating-a-custom-vpc&quot;&gt;Creating a custom VPC&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;Use 10.0.0.0/16 CIDR, most commonly used&lt;/li&gt;
-  &lt;li&gt;This creates a default route table allowing all traffic within this VPC to flow through (Destination 10.0.0.0/16 local&lt;/li&gt;
-  &lt;li&gt;This creates a default NACL which allows all inbound and outbound traffic&lt;/li&gt;
-  &lt;li&gt;If you create a new NACL, it is set to deny all inbound and outbound traffic&lt;/li&gt;
-  &lt;li&gt;Create an IGW if you are going to build a public subnet.&lt;/li&gt;
-  &lt;li&gt;Attach to your custom VPC&lt;/li&gt;
-  &lt;li&gt;DO NOT Add a route in the VPC’s route table to direct internet bound traffic to this IGW (0.0.0.0/0 -&amp;gt; IGW)&lt;/li&gt;
-  &lt;li&gt;Create a new route table, call it public route. It will allow all traffic within the VPC.&lt;/li&gt;
-  &lt;li&gt;Add a route in this route table (0.0.0.0/0 -&amp;gt; IGW)&lt;/li&gt;
-  &lt;li&gt;Next, we add 2 subnets, 1 public 1 private&lt;/li&gt;
-  &lt;li&gt;Pick /24 CIDR block allowing for 251 IPs each&lt;/li&gt;
-  &lt;li&gt;Public is 10.0.1.0/24 named as 10.0.1.0-public-us-east-1a&lt;/li&gt;
-  &lt;li&gt;Private is 10.0.2.0/24 named as 10.0.2.0-private-us-east-1a&lt;/li&gt;
-  &lt;li&gt;Note that both these subnets are associated with the default VPC NACL&lt;/li&gt;
-  &lt;li&gt;Note that both these subnets are associated with the default route table&lt;/li&gt;
-  &lt;li&gt;Now we change the route table of our public subnet to use the public route table&lt;/li&gt;
-  &lt;li&gt;Go to route tables, pick the public route, look for subnet associations. Click edit and attach our public subnet with this route table&lt;/li&gt;
-  &lt;li&gt;Next, we launch an instance in the public subnet, and make sure we can connect to it&lt;/li&gt;
-  &lt;li&gt;While launching it, create a new security group called MyWebSG, allow 80 and 22 from 0.0.0.0/0 for now&lt;/li&gt;
-  &lt;li&gt;Note the public IP and use it to ssh into this instance&lt;/li&gt;
-  &lt;li&gt;Run yum update and you’ll see it goes through (internet connectivity outbound)&lt;/li&gt;
-  &lt;li&gt;Launch an instance in private subnet this time. This is connected to a route which does not have internet connectivity.&lt;/li&gt;
-  &lt;li&gt;While doing this, create a new security group, call it MyBackendSG allowing 8080 from MyWebSG&lt;/li&gt;
-  &lt;li&gt;While still in the public instance, install apache and run it. Curl localhost to make sure it works, use the IP in the browser to verify also.&lt;/li&gt;
-  &lt;li&gt;Notice that your private instance has no internet connectivity, you cannot ssh into it.&lt;/li&gt;
-  &lt;li&gt;We need a bastion host to do so, we create it in the public Subnet. The security group will need to allow 22 from the internet. Call it bastionSG&lt;/li&gt;
-&lt;/ul&gt;</content>
-
-      
-      
-      
-      
-      
-
-      
-        <author>
-            <name>Manish Pandit</name>
-          
-          
-        </author>
-      
-
-      
-        <category term="aws" />
-      
-        <category term="certification" />
-      
-
-      
-
-      
-        <summary type="html">These are my notes on EC2 and VPC for the AWS Certified Associate Level exams. I attempted the AWS Certified Solution Architect - Associate and AWS Certified Developer - Associate and scored 78% and 90% respectively. It took me about a week (3-4 hours a day) to prepare for both, after being working professionally with AWS for over 3 years.</summary>
       
 
       
