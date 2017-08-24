@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-08-23T23:36:09-07:00</updated>
+  <updated>2017-08-23T23:47:51-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -41,12 +41,12 @@
 
 &lt;!--more--&gt;
 
-&lt;h1 id=&quot;setup&quot;&gt;Setup&lt;/h1&gt;
+&lt;h3 id=&quot;setup&quot;&gt;Setup&lt;/h3&gt;
 &lt;p&gt;Make sure you have an AWS Account, and the Default VPC. The purpose of this post is a quick start with ECS, and not to suggest a production deployment. Things like VPCs, Security Groups, AMIs, IAM roles, etc. will be completely different in the real world. We will use the default VPC (which has all public subnets), and wide open default Security Groups for Load Balancers and Instances. I am using &lt;code class=&quot;highlighter-rouge&quot;&gt;us-east-1&lt;/code&gt; as reflected by many URLs in this post.&lt;/p&gt;
 
 &lt;p&gt;Good familiarity with Docker will be helpful as well.&lt;/p&gt;
 
-&lt;h1 id=&quot;terminology&quot;&gt;Terminology&lt;/h1&gt;
+&lt;h3 id=&quot;terminology&quot;&gt;Terminology&lt;/h3&gt;
 
 &lt;ul&gt;
   &lt;li&gt;
@@ -69,20 +69,20 @@
   &lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h1 id=&quot;lets-roll&quot;&gt;Lets Roll!&lt;/h1&gt;
+&lt;h3 id=&quot;steps&quot;&gt;Steps&lt;/h3&gt;
 
-&lt;h2 id=&quot;push-docker-image&quot;&gt;Push Docker Image&lt;/h2&gt;
+&lt;h4 id=&quot;push-docker-image&quot;&gt;Push Docker Image&lt;/h4&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;First off, we create a Docker image. I have one ready, which runs Tomcat. In the real world, it’d be a &lt;code class=&quot;highlighter-rouge&quot;&gt;war&lt;/code&gt; deployed in Tomcat, or a python or node server.&lt;/li&gt;
-&lt;/ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;First off, we create a Docker image. I have one ready, which runs Tomcat. In the real world, it’d be a &lt;code class=&quot;highlighter-rouge&quot;&gt;war&lt;/code&gt; deployed in Tomcat, or a python or node server.&lt;/p&gt;
 
-&lt;p&gt;We can just use the one here -&lt;/p&gt;
+    &lt;p&gt;We can just use the one here -&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ docker pull lobster1234/tomcat:8.5.20
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ docker pull lobster1234/tomcat:8.5.20
 &lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;ul&gt;
+    &lt;/div&gt;
+  &lt;/li&gt;
   &lt;li&gt;
     &lt;p&gt;Create a repository in ECR by going to https://console.aws.amazon.com/ecs/home?region=us-east-1#/repositories and clicking &lt;strong&gt;Create Repository&lt;/strong&gt;.&lt;/p&gt;
   &lt;/li&gt;
@@ -94,7 +94,7 @@
   &lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&quot;cluster-creation&quot;&gt;Cluster Creation&lt;/h2&gt;
+&lt;h4 id=&quot;cluster-creation&quot;&gt;Cluster Creation&lt;/h4&gt;
 
 &lt;ul&gt;
   &lt;li&gt;
@@ -108,7 +108,7 @@
   &lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&quot;task-definition&quot;&gt;Task Definition&lt;/h2&gt;
+&lt;h4 id=&quot;task-definition&quot;&gt;Task Definition&lt;/h4&gt;
 
 &lt;ul&gt;
   &lt;li&gt;
@@ -128,7 +128,7 @@
   &lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&quot;service-and-alb-creation&quot;&gt;Service and ALB Creation&lt;/h2&gt;
+&lt;h4 id=&quot;service-and-alb-creation&quot;&gt;Service and ALB Creation&lt;/h4&gt;
 
 &lt;ul&gt;
   &lt;li&gt;
@@ -175,7 +175,7 @@
   &lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&quot;verification&quot;&gt;Verification&lt;/h2&gt;
+&lt;h4 id=&quot;verification&quot;&gt;Verification&lt;/h4&gt;
 
 &lt;ul&gt;
   &lt;li&gt;
@@ -191,7 +191,7 @@
 
 &lt;p&gt;Now we have a fully functional ECS Cluster with a service running across all nodes of the cluster, available via an ALB.&lt;/p&gt;
 
-&lt;h2 id=&quot;teardown&quot;&gt;Teardown&lt;/h2&gt;
+&lt;h4 id=&quot;teardown&quot;&gt;Teardown&lt;/h4&gt;
 
 &lt;p&gt;The fast and easy way is to click &lt;strong&gt;Delete Cluster&lt;/strong&gt; from the Cluster Details page. However, I’ll walk you through the steps that will need some tinkering around and help better understand what goes under the hood.&lt;/p&gt;
 
@@ -213,7 +213,7 @@
   &lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h1 id=&quot;summary&quot;&gt;Summary&lt;/h1&gt;
+&lt;h3 id=&quot;summary&quot;&gt;Summary&lt;/h3&gt;
 &lt;p&gt;In this post, we learnt how to -&lt;/p&gt;
 
 &lt;ol&gt;
@@ -228,7 +228,7 @@
 
 &lt;p&gt;Thoughts, feedback, ideas? Please let me know in the comments below.&lt;/p&gt;
 
-&lt;h1 style=&quot;text-align: center&quot; id=&quot;comments&quot;&gt;Comments&lt;/h1&gt;
+&lt;h3 style=&quot;text-align: center&quot; id=&quot;comments&quot;&gt;Comments&lt;/h3&gt;
 
 &lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
 &lt;script&gt;

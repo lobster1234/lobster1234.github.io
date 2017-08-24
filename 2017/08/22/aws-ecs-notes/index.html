@@ -343,12 +343,12 @@
 
 <!--more-->
 
-<h1 id="setup">Setup</h1>
+<h3 id="setup">Setup</h3>
 <p>Make sure you have an AWS Account, and the Default VPC. The purpose of this post is a quick start with ECS, and not to suggest a production deployment. Things like VPCs, Security Groups, AMIs, IAM roles, etc. will be completely different in the real world. We will use the default VPC (which has all public subnets), and wide open default Security Groups for Load Balancers and Instances. I am using <code class="highlighter-rouge">us-east-1</code> as reflected by many URLs in this post.</p>
 
 <p>Good familiarity with Docker will be helpful as well.</p>
 
-<h1 id="terminology">Terminology</h1>
+<h3 id="terminology">Terminology</h3>
 
 <ul>
   <li>
@@ -371,20 +371,20 @@
   </li>
 </ul>
 
-<h1 id="lets-roll">Lets Roll!</h1>
+<h3 id="steps">Steps</h3>
 
-<h2 id="push-docker-image">Push Docker Image</h2>
+<h4 id="push-docker-image">Push Docker Image</h4>
 
 <ul>
-  <li>First off, we create a Docker image. I have one ready, which runs Tomcat. In the real world, it’d be a <code class="highlighter-rouge">war</code> deployed in Tomcat, or a python or node server.</li>
-</ul>
+  <li>
+    <p>First off, we create a Docker image. I have one ready, which runs Tomcat. In the real world, it’d be a <code class="highlighter-rouge">war</code> deployed in Tomcat, or a python or node server.</p>
 
-<p>We can just use the one here -</p>
+    <p>We can just use the one here -</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>$ docker pull lobster1234/tomcat:8.5.20
+    <div class="highlighter-rouge"><pre class="highlight"><code>$ docker pull lobster1234/tomcat:8.5.20
 </code></pre>
-</div>
-<ul>
+    </div>
+  </li>
   <li>
     <p>Create a repository in ECR by going to https://console.aws.amazon.com/ecs/home?region=us-east-1#/repositories and clicking <strong>Create Repository</strong>.</p>
   </li>
@@ -396,7 +396,7 @@
   </li>
 </ul>
 
-<h2 id="cluster-creation">Cluster Creation</h2>
+<h4 id="cluster-creation">Cluster Creation</h4>
 
 <ul>
   <li>
@@ -410,7 +410,7 @@
   </li>
 </ul>
 
-<h2 id="task-definition">Task Definition</h2>
+<h4 id="task-definition">Task Definition</h4>
 
 <ul>
   <li>
@@ -430,7 +430,7 @@
   </li>
 </ul>
 
-<h2 id="service-and-alb-creation">Service and ALB Creation</h2>
+<h4 id="service-and-alb-creation">Service and ALB Creation</h4>
 
 <ul>
   <li>
@@ -477,7 +477,7 @@
   </li>
 </ul>
 
-<h2 id="verification">Verification</h2>
+<h4 id="verification">Verification</h4>
 
 <ul>
   <li>
@@ -493,7 +493,7 @@
 
 <p>Now we have a fully functional ECS Cluster with a service running across all nodes of the cluster, available via an ALB.</p>
 
-<h2 id="teardown">Teardown</h2>
+<h4 id="teardown">Teardown</h4>
 
 <p>The fast and easy way is to click <strong>Delete Cluster</strong> from the Cluster Details page. However, I’ll walk you through the steps that will need some tinkering around and help better understand what goes under the hood.</p>
 
@@ -515,7 +515,7 @@
   </li>
 </ul>
 
-<h1 id="summary">Summary</h1>
+<h3 id="summary">Summary</h3>
 <p>In this post, we learnt how to -</p>
 
 <ol>
@@ -530,7 +530,7 @@
 
 <p>Thoughts, feedback, ideas? Please let me know in the comments below.</p>
 
-<h1 style="text-align: center" id="comments">Comments</h1>
+<h3 style="text-align: center" id="comments">Comments</h3>
 
 <div id="disqus_thread"></div>
 <script>
