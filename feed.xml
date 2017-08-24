@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-08-23T23:30:56-07:00</updated>
+  <updated>2017-08-23T23:36:09-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -71,6 +71,8 @@
 
 &lt;h1 id=&quot;lets-roll&quot;&gt;Lets Roll!&lt;/h1&gt;
 
+&lt;h2 id=&quot;push-docker-image&quot;&gt;Push Docker Image&lt;/h2&gt;
+
 &lt;ul&gt;
   &lt;li&gt;First off, we create a Docker image. I have one ready, which runs Tomcat. In the real world, it’d be a &lt;code class=&quot;highlighter-rouge&quot;&gt;war&lt;/code&gt; deployed in Tomcat, or a python or node server.&lt;/li&gt;
 &lt;/ul&gt;
@@ -90,8 +92,13 @@
   &lt;li&gt;
     &lt;p&gt;Once this image is pushed (could take a while to upload 200+ MB), you’ll notice the image show up on ECR. Note the Repository URI as we’ll need it.&lt;/p&gt;
   &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;cluster-creation&quot;&gt;Cluster Creation&lt;/h2&gt;
+
+&lt;ul&gt;
   &lt;li&gt;
-    &lt;p&gt;Now we will create a &lt;em&gt;cluster&lt;/em&gt;. Go to https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters and click &lt;strong&gt;Clusters&lt;/strong&gt; -&amp;gt; &lt;strong&gt;Create Cluster&lt;/strong&gt;&lt;/p&gt;
+    &lt;p&gt;Go to https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters and click &lt;strong&gt;Clusters&lt;/strong&gt; -&amp;gt; &lt;strong&gt;Create Cluster&lt;/strong&gt;&lt;/p&gt;
   &lt;/li&gt;
   &lt;li&gt;
     &lt;p&gt;Cluster name = &lt;code class=&quot;highlighter-rouge&quot;&gt;my-first-cluster&lt;/code&gt;, Model = &lt;code class=&quot;highlighter-rouge&quot;&gt;On-Demand Instance&lt;/code&gt;, Instance Type = &lt;code class=&quot;highlighter-rouge&quot;&gt;m3.medium&lt;/code&gt;, Number of instances = &lt;code class=&quot;highlighter-rouge&quot;&gt;2&lt;/code&gt;, VPC = &lt;code class=&quot;highlighter-rouge&quot;&gt;Default VPC&lt;/code&gt;, Subnets = &lt;code class=&quot;highlighter-rouge&quot;&gt;us-east-1a, us-east-1b&lt;/code&gt;, Security Group = &lt;code class=&quot;highlighter-rouge&quot;&gt;Default&lt;/code&gt;. Leave other settings as-is. Click &lt;strong&gt;Create&lt;/strong&gt;.&lt;/p&gt;
@@ -99,6 +106,11 @@
   &lt;li&gt;
     &lt;p&gt;View the cluster here - https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/my-first-cluster/services. Check out the &lt;strong&gt;ECS Instances&lt;/strong&gt; tab and you’ll notice the 2 EC2 instances running in there in different AZs. They’re m3.mediums - do not get shocked seeing 1024 CPU. They are running AWS ECS agent as well as the Docker agent, as you can tell from the &lt;strong&gt;Agent Version&lt;/strong&gt; and &lt;strong&gt;Docker Version&lt;/strong&gt; columns.&lt;/p&gt;
   &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;task-definition&quot;&gt;Task Definition&lt;/h2&gt;
+
+&lt;ul&gt;
   &lt;li&gt;
     &lt;p&gt;Next, we will create a &lt;em&gt;task definition&lt;/em&gt; - this is where the &lt;em&gt;container image&lt;/em&gt; we pushed comes in. From the left menu, click &lt;strong&gt;Task Definitions&lt;/strong&gt;, and then click &lt;strong&gt;Create new Task Definition&lt;/strong&gt;.&lt;/p&gt;
   &lt;/li&gt;
@@ -114,6 +126,11 @@
   &lt;li&gt;
     &lt;p&gt;Now you should see https://console.aws.amazon.com/ecs/home?region=us-east-1#/taskDefinitions/my-first-task-definition/1 where there is an option to create a new revision, and an &lt;strong&gt;Actions&lt;/strong&gt; drop down.&lt;/p&gt;
   &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;service-and-alb-creation&quot;&gt;Service and ALB Creation&lt;/h2&gt;
+
+&lt;ul&gt;
   &lt;li&gt;
     &lt;p&gt;Next we will create a &lt;em&gt;service&lt;/em&gt; using this &lt;em&gt;task definition&lt;/em&gt;. Imagine the container image was indeed hosting a real service instead of a just a tomcat installation. We would want this service available across multiple AZs, and also multiple instances of this service within each of the &lt;em&gt;host&lt;/em&gt;. So we will do just that. Let us create a service by clicking &lt;strong&gt;Create Service&lt;/strong&gt; from the &lt;strong&gt;Actions&lt;/strong&gt; dropdown.&lt;/p&gt;
   &lt;/li&gt;
@@ -156,6 +173,11 @@
   &lt;li&gt;
     &lt;p&gt;On the View Service page, it should show 5 running tasks. Refresh the page if you do not see all 5, as it does take a few seconds for containers to launch.&lt;/p&gt;
   &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;verification&quot;&gt;Verification&lt;/h2&gt;
+
+&lt;ul&gt;
   &lt;li&gt;
     &lt;p&gt;To view the cluster, go to this URL - https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/my-first-cluster/services. You’ll be able to click the ECS Instances Tab to check how the containers are distributed across the cluster (2 and 3).&lt;/p&gt;
   &lt;/li&gt;
@@ -169,7 +191,7 @@
 
 &lt;p&gt;Now we have a fully functional ECS Cluster with a service running across all nodes of the cluster, available via an ALB.&lt;/p&gt;
 
-&lt;h1 id=&quot;teardown&quot;&gt;Teardown&lt;/h1&gt;
+&lt;h2 id=&quot;teardown&quot;&gt;Teardown&lt;/h2&gt;
 
 &lt;p&gt;The fast and easy way is to click &lt;strong&gt;Delete Cluster&lt;/strong&gt; from the Cluster Details page. However, I’ll walk you through the steps that will need some tinkering around and help better understand what goes under the hood.&lt;/p&gt;
 
