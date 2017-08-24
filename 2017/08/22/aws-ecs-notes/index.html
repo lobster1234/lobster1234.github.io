@@ -386,7 +386,7 @@
     </div>
   </li>
   <li>
-    <p>Create a repository in ECR by going to https://console.aws.amazon.com/ecs/home?region=us-east-1#/repositories and clicking <strong>Create Repository</strong>.</p>
+    <p>Create a repository in ECR by going to <a href="https://console.aws.amazon.com/ecs/home?region=us-east-1#/repositories" target="_blank_">https://console.aws.amazon.com/ecs/home?region=us-east-1#/repositories</a> and clicking <strong>Create Repository</strong>.</p>
   </li>
   <li>
     <p>Push this image onto ECR by creating a new repository, and following the steps on the AWS ECR Console.</p>
@@ -400,13 +400,13 @@
 
 <ul>
   <li>
-    <p>Go to https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters and click <strong>Clusters</strong> -&gt; <strong>Create Cluster</strong></p>
+    <p>Go to <a href="https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters" target="_blank_">https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters</a> and click <strong>Clusters</strong> -&gt; <strong>Create Cluster</strong></p>
   </li>
   <li>
     <p>Cluster name = <code class="highlighter-rouge">my-first-cluster</code>, Model = <code class="highlighter-rouge">On-Demand Instance</code>, Instance Type = <code class="highlighter-rouge">m3.medium</code>, Number of instances = <code class="highlighter-rouge">2</code>, VPC = <code class="highlighter-rouge">Default VPC</code>, Subnets = <code class="highlighter-rouge">us-east-1a, us-east-1b</code>, Security Group = <code class="highlighter-rouge">Default</code>. Leave other settings as-is. Click <strong>Create</strong>.</p>
   </li>
   <li>
-    <p>View the cluster here - https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/my-first-cluster/services. Check out the <strong>ECS Instances</strong> tab and you’ll notice the 2 EC2 instances running in there in different AZs. They’re m3.mediums - do not get shocked seeing 1024 CPU. They are running AWS ECS agent as well as the Docker agent, as you can tell from the <strong>Agent Version</strong> and <strong>Docker Version</strong> columns.</p>
+    <p>View the cluster here - <a href="https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/my-first-cluster/services" target="_blank_">https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/my-first-cluster/services</a>. Check out the <strong>ECS Instances</strong> tab and you’ll notice the 2 EC2 instances running in there in different AZs. They’re m3.mediums - do not get shocked seeing 1024 CPU. They are running AWS ECS agent as well as the Docker agent, as you can tell from the <strong>Agent Version</strong> and <strong>Docker Version</strong> columns.</p>
   </li>
 </ul>
 
@@ -426,7 +426,7 @@
     <p>Click <strong>Advanced Container Configuration</strong> - CPU Units = <code class="highlighter-rouge">1</code>, Essential = <code class="highlighter-rouge">true</code>, and leave the rest of the settings as-is. Click <strong>Add</strong>. On the Task Definition page, click <strong>Create</strong> after verifying the newly added container shows up. Notice there can be multiple, different containers per task.</p>
   </li>
   <li>
-    <p>Now you should see https://console.aws.amazon.com/ecs/home?region=us-east-1#/taskDefinitions/my-first-task-definition/1 where there is an option to create a new revision, and an <strong>Actions</strong> drop down.</p>
+    <p>Now you should see <a href="https://console.aws.amazon.com/ecs/home?region=us-east-1#/taskDefinitions/my-first-task-definition/1" target="_blank_">https://console.aws.amazon.com/ecs/home?region=us-east-1#/taskDefinitions/my-first-task-definition/1</a> where there is an option to create a new revision, and an <strong>Actions</strong> drop down.</p>
   </li>
 </ul>
 
@@ -443,7 +443,7 @@
     <p>Now we will associate this service with a Load Balancer. Like I mentioned earlier, <em>Classic Load Balancer</em> will not work, so we have to create an <em>Application Load Balancer</em>.</p>
   </li>
   <li>
-    <p>Leave the service tab we’re in. Open up a new tab, and point to the EC2 Console https://console.aws.amazon.com/ec2/v2/home?region=us-east-1#LoadBalancers</p>
+    <p>Leave the service tab we’re in. Open up a new tab, and point to the EC2 Console <a href="https://console.aws.amazon.com/ec2/v2/home?region=us-east-1#LoadBalancers" target="_blank_">https://console.aws.amazon.com/ec2/v2/home?region=us-east-1#LoadBalancers</a></p>
   </li>
   <li>
     <p>Click <strong>Create Load Balancer</strong> and pick <strong>Application Load Balancer</strong>.</p>
@@ -481,13 +481,13 @@
 
 <ul>
   <li>
-    <p>To view the cluster, go to this URL - https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/my-first-cluster/services. You’ll be able to click the ECS Instances Tab to check how the containers are distributed across the cluster (2 and 3).</p>
+    <p>To view the cluster, go to this URL - <a href="https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/my-first-cluster/services" target="_blank_">https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/my-first-cluster/services</a>. You’ll be able to click the ECS Instances Tab to check how the containers are distributed across the cluster (2 and 3).</p>
   </li>
   <li>
-    <p>To verify, go to the ALB https://us-east-1.console.aws.amazon.com/ec2/v2/home?region=us-east-1#LoadBalancers: and click on <code class="highlighter-rouge">my-first-ecs-lb</code>. From the description tab, copy the <strong>DNS Name</strong>, and paste it in the browser. You should see the Tomcat welcome page.</p>
+    <p>To verify, go to the ALB <a href="https://us-east-1.console.aws.amazon.com/ec2/v2/home?region=us-east-1#LoadBalancers" target="_blank_">https://us-east-1.console.aws.amazon.com/ec2/v2/home?region=us-east-1#LoadBalancers</a> and click on <code class="highlighter-rouge">my-first-ecs-lb</code>. From the description tab, copy the <strong>DNS Name</strong>, and paste it in the browser. You should see the Tomcat welcome page.</p>
   </li>
   <li>
-    <p>Feel free to play around with this setup, including setting up autoscaling for the service. The service console can be found here https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/my-first-cluster/services/my-first-service/tasks</p>
+    <p>Feel free to play around with this setup, including setting up autoscaling for the service. The service console can be found here <a href="https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/my-first-cluster/services/my-first-service/tasks" target="_blank_">https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/my-first-cluster/services/my-first-service/tasks</a></p>
   </li>
 </ul>
 
@@ -502,16 +502,16 @@
     <p>To stop all containers and remove this service, click <strong>Update</strong>, and change the number of tasks from <code class="highlighter-rouge">5</code> to <code class="highlighter-rouge">0</code>. Click <strong>Update Service</strong>. You’ll immediately notice that the Tomcat Welcome Page no longer works. In fact, this update process deregisters the containers from the ALB and then begins to drain connections. So although the tasks will show up as running, the ALB DNS URL will return a 503. All of this action can be seen Under <strong>Events</strong> tab in the <strong>Service Detail</strong> page. The default draining time is <code class="highlighter-rouge">300 seconds</code>, so expect to wait that long.</p>
   </li>
   <li>
-    <p>Next, we delete the ALB. From the LB page, https://us-east-1.console.aws.amazon.com/ec2/v2/home?region=us-east-1#LoadBalancers:, select the LB and select <strong>Delete</strong> from the <strong>Actions</strong> drop down.</p>
+    <p>Next, we delete the ALB. From the LB page, <a href="https://us-east-1.console.aws.amazon.com/ec2/v2/home?region=us-east-1#LoadBalancers" target="_blank_">https://us-east-1.console.aws.amazon.com/ec2/v2/home?region=us-east-1#LoadBalancers</a>, select the LB and select <strong>Delete</strong> from the <strong>Actions</strong> drop down.</p>
   </li>
   <li>
-    <p>Now we delete the target group we had created. On the target groups page at https://us-east-1.console.aws.amazon.com/ec2/v2/home?region=us-east-1#TargetGroups:, select <code class="highlighter-rouge">my-first-ecs-tg</code> and pick <strong>Delete</strong> from the <strong>Actions</strong> dropdown.</p>
+    <p>Now we delete the target group we had created. On the target groups page at <a href="https://us-east-1.console.aws.amazon.com/ec2/v2/home?region=us-east-1#TargetGroups" target="_blank_">https://us-east-1.console.aws.amazon.com/ec2/v2/home?region=us-east-1#TargetGroups</a>, select <code class="highlighter-rouge">my-first-ecs-tg</code> and pick <strong>Delete</strong> from the <strong>Actions</strong> dropdown.</p>
   </li>
   <li>
-    <p>Next, we delete the service. Come back to the service page at https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/my-first-cluster/services/my-first-service/tasks and click <strong>Delete</strong></p>
+    <p>Next, we delete the service. Come back to the service page at <a href="https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/my-first-cluster/services/my-first-service/tasks" target="_blank_">https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/my-first-cluster/services/my-first-service/tasks</a> and click <strong>Delete</strong></p>
   </li>
   <li>
-    <p>Finally, we delete the cluster. Go to cluster page at https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/my-first-cluster/services and click <strong>Delete Cluster</strong>. Verify by going to EC2 Console that the EC2 hosts are terminated.</p>
+    <p>Finally, we delete the cluster. Go to cluster page at <a href="https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/my-first-cluster/services" target="_blank_">https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/my-first-cluster/services</a> and click <strong>Delete Cluster</strong>. Verify by going to EC2 Console that the EC2 hosts are terminated.</p>
   </li>
 </ul>
 
