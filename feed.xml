@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-08-24T13:55:42-07:00</updated>
+  <updated>2017-09-30T23:16:37-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -25,6 +25,247 @@
     </author>
   
 
+  
+  
+    <entry>
+      
+      <title type="html">AWS KMS and Envelope Encryption</title>
+      
+      <link href="https://lobster1234.github.io/2017/09/29/aws-kms-envelope-encryption/" rel="alternate" type="text/html" title="AWS KMS and Envelope Encryption" />
+      <published>2017-09-29T23:44:37-07:00</published>
+      <updated>2017-09-29T23:44:37-07:00</updated>
+      <id>https://lobster1234.github.io/2017/09/29/aws-kms-envelope-encryption</id>
+      <content type="html" xml:base="https://lobster1234.github.io/2017/09/29/aws-kms-envelope-encryption/">&lt;p&gt;Every service needs encryption at one point or another - passwords to the database, credentials to an external service, or even entire filesystem or files. Sticking the secrets, or keys in configuration files seems a quick and easy option. However, it carries security risks, even if these configurations are managed outside of the source code. On top of it, the keys used to encrypt/decrypt the data bring additional security implications and requirements in terms of storage, audit, and lifecycle management.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://aws.amazon.com/kms/&quot;&gt;AWS KMS&lt;/a&gt;, or AWS Key Management Service is a fully managed service to store and manage keys. Any AWS service which supports encryption - S3 buckets, EBS Volumes, SQS, etc. uses KMS under the hood. KMS is more than just a key manager, it can also be used to encrypt large volumes of data, using a technique called Envelope Encryption.&lt;/p&gt;
+
+&lt;p&gt;In this post I will cover KMS, and the &lt;em&gt;why&lt;/em&gt;, &lt;em&gt;what&lt;/em&gt;, and &lt;em&gt;how&lt;/em&gt; of Envelope Encryption.&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;p&gt;An ideal key management system should be highly available, control access to the master key(s), audit the key(s) usage, manage key(s) lifecycle. This becomes all the more important with microservices, as the number of such secrets can grow to a large number, if the services being composed to offer a functionality all need their own secrets.&lt;/p&gt;
+
+&lt;h2 id=&quot;setup&quot;&gt;Setup&lt;/h2&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Access to &lt;a href=&quot;https://console.aws.amazon.com/console/home&quot;&gt;AWS Console&lt;/a&gt; (optional, but preferred)&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://aws.amazon.com/cli/&quot;&gt;AWS CLI&lt;/a&gt; which is configured with credentials that allow for &lt;code class=&quot;highlighter-rouge&quot;&gt;AWSKeyManagementServicePowerUser&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/awslabs/aws-shell&quot;&gt;AWS Shell&lt;/a&gt;, which I prefer over using the CLI&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;openssl&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;base64&lt;/code&gt; commands (I am using a Mac OSX Sierra)&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;aws-kms&quot;&gt;AWS KMS&lt;/h2&gt;
+
+&lt;p&gt;KMS keys are referred to as CMKs (Customer Master Keys) are then used to encrypt and decrypt data. Customers can also choose to upload their own keys to KMS. As mentioned above, AWS uses KMS to manage keys for it’s own services. These keys are called AWS-managed CMKs, as opposed to the ones created by the customer, called Customer-Managed CMKs. Customer-Managed CMKs can be used for AWS services if customers want greater control over key-rotations, etc. KMS provides &lt;a href=&quot;https://en.wikipedia.org/wiki/Symmetric-key_algorithm&quot;&gt;symmetric encryption&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;If you have, in the past, used any AWS service with encryption, AWS has created CMKs for it. To check it out, log in to the AWS Console, and click &lt;code class=&quot;highlighter-rouge&quot;&gt;Encryption keys&lt;/code&gt; under &lt;code class=&quot;highlighter-rouge&quot;&gt;IAM&lt;/code&gt; to see the AWS Managed Keys.&lt;/p&gt;
+
+&lt;p&gt;This is what mine looks like -&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/kms-aws-managed.png&quot; alt=&quot;kms-2&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The keys are region specific, so you may want to pick different regions to see the CMKs in those regions.&lt;/p&gt;
+
+&lt;p&gt;The CMKs can never be retrieved or seen in plaintext.&lt;/p&gt;
+
+&lt;p&gt;Data should be only decrypted &lt;em&gt;where&lt;/em&gt; it is needed, not at some server and then transmitted over unencrypted. IAM policies control who can encrypt and/or decrypt using the CMKs, and these policies can a be part of IAM roles associated with AWS resources. IAM policies also control who can administer the CMKs.&lt;/p&gt;
+
+&lt;p&gt;KMS can be used to decrypt/encrypt up to 4KB of data. This begs the question - how does AWS manage to encrypt EBS volumes and large S3 files with KMS? The answer is - &lt;a href=&quot;http://docs.aws.amazon.com/kms/latest/developerguide/workflow.html&quot;&gt;Envelope Encryption&lt;/a&gt;. The CMKs can be used to generate a different type of keys called data keys, which can then be used to encrypt/decrypt data. However, the data keys, when generated, are returned in plain-text, and AWS does not store or manage them. It is up to the customer to store and use the data keys on their own.&lt;/p&gt;
+
+&lt;h2 id=&quot;envelope-encryption&quot;&gt;Envelope Encryption&lt;/h2&gt;
+
+&lt;p&gt;Here are the steps to implement Envelope Encryption  -&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Create a new CMK, or re-use an existing CMK. This can be done the AWS Console, or with CLI using &lt;a href=&quot;http://docs.aws.amazon.com/cli/latest/reference/kms/create-key.html&quot;&gt;create-key&lt;/a&gt;.&lt;/li&gt;
+  &lt;li&gt;Use &lt;a href=&quot;http://docs.aws.amazon.com/cli/latest/reference/kms/generate-data-key.html&quot;&gt;generate-data-key&lt;/a&gt; to get a data key.&lt;/li&gt;
+  &lt;li&gt;This returns the plain text data key, and also an encrypted (with the specified CMK) version of the data key. The encrypted version is referred to as a CipherTextBlob. Store the returned CipherTextBlob (we will need it later). This CipherTextBlob has metadata which tells KMS which CMK was used to generate it. Store this CipherTextBlob.&lt;/li&gt;
+  &lt;li&gt;Use the plain-text data key to encrypt any amount of data.&lt;/li&gt;
+  &lt;li&gt;Throw away the plain-text data key, but be sure to store the CipherTextBlob along side the encrypted data.&lt;/li&gt;
+  &lt;li&gt;To decrypt, use the &lt;a href=&quot;http://docs.aws.amazon.com/kms/latest/APIReference/API_Decrypt.html&quot;&gt;Decrypt API&lt;/a&gt;, sending it the CipherTextBlob from step (3).&lt;/li&gt;
+  &lt;li&gt;The above step will return the plain text data key (the same one we threw away). Use this key to decrypt the data.&lt;/li&gt;
+  &lt;li&gt;Throw away the plain-text data key.&lt;/li&gt;
+  &lt;li&gt;To encrypt more data, repeat steps 6, 7, 8 except use the plain text key to &lt;strong&gt;encrypt&lt;/strong&gt; instead of &lt;strong&gt;decrypt&lt;/strong&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;It is very important to note that KMS has no record of the data key. It is us who are managing the data key. If you were to throw away the CipherTextBlob after deleting the plain text key, the encrypted data can NEVER be decrypted.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p style=&quot;text-align: center&quot;&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/envelope_encryption.png&quot; alt=&quot;kms-1&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;!--more--&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;envelope-encryption-with-cli&quot;&gt;Envelope Encryption with CLI&lt;/h2&gt;
+
+&lt;p&gt;I am using AWS Shell here, but you may use AWS CLI just as easily. You’d need to prefix all commands with &lt;code class=&quot;highlighter-rouge&quot;&gt;aws&lt;/code&gt; if so.&lt;/p&gt;
+
+&lt;p&gt;In the steps below, AWS Shell has the prompt &lt;code class=&quot;highlighter-rouge&quot;&gt;aws&amp;gt;&lt;/code&gt;, while terminal shell has the prompt &lt;code class=&quot;highlighter-rouge&quot;&gt;$&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Also, in real life situations, CMKs should not be created willy-nilly, and should have IAM policies associated with them to restrict who can manage, and use them.&lt;/p&gt;
+
+&lt;h4 id=&quot;1-create-a-new-cmk-proceed-to-step-3-if-you-already-have-a-cmk-that-youd-want-to-use&quot;&gt;1. Create a new CMK (proceed to step 3 if you already have a CMK that you’d want to use)&lt;/h4&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; kms create-key --description &quot;This is our master key&quot;
+{
+    &quot;KeyMetadata&quot;: {
+        &quot;Origin&quot;: &quot;AWS_KMS&quot;,
+        &quot;KeyId&quot;: &quot;30f0d765-d120-41ab-b078-************&quot;,
+        &quot;Description&quot;: &quot;This is our master key&quot;,
+        &quot;KeyManager&quot;: &quot;CUSTOMER&quot;,
+        &quot;Enabled&quot;: true,
+        &quot;KeyUsage&quot;: &quot;ENCRYPT_DECRYPT&quot;,
+        &quot;KeyState&quot;: &quot;Enabled&quot;,
+        &quot;CreationDate&quot;: 1506814355.941,
+        &quot;Arn&quot;: &quot;arn:aws:kms:us-east-1:************:key/30f0d765-d120-41ab-b078-************&quot;,
+        &quot;AWSAccountId&quot;: &quot;************&quot;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h4 id=&quot;2-create-an-alias-for-this-key-optional---i-prefer-using-aliases-over-key-ids&quot;&gt;2. Create an alias for this key (optional) - I prefer using aliases over key IDs.&lt;/h4&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; kms create-alias --target-key-id 30f0d765-d120-41ab-b078-************ --alias-name &quot;alias/our-master-key&quot;
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h4 id=&quot;3-get-data-key&quot;&gt;3. Get Data Key&lt;/h4&gt;
+
+&lt;p&gt;Now that we have the CMK, let’s create a data key using this CMK. We will use AES_256, which will use AES to generate a 256-bit data key. You can see how aliasing the CMK is relatively handy than using the key-id.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; kms generate-data-key --key-id alias/our-master-key --key-spec AES_256
+{
+    &quot;Plaintext&quot;: &quot;************2abcgdF4rWGaG54esFdaNnfTWBXezcU=&quot;,
+    &quot;KeyId&quot;: &quot;arn:aws:kms:us-east-1:************:key/30f0d765-d120-41ab-b078-************&quot;,
+    &quot;CipherTextBlob&quot;: &quot;******************************rP1R8rH5AgbwKqWvkXdAHHltn9RJtKSH/XCI5vPSjdOgGx2TYb7p2jjsTCgcOV65rODtZ7TDqpOL+bw==&quot;
+}
+aws&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;The key-id returned here is &lt;strong&gt;not&lt;/strong&gt; of the data key, but of the CMK. Remember, KMS has no record of any data keys it generates.&lt;/p&gt;
+
+&lt;h4 id=&quot;4-encrypt-data&quot;&gt;4. Encrypt Data&lt;/h4&gt;
+
+&lt;p&gt;We store the &lt;code class=&quot;highlighter-rouge&quot;&gt;CipherTextBlob&lt;/code&gt;, and use the &lt;code class=&quot;highlighter-rouge&quot;&gt;Plaintext&lt;/code&gt; to encrypt some data. You can use any programming language of your choice to do so. This is where it gets interesting. The blob as well as the key and CipherTextBlob is all &lt;code class=&quot;highlighter-rouge&quot;&gt;base64&lt;/code&gt; encoded. They need to be decoded before they can be put to any use. I will use &lt;code class=&quot;highlighter-rouge&quot;&gt;base64&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;openssl&lt;/code&gt;.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;This is not how real production usage will be. While I am using a simple string to demo encryption/decryption using data keys, in the real world this would be happening on entire databases and giant filesystems.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;First, we base64 &lt;em&gt;decode&lt;/em&gt; our plaintext key and store it in a file. In this example I am using a &lt;code class=&quot;highlighter-rouge&quot;&gt;tmp&lt;/code&gt; folder in my home directory.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ echo '************2abcgdF4rWGaG54esFdaNnfTWBXezcU=' | base64 --decode &amp;gt; ~/tmp/plaintext_key_decoded.txt
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;We have now decoded the base64 plain text key as &lt;code class=&quot;highlighter-rouge&quot;&gt;~/tmp/plaintext_key_decoded.txt&lt;/code&gt; file. Next, we encrypt a simple string, &lt;code class=&quot;highlighter-rouge&quot;&gt;Hello World&lt;/code&gt; using &lt;code class=&quot;highlighter-rouge&quot;&gt;openssl&lt;/code&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ echo &quot;Hello World!&quot;  | openssl enc -e -aes256 -k fileb://Users/mpandit/tmp/plaintext_key_decoded.txt &amp;gt; ~/tmp/encrypted.txt
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Here, we are encrypting &lt;code class=&quot;highlighter-rouge&quot;&gt;Hello World!&lt;/code&gt; using &lt;code class=&quot;highlighter-rouge&quot;&gt;openssl&lt;/code&gt; command line, using the decoded key that we had saved in a file. We are saving the result of this encryption in &lt;code class=&quot;highlighter-rouge&quot;&gt;~/tmp/encrypted.txt&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Next, we delete the plain text key, while making sure we have the base64 decoded CipherTextBlob stored.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ rm ~/tmp/plaintext_key_decoded.txt
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h4 id=&quot;5-decrypt-data&quot;&gt;5. Decrypt Data&lt;/h4&gt;
+
+&lt;p&gt;Just like the plain text key, the CipherTextBlob is also base64 encoded. Let us decode that and store that as well. We will need this later on to decrypt the data we have encrypted.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;echo '*****************************rP1R8rH5AgbwKqWvkXdAHHltn9RJtKSH/X3Q9VNjCgcOV65rODtZ7TDqMUmgPcZzwaiPSDXrv/ZBr4+safgompOL+bw==' | base64 --decode &amp;gt; ~/tmp/ciphertext_blob_decoded.txt
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Now we are ready to decrypt the encrypted data. Since we have deleted the plain text data key just like we should, we will ask KMS to give us the plain text data key by decrypting the CipherTextBlob.&lt;/p&gt;
+
+&lt;p&gt;Since the CipherTextBlob contains metadata, we do not need to tell KMS any information about the CMK that was used to encrypt the data key.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; kms decrypt --ciphertext-blob fileb:///Users/mpandit/tmp/ciphertext_blob_decoded.txt
+{
+    &quot;Plaintext&quot;: &quot;************2abcgdF4rWGaG54esFdaNnfTWBXezcU=&quot;,
+    &quot;KeyId&quot;: &quot;arn:aws:kms:us-east-1:************:key/30f0d765-d120-41ab-b078-************&quot;,
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;KMS has given our plain text key back. Let us use openssl to decrypt our encrypted data. We go through the same exercise of base64 decoding the plain text key before we can use it with &lt;code class=&quot;highlighter-rouge&quot;&gt;openssl&lt;/code&gt;. We use the same filename to keep things simple. Also I am too lazy, so copy-paste helps.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ echo '************2abcgdF4rWGaG54esFdaNnfTWBXezcU=' | base64 --decode &amp;gt; ~/tmp/plaintext_key_decoded.txt
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Next, we pass this to &lt;code class=&quot;highlighter-rouge&quot;&gt;openssl&lt;/code&gt;, this time to &lt;em&gt;decrypt&lt;/em&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ cat ~/tmp/encrypted.txt  | openssl enc -d -aes256 -k fileb://Users/mpandit/tmp/plaintext_key_decoded.txt
+Hello World!
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;And we get our encrypted data decrypted. In the real world, this same process happens at a much larger scale. Like encrypting EBS Volumes, S3 files, or even local storage outside of AWS. Also, these steps can be integrated in code using the crypto libraries available for the programming language being used.&lt;/p&gt;
+
+&lt;h4 id=&quot;6-audit-trail&quot;&gt;6. Audit Trail&lt;/h4&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://aws.amazon.com/cloudtrail/&quot;&gt;AWS CloudTrail&lt;/a&gt; will show the usage log of the CMKs. &lt;strong&gt;This will not show up on the event log on the console, but in the raw json files that CloudTrail is configured to write to.&lt;/strong&gt; This is used to audit the CMK usage.&lt;/p&gt;
+
+&lt;h3 style=&quot;text-align: center&quot; id=&quot;comments&quot;&gt;Comments&lt;/h3&gt;
+
+&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = &quot;https://lobster1234.github.io/2017/09/29/aws-kms-envelope-encryption/&quot;;  
+this.page.identifier = &quot;/2017/09/29/aws-kms-envelope-encryption&quot;;
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://lobster1234.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+&lt;/script&gt;
+
+&lt;noscript&gt;Please enable JavaScript to view the &lt;a href=&quot;https://disqus.com/?ref_noscript&quot;&gt;comments powered by Disqus.&lt;/a&gt;&lt;/noscript&gt;
+
+&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+
+
+      
+
+&lt;/script&gt;</content>
+
+      
+      
+      
+      
+      
+
+      
+        <author>
+            <name>Manish Pandit</name>
+          
+          
+        </author>
+      
+
+      
+        <category term="aws" />
+      
+
+      
+
+      
+        <summary type="html">Every service needs encryption at one point or another - passwords to the database, credentials to an external service, or even entire filesystem or files. Sticking the secrets, or keys in configuration files seems a quick and easy option. However, it carries security risks, even if these configurations are managed outside of the source code. On top of it, the keys used to encrypt/decrypt the data bring additional security implications and requirements in terms of storage, audit, and lifecycle management. AWS KMS, or AWS Key Management Service is a fully managed service to store and manage keys. Any AWS service which supports encryption - S3 buckets, EBS Volumes, SQS, etc. uses KMS under the hood. KMS is more than just a key manager, it can also be used to encrypt large volumes of data, using a technique called Envelope Encryption. In this post I will cover KMS, and the why, what, and how of Envelope Encryption.</summary>
+      
+
+      
+      
+    </entry>
+  
   
   
     <entry>
@@ -4552,121 +4793,6 @@ aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.co
 
       
         <summary type="html">Here is the problem statement. Print YES if the brackets in a given string are balanced, else print NO. Here is my O(N) submission to the challenge.</summary>
-      
-
-      
-      
-    </entry>
-  
-  
-  
-    <entry>
-      
-      <title type="html">Multitenant MySQL Setup</title>
-      
-      <link href="https://lobster1234.github.io/2016/11/03/multitenant-mysql/" rel="alternate" type="text/html" title="Multitenant MySQL Setup" />
-      <published>2016-11-03T10:05:22-07:00</published>
-      <updated>2016-11-03T10:05:22-07:00</updated>
-      <id>https://lobster1234.github.io/2016/11/03/multitenant-mysql</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2016/11/03/multitenant-mysql/">&lt;p&gt;It is much easier to make API/code multi-tenant, but it is a different story for databases. This problem exists at pretty much all SaaS based solutions, intending to provide data and service level isolation for many users/customers while trying to keep the code + database scalable. However, here are a few strategies that can be employed, based on the pros/cons and the freedom/constraints driving the solution.&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;h2 id=&quot;use-a-tenant_id-for-each-record&quot;&gt;Use a tenant_id for each record&lt;/h2&gt;
-
-&lt;h4 id=&quot;how&quot;&gt;How&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;Single database running on single instance&lt;/li&gt;
-  &lt;li&gt;Every record has a &lt;code class=&quot;highlighter-rouge&quot;&gt;tenant_id&lt;/code&gt; as a part of the composite primary key.&lt;/li&gt;
-  &lt;li&gt;Application will need to provide this &lt;code class=&quot;highlighter-rouge&quot;&gt;tenant_id&lt;/code&gt; for every query as a part of the where clause&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&quot;pros&quot;&gt;Pros&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;One database, one instance&lt;/li&gt;
-  &lt;li&gt;Relatively easy to run cross-tenant queries&lt;/li&gt;
-  &lt;li&gt;Relatively easier to manage and apply schema updates&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&quot;cons&quot;&gt;Cons&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;No db level isolation of tenant data&lt;/li&gt;
-  &lt;li&gt;No option to support schema changes specific to a tenant&lt;/li&gt;
-  &lt;li&gt;Imbalance of tenants can adversely affect the DB performance, creating hotspots&lt;/li&gt;
-  &lt;li&gt;The sheer size and operation frequency increases the chances of db file corruption&lt;/li&gt;
-  &lt;li&gt;Will hit the file system size limits&lt;/li&gt;
-  &lt;li&gt;Trust the developer to provide the additional where condition&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;put-every-tenant-in-a-separate-db-same-instance&quot;&gt;Put every tenant in a separate db, same instance&lt;/h2&gt;
-
-&lt;h4 id=&quot;how-1&quot;&gt;How&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;Every tenant gets his schema, but runs under the same physical database server&lt;/li&gt;
-  &lt;li&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;tenant_id&lt;/code&gt; becomes the db name, so the queries do not change, but the connection string changes.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&quot;pros-1&quot;&gt;Pros&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;Managable dataset size per tenant&lt;/li&gt;
-  &lt;li&gt;Better control of any schema changes specific to a tenant, if needed.&lt;/li&gt;
-  &lt;li&gt;DB level isolation of tenant data&lt;/li&gt;
-  &lt;li&gt;Easier to roll out tenant specific code release as other tenants wont be affected by schema changes if the app servers are deployed separately per tenant.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&quot;cons-1&quot;&gt;Cons&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;Will need to apply schema changes to all such DBs, making coordination of code changes harder if dedicated app servers talk to the db.&lt;/li&gt;
-  &lt;li&gt;Will hit the system file size limits, as it is still 1 physical file&lt;/li&gt;
-  &lt;li&gt;The fact that there is only 1 physical file, there could be IO contention just like 1 db per instance&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;put-every-tenant-in-its-own-instance&quot;&gt;Put every tenant in its own instance&lt;/h2&gt;
-
-&lt;h4 id=&quot;how-2&quot;&gt;How&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;Every tenant gets a provisioned hardware mysql instance&lt;/li&gt;
-  &lt;li&gt;The code will need to use separate connection strings, no impact to SQL&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&quot;pros-2&quot;&gt;Pros&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;Complete physical isolation of tenant data&lt;/li&gt;
-  &lt;li&gt;Control of the DB instance size based on the load exerted by the tenant&lt;/li&gt;
-  &lt;li&gt;Predictable Disk IO performance, due to isolation of data usage patterns&lt;/li&gt;
-  &lt;li&gt;Can have customized DB schema changes to a tenant&lt;/li&gt;
-  &lt;li&gt;Easier to roll out tenant specific code release (if dedicated app servers talk to a specific db)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&quot;cons-2&quot;&gt;Cons&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;Each tenant DB instance is $$&lt;/li&gt;
-  &lt;li&gt;The cost quickly adds up with secondaries (standby) and read replicas if needed&lt;/li&gt;
-  &lt;li&gt;Same challenge with DB schema updates across all tenants&lt;/li&gt;
-&lt;/ul&gt;</content>
-
-      
-      
-      
-      
-      
-
-      
-        <author>
-            <name>Manish Pandit</name>
-          
-          
-        </author>
-      
-
-      
-        <category term="databases" />
-      
-
-      
-
-      
-        <summary type="html">It is much easier to make API/code multi-tenant, but it is a different story for databases. This problem exists at pretty much all SaaS based solutions, intending to provide data and service level isolation for many users/customers while trying to keep the code + database scalable. However, here are a few strategies that can be employed, based on the pros/cons and the freedom/constraints driving the solution.</summary>
       
 
       

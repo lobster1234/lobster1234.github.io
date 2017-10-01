@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  
+  
+  <title>AWS KMS and Envelope Encryption</title>
+  <meta name="description" content="Every service needs encryption at one point or another - passwords to the database, credentials to an external service, or even entire filesystem or files. Sticking the secrets, or keys in configuration files seems a quick and easy option. However, it carries security risks, even if these configurations are managed outside of the source code. On top of it, the keys used to encrypt/decrypt the data bring additional security implications and requirements in terms of storage, audit, and lifecycle management. AWS KMS, or AWS Key Management Service is a fully managed service to store and manage keys. Any AWS service which supports encryption - S3 buckets, EBS Volumes, SQS, etc. uses KMS under the hood. KMS is more than just a key manager, it can also be used to encrypt large volumes of data, using a technique called Envelope Encryption. In this post I will cover KMS, and the why, what, and how of Envelope Encryption.">
+  <meta name="keywords" content="aws, kms, security, key-management-service, envelope-encryption">
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="https://lobster1234.github.io/2017/09/29/aws-kms-envelope-encryption/">
+  
+  
+  <link rel="alternate" type="application/rss+xml" title="Manish Pandit&#39;s Blog" href="https://lobster1234.github.io/feed.xml">
+
+  
+
+  
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="lobster1234">
+  <meta name="twitter:title" content="AWS KMS and Envelope Encryption">
+  <meta name="twitter:description" content="Every service needs encryption at one point or another - passwords to the database, credentials to an external service, or even entire filesystem or files. Sticking the secrets, or keys in configur...">
+  
+    <meta name="twitter:creator" content="lobster1234">
+  
+  
+
+  <script type="text/javascript">
+  WebFontConfig = {
+    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
+  };
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+  })();
+</script>
+
+  
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-96931340-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+
+  <!-- Begin Jekyll SEO tag v2.2.0 -->
+<title>AWS KMS and Envelope Encryption | Manish Pandit’s Blog</title>
+<meta property="og:title" content="AWS KMS and Envelope Encryption" />
+<meta name="author" content="Manish Pandit" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Every service needs encryption at one point or another - passwords to the database, credentials to an external service, or even entire filesystem or files. Sticking the secrets, or keys in configuration files seems a quick and easy option. However, it carries security risks, even if these configurations are managed outside of the source code. On top of it, the keys used to encrypt/decrypt the data bring additional security implications and requirements in terms of storage, audit, and lifecycle management. AWS KMS, or AWS Key Management Service is a fully managed service to store and manage keys. Any AWS service which supports encryption - S3 buckets, EBS Volumes, SQS, etc. uses KMS under the hood. KMS is more than just a key manager, it can also be used to encrypt large volumes of data, using a technique called Envelope Encryption. In this post I will cover KMS, and the why, what, and how of Envelope Encryption." />
+<meta property="og:description" content="Every service needs encryption at one point or another - passwords to the database, credentials to an external service, or even entire filesystem or files. Sticking the secrets, or keys in configuration files seems a quick and easy option. However, it carries security risks, even if these configurations are managed outside of the source code. On top of it, the keys used to encrypt/decrypt the data bring additional security implications and requirements in terms of storage, audit, and lifecycle management. AWS KMS, or AWS Key Management Service is a fully managed service to store and manage keys. Any AWS service which supports encryption - S3 buckets, EBS Volumes, SQS, etc. uses KMS under the hood. KMS is more than just a key manager, it can also be used to encrypt large volumes of data, using a technique called Envelope Encryption. In this post I will cover KMS, and the why, what, and how of Envelope Encryption." />
+<link rel="canonical" href="https://lobster1234.github.io/2017/09/29/aws-kms-envelope-encryption/" />
+<meta property="og:url" content="https://lobster1234.github.io/2017/09/29/aws-kms-envelope-encryption/" />
+<meta property="og:site_name" content="Manish Pandit’s Blog" />
+<meta property="og:image" content="https://lobster1234.github.io/assets/envelope_encryption.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2017-09-29T23:44:37-07:00" />
+<script type="application/ld+json">
+{"@context": "http://schema.org",
+"@type": "BlogPosting",
+"headline": "AWS KMS and Envelope Encryption",
+"author": {"@type": "Person",
+"name": "Manish Pandit"},
+"image": "https://lobster1234.github.io/assets/envelope_encryption.png",
+"datePublished": "2017-09-29T23:44:37-07:00",
+"description": "Every service needs encryption at one point or another - passwords to the database, credentials to an external service, or even entire filesystem or files. Sticking the secrets, or keys in configuration files seems a quick and easy option. However, it carries security risks, even if these configurations are managed outside of the source code. On top of it, the keys used to encrypt/decrypt the data bring additional security implications and requirements in terms of storage, audit, and lifecycle management. AWS KMS, or AWS Key Management Service is a fully managed service to store and manage keys. Any AWS service which supports encryption - S3 buckets, EBS Volumes, SQS, etc. uses KMS under the hood. KMS is more than just a key manager, it can also be used to encrypt large volumes of data, using a technique called Envelope Encryption. In this post I will cover KMS, and the why, what, and how of Envelope Encryption.",
+"mainEntityOfPage": {"@type": "WebPage",
+"@id": "https://lobster1234.github.io/2017/09/29/aws-kms-envelope-encryption/"},
+"url": "https://lobster1234.github.io/2017/09/29/aws-kms-envelope-encryption/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Home</a>
+
+    <nav class="site-nav">
+      
+        
+        <a class="page-link" href="/about/">About</a>
+      
+        
+        <a class="page-link" href="/archives/">Archives</a>
+      
+        
+        <a class="page-link" href="https://www.twitter.com/lobster1234">Twitter</a>
+      
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    
+      <h1 class="post-title" itemprop="name headline">AWS KMS and Envelope Encryption</h1>
+    
+    <p class="post-meta"><time datetime="2017-09-29T23:44:37-07:00" itemprop="datePublished">Sep 29, 2017</time> • 
+  
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <a href="/categories/aws/">aws</a>
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>Every service needs encryption at one point or another - passwords to the database, credentials to an external service, or even entire filesystem or files. Sticking the secrets, or keys in configuration files seems a quick and easy option. However, it carries security risks, even if these configurations are managed outside of the source code. On top of it, the keys used to encrypt/decrypt the data bring additional security implications and requirements in terms of storage, audit, and lifecycle management.</p>
+
+<p><a href="https://aws.amazon.com/kms/">AWS KMS</a>, or AWS Key Management Service is a fully managed service to store and manage keys. Any AWS service which supports encryption - S3 buckets, EBS Volumes, SQS, etc. uses KMS under the hood. KMS is more than just a key manager, it can also be used to encrypt large volumes of data, using a technique called Envelope Encryption.</p>
+
+<p>In this post I will cover KMS, and the <em>why</em>, <em>what</em>, and <em>how</em> of Envelope Encryption.</p>
+
+<!--more-->
+
+<p>An ideal key management system should be highly available, control access to the master key(s), audit the key(s) usage, manage key(s) lifecycle. This becomes all the more important with microservices, as the number of such secrets can grow to a large number, if the services being composed to offer a functionality all need their own secrets.</p>
+
+<h2 id="setup">Setup</h2>
+
+<ol>
+  <li>Access to <a href="https://console.aws.amazon.com/console/home">AWS Console</a> (optional, but preferred)</li>
+  <li><a href="https://aws.amazon.com/cli/">AWS CLI</a> which is configured with credentials that allow for <code class="highlighter-rouge">AWSKeyManagementServicePowerUser</code></li>
+  <li><a href="https://github.com/awslabs/aws-shell">AWS Shell</a>, which I prefer over using the CLI</li>
+  <li><code class="highlighter-rouge">openssl</code> and <code class="highlighter-rouge">base64</code> commands (I am using a Mac OSX Sierra)</li>
+</ol>
+
+<h2 id="aws-kms">AWS KMS</h2>
+
+<p>KMS keys are referred to as CMKs (Customer Master Keys) are then used to encrypt and decrypt data. Customers can also choose to upload their own keys to KMS. As mentioned above, AWS uses KMS to manage keys for it’s own services. These keys are called AWS-managed CMKs, as opposed to the ones created by the customer, called Customer-Managed CMKs. Customer-Managed CMKs can be used for AWS services if customers want greater control over key-rotations, etc. KMS provides <a href="https://en.wikipedia.org/wiki/Symmetric-key_algorithm">symmetric encryption</a>.</p>
+
+<p>If you have, in the past, used any AWS service with encryption, AWS has created CMKs for it. To check it out, log in to the AWS Console, and click <code class="highlighter-rouge">Encryption keys</code> under <code class="highlighter-rouge">IAM</code> to see the AWS Managed Keys.</p>
+
+<p>This is what mine looks like -</p>
+
+<p><img src="https://lobster1234.github.io/assets/kms-aws-managed.png" alt="kms-2" /></p>
+
+<p>The keys are region specific, so you may want to pick different regions to see the CMKs in those regions.</p>
+
+<p>The CMKs can never be retrieved or seen in plaintext.</p>
+
+<p>Data should be only decrypted <em>where</em> it is needed, not at some server and then transmitted over unencrypted. IAM policies control who can encrypt and/or decrypt using the CMKs, and these policies can a be part of IAM roles associated with AWS resources. IAM policies also control who can administer the CMKs.</p>
+
+<p>KMS can be used to decrypt/encrypt up to 4KB of data. This begs the question - how does AWS manage to encrypt EBS volumes and large S3 files with KMS? The answer is - <a href="http://docs.aws.amazon.com/kms/latest/developerguide/workflow.html">Envelope Encryption</a>. The CMKs can be used to generate a different type of keys called data keys, which can then be used to encrypt/decrypt data. However, the data keys, when generated, are returned in plain-text, and AWS does not store or manage them. It is up to the customer to store and use the data keys on their own.</p>
+
+<h2 id="envelope-encryption">Envelope Encryption</h2>
+
+<p>Here are the steps to implement Envelope Encryption  -</p>
+
+<ol>
+  <li>Create a new CMK, or re-use an existing CMK. This can be done the AWS Console, or with CLI using <a href="http://docs.aws.amazon.com/cli/latest/reference/kms/create-key.html">create-key</a>.</li>
+  <li>Use <a href="http://docs.aws.amazon.com/cli/latest/reference/kms/generate-data-key.html">generate-data-key</a> to get a data key.</li>
+  <li>This returns the plain text data key, and also an encrypted (with the specified CMK) version of the data key. The encrypted version is referred to as a CipherTextBlob. Store the returned CipherTextBlob (we will need it later). This CipherTextBlob has metadata which tells KMS which CMK was used to generate it. Store this CipherTextBlob.</li>
+  <li>Use the plain-text data key to encrypt any amount of data.</li>
+  <li>Throw away the plain-text data key, but be sure to store the CipherTextBlob along side the encrypted data.</li>
+  <li>To decrypt, use the <a href="http://docs.aws.amazon.com/kms/latest/APIReference/API_Decrypt.html">Decrypt API</a>, sending it the CipherTextBlob from step (3).</li>
+  <li>The above step will return the plain text data key (the same one we threw away). Use this key to decrypt the data.</li>
+  <li>Throw away the plain-text data key.</li>
+  <li>To encrypt more data, repeat steps 6, 7, 8 except use the plain text key to <strong>encrypt</strong> instead of <strong>decrypt</strong>.</li>
+</ol>
+
+<blockquote>
+  <p>It is very important to note that KMS has no record of the data key. It is us who are managing the data key. If you were to throw away the CipherTextBlob after deleting the plain text key, the encrypted data can NEVER be decrypted.</p>
+</blockquote>
+
+<p style="text-align: center"><img src="https://lobster1234.github.io/assets/envelope_encryption.png" alt="kms-1" /></p>
+<p><!--more--></p>
+
+<h2 id="envelope-encryption-with-cli">Envelope Encryption with CLI</h2>
+
+<p>I am using AWS Shell here, but you may use AWS CLI just as easily. You’d need to prefix all commands with <code class="highlighter-rouge">aws</code> if so.</p>
+
+<p>In the steps below, AWS Shell has the prompt <code class="highlighter-rouge">aws&gt;</code>, while terminal shell has the prompt <code class="highlighter-rouge">$</code>.</p>
+
+<p>Also, in real life situations, CMKs should not be created willy-nilly, and should have IAM policies associated with them to restrict who can manage, and use them.</p>
+
+<h4 id="1-create-a-new-cmk-proceed-to-step-3-if-you-already-have-a-cmk-that-youd-want-to-use">1. Create a new CMK (proceed to step 3 if you already have a CMK that you’d want to use)</h4>
+<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; kms create-key --description "This is our master key"
+{
+    "KeyMetadata": {
+        "Origin": "AWS_KMS",
+        "KeyId": "30f0d765-d120-41ab-b078-************",
+        "Description": "This is our master key",
+        "KeyManager": "CUSTOMER",
+        "Enabled": true,
+        "KeyUsage": "ENCRYPT_DECRYPT",
+        "KeyState": "Enabled",
+        "CreationDate": 1506814355.941,
+        "Arn": "arn:aws:kms:us-east-1:************:key/30f0d765-d120-41ab-b078-************",
+        "AWSAccountId": "************"
+    }
+}
+</code></pre>
+</div>
+
+<h4 id="2-create-an-alias-for-this-key-optional---i-prefer-using-aliases-over-key-ids">2. Create an alias for this key (optional) - I prefer using aliases over key IDs.</h4>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; kms create-alias --target-key-id 30f0d765-d120-41ab-b078-************ --alias-name "alias/our-master-key"
+
+</code></pre>
+</div>
+
+<h4 id="3-get-data-key">3. Get Data Key</h4>
+
+<p>Now that we have the CMK, let’s create a data key using this CMK. We will use AES_256, which will use AES to generate a 256-bit data key. You can see how aliasing the CMK is relatively handy than using the key-id.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; kms generate-data-key --key-id alias/our-master-key --key-spec AES_256
+{
+    "Plaintext": "************2abcgdF4rWGaG54esFdaNnfTWBXezcU=",
+    "KeyId": "arn:aws:kms:us-east-1:************:key/30f0d765-d120-41ab-b078-************",
+    "CipherTextBlob": "******************************rP1R8rH5AgbwKqWvkXdAHHltn9RJtKSH/XCI5vPSjdOgGx2TYb7p2jjsTCgcOV65rODtZ7TDqpOL+bw=="
+}
+aws&gt;
+</code></pre>
+</div>
+<p>The key-id returned here is <strong>not</strong> of the data key, but of the CMK. Remember, KMS has no record of any data keys it generates.</p>
+
+<h4 id="4-encrypt-data">4. Encrypt Data</h4>
+
+<p>We store the <code class="highlighter-rouge">CipherTextBlob</code>, and use the <code class="highlighter-rouge">Plaintext</code> to encrypt some data. You can use any programming language of your choice to do so. This is where it gets interesting. The blob as well as the key and CipherTextBlob is all <code class="highlighter-rouge">base64</code> encoded. They need to be decoded before they can be put to any use. I will use <code class="highlighter-rouge">base64</code> and <code class="highlighter-rouge">openssl</code>.</p>
+
+<blockquote>
+  <p>This is not how real production usage will be. While I am using a simple string to demo encryption/decryption using data keys, in the real world this would be happening on entire databases and giant filesystems.</p>
+</blockquote>
+
+<p>First, we base64 <em>decode</em> our plaintext key and store it in a file. In this example I am using a <code class="highlighter-rouge">tmp</code> folder in my home directory.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>$ echo '************2abcgdF4rWGaG54esFdaNnfTWBXezcU=' | base64 --decode &gt; ~/tmp/plaintext_key_decoded.txt
+</code></pre>
+</div>
+<p>We have now decoded the base64 plain text key as <code class="highlighter-rouge">~/tmp/plaintext_key_decoded.txt</code> file. Next, we encrypt a simple string, <code class="highlighter-rouge">Hello World</code> using <code class="highlighter-rouge">openssl</code>.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ echo "Hello World!"  | openssl enc -e -aes256 -k fileb://Users/mpandit/tmp/plaintext_key_decoded.txt &gt; ~/tmp/encrypted.txt
+</code></pre>
+</div>
+<p>Here, we are encrypting <code class="highlighter-rouge">Hello World!</code> using <code class="highlighter-rouge">openssl</code> command line, using the decoded key that we had saved in a file. We are saving the result of this encryption in <code class="highlighter-rouge">~/tmp/encrypted.txt</code>.</p>
+
+<p>Next, we delete the plain text key, while making sure we have the base64 decoded CipherTextBlob stored.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ rm ~/tmp/plaintext_key_decoded.txt
+</code></pre>
+</div>
+
+<h4 id="5-decrypt-data">5. Decrypt Data</h4>
+
+<p>Just like the plain text key, the CipherTextBlob is also base64 encoded. Let us decode that and store that as well. We will need this later on to decrypt the data we have encrypted.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>echo '*****************************rP1R8rH5AgbwKqWvkXdAHHltn9RJtKSH/X3Q9VNjCgcOV65rODtZ7TDqMUmgPcZzwaiPSDXrv/ZBr4+safgompOL+bw==' | base64 --decode &gt; ~/tmp/ciphertext_blob_decoded.txt
+</code></pre>
+</div>
+
+<p>Now we are ready to decrypt the encrypted data. Since we have deleted the plain text data key just like we should, we will ask KMS to give us the plain text data key by decrypting the CipherTextBlob.</p>
+
+<p>Since the CipherTextBlob contains metadata, we do not need to tell KMS any information about the CMK that was used to encrypt the data key.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; kms decrypt --ciphertext-blob fileb:///Users/mpandit/tmp/ciphertext_blob_decoded.txt
+{
+    "Plaintext": "************2abcgdF4rWGaG54esFdaNnfTWBXezcU=",
+    "KeyId": "arn:aws:kms:us-east-1:************:key/30f0d765-d120-41ab-b078-************",
+}
+
+</code></pre>
+</div>
+<p>KMS has given our plain text key back. Let us use openssl to decrypt our encrypted data. We go through the same exercise of base64 decoding the plain text key before we can use it with <code class="highlighter-rouge">openssl</code>. We use the same filename to keep things simple. Also I am too lazy, so copy-paste helps.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ echo '************2abcgdF4rWGaG54esFdaNnfTWBXezcU=' | base64 --decode &gt; ~/tmp/plaintext_key_decoded.txt
+
+</code></pre>
+</div>
+<p>Next, we pass this to <code class="highlighter-rouge">openssl</code>, this time to <em>decrypt</em>.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ cat ~/tmp/encrypted.txt  | openssl enc -d -aes256 -k fileb://Users/mpandit/tmp/plaintext_key_decoded.txt
+Hello World!
+</code></pre>
+</div>
+
+<p>And we get our encrypted data decrypted. In the real world, this same process happens at a much larger scale. Like encrypting EBS Volumes, S3 files, or even local storage outside of AWS. Also, these steps can be integrated in code using the crypto libraries available for the programming language being used.</p>
+
+<h4 id="6-audit-trail">6. Audit Trail</h4>
+
+<p><a href="https://aws.amazon.com/cloudtrail/">AWS CloudTrail</a> will show the usage log of the CMKs. <strong>This will not show up on the event log on the console, but in the raw json files that CloudTrail is configured to write to.</strong> This is used to audit the CMK usage.</p>
+
+<h3 style="text-align: center" id="comments">Comments</h3>
+
+<div id="disqus_thread"></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = "https://lobster1234.github.io/2017/09/29/aws-kms-envelope-encryption/";  
+this.page.identifier = "/2017/09/29/aws-kms-envelope-encryption";
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://lobster1234.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+<div id="disqus_thread"></div>
+<script>
+
+
+      
+
+</script>
+
+  </div>
+
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <p>
+      
+
+&copy; Manish Pandit - Powered by <a href="https://jekyllrb.com">Jekyll</a> &amp; <a href="https://github.com/yous/whiteglass">whiteglass</a> - Subscribe via <a href="https://lobster1234.github.io/feed.xml">RSS</a>
+
+    </p>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
