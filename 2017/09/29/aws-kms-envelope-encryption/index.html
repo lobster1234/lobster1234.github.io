@@ -207,7 +207,7 @@
 
 <!--more-->
 
-<p>An ideal key management system should be highly available, control access to the master key(s), audit the key(s) usage, manage key(s) lifecycle. This becomes all the more important with microservices, as the number of such secrets can grow to a large number, if the services being composed to offer a functionality all need their own secrets.</p>
+<p>An ideal key management system should be highly available, control access to the master key(s), audit the key(s) usage, and manage key(s) lifecycle. This becomes all the more important with microservices, as the number of such secrets can grow to a large number, if the services being composed to offer a functionality all need their own secrets.</p>
 
 <h2 id="setup">Setup</h2>
 
@@ -220,17 +220,17 @@
 
 <h2 id="aws-kms">AWS KMS</h2>
 
-<p>KMS keys are referred to as CMKs (Customer Master Keys) are then used to encrypt and decrypt data. Customers can also choose to upload their own keys to KMS. As mentioned above, AWS uses KMS to manage keys for it’s own services. These keys are called AWS-managed CMKs, as opposed to the ones created by the customer, called Customer-Managed CMKs. Customer-Managed CMKs can be used for AWS services if customers want greater control over key-rotations, etc. KMS provides <a href="https://en.wikipedia.org/wiki/Symmetric-key_algorithm">symmetric encryption</a>.</p>
+<p>KMS keys are referred to as CMKs (Customer Master Keys). The CMKs are used to encrypt and decrypt data, <em>or other keys</em> - as we will see below. Customers can also choose to upload their own keys to KMS. As mentioned earlier, AWS uses KMS to manage keys for it’s own services. These keys are called <em>AWS-Managed CMKs</em>, as opposed to the ones created by the customer, called <em>Customer-Managed CMKs</em>. Customer-Managed CMKs can be used for AWS services if customers want greater control over key-rotations, etc. KMS provides <a href="https://en.wikipedia.org/wiki/Symmetric-key_algorithm">symmetric encryption</a>.</p>
 
-<p>If you have, in the past, used any AWS service with encryption, AWS has created CMKs for it. To check it out, log in to the AWS Console, and click <code class="highlighter-rouge">Encryption keys</code> under <code class="highlighter-rouge">IAM</code> to see the AWS Managed Keys.</p>
+<p>If you have, in the past, used any AWS service with encryption, AWS has created CMKs for it on your behalf. These will be the AWS-Managed CMKs - one per service per region. To check it out, log in to the AWS Console, and click <code class="highlighter-rouge">Encryption keys</code> under <code class="highlighter-rouge">IAM</code> to see the AWS Managed Keys. The AWS-Managed CMKs show up with the orange AWS icon.</p>
 
-<p>This is what mine looks like -</p>
+<p>Here is what my keys look like -</p>
 
 <p><img src="https://lobster1234.github.io/assets/kms-aws-managed.png" alt="kms-2" /></p>
 
 <p>The keys are region specific, so you may want to pick different regions to see the CMKs in those regions.</p>
 
-<p>The CMKs can never be retrieved or seen in plaintext.</p>
+<p>The CMKs can never be retrieved or seen in plaintext - AWS uses its underlying infrastructure to keep the CMKs secure, highly available, and durable.</p>
 
 <p>Data should be only decrypted <em>where</em> it is needed, not at some server and then transmitted over unencrypted. IAM policies control who can encrypt and/or decrypt using the CMKs, and these policies can a be part of IAM roles associated with AWS resources. IAM policies also control who can administer the CMKs.</p>
 
@@ -243,7 +243,7 @@
 <ol>
   <li>Create a new CMK, or re-use an existing CMK. This can be done the AWS Console, or with CLI using <a href="http://docs.aws.amazon.com/cli/latest/reference/kms/create-key.html">create-key</a>.</li>
   <li>Use <a href="http://docs.aws.amazon.com/cli/latest/reference/kms/generate-data-key.html">generate-data-key</a> to get a data key.</li>
-  <li>This returns the plain text data key, and also an encrypted (with the specified CMK) version of the data key. The encrypted version is referred to as a CipherTextBlob. Store the returned CipherTextBlob (we will need it later). This CipherTextBlob has metadata which tells KMS which CMK was used to generate it. Store this CipherTextBlob.</li>
+  <li>This returns the plain text data key, and also an encrypted (with the specified CMK) version of the data key. The encrypted version is referred to as a <em>CipherTextBlob</em>. Store the returned CipherTextBlob (we will need it later). The CipherTextBlob has metadata which tells KMS which CMK was used to generate it. Store this CipherTextBlob.</li>
   <li>Use the plain-text data key to encrypt any amount of data.</li>
   <li>Throw away the plain-text data key, but be sure to store the CipherTextBlob along side the encrypted data.</li>
   <li>To decrypt, use the <a href="http://docs.aws.amazon.com/kms/latest/APIReference/API_Decrypt.html">Decrypt API</a>, sending it the CipherTextBlob from step (3).</li>
@@ -251,6 +251,8 @@
   <li>Throw away the plain-text data key.</li>
   <li>To encrypt more data, repeat steps 6, 7, 8 except use the plain text key to <strong>encrypt</strong> instead of <strong>decrypt</strong>.</li>
 </ol>
+
+<p>This ensures that the encrypted data will not be compromised as long as the plain-text data key is destroyed after each encryption/decryption process. At best, someone can get to the CipherTextBlob, but unless they can call KMS to decrypt it, the encrypted data cannot be decrypted with just the CipherTextBlob.</p>
 
 <blockquote>
   <p>It is very important to note that KMS has no record of the data key. It is us who are managing the data key. If you were to throw away the CipherTextBlob after deleting the plain text key, the encrypted data can NEVER be decrypted.</p>
