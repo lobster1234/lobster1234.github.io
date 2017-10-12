@@ -128,6 +128,169 @@
       <li>
         <header class="post-header">
           <h1 class="post-title">
+            <a class="post-link" href="/2017/10/10/logstash-with-aws-lambda/">Logstash logging with AWS Lambda</a>
+          </h1>
+
+          <p class="post-meta">Oct 10, 2017 • 
+  
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <a href="/categories/aws/">aws</a>,
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <a href="/categories/serverless/">serverless</a>
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+</p>
+        </header>
+
+        <div class="post-content">
+          <p>Its a challenge to log messages with a Lambda, given that there is no server to run the agents or forwarders (splunk, filebeat, etc.) on. Here is a quick and easy tutorial to set up <a href="https://www.elastic.co/products">ELK</a> logging by writing directly to <a href="https://www.elastic.co/products/logstash">logstash</a> via the <a href="https://github.com/logstash/logstash-logback-encoder">TCP appender</a> and logback. This is for a Java/Maven based Lambda.</p>
+
+
+        </div>
+        
+          <p class="post-continue">
+            <a href="/2017/10/10/logstash-with-aws-lambda/">Read on &rarr;</a>
+          </p>
+        
+      </li>
+    
+      
+      
+
+      <li>
+        <header class="post-header">
+          <h1 class="post-title">
             <a class="post-link" href="/2017/10/07/aws-lambda-with-serverless-framework-and-java/">SVCC 2017 - AWS Lambda with Serverless Framework and Java</a>
           </h1>
 
@@ -853,171 +1016,6 @@
         
           <p class="post-continue">
             <a href="/2017/08/14/search-with-nutch-mongodb-solr/">Read on &rarr;</a>
-          </p>
-        
-      </li>
-    
-      
-      
-
-      <li>
-        <header class="post-header">
-          <h1 class="post-title">
-            <a class="post-link" href="/2017/07/05/caching-gotchas-and-lessons-learned/">Caching - Gotchas &amp; Lessons Learned</a>
-          </h1>
-
-          <p class="post-meta">Jul 5, 2017 • 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/architecture/">architecture</a>,
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/caching/">caching</a>
-    
-  
-    
-  
-    
-  
-    
-  
-
-</p>
-        </header>
-
-        <div class="post-content">
-          <p>It has been said <a href="https://martinfowler.com/bliki/TwoHardThings.html" target="_blank_">time and again</a> - <em>“There are only two hard things in Computer Science: cache invalidation and naming things”.</em> Having run into both of these problems in my professional career, I figured I could write a post, summarizing the lessons I have learned along the way by seeing and building various caching architectures across many companies, big and small.</p>
-
-<p>Just like threading, caching is easy to code, but often creates more problems than it intends to solve. These problems can arise from - you guessed it - invalidation,  sub-par efficiency, inconsistency, and many more. It is also one of my favorite topics for technical interviews :)</p>
-
-
-        </div>
-        
-          <p class="post-continue">
-            <a href="/2017/07/05/caching-gotchas-and-lessons-learned/">Read on &rarr;</a>
           </p>
         
       </li>

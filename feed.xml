@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-10-07T16:42:03-07:00</updated>
+  <updated>2017-10-11T23:36:38-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -25,6 +25,168 @@
     </author>
   
 
+  
+  
+    <entry>
+      
+      <title type="html">Logstash logging with AWS Lambda</title>
+      
+      <link href="https://lobster1234.github.io/2017/10/10/logstash-with-aws-lambda/" rel="alternate" type="text/html" title="Logstash logging with AWS Lambda" />
+      <published>2017-10-10T13:44:37-07:00</published>
+      <updated>2017-10-10T13:44:37-07:00</updated>
+      <id>https://lobster1234.github.io/2017/10/10/logstash-with-aws-lambda</id>
+      <content type="html" xml:base="https://lobster1234.github.io/2017/10/10/logstash-with-aws-lambda/">&lt;p&gt;Its a challenge to log messages with a Lambda, given that there is no server to run the agents or forwarders (splunk, filebeat, etc.) on. Here is a quick and easy tutorial to set up &lt;a href=&quot;https://www.elastic.co/products&quot;&gt;ELK&lt;/a&gt; logging by writing directly to &lt;a href=&quot;https://www.elastic.co/products/logstash&quot;&gt;logstash&lt;/a&gt; via the &lt;a href=&quot;https://github.com/logstash/logstash-logback-encoder&quot;&gt;TCP appender&lt;/a&gt; and logback. This is for a Java/Maven based Lambda.&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Make sure the Lambda is running in the right Subnet and has the right Security Group(s) to be able to talk to Logstash server and port.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h1 id=&quot;pomxml&quot;&gt;pom.xml&lt;/h1&gt;
+&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;net.logstash.logback&lt;span class=&quot;nt&quot;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;logstash-logback-encoder&lt;span class=&quot;nt&quot;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;4.11&lt;span class=&quot;nt&quot;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;ch.qos.logback&lt;span class=&quot;nt&quot;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;logback-classic&lt;span class=&quot;nt&quot;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;1.2.3&lt;span class=&quot;nt&quot;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h1 id=&quot;logbackxml&quot;&gt;logback.xml&lt;/h1&gt;
+
+&lt;p&gt;Add this file to &lt;code class=&quot;highlighter-rouge&quot;&gt;src/main/resources&lt;/code&gt; folder.&lt;/p&gt;
+
+&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;configuration&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;appender&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;stash&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;net.logstash.logback.appender.LogstashTcpSocketAppender&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;c&quot;&gt;&amp;lt;!-- Replace the destination with the logstash server: logstash port --&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;destination&amp;gt;&lt;/span&gt;localhost:5000&lt;span class=&quot;nt&quot;&gt;&amp;lt;/destination&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;c&quot;&gt;&amp;lt;!-- There can be multiple destinations --&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;encoder&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;net.logstash.logback.encoder.LogstashEncoder&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;/appender&amp;gt;&lt;/span&gt;
+
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;root&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;level=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;DEBUG&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;appender-ref&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;ref=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;stash&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;/root&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/configuration&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h1 id=&quot;finally-block&quot;&gt;finally block&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;Make sure the code closes the Logging Context before the JVM dies.&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;final&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Logger&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;logger&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;LoggerFactory&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getLogger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getClass&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;());&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;try&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;logger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;info&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;This is an info&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;logger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;debug&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;This is a debug&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;logger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;trace&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;This is a trace&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;logger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;error&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;This is an error&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;RuntimeException&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Runtime Exception!&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;));&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;logger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;warn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;This is a warning&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;finally&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;LoggerContext&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;loggerContext&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;LoggerContext&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;LoggerFactory&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getILoggerFactory&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;loggerContext&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;stop&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h1 id=&quot;testing-locally-with-docker-elk&quot;&gt;Testing locally with Docker-ELK&lt;/h1&gt;
+
+&lt;p&gt;Install the ELK stack on Docker locally via &lt;a href=&quot;https://github.com/deviantony/docker-elk&quot;&gt;docker-elk&lt;/a&gt; and create the default index. This will listen on port &lt;code class=&quot;highlighter-rouge&quot;&gt;5000&lt;/code&gt; for LogStash.&lt;/p&gt;
+
+&lt;h1 id=&quot;logstash-tcp-receiver&quot;&gt;Logstash TCP receiver&lt;/h1&gt;
+
+&lt;p&gt;Final change, locate &lt;code class=&quot;highlighter-rouge&quot;&gt;$LOGSTASH_HOME/pipeline/logstash.conf&lt;/code&gt; and change the &lt;code class=&quot;highlighter-rouge&quot;&gt;input&lt;/code&gt; to include the &lt;code class=&quot;highlighter-rouge&quot;&gt;json_lines&lt;/code&gt; codec. This is needed to ensure that the &lt;code class=&quot;highlighter-rouge&quot;&gt;message&lt;/code&gt; does not end up being embedded in another &lt;code class=&quot;highlighter-rouge&quot;&gt;message&lt;/code&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;input {
+        tcp {
+                port =&amp;gt; 5000
+                codec =&amp;gt; json_lines
+        }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Restart logstash, and search for the message in kibana (port &lt;code class=&quot;highlighter-rouge&quot;&gt;5601&lt;/code&gt; if you’re using docker-elk)&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@timestamp:October 11th 2017, 23:04:16.845 level:WARN port:33,448 thread_name:main
+level_value:30000 @version:1 host:172.19.0.1 logger_name:com.foo.serverless.logging.Test
+message:This is a warning _id:AV8PL05oe2YvJOO3IrZ1 _type:logs
+_index:logstash-2017.10.12 _score: -
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;This text looks much prettier on Kibana ;)&lt;/p&gt;
+
+&lt;h3 style=&quot;text-align: center&quot; id=&quot;comments&quot;&gt;Comments&lt;/h3&gt;
+
+&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = &quot;https://lobster1234.github.io/2017/10/10/logstash-with-aws-lambda/&quot;;  
+this.page.identifier = &quot;/2017/10/10/logstash-with-aws-lambda&quot;;
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://lobster1234.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+&lt;/script&gt;
+
+&lt;noscript&gt;Please enable JavaScript to view the &lt;a href=&quot;https://disqus.com/?ref_noscript&quot;&gt;comments powered by Disqus.&lt;/a&gt;&lt;/noscript&gt;
+
+&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+
+
+      
+
+&lt;/script&gt;</content>
+
+      
+      
+      
+      
+      
+
+      
+        <author>
+            <name>Manish Pandit</name>
+          
+          
+        </author>
+      
+
+      
+        <category term="aws" />
+      
+        <category term="serverless" />
+      
+
+      
+        <category term="aws," />
+      
+        <category term="lambda," />
+      
+        <category term="serverless" />
+      
+
+      
+        <summary type="html">Its a challenge to log messages with a Lambda, given that there is no server to run the agents or forwarders (splunk, filebeat, etc.) on. Here is a quick and easy tutorial to set up ELK logging by writing directly to logstash via the TCP appender and logback. This is for a Java/Maven based Lambda.</summary>
+      
+
+      
+      
+    </entry>
+  
   
   
     <entry>
@@ -4734,51 +4896,6 @@ aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.co
 
       
         <summary type="html">This post is the handout for the SQS Lab I ran as a part of hands-on AWS training to the Engineering + DevOps team at Marqeta.</summary>
-      
-
-      
-      
-    </entry>
-  
-  
-  
-    <entry>
-      
-      <title type="html">AWS Primer and Quickstart Presentation</title>
-      
-      <link href="https://lobster1234.github.io/2017/02/01/aws-primer-and-quickstart/" rel="alternate" type="text/html" title="AWS Primer and Quickstart Presentation" />
-      <published>2017-02-01T07:22:10-08:00</published>
-      <updated>2017-02-01T07:22:10-08:00</updated>
-      <id>https://lobster1234.github.io/2017/02/01/aws-primer-and-quickstart</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2017/02/01/aws-primer-and-quickstart/">Slides from my introductory talk on AWS at Marqeta.
-
-&lt;!--more--&gt;
-&lt;script async class=&quot;speakerdeck-embed&quot; data-id=&quot;13c65dd7c1744c319001b4415e3ca439&quot; data-ratio=&quot;1.77777777777778&quot; src=&quot;//speakerdeck.com/assets/embed.js&quot;&gt;&lt;/script&gt;</content>
-
-      
-      
-      
-      
-      
-
-      
-        <author>
-            <name>Manish Pandit</name>
-          
-          
-        </author>
-      
-
-      
-        <category term="aws" />
-      
-        <category term="presentations" />
-      
-
-      
-
-      
-        <summary type="html">Slides from my introductory talk on AWS at Marqeta.</summary>
       
 
       

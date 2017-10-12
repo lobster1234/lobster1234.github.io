@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  
+  
+  <title>Logstash logging with AWS Lambda</title>
+  <meta name="description" content="Its a challenge to log messages with a Lambda, given that there is no server to run the agents or forwarders (splunk, filebeat, etc.) on. Here is a quick and easy tutorial to set up ELK logging by writing directly to logstash via the TCP appender and logback. This is for a Java/Maven based Lambda.">
+  
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="https://lobster1234.github.io/2017/10/10/logstash-with-aws-lambda/">
+  
+  
+  <link rel="alternate" type="application/rss+xml" title="Manish Pandit&#39;s Blog" href="https://lobster1234.github.io/feed.xml">
+
+  
+
+  
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="lobster1234">
+  <meta name="twitter:title" content="Logstash logging with AWS Lambda">
+  <meta name="twitter:description" content="Its a challenge to log messages with a Lambda, given that there is no server to run the agents or forwarders (splunk, filebeat, etc.) on. Here is a quick and easy tutorial to set up ELK logging by ...">
+  
+    <meta name="twitter:creator" content="lobster1234">
+  
+  
+
+  <script type="text/javascript">
+  WebFontConfig = {
+    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
+  };
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+  })();
+</script>
+
+  
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-96931340-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+
+  <!-- Begin Jekyll SEO tag v2.2.0 -->
+<title>Logstash logging with AWS Lambda | Manish Pandit’s Blog</title>
+<meta property="og:title" content="Logstash logging with AWS Lambda" />
+<meta name="author" content="Manish Pandit" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Its a challenge to log messages with a Lambda, given that there is no server to run the agents or forwarders (splunk, filebeat, etc.) on. Here is a quick and easy tutorial to set up ELK logging by writing directly to logstash via the TCP appender and logback. This is for a Java/Maven based Lambda." />
+<meta property="og:description" content="Its a challenge to log messages with a Lambda, given that there is no server to run the agents or forwarders (splunk, filebeat, etc.) on. Here is a quick and easy tutorial to set up ELK logging by writing directly to logstash via the TCP appender and logback. This is for a Java/Maven based Lambda." />
+<link rel="canonical" href="https://lobster1234.github.io/2017/10/10/logstash-with-aws-lambda/" />
+<meta property="og:url" content="https://lobster1234.github.io/2017/10/10/logstash-with-aws-lambda/" />
+<meta property="og:site_name" content="Manish Pandit’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2017-10-10T13:44:37-07:00" />
+<script type="application/ld+json">
+{"@context": "http://schema.org",
+"@type": "BlogPosting",
+"headline": "Logstash logging with AWS Lambda",
+"author": {"@type": "Person",
+"name": "Manish Pandit"},
+"datePublished": "2017-10-10T13:44:37-07:00",
+"description": "Its a challenge to log messages with a Lambda, given that there is no server to run the agents or forwarders (splunk, filebeat, etc.) on. Here is a quick and easy tutorial to set up ELK logging by writing directly to logstash via the TCP appender and logback. This is for a Java/Maven based Lambda.",
+"mainEntityOfPage": {"@type": "WebPage",
+"@id": "https://lobster1234.github.io/2017/10/10/logstash-with-aws-lambda/"},
+"url": "https://lobster1234.github.io/2017/10/10/logstash-with-aws-lambda/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Home</a>
+
+    <nav class="site-nav">
+      
+        
+        <a class="page-link" href="/about/">About</a>
+      
+        
+        <a class="page-link" href="/archives/">Archives</a>
+      
+        
+        <a class="page-link" href="https://www.twitter.com/lobster1234">Twitter</a>
+      
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    
+      <h1 class="post-title" itemprop="name headline">Logstash logging with AWS Lambda</h1>
+    
+    <p class="post-meta"><time datetime="2017-10-10T13:44:37-07:00" itemprop="datePublished">Oct 10, 2017</time> • 
+  
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <a href="/categories/aws/">aws</a>,
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <a href="/categories/serverless/">serverless</a>
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>Its a challenge to log messages with a Lambda, given that there is no server to run the agents or forwarders (splunk, filebeat, etc.) on. Here is a quick and easy tutorial to set up <a href="https://www.elastic.co/products">ELK</a> logging by writing directly to <a href="https://www.elastic.co/products/logstash">logstash</a> via the <a href="https://github.com/logstash/logstash-logback-encoder">TCP appender</a> and logback. This is for a Java/Maven based Lambda.</p>
+
+<!--more-->
+
+<blockquote>
+  <p>Make sure the Lambda is running in the right Subnet and has the right Security Group(s) to be able to talk to Logstash server and port.</p>
+</blockquote>
+
+<h1 id="pomxml">pom.xml</h1>
+<div class="language-xml highlighter-rouge"><pre class="highlight"><code><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>net.logstash.logback<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>logstash-logback-encoder<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>4.11<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>ch.qos.logback<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>logback-classic<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>1.2.3<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre>
+</div>
+
+<h1 id="logbackxml">logback.xml</h1>
+
+<p>Add this file to <code class="highlighter-rouge">src/main/resources</code> folder.</p>
+
+<div class="language-xml highlighter-rouge"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="nt">&lt;configuration&gt;</span>
+    <span class="nt">&lt;appender</span> <span class="na">name=</span><span class="s">"stash"</span> <span class="na">class=</span><span class="s">"net.logstash.logback.appender.LogstashTcpSocketAppender"</span><span class="nt">&gt;</span>
+  <span class="c">&lt;!-- Replace the destination with the logstash server: logstash port --&gt;</span>
+        <span class="nt">&lt;destination&gt;</span>localhost:5000<span class="nt">&lt;/destination&gt;</span>
+  <span class="c">&lt;!-- There can be multiple destinations --&gt;</span>
+        <span class="nt">&lt;encoder</span> <span class="na">class=</span><span class="s">"net.logstash.logback.encoder.LogstashEncoder"</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/appender&gt;</span>
+
+    <span class="nt">&lt;root</span> <span class="na">level=</span><span class="s">"DEBUG"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;appender-ref</span> <span class="na">ref=</span><span class="s">"stash"</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/root&gt;</span>
+<span class="nt">&lt;/configuration&gt;</span>
+</code></pre>
+</div>
+
+<h1 id="finally-block">finally block</h1>
+<p><strong>Make sure the code closes the Logging Context before the JVM dies.</strong></p>
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kd">private</span> <span class="kd">final</span> <span class="n">Logger</span> <span class="n">logger</span> <span class="o">=</span> <span class="n">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">getClass</span><span class="o">());</span>
+<span class="k">try</span> <span class="o">{</span>
+    <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"This is an info"</span><span class="o">);</span>
+    <span class="n">logger</span><span class="o">.</span><span class="na">debug</span><span class="o">(</span><span class="s">"This is a debug"</span><span class="o">);</span>
+    <span class="n">logger</span><span class="o">.</span><span class="na">trace</span><span class="o">(</span><span class="s">"This is a trace"</span><span class="o">);</span>
+    <span class="n">logger</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="s">"This is an error"</span><span class="o">,</span> <span class="k">new</span> <span class="n">RuntimeException</span><span class="o">(</span><span class="s">"Runtime Exception!"</span><span class="o">));</span>
+    <span class="n">logger</span><span class="o">.</span><span class="na">warn</span><span class="o">(</span><span class="s">"This is a warning"</span><span class="o">);</span>
+<span class="o">}</span><span class="k">finally</span><span class="o">{</span>
+    <span class="n">LoggerContext</span> <span class="n">loggerContext</span> <span class="o">=</span> <span class="o">(</span><span class="n">LoggerContext</span><span class="o">)</span> <span class="n">LoggerFactory</span><span class="o">.</span><span class="na">getILoggerFactory</span><span class="o">();</span>
+    <span class="n">loggerContext</span><span class="o">.</span><span class="na">stop</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<h1 id="testing-locally-with-docker-elk">Testing locally with Docker-ELK</h1>
+
+<p>Install the ELK stack on Docker locally via <a href="https://github.com/deviantony/docker-elk">docker-elk</a> and create the default index. This will listen on port <code class="highlighter-rouge">5000</code> for LogStash.</p>
+
+<h1 id="logstash-tcp-receiver">Logstash TCP receiver</h1>
+
+<p>Final change, locate <code class="highlighter-rouge">$LOGSTASH_HOME/pipeline/logstash.conf</code> and change the <code class="highlighter-rouge">input</code> to include the <code class="highlighter-rouge">json_lines</code> codec. This is needed to ensure that the <code class="highlighter-rouge">message</code> does not end up being embedded in another <code class="highlighter-rouge">message</code>.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>input {
+        tcp {
+                port =&gt; 5000
+                codec =&gt; json_lines
+        }
+}
+</code></pre>
+</div>
+<p>Restart logstash, and search for the message in kibana (port <code class="highlighter-rouge">5601</code> if you’re using docker-elk)</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>@timestamp:October 11th 2017, 23:04:16.845 level:WARN port:33,448 thread_name:main
+level_value:30000 @version:1 host:172.19.0.1 logger_name:com.foo.serverless.logging.Test
+message:This is a warning _id:AV8PL05oe2YvJOO3IrZ1 _type:logs
+_index:logstash-2017.10.12 _score: -
+</code></pre>
+</div>
+
+<p>This text looks much prettier on Kibana ;)</p>
+
+<h3 style="text-align: center" id="comments">Comments</h3>
+
+<div id="disqus_thread"></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = "https://lobster1234.github.io/2017/10/10/logstash-with-aws-lambda/";  
+this.page.identifier = "/2017/10/10/logstash-with-aws-lambda";
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://lobster1234.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+<div id="disqus_thread"></div>
+<script>
+
+
+      
+
+</script>
+
+  </div>
+
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <p>
+      
+
+&copy; Manish Pandit - Powered by <a href="https://jekyllrb.com">Jekyll</a> &amp; <a href="https://github.com/yous/whiteglass">whiteglass</a> - Subscribe via <a href="https://lobster1234.github.io/feed.xml">RSS</a>
+
+    </p>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
