@@ -216,7 +216,7 @@
 </div>
 
 <h3 id="create-an-iam-policy">Create an IAM policy</h3>
-<p>This is where it gets interesting. AWS’s handling of assigning policies to SQS via CLI is really uncomfortable. Basically you’d need to flatten out the entire IAM policy JSON as a string, and put everything in a single line. To save my blog from looking ugly, I will not put everything in a single line, but if you plan on getting this to work, you’d need to make sure this file has one and only one line. We will create one file, call it <code class="highlighter-rouge">/tmp/policy.json</code>, with these contents. Your account IDs/ARNs will be different.</p>
+<p>This is where it gets interesting. AWS’s handling of assigning policies to SQS via CLI is really uncomfortable. Basically you’d need to flatten out the entire IAM policy JSON as a string, and put everything in a single line. We will create one file, call it <code class="highlighter-rouge">/tmp/policy.json</code>, with these contents. Your account IDs/ARNs will be different.</p>
 
 <div class="language-json highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="w"> </span><span class="nt">"Policy"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"{ \"Version\": \"2012-10-17\", \"Id\": \"arn:aws:sqs:us-east-1:***********:fan-out-sink/SQSDefaultPolicy\", \"Statement\": [{ \"Sid\": \"Sid1508039487834\",\"Effect\": \"Allow\", \"Principal\": {\"AWS\": \"*\"},\"Action\": \"SQS:SendMessage\",\"Resource\": \"arn:aws:sqs:us-east-1:***********:fan-out-sink\",\"Condition\": {\"ArnEquals\": {\"aws:SourceArn\": \"arn:aws:sns:us-east-1:***********:fan-out-topic\"}}}]}"</span><span class="p">}</span><span class="w">
 </span></code></pre>
