@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-10-11T23:36:38-07:00</updated>
+  <updated>2017-10-14T23:00:49-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -25,6 +25,200 @@
     </author>
   
 
+  
+  
+    <entry>
+      
+      <title type="html">Fanout SNS-SQS Gotcha</title>
+      
+      <link href="https://lobster1234.github.io/2017/10/14/fan-out-with-sns-and-sqs-gotcha/" rel="alternate" type="text/html" title="Fanout SNS-SQS Gotcha" />
+      <published>2017-10-14T13:44:37-07:00</published>
+      <updated>2017-10-14T13:44:37-07:00</updated>
+      <id>https://lobster1234.github.io/2017/10/14/fan-out-with-sns-and-sqs-gotcha</id>
+      <content type="html" xml:base="https://lobster1234.github.io/2017/10/14/fan-out-with-sns-and-sqs-gotcha/">&lt;p&gt;One of the very common architectural patterns is &lt;em&gt;fan-out&lt;/em&gt; where an event is sent to multiple subscribers by a broker. An event like placing an order, which can then be handled by inventory service, record-keeping, as well as shipping service concurrently. These events can even be very frequent like clickstreams, or search strings on a website. AWS offers &lt;a href=&quot;https://aws.amazon.com/blogs/compute/messaging-fanout-pattern-for-serverless-architectures-using-amazon-sns/&quot;&gt;fan-out architecture&lt;/a&gt; with SNS topics, and SQS can subscribe to a topic. Thus, the publisher can publish events on an SNS topic, which will forwarded to the SQS queue(s) that are subscribed to that topic. It is documented that FIFO queues cannot be SNS subscribers. However, as I recently found out, encrypted queues cannot subscribe to SNS either. While AWS stops you from subscribing a FIFO queue to SNS, encrypted queues are allowed to subscribe, but they never get any events. The purpose of this post is to document this previously undocumented behavior.
+&lt;!--more--&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;setup&quot;&gt;Setup&lt;/h3&gt;
+&lt;p&gt;We will create an SNS topic called &lt;code class=&quot;highlighter-rouge&quot;&gt;fan-out-topic&lt;/code&gt;, and then create a SQS Standard Queue called &lt;code class=&quot;highlighter-rouge&quot;&gt;fan-out-sink&lt;/code&gt;. We will create an IAM policy so the queue can receive messages from the topic, and finally we will subscribe the queue to the topic. Next, we will verify that the fan-out works. Finally we will enable SSE on the queue, and verify that the fan out no longer works.&lt;/p&gt;
+
+&lt;p&gt;I will use aws-shell CLI.&lt;/p&gt;
+
+&lt;h3 id=&quot;create-an-sns-topic&quot;&gt;Create an SNS topic&lt;/h3&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sns create-topic --name fan-out-topic
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;create-the-sqs-queue&quot;&gt;Create the SQS queue&lt;/h3&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sqs create-queue --queue-name fan-out-sink
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;create-an-iam-policy&quot;&gt;Create an IAM policy&lt;/h3&gt;
+&lt;p&gt;This is where it gets interesting. AWS’s handling of assigning policies to SQS via CLI is really uncomfortable. Basically you’d need to flatten out the entire IAM policy JSON as a string, and put everything in a single line. To save my blog from looking ugly, I will not put everything in a single line, but if you plan on getting this to work, you’d need to make sure this file has one and only one line. We will create one file, call it &lt;code class=&quot;highlighter-rouge&quot;&gt;/tmp/policy.json&lt;/code&gt;, with these contents. Your account IDs/ARNs will be different.&lt;/p&gt;
+
+&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;Policy&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;{ \&quot;Version\&quot;: \&quot;2012-10-17\&quot;, \&quot;Id\&quot;: \&quot;arn:aws:sqs:us-east-1:***********:fan-out-sink/SQSDefaultPolicy\&quot;, \&quot;Statement\&quot;: [{ \&quot;Sid\&quot;: \&quot;Sid1508039487834\&quot;,\&quot;Effect\&quot;: \&quot;Allow\&quot;, \&quot;Principal\&quot;: {\&quot;AWS\&quot;: \&quot;*\&quot;},\&quot;Action\&quot;: \&quot;SQS:SendMessage\&quot;,\&quot;Resource\&quot;: \&quot;arn:aws:sqs:us-east-1:***********:fan-out-sink\&quot;,\&quot;Condition\&quot;: {\&quot;ArnEquals\&quot;: {\&quot;aws:SourceArn\&quot;: \&quot;arn:aws:sns:us-east-1:***********:fan-out-topic\&quot;}}}]}&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;associate-this-policy-with-sqs&quot;&gt;Associate this policy with SQS&lt;/h3&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sqs set-queue-attributes --queue-url https://queue.amazonaws.com/***********/fan-out-sink --attributes file:///tmp/policy.json
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;subscribe-sqs-to-sns&quot;&gt;Subscribe SQS to SNS&lt;/h3&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sns subscribe --topic-arn arn:aws:sns:us-east-1:***********:fan-out-topic --protocol sqs --notification-endpoint arn:aws:sqs:us-east-1:***********:fan-out-sink
+{
+    &quot;SubscriptionArn&quot;: &quot;arn:aws:sns:us-east-1:***********:fan-out-topic:c0ddf05a-a62e-44dc-ac64-99da02a00fba&quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;The SubscriptionArn would mean that we do not need to confirm this subscription.&lt;/p&gt;
+
+&lt;h3 id=&quot;test-the-fan-out&quot;&gt;Test the fan-out&lt;/h3&gt;
+&lt;p&gt;Lets publish a message on the topic&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sns publish --message &quot;Hello!&quot; --topic-arn arn:aws:sns:us-east-1:***********:fan-out-topic
+{
+    &quot;MessageId&quot;: &quot;92ce4aac-c8b9-59b3-b4c3-18f02e3a1306&quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;And receive it&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sqs receive-message --queue-url https://queue.amazonaws.com/***********/fan-out-sink
+{
+    &quot;Messages&quot;: [
+        {
+            &quot;Body&quot;: &quot;{\n  \&quot;Type\&quot; : \&quot;Notification\&quot;,\n  \&quot;MessageId\&quot; : \&quot;d649c24e-fcac-5375-b1e5-901227c0fa47\&quot;,\n  \&quot;TopicArn\&quot; : \&quot;arn:aws:sns:us-east-1:***********:fan-out-topic\&quot;,\n  \&quot;Message\&quot; : \&quot;Hello!\&quot;,\n  \&quot;Timestamp\&quot; : \&quot;2017-10-15T03:42:36.671Z\&quot;,\n  \&quot;SignatureVersion\&quot; : \&quot;1\&quot;,\n  &quot;MessageId&quot;: &quot;88e5bca5-60a0-48ba-8148-67930dc3cee0&quot;
+        }
+    ]
+}
+aws&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;I’ve removed other response attributes for brevity.&lt;/p&gt;
+
+&lt;p&gt;We will then purge this queue before enabling SSE on it. Alternatively, you may choose to just delete the messages.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sqs purge-queue --queue-url https://queue.amazonaws.com/***********/fan-out-sink
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;enable-sse&quot;&gt;Enable SSE&lt;/h3&gt;
+&lt;p&gt;Since I have a CMK I had created earlier, I will use it’s alias. You may choose to use &lt;code class=&quot;highlighter-rouge&quot;&gt;alias/aws/sqs&lt;/code&gt; if one does not exist, as this is a Managed CMK AWS uses to encrypt any SQS.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sqs set-queue-attributes --queue-url https://queue.amazonaws.com/***********/fan-out-sink --attributes KmsMasterKeyId=alias/my-master-key
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;We can verify that the queue has SSE enabled by doing so -&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sqs get-queue-attributes --attribute-names KmsMasterKeyId --queue-url https://queue.amazonaws.om/***********/fan-out-sink
+{
+    &quot;Attributes&quot;: {
+        &quot;KmsMasterKeyId&quot;: &quot;alias/my-master-key&quot;
+    }
+}
+aws&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h3 id=&quot;try-the-fanout&quot;&gt;Try the fanout&lt;/h3&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sns publish --message &quot;Hello!&quot; --topic-arn arn:aws:sns:us-east-1:***********:fan-out-topic
+{
+    &quot;MessageId&quot;: &quot;d28301cf-994c-5e50-a365-53937013a49c&quot;
+}
+aws&amp;gt; sqs receive-message --queue-url https://queue.amazonaws.com/***********/fan-out-sink
+aws&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;As you can see, we did not get the message in the queue. This can also be verified on the AWS Console where the queue will show zero available messages.&lt;/p&gt;
+
+&lt;h3 id=&quot;re-validate&quot;&gt;Re-validate&lt;/h3&gt;
+&lt;p&gt;We will remove SSE and run one final test.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sqs set-queue-attributes --queue-url https://queue.amazonaws.com/***********/fan-out-sink --attributes KmsMasterKeyId=
+aws&amp;gt; sqs get-queue-attributes --attribute-names KmsMasterKeyId --queue-url https://queue.amazonaws.om/***********/fan-out-sink
+aws&amp;gt; sns publish --message &quot;Reverification!&quot; --topic-arn arn:aws:sns:us-east-1:***********:fan-out-topic
+{
+    &quot;MessageId&quot;: &quot;be931efe-aa12-561e-87c5-4ca2405cc84a&quot;
+}
+aws&amp;gt; sqs receive-message --queue-url https://queue.amazonaws.com/***********/fan-out-sink
+{
+    &quot;Messages&quot;: [
+        {
+            &quot;Body&quot;: &quot;{\n  \&quot;Type\&quot; : \&quot;Notification\&quot;,\n  \&quot;MessageId\&quot; : \&quot;be931efe-aa12-561e-87c5-4ca2405cc84a\&quot;,\n  \&quot;TopicArn\&quot; : \&quot;arn:aws:sns:us-east-1:***********:fan-out-topic\&quot;,\n  \&quot;Message\&quot; : \&quot;Reverification!\&quot;,\n  \&quot;Timestamp\&quot; : \&quot;2017-10-15T04:46:06.457Z\&quot;,\n  \&quot;SignatureVersion\&quot; : \&quot;1\&quot;,\n
+            &quot;MessageId&quot;: &quot;a987c68e-141f-4a29-a8d3-d3668c5c98a6&quot;
+        }
+    ]
+}
+aws&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;This shows that an SSE-enabled SQS queue cannot get messages from a subscribed SNS topic.&lt;/p&gt;
+
+&lt;h3 style=&quot;text-align: center&quot; id=&quot;comments&quot;&gt;Comments&lt;/h3&gt;
+
+&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = &quot;https://lobster1234.github.io/2017/10/14/fan-out-with-sns-and-sqs-gotcha/&quot;;  
+this.page.identifier = &quot;/2017/10/14/fan-out-with-sns-and-sqs-gotcha&quot;;
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://lobster1234.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+&lt;/script&gt;
+
+&lt;noscript&gt;Please enable JavaScript to view the &lt;a href=&quot;https://disqus.com/?ref_noscript&quot;&gt;comments powered by Disqus.&lt;/a&gt;&lt;/noscript&gt;
+
+&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+
+
+      
+
+&lt;/script&gt;</content>
+
+      
+      
+      
+      
+      
+
+      
+        <author>
+            <name>Manish Pandit</name>
+          
+          
+        </author>
+      
+
+      
+        <category term="aws" />
+      
+
+      
+        <category term="aws," />
+      
+        <category term="sqs," />
+      
+        <category term="sns," />
+      
+        <category term="fanout" />
+      
+
+      
+        <summary type="html">One of the very common architectural patterns is fan-out where an event is sent to multiple subscribers by a broker. An event like placing an order, which can then be handled by inventory service, record-keeping, as well as shipping service concurrently. These events can even be very frequent like clickstreams, or search strings on a website. AWS offers fan-out architecture with SNS topics, and SQS can subscribe to a topic. Thus, the publisher can publish events on an SNS topic, which will forwarded to the SQS queue(s) that are subscribed to that topic. It is documented that FIFO queues cannot be SNS subscribers. However, as I recently found out, encrypted queues cannot subscribe to SNS either. While AWS stops you from subscribing a FIFO queue to SNS, encrypted queues are allowed to subscribe, but they never get any events. The purpose of this post is to document this previously undocumented behavior.</summary>
+      
+
+      
+      
+    </entry>
+  
   
   
     <entry>
@@ -4731,171 +4925,6 @@ Duration (avg.): 276.55ms
 
       
         <summary type="html">I’ve put together my notes from the AWS webinar, which can be seen here. Lambda is the key enabler and a core AWS component for serverless computing. Lets you run the code you want, without worrying about the underlying infrastructure and provisioning. It is also cost efficient, as there are no instances that are in running state but idle. Lambda handles scaling up and scaling down as needed, transparently to the customer.</summary>
-      
-
-      
-      
-    </entry>
-  
-  
-  
-    <entry>
-      
-      <title type="html">AWS Training at Marqeta : SQS Lab</title>
-      
-      <link href="https://lobster1234.github.io/2017/02/17/marqeta-aws-sqs-lab/" rel="alternate" type="text/html" title="AWS Training at Marqeta : SQS Lab" />
-      <published>2017-02-17T19:10:44-08:00</published>
-      <updated>2017-02-17T19:10:44-08:00</updated>
-      <id>https://lobster1234.github.io/2017/02/17/marqeta-aws-sqs-lab</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2017/02/17/marqeta-aws-sqs-lab/">&lt;p&gt;This post is the handout for the SQS Lab I ran as a part of hands-on AWS training to the Engineering + DevOps team at &lt;a href=&quot;https://www.marqeta.com&quot; target=&quot;_blank&quot;&gt;Marqeta&lt;/a&gt;.&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;p&gt;In this lab we will use AWS CLI to work with SQS. I’ve replaced the account ID with 111111111111.&lt;/p&gt;
-
-&lt;h2 id=&quot;prepare-the-cli-aws-shell&quot;&gt;Prepare the CLI (aws-shell)&lt;/h2&gt;
-&lt;p&gt;In the previous lab we configured &lt;code class=&quot;highlighter-rouge&quot;&gt;aws-shell&lt;/code&gt; on our laptops with an access key, secret, and default region. However, the user only had &lt;code class=&quot;highlighter-rouge&quot;&gt;AmazonS3FullAccess&lt;/code&gt; via a managed policy, and &lt;code class=&quot;highlighter-rouge&quot;&gt;AmazonEC2FullAccess&lt;/code&gt; via the &lt;code class=&quot;highlighter-rouge&quot;&gt;developers&lt;/code&gt; group.&lt;/p&gt;
-
-&lt;p&gt;We will fire up the &lt;code class=&quot;highlighter-rouge&quot;&gt;aws-shell&lt;/code&gt; and use basic SQS commands. Autocomplete feature of the shell will come in very handy as you’ll see.&lt;/p&gt;
-
-&lt;p&gt;First, we will try to list the queues we have in our account.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sqs list-queues
-
-An error occurred (AccessDenied) when calling the ListQueues operation: Access to the resource https://queue.amazonaws.com/ is denied.
-aws&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;p&gt;Since the access key and secret we’re using is not tied to SQS policy, we go ahead and add that to the &lt;code class=&quot;highlighter-rouge&quot;&gt;developers&lt;/code&gt; group. It is called &lt;code class=&quot;highlighter-rouge&quot;&gt;AmazonSQSFullAccess&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;Once done, you should see an empty list for the same command.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sqs list-queues
-aws&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;p&gt;Next, lets create a queue.&lt;/p&gt;
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sqs create-queue --queue-name my_test_queue
-{
-    &quot;QueueUrl&quot;: &quot;https://queue.amazonaws.com/111111111111/my_test_queue&quot;
-}
-aws&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;p&gt;We can go on the console in SQS section, and see this queue being created. You will notice that the Queue URL on the console is a bit richer, with region in there as well.&lt;/p&gt;
-
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;	https://sqs.us-east-1.amazonaws.com/111111111111/my_test_queue
-&lt;/code&gt;
-Now that we’ve created a queue, we will go ahead and send a message to it. As you do this, you will notice that &lt;code class=&quot;highlighter-rouge&quot;&gt;aws-shell&lt;/code&gt; will autocomplete the queue-url for us.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sqs send-message --queue-url https://queue.amazonaws.com/111111111111/my_test_queue --message-body &quot;Hello!&quot;
-{
-    &quot;MD5OfMessageBody&quot;: &quot;952d2c56d0485958336747bcdd98590d&quot;,
-    &quot;MessageId&quot;: &quot;31e40b96-c61c-4b6a-8682-67ebb7badc36&quot;
-}
-aws&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;p&gt;The max message size is 256KB, with a default visibility timeout of 30 seconds. This means whoever consumes this message has 30 seconds to process it, otherwise it will become available to other consumers for processing, i.e. back in the queue. Lets give that a try.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sqs receive-message --queue-url https://queue.amazonaws.com/111111111111/my_test_queue
-{
-    &quot;Messages&quot;: [
-        {
-            &quot;Body&quot;: &quot;Hello!&quot;,
-            &quot;ReceiptHandle&quot;: &quot;AQEBD9ziSgXsnzTdBNzjNDksLpLU/ASfSdxdeFT1MkzCezLdnKL9HljPpsRaz97eSdjRCm27c3/iNcaITv2PEFgpNs62zezc4jpzWh3ysPYVwVgBjqbhobVQiF8JBRxuHSfqgQ8qSsgF2QOpU2Bn6qE/wC/LSqwxNqd/aQRab5EUA9zgqHx9L15FIlbmdGrz8Qz6ebPyFi4Lr5gb+S79t+wN9s0yE9+kEQvKjeweF0OHRyGeBWybwEFVlc3qPeo0QT9WLdkQ68PKBCY8s7djSJoD7npv9j2YeFS4+EcNzJ9ql5x2wpzcLOF672exXivigcjGMUdP9JT32Xju61ixWYnIDgd7KXWo12f+VgSc7/s143kZGPNwpkicvoNRlmzx/urI&quot;,
-            &quot;MD5OfBody&quot;: &quot;952d2c56d0485958336747bcdd98590d&quot;,
-            &quot;MessageId&quot;: &quot;31e40b96-c61c-4b6a-8682-67ebb7badc36&quot;
-        }
-    ]
-}
-aws&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;p&gt;We immediately fire the same command, and notice nothing comes back.&lt;/p&gt;
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sqs receive-message --queue-url https://queue.amazonaws.com/111111111111/my_test_queue
-aws&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;p&gt;This is due to the visibility timeout of 30 seconds. Lets wait 30 seconds, and you’ll see the same message comes back on the queue.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sqs receive-message --queue-url https://queue.amazonaws.com/111111111111/my_test_queue
-{
-    &quot;Messages&quot;: [
-        {
-            &quot;Body&quot;: &quot;Hello!&quot;,
-            &quot;ReceiptHandle&quot;: &quot;AQEBU5MiEmzKdpwJ705Ehe6brf5fmkx0sa+m2ibZxbVsmdsKiHX+RyDu4s+T2yBNP9MS7NjSmEA9l/dLgwn55cN6qDCTCxxOrvVEp1MVMqximPCjzFgkmYTYR5w32TBqamDxKqadAGPUgjLyLlvD/M5tc+MuyvrFL2WaWovK7cpMRk5VGlW+pSaC+TNfhtt2QeLpNW4GUnLxtAu96BrY54ll3jelHtt3jnuAqNOaJ6nzDwKvfonyrpdd4sVS+cKPo4LzS47kJyX8p/gZdi/7cY5Oty+1RhfEkfmkEUKm2Eg4DK8Rm+E9jyUjYK+VmxWc/0JAeKwGRkIuZEuYW1kWav7y3/PkJNaXHJvVQtyLDQiSy8zf8wrjyoyGknaonmUIHtyP&quot;,
-            &quot;MD5OfBody&quot;: &quot;952d2c56d0485958336747bcdd98590d&quot;,
-            &quot;MessageId&quot;: &quot;31e40b96-c61c-4b6a-8682-67ebb7badc36&quot;
-        }
-    ]
-}
-aws&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;p&gt;This is where the application developers have to pick a right visibility timeout, which should allow the consumer enough time to process the message and delete it from the queue, so multiple processing does not occur. Let us delete the message after processing (reading) it.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sqs delete-message --queue-url https://queue.amazonaws.com/111111111111/my_test_queue --receipt-handle &quot;AQEBHh4KsuIv0QABOD49rbmmu6V0r0I34ENhrQqT5me0pPMfM2KOBWX+NvqPVV8eaB3T7zujcJj0qgQlvvqbzgCMKeKYSlExbVgLs6tFHKZgR6wUVH/X6RhN579u4LHFo3SBu9IExDpz226sEoVAn0MOhOlvArU72xJQm+pNPwRjEicQxu6MQPakfiq8yHGICYSUPyBhz+/OwxLx4iDe8exWY2Esvz2zt1q7kD/u2PqzPXiL0uIBsW18tyslMfftGSEV3cB19HFJEHNJ9olZtstNMrX1MAGJZqDHxS1rllSCrNCiqD4264Ou/eyf7duPwhvNT97mmUS0NbCuhTX5P3Kt4BytNFwKY3Qu13vkgb1rciO/1NNifwNbJ+gjOI7xS246&quot;
-aws&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;p&gt;Notice that we need to provide the &lt;code class=&quot;highlighter-rouge&quot;&gt;receipt-handle&lt;/code&gt; that we got after receiving the message in order to delete it.&lt;/p&gt;
-
-&lt;p&gt;Next we can go on the console and look at cloudwatch monitoring. We will also create an alarm to notify us if a message has not been picked up for N minutes. This is something that can alert us of dead consumers, or an issue with processing the messages.&lt;/p&gt;
-
-&lt;h2 id=&quot;more-on-visibility-timeout&quot;&gt;More on visibility timeout&lt;/h2&gt;
-
-&lt;p&gt;In order to change visibility timeout, which can be done when the consumer does not want the message to go back in the queue, like it wants to retry processing the message itself instead of passing it on to another consumer, it can be done by providing the &lt;code class=&quot;highlighter-rouge&quot;&gt;queue-url&lt;/code&gt; and the &lt;code class=&quot;highlighter-rouge&quot;&gt;receipt-handle&lt;/code&gt; like so - note that &lt;code class=&quot;highlighter-rouge&quot;&gt;visibility-timeout&lt;/code&gt; is specified in seconds.&lt;/p&gt;
-
-&lt;p&gt;Lets push a message, consume it, and then increase the &lt;code class=&quot;highlighter-rouge&quot;&gt;visibility-timeout&lt;/code&gt; to 2 minutes (120 seconds).&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sqs send-message --queue-url https://queue.amazonaws.com/111111111111/my_test_queue --message-body &quot;Gonna take long&quot;
-{
-    &quot;MD5OfMessageBody&quot;: &quot;de80b2f443dc0a15382a40a625b74d3a&quot;,
-    &quot;MessageId&quot;: &quot;8efcd759-eb0f-48a3-92fe-5b83e0dd8740&quot;
-}
-aws&amp;gt; sqs receive-message --queue-url https://queue.amazonaws.com/111111111111/my_test_queue
-{
-    &quot;Messages&quot;: [
-        {
-            &quot;Body&quot;: &quot;Gonna take long&quot;,
-            &quot;ReceiptHandle&quot;: &quot;AQEBYkUuIUjSEnzSI7ymjk/oRB0K9osJ2Nyud1+pij4nVAJ8taZ+FHq1kvWIm4LGrjZEVveMPOjsxP/nmmaUCEXAZKYQHATnQDT2Hqt+NJiMQG+EFd6HBTXtT5gH29UN/ieAOGHAV6zWR2IJH+h4eRA8U7tgciatz5P/KGrHgH1qmxe9EoSkXOulikG82cs22gymNBeqNe+TZiNgwH6Kfd6CwTcCh8oowk1YXMqXaVCBso1n1R7JtMkDWd4R1CnEVCtTt1ZCfbVgHrKADPFkuwUYIp0lEXXYeDD5GqvJBaR3+INFW2t7qEMb0uzPr1s9n42W2uMEC7u45dqYss9mWlNhrI7+YG6IxCL0jx7VxIIrkOj1ihsHgwj+bxMCH7Eiu+87&quot;,
-            &quot;MD5OfBody&quot;: &quot;de80b2f443dc0a15382a40a625b74d3a&quot;,
-            &quot;MessageId&quot;: &quot;8efcd759-eb0f-48a3-92fe-5b83e0dd8740&quot;
-        }
-    ]
-}
-
-aws&amp;gt; sqs change-message-visibility --queue-url https://queue.amazonaws.com/111111111111/my_test_queue --receipt-handle &quot;AQEBYkUuIUjSEnzSI7ymjk/oRB0K9osJ2Nyud1+pij4nVAJ8taZ+FHq1kvWIm4LGrjZEVveMPOjsxP/nmmaUCEXAZKYQHATnQDT2Hqt+NJiMQG+EFd6HBTXtT5gH29UN/ieAOGHAV6zWR2IJH+h4eRA8U7tgciatz5P/KGrHgH1qmxe9EoSkXOulikG82cs22gymNBeqNe+TZiNgwH6Kfd6CwTcCh8oowk1YXMqXaVCBso1n1R7JtMkDWd4R1CnEVCtTt1ZCfbVgHrKADPFkuwUYIp0lEXXYeDD5GqvJBaR3+INFW2t7qEMb0uzPr1s9n42W2uMEC7u45dqYss9mWlNhrI7+YG6IxCL0jx7VxIIrkOj1ihsHgwj+bxMCH7Eiu+87&quot; --visibility-timeout 120
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;Now even if we try to get message after 30 seconds, this message will not show up. However, it will after 120 seconds unless we delete it. Remember that this value is absolute, which means it changes the timeout from default (30 seconds) to 120 seconds and not to 30+120 seconds.&lt;/p&gt;</content>
-
-      
-      
-      
-      
-      
-
-      
-        <author>
-            <name>Manish Pandit</name>
-          
-          
-        </author>
-      
-
-      
-        <category term="aws" />
-      
-        <category term="sqs" />
-      
-
-      
-
-      
-        <summary type="html">This post is the handout for the SQS Lab I ran as a part of hands-on AWS training to the Engineering + DevOps team at Marqeta.</summary>
       
 
       

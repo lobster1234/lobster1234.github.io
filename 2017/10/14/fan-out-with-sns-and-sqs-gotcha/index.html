@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  
+  
+  <title>Fanout SNS-SQS Gotcha</title>
+  <meta name="description" content="One of the very common architectural patterns is fan-out where an event is sent to multiple subscribers by a broker. An event like placing an order, which can then be handled by inventory service, record-keeping, as well as shipping service concurrently. These events can even be very frequent like clickstreams, or search strings on a website. AWS offers fan-out architecture with SNS topics, and SQS can subscribe to a topic. Thus, the publisher can publish events on an SNS topic, which will forwarded to the SQS queue(s) that are subscribed to that topic. It is documented that FIFO queues cannot be SNS subscribers. However, as I recently found out, encrypted queues cannot subscribe to SNS either. While AWS stops you from subscribing a FIFO queue to SNS, encrypted queues are allowed to subscribe, but they never get any events. The purpose of this post is to document this previously undocumented behavior.">
+  
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="https://lobster1234.github.io/2017/10/14/fan-out-with-sns-and-sqs-gotcha/">
+  
+  
+  <link rel="alternate" type="application/rss+xml" title="Manish Pandit&#39;s Blog" href="https://lobster1234.github.io/feed.xml">
+
+  
+
+  
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="lobster1234">
+  <meta name="twitter:title" content="Fanout SNS-SQS Gotcha">
+  <meta name="twitter:description" content="One of the very common architectural patterns is fan-out where an event is sent to multiple subscribers by a broker. An event like placing an order, which can then be handled by inventory service, ...">
+  
+    <meta name="twitter:creator" content="lobster1234">
+  
+  
+
+  <script type="text/javascript">
+  WebFontConfig = {
+    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
+  };
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+  })();
+</script>
+
+  
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-96931340-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+
+  <!-- Begin Jekyll SEO tag v2.2.0 -->
+<title>Fanout SNS-SQS Gotcha | Manish Pandit’s Blog</title>
+<meta property="og:title" content="Fanout SNS-SQS Gotcha" />
+<meta name="author" content="Manish Pandit" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="One of the very common architectural patterns is fan-out where an event is sent to multiple subscribers by a broker. An event like placing an order, which can then be handled by inventory service, record-keeping, as well as shipping service concurrently. These events can even be very frequent like clickstreams, or search strings on a website. AWS offers fan-out architecture with SNS topics, and SQS can subscribe to a topic. Thus, the publisher can publish events on an SNS topic, which will forwarded to the SQS queue(s) that are subscribed to that topic. It is documented that FIFO queues cannot be SNS subscribers. However, as I recently found out, encrypted queues cannot subscribe to SNS either. While AWS stops you from subscribing a FIFO queue to SNS, encrypted queues are allowed to subscribe, but they never get any events. The purpose of this post is to document this previously undocumented behavior." />
+<meta property="og:description" content="One of the very common architectural patterns is fan-out where an event is sent to multiple subscribers by a broker. An event like placing an order, which can then be handled by inventory service, record-keeping, as well as shipping service concurrently. These events can even be very frequent like clickstreams, or search strings on a website. AWS offers fan-out architecture with SNS topics, and SQS can subscribe to a topic. Thus, the publisher can publish events on an SNS topic, which will forwarded to the SQS queue(s) that are subscribed to that topic. It is documented that FIFO queues cannot be SNS subscribers. However, as I recently found out, encrypted queues cannot subscribe to SNS either. While AWS stops you from subscribing a FIFO queue to SNS, encrypted queues are allowed to subscribe, but they never get any events. The purpose of this post is to document this previously undocumented behavior." />
+<link rel="canonical" href="https://lobster1234.github.io/2017/10/14/fan-out-with-sns-and-sqs-gotcha/" />
+<meta property="og:url" content="https://lobster1234.github.io/2017/10/14/fan-out-with-sns-and-sqs-gotcha/" />
+<meta property="og:site_name" content="Manish Pandit’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2017-10-14T13:44:37-07:00" />
+<script type="application/ld+json">
+{"@context": "http://schema.org",
+"@type": "BlogPosting",
+"headline": "Fanout SNS-SQS Gotcha",
+"author": {"@type": "Person",
+"name": "Manish Pandit"},
+"datePublished": "2017-10-14T13:44:37-07:00",
+"description": "One of the very common architectural patterns is fan-out where an event is sent to multiple subscribers by a broker. An event like placing an order, which can then be handled by inventory service, record-keeping, as well as shipping service concurrently. These events can even be very frequent like clickstreams, or search strings on a website. AWS offers fan-out architecture with SNS topics, and SQS can subscribe to a topic. Thus, the publisher can publish events on an SNS topic, which will forwarded to the SQS queue(s) that are subscribed to that topic. It is documented that FIFO queues cannot be SNS subscribers. However, as I recently found out, encrypted queues cannot subscribe to SNS either. While AWS stops you from subscribing a FIFO queue to SNS, encrypted queues are allowed to subscribe, but they never get any events. The purpose of this post is to document this previously undocumented behavior.",
+"mainEntityOfPage": {"@type": "WebPage",
+"@id": "https://lobster1234.github.io/2017/10/14/fan-out-with-sns-and-sqs-gotcha/"},
+"url": "https://lobster1234.github.io/2017/10/14/fan-out-with-sns-and-sqs-gotcha/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Home</a>
+
+    <nav class="site-nav">
+      
+        
+        <a class="page-link" href="/about/">About</a>
+      
+        
+        <a class="page-link" href="/archives/">Archives</a>
+      
+        
+        <a class="page-link" href="https://www.twitter.com/lobster1234">Twitter</a>
+      
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    
+      <h1 class="post-title" itemprop="name headline">Fanout SNS-SQS Gotcha</h1>
+    
+    <p class="post-meta"><time datetime="2017-10-14T13:44:37-07:00" itemprop="datePublished">Oct 14, 2017</time> • 
+  
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <a href="/categories/aws/">aws</a>
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>One of the very common architectural patterns is <em>fan-out</em> where an event is sent to multiple subscribers by a broker. An event like placing an order, which can then be handled by inventory service, record-keeping, as well as shipping service concurrently. These events can even be very frequent like clickstreams, or search strings on a website. AWS offers <a href="https://aws.amazon.com/blogs/compute/messaging-fanout-pattern-for-serverless-architectures-using-amazon-sns/">fan-out architecture</a> with SNS topics, and SQS can subscribe to a topic. Thus, the publisher can publish events on an SNS topic, which will forwarded to the SQS queue(s) that are subscribed to that topic. It is documented that FIFO queues cannot be SNS subscribers. However, as I recently found out, encrypted queues cannot subscribe to SNS either. While AWS stops you from subscribing a FIFO queue to SNS, encrypted queues are allowed to subscribe, but they never get any events. The purpose of this post is to document this previously undocumented behavior.
+<!--more--></p>
+
+<h3 id="setup">Setup</h3>
+<p>We will create an SNS topic called <code class="highlighter-rouge">fan-out-topic</code>, and then create a SQS Standard Queue called <code class="highlighter-rouge">fan-out-sink</code>. We will create an IAM policy so the queue can receive messages from the topic, and finally we will subscribe the queue to the topic. Next, we will verify that the fan-out works. Finally we will enable SSE on the queue, and verify that the fan out no longer works.</p>
+
+<p>I will use aws-shell CLI.</p>
+
+<h3 id="create-an-sns-topic">Create an SNS topic</h3>
+<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sns create-topic --name fan-out-topic
+</code></pre>
+</div>
+
+<h3 id="create-the-sqs-queue">Create the SQS queue</h3>
+<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sqs create-queue --queue-name fan-out-sink
+</code></pre>
+</div>
+
+<h3 id="create-an-iam-policy">Create an IAM policy</h3>
+<p>This is where it gets interesting. AWS’s handling of assigning policies to SQS via CLI is really uncomfortable. Basically you’d need to flatten out the entire IAM policy JSON as a string, and put everything in a single line. To save my blog from looking ugly, I will not put everything in a single line, but if you plan on getting this to work, you’d need to make sure this file has one and only one line. We will create one file, call it <code class="highlighter-rouge">/tmp/policy.json</code>, with these contents. Your account IDs/ARNs will be different.</p>
+
+<div class="language-json highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="w"> </span><span class="nt">"Policy"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"{ \"Version\": \"2012-10-17\", \"Id\": \"arn:aws:sqs:us-east-1:***********:fan-out-sink/SQSDefaultPolicy\", \"Statement\": [{ \"Sid\": \"Sid1508039487834\",\"Effect\": \"Allow\", \"Principal\": {\"AWS\": \"*\"},\"Action\": \"SQS:SendMessage\",\"Resource\": \"arn:aws:sqs:us-east-1:***********:fan-out-sink\",\"Condition\": {\"ArnEquals\": {\"aws:SourceArn\": \"arn:aws:sns:us-east-1:***********:fan-out-topic\"}}}]}"</span><span class="p">}</span><span class="w">
+</span></code></pre>
+</div>
+
+<h3 id="associate-this-policy-with-sqs">Associate this policy with SQS</h3>
+<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sqs set-queue-attributes --queue-url https://queue.amazonaws.com/***********/fan-out-sink --attributes file:///tmp/policy.json
+</code></pre>
+</div>
+
+<h3 id="subscribe-sqs-to-sns">Subscribe SQS to SNS</h3>
+<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sns subscribe --topic-arn arn:aws:sns:us-east-1:***********:fan-out-topic --protocol sqs --notification-endpoint arn:aws:sqs:us-east-1:***********:fan-out-sink
+{
+    "SubscriptionArn": "arn:aws:sns:us-east-1:***********:fan-out-topic:c0ddf05a-a62e-44dc-ac64-99da02a00fba"
+}
+</code></pre>
+</div>
+<p>The SubscriptionArn would mean that we do not need to confirm this subscription.</p>
+
+<h3 id="test-the-fan-out">Test the fan-out</h3>
+<p>Lets publish a message on the topic</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sns publish --message "Hello!" --topic-arn arn:aws:sns:us-east-1:***********:fan-out-topic
+{
+    "MessageId": "92ce4aac-c8b9-59b3-b4c3-18f02e3a1306"
+}
+</code></pre>
+</div>
+<p>And receive it</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sqs receive-message --queue-url https://queue.amazonaws.com/***********/fan-out-sink
+{
+    "Messages": [
+        {
+            "Body": "{\n  \"Type\" : \"Notification\",\n  \"MessageId\" : \"d649c24e-fcac-5375-b1e5-901227c0fa47\",\n  \"TopicArn\" : \"arn:aws:sns:us-east-1:***********:fan-out-topic\",\n  \"Message\" : \"Hello!\",\n  \"Timestamp\" : \"2017-10-15T03:42:36.671Z\",\n  \"SignatureVersion\" : \"1\",\n  "MessageId": "88e5bca5-60a0-48ba-8148-67930dc3cee0"
+        }
+    ]
+}
+aws&gt;
+</code></pre>
+</div>
+<p>I’ve removed other response attributes for brevity.</p>
+
+<p>We will then purge this queue before enabling SSE on it. Alternatively, you may choose to just delete the messages.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sqs purge-queue --queue-url https://queue.amazonaws.com/***********/fan-out-sink
+</code></pre>
+</div>
+
+<h3 id="enable-sse">Enable SSE</h3>
+<p>Since I have a CMK I had created earlier, I will use it’s alias. You may choose to use <code class="highlighter-rouge">alias/aws/sqs</code> if one does not exist, as this is a Managed CMK AWS uses to encrypt any SQS.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sqs set-queue-attributes --queue-url https://queue.amazonaws.com/***********/fan-out-sink --attributes KmsMasterKeyId=alias/my-master-key
+</code></pre>
+</div>
+<p>We can verify that the queue has SSE enabled by doing so -</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sqs get-queue-attributes --attribute-names KmsMasterKeyId --queue-url https://queue.amazonaws.om/***********/fan-out-sink
+{
+    "Attributes": {
+        "KmsMasterKeyId": "alias/my-master-key"
+    }
+}
+aws&gt;
+</code></pre>
+</div>
+<h3 id="try-the-fanout">Try the fanout</h3>
+<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sns publish --message "Hello!" --topic-arn arn:aws:sns:us-east-1:***********:fan-out-topic
+{
+    "MessageId": "d28301cf-994c-5e50-a365-53937013a49c"
+}
+aws&gt; sqs receive-message --queue-url https://queue.amazonaws.com/***********/fan-out-sink
+aws&gt;
+</code></pre>
+</div>
+<p>As you can see, we did not get the message in the queue. This can also be verified on the AWS Console where the queue will show zero available messages.</p>
+
+<h3 id="re-validate">Re-validate</h3>
+<p>We will remove SSE and run one final test.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sqs set-queue-attributes --queue-url https://queue.amazonaws.com/***********/fan-out-sink --attributes KmsMasterKeyId=
+aws&gt; sqs get-queue-attributes --attribute-names KmsMasterKeyId --queue-url https://queue.amazonaws.om/***********/fan-out-sink
+aws&gt; sns publish --message "Reverification!" --topic-arn arn:aws:sns:us-east-1:***********:fan-out-topic
+{
+    "MessageId": "be931efe-aa12-561e-87c5-4ca2405cc84a"
+}
+aws&gt; sqs receive-message --queue-url https://queue.amazonaws.com/***********/fan-out-sink
+{
+    "Messages": [
+        {
+            "Body": "{\n  \"Type\" : \"Notification\",\n  \"MessageId\" : \"be931efe-aa12-561e-87c5-4ca2405cc84a\",\n  \"TopicArn\" : \"arn:aws:sns:us-east-1:***********:fan-out-topic\",\n  \"Message\" : \"Reverification!\",\n  \"Timestamp\" : \"2017-10-15T04:46:06.457Z\",\n  \"SignatureVersion\" : \"1\",\n
+            "MessageId": "a987c68e-141f-4a29-a8d3-d3668c5c98a6"
+        }
+    ]
+}
+aws&gt;
+</code></pre>
+</div>
+
+<p>This shows that an SSE-enabled SQS queue cannot get messages from a subscribed SNS topic.</p>
+
+<h3 style="text-align: center" id="comments">Comments</h3>
+
+<div id="disqus_thread"></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = "https://lobster1234.github.io/2017/10/14/fan-out-with-sns-and-sqs-gotcha/";  
+this.page.identifier = "/2017/10/14/fan-out-with-sns-and-sqs-gotcha";
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://lobster1234.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+<div id="disqus_thread"></div>
+<script>
+
+
+      
+
+</script>
+
+  </div>
+
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <p>
+      
+
+&copy; Manish Pandit - Powered by <a href="https://jekyllrb.com">Jekyll</a> &amp; <a href="https://github.com/yous/whiteglass">whiteglass</a> - Subscribe via <a href="https://lobster1234.github.io/feed.xml">RSS</a>
+
+    </p>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
