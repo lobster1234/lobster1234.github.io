@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-10-14T23:00:49-07:00</updated>
+  <updated>2017-10-14T23:09:06-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -35,13 +35,13 @@
       <published>2017-10-14T13:44:37-07:00</published>
       <updated>2017-10-14T13:44:37-07:00</updated>
       <id>https://lobster1234.github.io/2017/10/14/fan-out-with-sns-and-sqs-gotcha</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2017/10/14/fan-out-with-sns-and-sqs-gotcha/">&lt;p&gt;One of the very common architectural patterns is &lt;em&gt;fan-out&lt;/em&gt; where an event is sent to multiple subscribers by a broker. An event like placing an order, which can then be handled by inventory service, record-keeping, as well as shipping service concurrently. These events can even be very frequent like clickstreams, or search strings on a website. AWS offers &lt;a href=&quot;https://aws.amazon.com/blogs/compute/messaging-fanout-pattern-for-serverless-architectures-using-amazon-sns/&quot;&gt;fan-out architecture&lt;/a&gt; with SNS topics, and SQS can subscribe to a topic. Thus, the publisher can publish events on an SNS topic, which will forwarded to the SQS queue(s) that are subscribed to that topic. It is documented that FIFO queues cannot be SNS subscribers. However, as I recently found out, encrypted queues cannot subscribe to SNS either. While AWS stops you from subscribing a FIFO queue to SNS, encrypted queues are allowed to subscribe, but they never get any events. The purpose of this post is to document this previously undocumented behavior.
+      <content type="html" xml:base="https://lobster1234.github.io/2017/10/14/fan-out-with-sns-and-sqs-gotcha/">&lt;p&gt;One of the very common architectural patterns is &lt;em&gt;fan-out&lt;/em&gt; where an event is sent to multiple subscribers by a broker. An event like placing an order, which can then be handled by inventory service, record-keeping, as well as shipping service concurrently. These events can even be very frequent like clickstreams, or search strings on a website. AWS offers &lt;a href=&quot;http://docs.aws.amazon.com/sns/latest/dg/SNS_Scenarios.html&quot;&gt;fan-out architecture&lt;/a&gt; with &lt;a href=&quot;https://aws.amazon.com/sns/&quot;&gt;SNS&lt;/a&gt; topics, and &lt;a href=&quot;https://aws.amazon.com/sqs/&quot;&gt;SQS&lt;/a&gt; can subscribe to a topic. Thus, the publisher can publish events on an SNS topic, which will forwarded to the SQS queue(s) that are subscribed to that topic. It is documented that FIFO queues cannot be SNS subscribers. However, as I recently found out, encrypted queues cannot subscribe to SNS either. While AWS stops you from subscribing a &lt;a href=&quot;http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues.html&quot;&gt;FIFO queue&lt;/a&gt; to SNS, &lt;a href=&quot;https://aws.amazon.com/blogs/aws/new-server-side-encryption-for-amazon-simple-queue-service-sqs/&quot;&gt;SSE-encrypted queues&lt;/a&gt; are allowed to subscribe, but they never get any events. The purpose of this post is to document this previously undocumented behavior.
 &lt;!--more--&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;setup&quot;&gt;Setup&lt;/h3&gt;
 &lt;p&gt;We will create an SNS topic called &lt;code class=&quot;highlighter-rouge&quot;&gt;fan-out-topic&lt;/code&gt;, and then create a SQS Standard Queue called &lt;code class=&quot;highlighter-rouge&quot;&gt;fan-out-sink&lt;/code&gt;. We will create an IAM policy so the queue can receive messages from the topic, and finally we will subscribe the queue to the topic. Next, we will verify that the fan-out works. Finally we will enable SSE on the queue, and verify that the fan out no longer works.&lt;/p&gt;
 
-&lt;p&gt;I will use aws-shell CLI.&lt;/p&gt;
+&lt;p&gt;I will use &lt;a href=&quot;https://github.com/awslabs/aws-shell&quot;&gt;aws-shell&lt;/a&gt; CLI for all the operations.&lt;/p&gt;
 
 &lt;h3 id=&quot;create-an-sns-topic&quot;&gt;Create an SNS topic&lt;/h3&gt;
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sns create-topic --name fan-out-topic
@@ -74,7 +74,7 @@
 &lt;/div&gt;
 &lt;p&gt;The SubscriptionArn would mean that we do not need to confirm this subscription.&lt;/p&gt;
 
-&lt;h3 id=&quot;test-the-fan-out&quot;&gt;Test the fan-out&lt;/h3&gt;
+&lt;h3 id=&quot;test-the-fan-out--works&quot;&gt;Test the fan-out : works!&lt;/h3&gt;
 &lt;p&gt;Lets publish a message on the topic&lt;/p&gt;
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sns publish --message &quot;Hello!&quot; --topic-arn arn:aws:sns:us-east-1:***********:fan-out-topic
 {
@@ -102,7 +102,7 @@ aws&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;h3 id=&quot;enable-sse&quot;&gt;Enable SSE&lt;/h3&gt;
+&lt;h3 id=&quot;enable-sse-on-sqs&quot;&gt;Enable SSE on SQS&lt;/h3&gt;
 &lt;p&gt;Since I have a CMK I had created earlier, I will use it’s alias. You may choose to use &lt;code class=&quot;highlighter-rouge&quot;&gt;alias/aws/sqs&lt;/code&gt; if one does not exist, as this is a Managed CMK AWS uses to encrypt any SQS.&lt;/p&gt;
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sqs set-queue-attributes --queue-url https://queue.amazonaws.com/***********/fan-out-sink --attributes KmsMasterKeyId=alias/my-master-key
 &lt;/code&gt;&lt;/pre&gt;
@@ -117,7 +117,7 @@ aws&amp;gt;
 aws&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
-&lt;h3 id=&quot;try-the-fanout&quot;&gt;Try the fanout&lt;/h3&gt;
+&lt;h3 id=&quot;try-the-fan-out--fails&quot;&gt;Try the fan-out : fails!&lt;/h3&gt;
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sns publish --message &quot;Hello!&quot; --topic-arn arn:aws:sns:us-east-1:***********:fan-out-topic
 {
     &quot;MessageId&quot;: &quot;d28301cf-994c-5e50-a365-53937013a49c&quot;
@@ -128,10 +128,11 @@ aws&amp;gt;
 &lt;/div&gt;
 &lt;p&gt;As you can see, we did not get the message in the queue. This can also be verified on the AWS Console where the queue will show zero available messages.&lt;/p&gt;
 
-&lt;h3 id=&quot;re-validate&quot;&gt;Re-validate&lt;/h3&gt;
-&lt;p&gt;We will remove SSE and run one final test.&lt;/p&gt;
+&lt;h3 id=&quot;re-validate-by-disabling-sse&quot;&gt;Re-validate by disabling SSE&lt;/h3&gt;
+&lt;p&gt;We will remove SSE and run one final test. This is done by setting &lt;code class=&quot;highlighter-rouge&quot;&gt;KmsMasterKeyId&lt;/code&gt; to empty.&lt;/p&gt;
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sqs set-queue-attributes --queue-url https://queue.amazonaws.com/***********/fan-out-sink --attributes KmsMasterKeyId=
 aws&amp;gt; sqs get-queue-attributes --attribute-names KmsMasterKeyId --queue-url https://queue.amazonaws.om/***********/fan-out-sink
+aws&amp;gt;
 aws&amp;gt; sns publish --message &quot;Reverification!&quot; --topic-arn arn:aws:sns:us-east-1:***********:fan-out-topic
 {
     &quot;MessageId&quot;: &quot;be931efe-aa12-561e-87c5-4ca2405cc84a&quot;
@@ -212,7 +213,7 @@ s.setAttribute('data-timestamp', +new Date());
       
 
       
-        <summary type="html">One of the very common architectural patterns is fan-out where an event is sent to multiple subscribers by a broker. An event like placing an order, which can then be handled by inventory service, record-keeping, as well as shipping service concurrently. These events can even be very frequent like clickstreams, or search strings on a website. AWS offers fan-out architecture with SNS topics, and SQS can subscribe to a topic. Thus, the publisher can publish events on an SNS topic, which will forwarded to the SQS queue(s) that are subscribed to that topic. It is documented that FIFO queues cannot be SNS subscribers. However, as I recently found out, encrypted queues cannot subscribe to SNS either. While AWS stops you from subscribing a FIFO queue to SNS, encrypted queues are allowed to subscribe, but they never get any events. The purpose of this post is to document this previously undocumented behavior.</summary>
+        <summary type="html">One of the very common architectural patterns is fan-out where an event is sent to multiple subscribers by a broker. An event like placing an order, which can then be handled by inventory service, record-keeping, as well as shipping service concurrently. These events can even be very frequent like clickstreams, or search strings on a website. AWS offers fan-out architecture with SNS topics, and SQS can subscribe to a topic. Thus, the publisher can publish events on an SNS topic, which will forwarded to the SQS queue(s) that are subscribed to that topic. It is documented that FIFO queues cannot be SNS subscribers. However, as I recently found out, encrypted queues cannot subscribe to SNS either. While AWS stops you from subscribing a FIFO queue to SNS, SSE-encrypted queues are allowed to subscribe, but they never get any events. The purpose of this post is to document this previously undocumented behavior.</summary>
       
 
       
