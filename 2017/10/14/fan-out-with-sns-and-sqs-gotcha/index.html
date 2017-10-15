@@ -10,7 +10,7 @@
   
   
   <title>Fanout SNS-SQS Gotcha</title>
-  <meta name="description" content="One of the very common architectural patterns is fan-out where an event is sent to multiple subscribers by a broker. An event can be like placing an order, which can then be handled by inventory service, record-keeping, as well as shipping service concurrently. These events can also be very frequent - like clickstreams, or search strings on a website. AWS allows for fan-out architecture with SNS topics, and SQS. SQS queues can can subscribe to SNS topics. Thus, the publisher can publish events on an SNS topic, which will then forwarded to the SQS queue(s) that have subscribed to that topic. It is documented that FIFO queues cannot be SNS subscribers here. However, as I recently found out, SSE-enabled SQS queues cannot subscribe to SNS either. While AWS stops you from subscribing a FIFO queue to SNS, SSE-encrypted queues are allowed to subscribe, but they never get any events. The purpose of this post is to document this previously undocumented behavior.">
+  <meta name="description" content="One of the very common architectural patterns is fan-out where an event is sent to multiple subscribers by a broker. An event can be like placing an order, which can then be handled by inventory service, record-keeping, as well as shipping service concurrently. These events can also be very frequent - like clickstreams, or search strings on a website. AWS allows for fan-out architecture with SNS topics, and SQS queues. SQS queue(s) can subscribe to SNS topics and receive any message sent to the SNS topic(s). It is documented that FIFO queues cannot be SNS subscribers here. However, as I recently found out, SSE-enabled SQS queues cannot subscribe to SNS either. While AWS stops us from subscribing a FIFO queue to SNS, SSE-enabled queues are allowed to subscribe, but they never get any events. The purpose of this post is to document this previously undocumented behavior.">
   
 
   <link rel="stylesheet" href="/assets/main.css">
@@ -65,8 +65,8 @@
 <meta property="og:title" content="Fanout SNS-SQS Gotcha" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="One of the very common architectural patterns is fan-out where an event is sent to multiple subscribers by a broker. An event can be like placing an order, which can then be handled by inventory service, record-keeping, as well as shipping service concurrently. These events can also be very frequent - like clickstreams, or search strings on a website. AWS allows for fan-out architecture with SNS topics, and SQS. SQS queues can can subscribe to SNS topics. Thus, the publisher can publish events on an SNS topic, which will then forwarded to the SQS queue(s) that have subscribed to that topic. It is documented that FIFO queues cannot be SNS subscribers here. However, as I recently found out, SSE-enabled SQS queues cannot subscribe to SNS either. While AWS stops you from subscribing a FIFO queue to SNS, SSE-encrypted queues are allowed to subscribe, but they never get any events. The purpose of this post is to document this previously undocumented behavior." />
-<meta property="og:description" content="One of the very common architectural patterns is fan-out where an event is sent to multiple subscribers by a broker. An event can be like placing an order, which can then be handled by inventory service, record-keeping, as well as shipping service concurrently. These events can also be very frequent - like clickstreams, or search strings on a website. AWS allows for fan-out architecture with SNS topics, and SQS. SQS queues can can subscribe to SNS topics. Thus, the publisher can publish events on an SNS topic, which will then forwarded to the SQS queue(s) that have subscribed to that topic. It is documented that FIFO queues cannot be SNS subscribers here. However, as I recently found out, SSE-enabled SQS queues cannot subscribe to SNS either. While AWS stops you from subscribing a FIFO queue to SNS, SSE-encrypted queues are allowed to subscribe, but they never get any events. The purpose of this post is to document this previously undocumented behavior." />
+<meta name="description" content="One of the very common architectural patterns is fan-out where an event is sent to multiple subscribers by a broker. An event can be like placing an order, which can then be handled by inventory service, record-keeping, as well as shipping service concurrently. These events can also be very frequent - like clickstreams, or search strings on a website. AWS allows for fan-out architecture with SNS topics, and SQS queues. SQS queue(s) can subscribe to SNS topics and receive any message sent to the SNS topic(s). It is documented that FIFO queues cannot be SNS subscribers here. However, as I recently found out, SSE-enabled SQS queues cannot subscribe to SNS either. While AWS stops us from subscribing a FIFO queue to SNS, SSE-enabled queues are allowed to subscribe, but they never get any events. The purpose of this post is to document this previously undocumented behavior." />
+<meta property="og:description" content="One of the very common architectural patterns is fan-out where an event is sent to multiple subscribers by a broker. An event can be like placing an order, which can then be handled by inventory service, record-keeping, as well as shipping service concurrently. These events can also be very frequent - like clickstreams, or search strings on a website. AWS allows for fan-out architecture with SNS topics, and SQS queues. SQS queue(s) can subscribe to SNS topics and receive any message sent to the SNS topic(s). It is documented that FIFO queues cannot be SNS subscribers here. However, as I recently found out, SSE-enabled SQS queues cannot subscribe to SNS either. While AWS stops us from subscribing a FIFO queue to SNS, SSE-enabled queues are allowed to subscribe, but they never get any events. The purpose of this post is to document this previously undocumented behavior." />
 <link rel="canonical" href="https://lobster1234.github.io/2017/10/14/fan-out-with-sns-and-sqs-gotcha/" />
 <meta property="og:url" content="https://lobster1234.github.io/2017/10/14/fan-out-with-sns-and-sqs-gotcha/" />
 <meta property="og:site_name" content="Manish Pandit’s Blog" />
@@ -79,7 +79,7 @@
 "author": {"@type": "Person",
 "name": "Manish Pandit"},
 "datePublished": "2017-10-14T13:44:37-07:00",
-"description": "One of the very common architectural patterns is fan-out where an event is sent to multiple subscribers by a broker. An event can be like placing an order, which can then be handled by inventory service, record-keeping, as well as shipping service concurrently. These events can also be very frequent - like clickstreams, or search strings on a website. AWS allows for fan-out architecture with SNS topics, and SQS. SQS queues can can subscribe to SNS topics. Thus, the publisher can publish events on an SNS topic, which will then forwarded to the SQS queue(s) that have subscribed to that topic. It is documented that FIFO queues cannot be SNS subscribers here. However, as I recently found out, SSE-enabled SQS queues cannot subscribe to SNS either. While AWS stops you from subscribing a FIFO queue to SNS, SSE-encrypted queues are allowed to subscribe, but they never get any events. The purpose of this post is to document this previously undocumented behavior.",
+"description": "One of the very common architectural patterns is fan-out where an event is sent to multiple subscribers by a broker. An event can be like placing an order, which can then be handled by inventory service, record-keeping, as well as shipping service concurrently. These events can also be very frequent - like clickstreams, or search strings on a website. AWS allows for fan-out architecture with SNS topics, and SQS queues. SQS queue(s) can subscribe to SNS topics and receive any message sent to the SNS topic(s). It is documented that FIFO queues cannot be SNS subscribers here. However, as I recently found out, SSE-enabled SQS queues cannot subscribe to SNS either. While AWS stops us from subscribing a FIFO queue to SNS, SSE-enabled queues are allowed to subscribe, but they never get any events. The purpose of this post is to document this previously undocumented behavior.",
 "mainEntityOfPage": {"@type": "WebPage",
 "@id": "https://lobster1234.github.io/2017/10/14/fan-out-with-sns-and-sqs-gotcha/"},
 "url": "https://lobster1234.github.io/2017/10/14/fan-out-with-sns-and-sqs-gotcha/"}</script>
@@ -197,9 +197,9 @@
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <p>One of the very common architectural patterns is <em>fan-out</em> where an event is sent to multiple subscribers by a broker. An event can be like placing an order, which can then be handled by inventory service, record-keeping, as well as shipping service concurrently. These events can also be very frequent - like clickstreams, or search strings on a website. AWS allows for <a href="http://docs.aws.amazon.com/sns/latest/dg/SNS_Scenarios.html">fan-out architecture</a> with <a href="https://aws.amazon.com/sns/">SNS</a> topics, and <a href="https://aws.amazon.com/sqs/">SQS</a>. SQS queues can can subscribe to SNS topics. Thus, the publisher can publish events on an SNS topic, which will then forwarded to the SQS queue(s) that have subscribed to that topic. It is documented that <a href="(http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues.html)">FIFO queues</a> cannot be SNS subscribers <a href="https://forums.aws.amazon.com/thread.jspa?threadID=246962">here</a>.</p>
+    <p>One of the very common architectural patterns is <em>fan-out</em> where an event is sent to multiple subscribers by a broker. An event can be like placing an order, which can then be handled by inventory service, record-keeping, as well as shipping service concurrently. These events can also be very frequent - like clickstreams, or search strings on a website. AWS allows for <a href="http://docs.aws.amazon.com/sns/latest/dg/SNS_Scenarios.html">fan-out architecture</a> with <a href="https://aws.amazon.com/sns/">SNS</a> topics, and <a href="https://aws.amazon.com/sqs/">SQS</a> queues. SQS queue(s) can subscribe to SNS topics and receive any message sent to the SNS topic(s). It is documented that <a href="(http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues.html)">FIFO queues</a> cannot be SNS subscribers <a href="https://forums.aws.amazon.com/thread.jspa?threadID=246962">here</a>.</p>
 
-<p>However, as I recently found out, SSE-enabled SQS queues cannot subscribe to SNS either. While AWS stops you from subscribing a FIFO queue to SNS, <a href="https://aws.amazon.com/blogs/aws/new-server-side-encryption-for-amazon-simple-queue-service-sqs/">SSE-encrypted queues</a> are allowed to subscribe, but they never get any events. The purpose of this post is to document this previously undocumented behavior.
+<p>However, as I recently found out, SSE-enabled SQS queues cannot subscribe to SNS either. While AWS stops us from subscribing a FIFO queue to SNS, <a href="https://aws.amazon.com/blogs/aws/new-server-side-encryption-for-amazon-simple-queue-service-sqs/">SSE-enabled queues</a> are allowed to subscribe, but they never get any events. The purpose of this post is to document this previously undocumented behavior.
 <!--more--></p>
 
 <h3 id="setup">Setup</h3>
@@ -218,7 +218,9 @@
 </div>
 
 <h3 id="create-an-iam-policy">Create an IAM policy</h3>
-<p>This is where it gets interesting. AWS’s handling of assigning policies to SQS via CLI is really uncomfortable. Basically you’d need to flatten out the entire IAM policy JSON as a string, and put everything in a single line. We will create one file, call it <code class="highlighter-rouge">/tmp/policy.json</code>, with these contents. Your account IDs/ARNs will be different.</p>
+<p>The SQS queue will need to have an associated IAM policy to allow the SNS topic to send message to it via <code class="highlighter-rouge">SendMessage</code> action.</p>
+
+<p>This is where it gets interesting. AWS’s handling of assigning policies to SQS via CLI is really uncomfortable. Basically we’d need to flatten out the entire IAM policy JSON as a string, and put everything in a single line. We will create one file, call it <code class="highlighter-rouge">/tmp/policy.json</code>, with these contents. Your account IDs/ARNs will be different.</p>
 
 <div class="language-json highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="w"> </span><span class="nt">"Policy"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"{ \"Version\": \"2012-10-17\", \"Id\": \"arn:aws:sqs:us-east-1:***********:fan-out-sink/SQSDefaultPolicy\", \"Statement\": [{ \"Sid\": \"Sid1508039487834\",\"Effect\": \"Allow\", \"Principal\": {\"AWS\": \"*\"},\"Action\": \"SQS:SendMessage\",\"Resource\": \"arn:aws:sqs:us-east-1:***********:fan-out-sink\",\"Condition\": {\"ArnEquals\": {\"aws:SourceArn\": \"arn:aws:sns:us-east-1:***********:fan-out-topic\"}}}]}"</span><span class="p">}</span><span class="w">
 </span></code></pre>
@@ -236,17 +238,17 @@
 }
 </code></pre>
 </div>
-<p>The SubscriptionArn would mean that we do not need to confirm this subscription.</p>
+<p>The <code class="highlighter-rouge">SubscriptionArn</code> would mean that we do not need to confirm this subscription.</p>
 
-<h3 id="test-the-fan-out--works">Test the fan-out : works!</h3>
-<p>Lets publish a message on the topic</p>
+<h3 id="try-the-fan-out--works">Try the fan-out : works!</h3>
+<p>Let’s publish a message on the topic</p>
 <div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sns publish --message "Hello!" --topic-arn arn:aws:sns:us-east-1:***********:fan-out-topic
 {
     "MessageId": "92ce4aac-c8b9-59b3-b4c3-18f02e3a1306"
 }
 </code></pre>
 </div>
-<p>And receive it</p>
+<p>..and receive it</p>
 <div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sqs receive-message --queue-url https://queue.amazonaws.com/***********/fan-out-sink
 {
     "Messages": [
@@ -260,7 +262,7 @@ aws&gt;
 </div>
 <p>I’ve removed other response attributes for brevity.</p>
 
-<p>We will then purge this queue before enabling SSE on it. Alternatively, you may choose to just delete the messages.</p>
+<p>We will then purge this queue before enabling SSE on it. Alternatively, we may choose to just delete the messages.</p>
 
 <div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sqs purge-queue --queue-url https://queue.amazonaws.com/***********/fan-out-sink
 </code></pre>
@@ -290,7 +292,7 @@ aws&gt; sqs receive-message --queue-url https://queue.amazonaws.com/***********/
 aws&gt;
 </code></pre>
 </div>
-<p>As you can see, we did not get the message in the queue. This can also be verified on the AWS Console where the queue will show zero available messages.</p>
+<p>As we can see, we did not get the message in the queue. This can also be verified on the AWS Console, where the queue will show zero available messages.</p>
 
 <h3 id="re-validate-by-disabling-sse">Re-validate by disabling SSE</h3>
 <p>We will remove SSE and run one final test. This is done by setting <code class="highlighter-rouge">KmsMasterKeyId</code> to empty.</p>
