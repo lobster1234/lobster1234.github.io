@@ -290,6 +290,8 @@
 
 <h1 id="logbackxml">logback.xml</h1>
 
+<p>We will use 2 appenders - the <code class="highlighter-rouge">STDOUT</code> appender will send the logs to cloudwatch, just in case Logstash TCP does not work.</p>
+
 <p>Add this file to <code class="highlighter-rouge">src/main/resources</code> folder.</p>
 
 <div class="language-xml highlighter-rouge"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
@@ -300,24 +302,45 @@
   <span class="c">&lt;!-- There can be multiple destinations --&gt;</span>
         <span class="nt">&lt;encoder</span> <span class="na">class=</span><span class="s">"net.logstash.logback.encoder.LogstashEncoder"</span> <span class="nt">/&gt;</span>
     <span class="nt">&lt;/appender&gt;</span>
-
-    <span class="nt">&lt;root</span> <span class="na">level=</span><span class="s">"DEBUG"</span><span class="nt">&gt;</span>
-        <span class="nt">&lt;appender-ref</span> <span class="na">ref=</span><span class="s">"stash"</span> <span class="nt">/&gt;</span>
-    <span class="nt">&lt;/root&gt;</span>
+    <span class="nt">&lt;appender</span> <span class="na">name=</span><span class="s">"STDOUT"</span> <span class="na">class=</span><span class="s">"ch.qos.logback.core.ConsoleAppender"</span><span class="nt">&gt;</span>
+          <span class="nt">&lt;layout</span> <span class="na">class=</span><span class="s">"ch.qos.logback.classic.PatternLayout"</span><span class="nt">&gt;</span>
+              <span class="nt">&lt;Pattern&gt;</span>
+                  %d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
+              <span class="nt">&lt;/Pattern&gt;</span>
+          <span class="nt">&lt;/layout&gt;</span>
+      <span class="nt">&lt;/appender&gt;</span>
+      <span class="nt">&lt;root</span> <span class="na">level=</span><span class="s">"DEBUG"</span><span class="nt">&gt;</span>
+          <span class="nt">&lt;appender-ref</span> <span class="na">ref=</span><span class="s">"stash"</span> <span class="nt">/&gt;</span>
+          <span class="nt">&lt;appender-ref</span> <span class="na">ref=</span><span class="s">"STDOUT"</span> <span class="nt">/&gt;</span>
+      <span class="nt">&lt;/root&gt;</span>
 <span class="nt">&lt;/configuration&gt;</span>
+</code></pre>
+</div>
+
+<h1 id="the-handler-method">The Handler method</h1>
+<p>In the hander method, reset the <code class="highlighter-rouge">LoggerContext</code>, and reload the configuration. I know this sounds super odd, but when invoking lambdas multiple times, I did notice the logs missing from Kibana. Since I do not know how AWS recycles lambda execution environments, it is something to do with logback context being in a limbo. I even noticed some executions timing out (I had a 60s timeout), but somehow made it to Kibana as unique invocations. If you’ve made it work any other way, please mention in the comments section below. I am using <a href="https://www.serverless.com">Serverless Framework</a>.</p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code> <span class="kd">private</span> <span class="kd">final</span> <span class="n">Logger</span> <span class="n">logger</span> <span class="o">=</span> <span class="n">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">getClass</span><span class="o">());</span>
+
+ <span class="nd">@Override</span>
+ <span class="kd">public</span> <span class="n">Void</span> <span class="nf">handleRequest</span><span class="o">(</span><span class="n">SNSEvent</span> <span class="n">event</span><span class="o">,</span> <span class="n">Context</span> <span class="n">context</span><span class="o">)</span> <span class="o">{</span>
+       <span class="n">LoggerContext</span> <span class="n">loggerContext</span> <span class="o">=</span> <span class="o">(</span><span class="n">LoggerContext</span><span class="o">)</span> <span class="n">LoggerFactory</span><span class="o">.</span><span class="na">getILoggerFactory</span><span class="o">();</span>
+       <span class="n">loggerContext</span><span class="o">.</span><span class="na">reset</span><span class="o">();</span>
+       <span class="n">JoranConfigurator</span> <span class="n">config</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JoranConfigurator</span><span class="o">();</span>
+       <span class="n">config</span><span class="o">.</span><span class="na">setContext</span><span class="o">(</span><span class="n">loggerContext</span><span class="o">);</span>
+       <span class="k">try</span> <span class="o">{</span>
+            <span class="n">config</span><span class="o">.</span><span class="na">doConfigure</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">getClass</span><span class="o">().</span><span class="na">getResourceAsStream</span><span class="o">(</span><span class="s">"/logback.xml"</span><span class="o">));</span>
+            <span class="n">event</span><span class="o">.</span><span class="na">getRecords</span><span class="o">().</span><span class="na">forEach</span><span class="o">(</span><span class="n">x</span> <span class="o">-&gt;</span> <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="n">x</span><span class="o">.</span><span class="na">getSNS</span><span class="o">().</span><span class="na">getMessage</span><span class="o">()));</span>
+           <span class="o">}</span>
+       <span class="o">}</span><span class="k">catch</span><span class="o">(</span><span class="n">JoranException</span> <span class="n">e</span><span class="o">){</span>
+           <span class="n">logger</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="s">"Cannot initialize logger context "</span><span class="o">,</span><span class="n">e</span><span class="o">);</span>
+       <span class="o">}</span>
 </code></pre>
 </div>
 
 <h1 id="finally-block">finally block</h1>
 <p><strong>Make sure the code closes the Logging Context before the JVM dies.</strong></p>
-<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kd">private</span> <span class="kd">final</span> <span class="n">Logger</span> <span class="n">logger</span> <span class="o">=</span> <span class="n">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">getClass</span><span class="o">());</span>
-<span class="k">try</span> <span class="o">{</span>
-    <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"This is an info"</span><span class="o">);</span>
-    <span class="n">logger</span><span class="o">.</span><span class="na">debug</span><span class="o">(</span><span class="s">"This is a debug"</span><span class="o">);</span>
-    <span class="n">logger</span><span class="o">.</span><span class="na">trace</span><span class="o">(</span><span class="s">"This is a trace"</span><span class="o">);</span>
-    <span class="n">logger</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="s">"This is an error"</span><span class="o">,</span> <span class="k">new</span> <span class="n">RuntimeException</span><span class="o">(</span><span class="s">"Runtime Exception!"</span><span class="o">));</span>
-    <span class="n">logger</span><span class="o">.</span><span class="na">warn</span><span class="o">(</span><span class="s">"This is a warning"</span><span class="o">);</span>
-<span class="o">}</span><span class="k">finally</span><span class="o">{</span>
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="k">finally</span><span class="o">{</span>
     <span class="n">LoggerContext</span> <span class="n">loggerContext</span> <span class="o">=</span> <span class="o">(</span><span class="n">LoggerContext</span><span class="o">)</span> <span class="n">LoggerFactory</span><span class="o">.</span><span class="na">getILoggerFactory</span><span class="o">();</span>
     <span class="n">loggerContext</span><span class="o">.</span><span class="na">stop</span><span class="o">();</span>
 <span class="o">}</span>
@@ -340,15 +363,29 @@
 }
 </code></pre>
 </div>
-<p>Restart logstash, and search for the message in kibana (port <code class="highlighter-rouge">5601</code> if you’re using docker-elk)</p>
-<div class="highlighter-rouge"><pre class="highlight"><code>@timestamp:October 11th 2017, 23:04:16.845 level:WARN port:33,448 thread_name:main
-level_value:30000 @version:1 host:172.19.0.1 logger_name:com.foo.serverless.logging.Test
-message:This is a warning _id:AV8PL05oe2YvJOO3IrZ1 _type:logs
-_index:logstash-2017.10.12 _score: -
+<p>Restart Logstash, and search for the message in Kibana (port <code class="highlighter-rouge">5601</code> if you’re using docker-elk) after running the lambda.</p>
+
+<p>Here is a sample output -</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>@version:
+    1
+host:
+    10.0.1.128
+@timestamp:
+    October 10th 2017, 23:16:55.273
+message:
+    {"@timestamp":"2017-10-10T06:16:55.018+00:00","@version":1,"message":"Testing ELK Logging with Logstash and Lambda ","logger_name":"com.test.serverless.logging.Handler","thread_name":"main","level":"INFO","level_value":20000}
+port:
+    48,608
+_id:
+    AV8o-lTxQqZEdfFJQV0z
+_type:
+    logs
+_index:
+    logstash-2017.10.10
+_score:
 </code></pre>
 </div>
-
-<p>This text looks much prettier on Kibana ;)</p>
 
 <h3 style="text-align: center" id="comments">Comments</h3>
 
