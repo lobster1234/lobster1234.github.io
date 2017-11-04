@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-10-19T23:36:13-07:00</updated>
+  <updated>2017-11-04T00:20:31-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -25,6 +25,209 @@
     </author>
   
 
+  
+  
+    <entry>
+      
+      <title type="html">Amazon Aurora Notes</title>
+      
+      <link href="https://lobster1234.github.io/2017/11/03/amazon-aurora-rds-notes/" rel="alternate" type="text/html" title="Amazon Aurora Notes" />
+      <published>2017-11-03T13:44:37-07:00</published>
+      <updated>2017-11-03T13:44:37-07:00</updated>
+      <id>https://lobster1234.github.io/2017/11/03/amazon-aurora-rds-notes</id>
+      <content type="html" xml:base="https://lobster1234.github.io/2017/11/03/amazon-aurora-rds-notes/">&lt;p&gt;At &lt;a href=&quot;https://www.marqeta.com&quot;&gt;Marqeta&lt;/a&gt;, we strive to continually evolve our platform to make it scalable and highly performant. We rely heavily on MySQL, and have many MySQL instances hosted across data centers, as well as on EC2s for various purposes. While refactoring some of our APIs, we thought of giving &lt;a href=&quot;https://aws.amazon.com/rds/aurora/&quot;&gt;Amazon Aurora&lt;/a&gt; a try. Having heard about Aurora’s performance and high availability, this was definitely a great opportunity. Setting up a single node cluster (one &lt;code class=&quot;highlighter-rouge&quot;&gt;db.t2.small&lt;/code&gt;) via the &lt;a href=&quot;https://console.aws.amazon.com/rds/home?region=us-east-1&quot;&gt;Console&lt;/a&gt; was the first step. After a few clicks, we had our first Aurora Cluster running happily. Next step was to fire up our regression tests while pointing to a schema in Aurora. Our database fixtures worked like a charm, and we were surprised to see all of our (thousand+) tests pass - while we knew it was a MySQL &lt;em&gt;drop in replacement&lt;/em&gt;, we still expected some drama. Great first impression!&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;p&gt;This post is a collection of notes from online resources on Aurora (listed under References) that helped us learn more about the service, along with the excellent &lt;a href=&quot;http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Aurora.html&quot;&gt;documentation&lt;/a&gt; on AWS.&lt;/p&gt;
+
+&lt;h3 id=&quot;history&quot;&gt;History&lt;/h3&gt;
+
+&lt;p&gt;Work on Aurora started around ~2011, and has it been around as a service for about 2.5 years. Traditional relational databases are built on a monolithic stack, with SQL, Transactions, Caching and Logging all lumped together. This has not changed since the 1970s. Scaling out a monolith would mean replicating the same stack many times.&lt;/p&gt;
+
+&lt;h3 id=&quot;motivation&quot;&gt;Motivation&lt;/h3&gt;
+
+&lt;p&gt;The motivation to build Aurora DB was to combine the performance and availability of commercial databases with simplicity and cost effectiveness of open source databases. Apart from being a drop in replacement to MySQL and it’s clones, the following principles form the core -&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Scale out, distributed design&lt;/li&gt;
+  &lt;li&gt;Service oriented to leverage AWS services&lt;/li&gt;
+  &lt;li&gt;Automation of administrative tasks that burden DBAs&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;distributed-scale-out-fault-tolerant-and-multitenant&quot;&gt;Distributed, Scale out, Fault tolerant and Multitenant&lt;/h4&gt;
+
+&lt;p&gt;Logging and Storage layers are peeled off from the monolith to be distributed and multitenant. This allows for optimization at the network as well as storage level. Storage is distributed across three availability zones, replicated twice in each availability zone. The storage volume is also striped across hundreds of storage nodes. Finally, everything comes together with a purpose built storage layer protocol which utilizes &lt;em&gt;redo logs&lt;/em&gt; (compared to the MySQL bin logs and buffers). The traditional storage protocols are replaced with simple, redo log streams.&lt;/p&gt;
+
+&lt;h4 id=&quot;integration-with-aws-services&quot;&gt;Integration with AWS Services&lt;/h4&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Aurora integrates with Lambda - stored procedures and triggers can invoke Lambda functions&lt;/li&gt;
+  &lt;li&gt;S3 is central to aurora - the snapshots and backups, etc. are stored in S3&lt;/li&gt;
+  &lt;li&gt;IAM roles and policies are used to manage DB access control&lt;/li&gt;
+  &lt;li&gt;The logs can be ingested into cloudwatch, and can be then used to create alarms&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;automate-tasks&quot;&gt;Automate tasks&lt;/h4&gt;
+
+&lt;p&gt;The customers can focus on schema design and query optimization, while AWS manages failover, backup/recovery, snapshotting, etc. With a very different design than traditional databases, a lot of database management/administration activities are performed much quicker, with minimal to no impact to the database performance during the execution.&lt;/p&gt;
+
+&lt;h3 id=&quot;pricing&quot;&gt;Pricing&lt;/h3&gt;
+
+&lt;p&gt;Aurora has a very simple &lt;em&gt;Pay as you go&lt;/em&gt; &lt;a href=&quot;https://aws.amazon.com/rds/aurora/pricing/&quot;&gt;pricing&lt;/a&gt; model. The customers only pay for the storage and IO used. In other words, no provisioning is needed, which takes out the over or underestimation of IO and/or storage. Billing grows linearly with traffic. Aurora costs 1/10th the cost of commercial databases like Oracle and SQL Server. TCO is lower even for MySQL on EC2 due to no need for standby replica, less IOPS to pay for, and smaller instance size (and less number of instances) for the same workload.&lt;/p&gt;
+
+&lt;h3 id=&quot;performance&quot;&gt;Performance&lt;/h3&gt;
+
+&lt;p&gt;Aurora scales for reads and writes with instance size. In other words, an EC2 running MySQL will not scale linearly with the instance size, but Aurora would.&lt;/p&gt;
+
+&lt;p&gt;The SysBench benchmark tests put Aurora up to 5X faster than MySQL on a 32-core, 244GB RAM setup.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;120K writes/sec vs. 25K writes/sec on MySQL&lt;/li&gt;
+  &lt;li&gt;600K reads/sec on Aurora vs. 150K reads/sec on MySQL&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Additionally, Amazon’s own tests report the following at 30K IOPS -&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;With 5K connections - 8X faster&lt;/li&gt;
+  &lt;li&gt;With 10K tables - 11X faster&lt;/li&gt;
+  &lt;li&gt;With 1TB DB size - 21X faster&lt;/li&gt;
+  &lt;li&gt;TPCC benchmark - 136X faster with 800GB DB size&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;design&quot;&gt;Design&lt;/h3&gt;
+
+&lt;p&gt;Aurora deviates from a traditional storage system by using distributed, heavily replicated storage based on the redo log records. This makes the design much simpler, and dramatically reduces the frequency, and size of the IO to perform the same tasks as MySQL. This is true even after replicating the data six times (2x across 3 AZs).
+The less amount of IO comes from not dealing with many buffers and many logs synchronously as MySQL. On an average, there is 7-9 times less traffic than MySQL. Another optimization is around Asynchronous Group Commits, which replace disk IO with network IO. The threading model is based on adaptive thread pool which can gracefully handle 5000+ concurrent connections on r3.8xlarge instance. The locking model allows for concurrent access to the lock chains, unlike a single lock in MySQL.&lt;/p&gt;
+
+&lt;p&gt;A good overview can be found &lt;a href=&quot;http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Aurora.Overview.html&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;high-availability&quot;&gt;High Availability&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;6-way replication - 2 replicas in each of 3 Availability Zones&lt;/li&gt;
+  &lt;li&gt;4 out of 6 write quorum for durable writes&lt;/li&gt;
+  &lt;li&gt;3 out of 6 read quorum for durable reads&lt;/li&gt;
+  &lt;li&gt;Peer to peer replication for repairs&lt;/li&gt;
+  &lt;li&gt;Volume striped across hundreds of storage nodes&lt;/li&gt;
+  &lt;li&gt;Up to 15 promotable read replicas, which can be distributed across 3 AZs&lt;/li&gt;
+  &lt;li&gt;Automatic monitoring of the master, and one of the replicas is promoted on failure&lt;/li&gt;
+  &lt;li&gt;There are &lt;em&gt;read replica endpoints&lt;/em&gt;, which can load balance read traffic across the read replicas for read requests&lt;/li&gt;
+  &lt;li&gt;Replication protocol does not use &lt;em&gt;binlogs&lt;/em&gt;, but uses &lt;em&gt;redo log streams&lt;/em&gt; - this means the replication lag is in milliseconds vs. seconds (or mins) for MySQL&lt;/li&gt;
+  &lt;li&gt;Automatic failover takes 15-30 seconds. The heartbeat is checked every second, and Aurora waits for 5 beats to fail before failing over. Once a failover is triggered, promotion involves DNS propagation (30s) and DB recovery (5-10s) compared to several minutes for MySQL&lt;/li&gt;
+  &lt;li&gt;Cross-region read replicas can be used for faster DR and enhanced data locally&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;ease-of-use&quot;&gt;Ease of use&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Automated storage management - up to 64TB storage volume, starts with 10G and more storage is automatically added in increments of 10G&lt;/li&gt;
+  &lt;li&gt;Continuous incremental backups with no performance impact&lt;/li&gt;
+  &lt;li&gt;Automatic hotspot management, encryption, mirror repair, re-striping&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;security-and-compliance&quot;&gt;Security and compliance&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Aurora uses KMS integration for encryption at rest for the storage volume&lt;/li&gt;
+  &lt;li&gt;All the replication and network communication is over SSL&lt;/li&gt;
+  &lt;li&gt;Industry Standards Compliant - SOC, ISO, PCI/DSS, HIPAA&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;monitoring&quot;&gt;Monitoring&lt;/h3&gt;
+
+&lt;p&gt;There are more than 50 system and Operating System level metrics captured at 1-60s granularity. These metrics can be egressed to cloudwatch logs.&lt;/p&gt;
+
+&lt;h3 id=&quot;use-cases&quot;&gt;Use Cases&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Consolidate multiple MySQL shards into 1 large Aurora instance&lt;/li&gt;
+  &lt;li&gt;NoSQL workloads - massively concurrent event stores&lt;/li&gt;
+  &lt;li&gt;Near realtime analytics and reporting with no lag read replicas&lt;/li&gt;
+  &lt;li&gt;Event driven data pipelines via Lambda&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h3&gt;
+
+&lt;p&gt;While these notes do not cover recent developments with Aurora - like &lt;a href=&quot;https://aws.amazon.com/rds/aurora/details/postgresql-details/&quot;&gt;PostgreSQL support&lt;/a&gt;, I hope they convince you to take Aurora for a spin and check it out. There is a lot of information available in the &lt;a href=&quot;http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Aurora.html&quot;&gt;official documentation&lt;/a&gt;, as well as on other blogs like &lt;a href=&quot;https://github.com/open-guides/og-aws#rds-aurora&quot;&gt;AWS Open Guide&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;references&quot;&gt;References&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://youtu.be/60QumD2QsF0&quot;&gt;AWS re:Invent 2016: Getting Started with Amazon Aurora (DAT203)&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://aws.amazon.com/blogs/database/amazon-aurora-under-the-hood-fast-ddl/&quot;&gt;Amazon Aurora Under the Hood: Fast DDL&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=duf5uUsW3TM&quot;&gt;AWS re:Invent 2016: Deep Dive on Amazon Aurora (DAT303)&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 style=&quot;text-align: center&quot; id=&quot;comments&quot;&gt;Comments&lt;/h3&gt;
+
+&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = &quot;https://lobster1234.github.io/2017/11/03/amazon-aurora-rds-notes/&quot;;  
+this.page.identifier = &quot;/2017/11/03/amazon-aurora-rds-notes&quot;;
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://lobster1234.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+&lt;/script&gt;
+
+&lt;noscript&gt;Please enable JavaScript to view the &lt;a href=&quot;https://disqus.com/?ref_noscript&quot;&gt;comments powered by Disqus.&lt;/a&gt;&lt;/noscript&gt;
+
+&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+
+
+      
+
+&lt;/script&gt;</content>
+
+      
+      
+      
+      
+      
+
+      
+        <author>
+            <name>Manish Pandit</name>
+          
+          
+        </author>
+      
+
+      
+        <category term="aws" />
+      
+
+      
+        <category term="aws," />
+      
+        <category term="aurora," />
+      
+        <category term="rds," />
+      
+        <category term="mysql" />
+      
+
+      
+        <summary type="html">At Marqeta, we strive to continually evolve our platform to make it scalable and highly performant. We rely heavily on MySQL, and have many MySQL instances hosted across data centers, as well as on EC2s for various purposes. While refactoring some of our APIs, we thought of giving Amazon Aurora a try. Having heard about Aurora’s performance and high availability, this was definitely a great opportunity. Setting up a single node cluster (one db.t2.small) via the Console was the first step. After a few clicks, we had our first Aurora Cluster running happily. Next step was to fire up our regression tests while pointing to a schema in Aurora. Our database fixtures worked like a charm, and we were surprised to see all of our (thousand+) tests pass - while we knew it was a MySQL drop in replacement, we still expected some drama. Great first impression!</summary>
+      
+
+      
+      
+    </entry>
+  
   
   
     <entry>
@@ -4801,172 +5004,6 @@ Duration (avg.): 276.55ms
 
       
         <summary type="html">Serverless is a node.js based framework that makes creating, deploying, and managing serverless functions a breeze. We will use AWS as our FaaS (Function-as-a-Service) provider, although Serverless supports IBM OpenWhisk and Microsoft Azure as well. In this tutorial, we will create and deploy a java-maven based AWS Lambda function. In Part-1 we will not modify any code, or even look at the generated code. We will focus on the deployment and the command line interface to manage lambda, provided out of the box by serverless framework.</summary>
-      
-
-      
-      
-    </entry>
-  
-  
-  
-    <entry>
-      
-      <title type="html">Notes from AWS Lambda Deep Dive Webinar</title>
-      
-      <link href="https://lobster1234.github.io/2017/02/27/notes-from-aws-lambda-deep-dive-webinar/" rel="alternate" type="text/html" title="Notes from AWS Lambda Deep Dive Webinar" />
-      <published>2017-02-27T07:20:44-08:00</published>
-      <updated>2017-02-27T07:20:44-08:00</updated>
-      <id>https://lobster1234.github.io/2017/02/27/notes-from-aws-lambda-deep-dive-webinar</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2017/02/27/notes-from-aws-lambda-deep-dive-webinar/">&lt;p&gt;I’ve put together my notes from the AWS webinar, which can be seen &lt;a href=&quot;https://www.youtube.com/watch?v=dB4zJk_fqrU&quot; target=&quot;_blank&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;Lambda is the key enabler and a core AWS component for serverless computing. Lets you run the code you want, without worrying about the underlying infrastructure and provisioning. It is also cost efficient, as there are no instances that are in running state but idle. Lambda handles scaling up and scaling down as needed, transparently to the customer.&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;h2 id=&quot;components&quot;&gt;Components&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Event Source - Changes in state of the resources or data, or any events triggered explicitly or implicitly. A large number of AWS services can act as Event Sources - Like S3 (Object PUT, DELETE..), DynamoDB, IoT, CloudFormation, CloudWatch, SNS, API Gateway and Cron schedule to name a few.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Function - The piece of code that would be run when that event occurs. The function can access any services downstream if needed. Currently Supported languages are Node.js, Python, Java 8 and C#.&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;use-cases&quot;&gt;Use cases&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;Stateless, event-based file/data processing.&lt;/li&gt;
-  &lt;li&gt;On demand execution of some logic where an event is generated via an explicit action.&lt;/li&gt;
-  &lt;li&gt;Custom Workflows for state changes within AWS.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;development&quot;&gt;Development&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;Code can be developed in the 4 supported languages (currently).&lt;/li&gt;
-  &lt;li&gt;The code should have no affinity or access to the underlying infrastructure, and should use external infrastructure for state (like a cache or a database). The code should be entirely stateless.&lt;/li&gt;
-  &lt;li&gt;The memory usage allowed is from 128MB to 1.5GB in increments of 64MB. CPU and network are allocated proportionately.&lt;/li&gt;
-  &lt;li&gt;Lambda can be invoked synchronously (the client waits for a response from the function), and asynchronously (fire and forget, a 202 Accepted).&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;what-is-in-it&quot;&gt;What is in it&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Handler()&lt;/code&gt; function - Entry point for Lambda.&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Event&lt;/code&gt; Object - The request (representation of the event). Can be a stream or an simple data type.&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Context&lt;/code&gt; Object - Provides a handle to the environment and basic utilities like time, logging and client/event info.&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;FunctionConfiguration&lt;/code&gt; Metadata
-    &lt;ol&gt;
-      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;VpcConfig&lt;/code&gt; - Useful if you want to access your private resources within your VPC. Enables the lambda environment to be able to talk to your VPC.&lt;/li&gt;
-      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;DeadLetterConfig&lt;/code&gt; - Failed events are sent to SQS or SNS. A dead letter queue or an SNS topic can be configured where the event is sent back in case the lambda function fails to process it. It is only available for async requests.&lt;/li&gt;
-      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Environment&lt;/code&gt; - Key value pairs as a part of the configuration, which are then available as environment variables to the function. They’re encrypted at rest via KMS, and are decrypted during lambda initialization.&lt;/li&gt;
-    &lt;/ol&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;limits&quot;&gt;Limits&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;512 MB of temporary storage (ephemeral).&lt;/li&gt;
-  &lt;li&gt;1024 File Descriptors&lt;/li&gt;
-  &lt;li&gt;1024 processes + threads&lt;/li&gt;
-  &lt;li&gt;300 seconds maximum execution duration&lt;/li&gt;
-  &lt;li&gt;6MB Request payload&lt;/li&gt;
-  &lt;li&gt;6MB Response&lt;/li&gt;
-  &lt;li&gt;50MB Deployment package (compressed)&lt;/li&gt;
-  &lt;li&gt;250MB Uncompressed&lt;/li&gt;
-  &lt;li&gt;4KB Environment variables&lt;/li&gt;
-  &lt;li&gt;100 Concurrent Executions (can be increased by requesting Amazon)&lt;/li&gt;
-  &lt;li&gt;75GB total size of all lambdas across one region.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;container-model&quot;&gt;Container Model&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;Each execution happens in a container that is created and managed by AWS. Containers are  re-used. This re-use can let us share cached static data, or DB connections between invocations. The folder &lt;code class=&quot;highlighter-rouge&quot;&gt;/tmp&lt;/code&gt; is available across invocations. However, do not rely on this, use it opportunistically.&lt;/li&gt;
-  &lt;li&gt;Bootstrapping happens when a function is invoked for the first time after creation or update. The start time can be reduced by allowing more memory, having a smaller deployment package. Clearly Python and Node.js will be much quicker to bootstrap than Java and C#. Strip down the deployment of all the libraries that are not needed, as lambda will load everything that is present in the package. Mode to an interpreted language if cold starts are not within acceptable limits.&lt;/li&gt;
-  &lt;li&gt;Containers run Amazon Linux AMI. If there are any native binaries, compile against this environment.&lt;/li&gt;
-  &lt;li&gt;OpenJDK 1.8 is already provided by the container, so does not need to be packaged. Similarly AWS SDK for other languages, etc.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;deployment&quot;&gt;Deployment&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;A zip file or a jar file containing the code and dependencies. Use Maven or Eclipse to make a package.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;cicd-options&quot;&gt;CI/CD Options&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;Use AWS CodeCommit, CodeBuild, CodePipeline&lt;/li&gt;
-  &lt;li&gt;Use Github, Jenkins, CodeShip&lt;/li&gt;
-  &lt;li&gt;Put the package on an S3 location&lt;/li&gt;
-  &lt;li&gt;AWS &lt;code class=&quot;highlighter-rouge&quot;&gt;SAM&lt;/code&gt; - Serverless Application Model&lt;/li&gt;
-  &lt;li&gt;CloudFormation supports &lt;code class=&quot;highlighter-rouge&quot;&gt;SAM&lt;/code&gt; extensions&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;versioning&quot;&gt;Versioning&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;A version is an immutable copy of code+config&lt;/li&gt;
-  &lt;li&gt;Each version gets it’s own ARN&lt;/li&gt;
-  &lt;li&gt;Versions can be aliased (like 13=Dev, 11=Prod, 12=Beta)&lt;/li&gt;
-  &lt;li&gt;The aliasing enables rollbacks or staged promotions.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;security-and-scaling&quot;&gt;Security and Scaling&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;The Push model, where the upstream service invokes the function. The resource level policies are applied to the lambda function which control which resources can invoke it (Like allow S3 to invoke this function). The policies are already created when the event source is attached via the console.&lt;/li&gt;
-  &lt;li&gt;The pull model is used for stream event sources (Kinesis and DynbamoDB). Here lambda polls instead of the resources pushing. An IAM policy is created for the Lambda to be able to poll the source (instead of the other way around for Push).&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;concurrency-and-scaling&quot;&gt;Concurrency and Scaling&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;Requests per second * function execution duration&lt;/li&gt;
-  &lt;li&gt;When throttled, the async events are retried automatically for 6 hours, with delays between retries.&lt;/li&gt;
-  &lt;li&gt;For sync requests, the client gets a 429.&lt;/li&gt;
-  &lt;li&gt;Use async model if bursts are expected as retries are handled automatically when throttled.&lt;/li&gt;
-  &lt;li&gt;Request AWS to increase the concurrency limit if consistently getting throttled.&lt;/li&gt;
-  &lt;li&gt;Ensure the downstream also keeps up with Lambda throttling, for example, if each lambda creates 10 MySQL connections, 100 concurrent invocations is not something MySQL will be able to handle.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;debugging-and-operations&quot;&gt;Debugging and Operations&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;4xx errors can be invalid parameter value (400), resource not found (404), request too large (413) and can be fixed by the developer.&lt;/li&gt;
-  &lt;li&gt;5xx need to be fixed by the admin&lt;/li&gt;
-  &lt;li&gt;Stream based events are retried till the data expires&lt;/li&gt;
-  &lt;li&gt;Async invocations are retried 2 extra times before sent to dead letter queue&lt;/li&gt;
-  &lt;li&gt;For sync invocations, the caller will need to implement the retry logic when they get an error from the call&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;tracing-tracking-and-logging&quot;&gt;Tracing, Tracking and Logging&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;AWS X-Ray (Preview) for detailed breakdown of lambda performance and behavior metrics.&lt;/li&gt;
-  &lt;li&gt;All calls made to lambda are logged to CloudTrail. They can be delivered to S3 and analyzed.&lt;/li&gt;
-  &lt;li&gt;Every start, end, and report goes to CloudWatch&lt;/li&gt;
-  &lt;li&gt;Java User logs can be created via &lt;code class=&quot;highlighter-rouge&quot;&gt;System.out.println()&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;System.err.println()&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;LambdaLogger.log()&lt;/code&gt;, and &lt;code class=&quot;highlighter-rouge&quot;&gt;Log4j.*&lt;/code&gt;&lt;/li&gt;
-  &lt;li&gt;Default metrics are free - which include duration, throttles, errors, etc. Custom metrics can also be added by the function itself via the CloudWatch API.&lt;/li&gt;
-&lt;/ul&gt;</content>
-
-      
-      
-      
-      
-      
-
-      
-        <author>
-            <name>Manish Pandit</name>
-          
-          
-        </author>
-      
-
-      
-        <category term="aws" />
-      
-        <category term="serverless" />
-      
-        <category term="lambda" />
-      
-
-      
-
-      
-        <summary type="html">I’ve put together my notes from the AWS webinar, which can be seen here. Lambda is the key enabler and a core AWS component for serverless computing. Lets you run the code you want, without worrying about the underlying infrastructure and provisioning. It is also cost efficient, as there are no instances that are in running state but idle. Lambda handles scaling up and scaling down as needed, transparently to the customer.</summary>
       
 
       
