@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  
+  
+  <title>Scale By the Bay - Immutable AWS Deployments with Packer and Jenkins</title>
+  <meta name="description" content="Slides from my talk at Scale By the Bay 2017. In this session I will talk about Immutable Deployments - which have become almost essential in the world of Microservices. As the frequency of deployments across multiple services increases with increasing granularity, it is critical to have repeatable, predictable and immutable deployments serving our customers. In practice, this is achieved via several DevOps tools. We will use Hashicorp Packer and Jenkins to build a simple, immutable AWS deployment of a hello-world microservice. Familiarity with AWS is recommended, but not required for this talk.">
+  
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="https://lobster1234.github.io/2017/11/17/immutable-aws-deployments-with-packer-and-jenkins/">
+  
+  
+  <link rel="alternate" type="application/rss+xml" title="Manish Pandit&#39;s Blog" href="https://lobster1234.github.io/feed.xml">
+
+  
+
+  
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="lobster1234">
+  <meta name="twitter:title" content="Scale By the Bay - Immutable AWS Deployments with Packer and Jenkins">
+  <meta name="twitter:description" content="Slides from my talk at Scale By the Bay 2017. In this session I will talk about Immutable Deployments - which have become almost essential in the world of Microservices. As the frequency of deploym...">
+  
+    <meta name="twitter:creator" content="lobster1234">
+  
+  
+
+  <script type="text/javascript">
+  WebFontConfig = {
+    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
+  };
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+  })();
+</script>
+
+  
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-96931340-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+
+  <!-- Begin Jekyll SEO tag v2.2.0 -->
+<title>Scale By the Bay - Immutable AWS Deployments with Packer and Jenkins | Manish Pandit’s Blog</title>
+<meta property="og:title" content="Scale By the Bay - Immutable AWS Deployments with Packer and Jenkins" />
+<meta name="author" content="Manish Pandit" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Slides from my talk at Scale By the Bay 2017. In this session I will talk about Immutable Deployments - which have become almost essential in the world of Microservices. As the frequency of deployments across multiple services increases with increasing granularity, it is critical to have repeatable, predictable and immutable deployments serving our customers. In practice, this is achieved via several DevOps tools. We will use Hashicorp Packer and Jenkins to build a simple, immutable AWS deployment of a hello-world microservice. Familiarity with AWS is recommended, but not required for this talk." />
+<meta property="og:description" content="Slides from my talk at Scale By the Bay 2017. In this session I will talk about Immutable Deployments - which have become almost essential in the world of Microservices. As the frequency of deployments across multiple services increases with increasing granularity, it is critical to have repeatable, predictable and immutable deployments serving our customers. In practice, this is achieved via several DevOps tools. We will use Hashicorp Packer and Jenkins to build a simple, immutable AWS deployment of a hello-world microservice. Familiarity with AWS is recommended, but not required for this talk." />
+<link rel="canonical" href="https://lobster1234.github.io/2017/11/17/immutable-aws-deployments-with-packer-and-jenkins/" />
+<meta property="og:url" content="https://lobster1234.github.io/2017/11/17/immutable-aws-deployments-with-packer-and-jenkins/" />
+<meta property="og:site_name" content="Manish Pandit’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2017-11-17T12:44:37-08:00" />
+<script type="application/ld+json">
+{"@context": "http://schema.org",
+"@type": "BlogPosting",
+"headline": "Scale By the Bay - Immutable AWS Deployments with Packer and Jenkins",
+"author": {"@type": "Person",
+"name": "Manish Pandit"},
+"datePublished": "2017-11-17T12:44:37-08:00",
+"description": "Slides from my talk at Scale By the Bay 2017. In this session I will talk about Immutable Deployments - which have become almost essential in the world of Microservices. As the frequency of deployments across multiple services increases with increasing granularity, it is critical to have repeatable, predictable and immutable deployments serving our customers. In practice, this is achieved via several DevOps tools. We will use Hashicorp Packer and Jenkins to build a simple, immutable AWS deployment of a hello-world microservice. Familiarity with AWS is recommended, but not required for this talk.",
+"mainEntityOfPage": {"@type": "WebPage",
+"@id": "https://lobster1234.github.io/2017/11/17/immutable-aws-deployments-with-packer-and-jenkins/"},
+"url": "https://lobster1234.github.io/2017/11/17/immutable-aws-deployments-with-packer-and-jenkins/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Home</a>
+
+    <nav class="site-nav">
+      
+        
+        <a class="page-link" href="/about/">About</a>
+      
+        
+        <a class="page-link" href="/archives/">Archives</a>
+      
+        
+        <a class="page-link" href="https://www.twitter.com/lobster1234">Twitter</a>
+      
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    
+      <h1 class="post-title" itemprop="name headline">Scale By the Bay - Immutable AWS Deployments with Packer and Jenkins</h1>
+    
+    <p class="post-meta"><time datetime="2017-11-17T12:44:37-08:00" itemprop="datePublished">Nov 17, 2017</time> • 
+  
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <a href="/categories/aws/">aws</a>,
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+  
+    
+  
+    
+  
+    
+      <a href="/categories/presentations/">presentations</a>
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>Slides from my talk at <a href="http://scale.bythebay.io/" target="_blank_">Scale By the Bay 2017</a>.</p>
+
+<p>In this session I will talk about Immutable Deployments - which have become almost essential in the world of Microservices. As the frequency of deployments across multiple services increases with increasing granularity, it is critical to have repeatable, predictable and immutable deployments serving our customers. In practice, this is achieved via several DevOps tools. We will use Hashicorp <a href="https://www.packer.io">Packer</a> and Jenkins to build a simple, immutable AWS deployment of a <a href="https://github.com/lobster1234/helloworld-api">hello-world microservice</a>. Familiarity with AWS is recommended, but not required for this talk.</p>
+
+<!--more-->
+
+<script async="" class="speakerdeck-embed" data-id="2a5b5a086a104c90a3902fdddbf30537" data-ratio="1.77777777777778" src="//speakerdeck.com/assets/embed.js"></script>
+
+
+  </div>
+
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <p>
+      
+
+&copy; Manish Pandit - Powered by <a href="https://jekyllrb.com">Jekyll</a> &amp; <a href="https://github.com/yous/whiteglass">whiteglass</a> - Subscribe via <a href="https://lobster1234.github.io/feed.xml">RSS</a>
+
+    </p>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
