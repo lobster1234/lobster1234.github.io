@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-11-17T16:23:25-08:00</updated>
+  <updated>2017-11-26T14:14:32-08:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -41,7 +41,12 @@
 
 &lt;!--more--&gt;
 
-&lt;script async=&quot;&quot; class=&quot;speakerdeck-embed&quot; data-id=&quot;2a5b5a086a104c90a3902fdddbf30537&quot; data-ratio=&quot;1.77777777777778&quot; src=&quot;//speakerdeck.com/assets/embed.js&quot;&gt;&lt;/script&gt;</content>
+&lt;h4 id=&quot;slides&quot;&gt;Slides&lt;/h4&gt;
+
+&lt;script async=&quot;&quot; class=&quot;speakerdeck-embed&quot; data-id=&quot;2a5b5a086a104c90a3902fdddbf30537&quot; data-ratio=&quot;1.77777777777778&quot; src=&quot;//speakerdeck.com/assets/embed.js&quot;&gt;&lt;/script&gt;
+
+&lt;h4 id=&quot;video&quot;&gt;Video&lt;/h4&gt;
+&lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;https://www.youtube.com/embed/dzTlL2bjJ60&quot; frameborder=&quot;0&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;</content>
 
       
       
