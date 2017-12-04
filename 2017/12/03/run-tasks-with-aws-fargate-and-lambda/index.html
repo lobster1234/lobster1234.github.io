@@ -339,8 +339,11 @@
   <div class="post-content" itemprop="articleBody">
     <p>As with any other financial company, at <a href="https://www.marqeta.com">Marqeta</a>, we have a good number of batch jobs, which we are migrating over to <a href="https://aws.amazon.com/batch/">AWS Batch</a>. However, even in managed mode, AWS Batch needs us to define <a href="http://docs.aws.amazon.com/batch/latest/userguide/compute_environments.html">Compute Environments</a>, which are clusters of EC2 instances running ECS (and Docker) agents.</p>
 
-<p><a href="https://aws.amazon.com/fargate/">AWS Fargate</a> was <a href="https://aws.amazon.com/blogs/compute/aws-fargate-a-product-overview/">announced</a> very recently at re:Invent 2017. Fargate adds a layer of abstraction on top of the Compute Environment, or the ECS Cluster. We no longer have to worry about the AMI, EC2 types, task placement, etc. In this post I cover the POC done to use Fargate over AWS Batch for batch processing, but this can also be used as a tutorial for running any type of tasks using Fargate. We create an ECS Task definition, a Fargate Cluster, and a Lambda to run the task using CloudWatch Event trigger.
-<!--more--></p>
+<p><a href="https://aws.amazon.com/fargate/">AWS Fargate</a> was <a href="https://aws.amazon.com/blogs/compute/aws-fargate-a-product-overview/">announced</a> very recently at re:Invent 2017. Fargate adds a layer of abstraction on top of the Compute Environment, or the ECS Cluster. We no longer have to worry about the AMI, EC2 types, task placement, etc. In this post I cover the POC done to use Fargate over AWS Batch for batch processing, but this can also be used as a tutorial for running any type of tasks using Fargate. We create an ECS Task definition, a Fargate Cluster, and a Lambda to run the task using CloudWatch Event trigger.</p>
+
+<p><img src="https://lobster1234.github.io/assets/fargate.png" alt="Fargate-0" /></p>
+
+<!--more-->
 
 <h3 id="setup">Setup</h3>
 <ul>
