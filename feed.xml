@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-11-26T14:14:32-08:00</updated>
+  <updated>2017-12-04T01:09:11-08:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -25,6 +25,300 @@
     </author>
   
 
+  
+  
+    <entry>
+      
+      <title type="html">Run tasks with AWS Fargate and Lambda</title>
+      
+      <link href="https://lobster1234.github.io/2017/12/03/run-tasks-with-aws-fargate-and-lambda/" rel="alternate" type="text/html" title="Run tasks with AWS Fargate and Lambda" />
+      <published>2017-12-03T22:44:37-08:00</published>
+      <updated>2017-12-03T22:44:37-08:00</updated>
+      <id>https://lobster1234.github.io/2017/12/03/run-tasks-with-aws-fargate-and-lambda</id>
+      <content type="html" xml:base="https://lobster1234.github.io/2017/12/03/run-tasks-with-aws-fargate-and-lambda/">&lt;p&gt;As with any other financial company, at &lt;a href=&quot;https://www.marqeta.com&quot;&gt;Marqeta&lt;/a&gt;, we have a good number of batch jobs, which we are migrating over to &lt;a href=&quot;https://aws.amazon.com/batch/&quot;&gt;AWS Batch&lt;/a&gt;. However, even in managed mode, AWS Batch needs us to define &lt;a href=&quot;http://docs.aws.amazon.com/batch/latest/userguide/compute_environments.html&quot;&gt;Compute Environments&lt;/a&gt;, which are clusters of EC2 instances running ECS (and Docker) agents.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://aws.amazon.com/fargate/&quot;&gt;AWS Fargate&lt;/a&gt; was &lt;a href=&quot;https://aws.amazon.com/blogs/compute/aws-fargate-a-product-overview/&quot;&gt;announced&lt;/a&gt; very recently at re:Invent 2017. Fargate adds a layer of abstraction on top of the Compute Environment, or the ECS Cluster. We no longer have to worry about the AMI, EC2 types, task placement, etc. In this post I cover the POC done to use Fargate over AWS Batch for batch processing, but this can also be used as a tutorial for running any type of tasks using Fargate. We create an ECS Task definition, a Fargate Cluster, and a Lambda to run the task using CloudWatch Event trigger.
+&lt;!--more--&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;setup&quot;&gt;Setup&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;We will use the AWS Console, but everything in the console can also be done via CLI. I prefer console, as this is a very new service, so we can see all the options etc. without digging in the documentation.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;A docker image to act as a task. I am using a &lt;a href=&quot;https://github.com/lobster1234/dockerfiles/tree/master/python-sleep-task&quot;&gt;simple task&lt;/a&gt; that sleeps for 5 seconds and exits.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;A Lambda Function to run the task.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;The Lambda cannot use the current &lt;a href=&quot;http://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html&quot;&gt;Python Lambda Execution Environment&lt;/a&gt;, as at the time of writing, it is pre-installed with Boto3 1.4.7, which lacks support for Fargate tasks. So we bundle &lt;a href=&quot;http://boto3.readthedocs.io/en/latest/&quot;&gt;Boto3 1.4.8&lt;/a&gt; in the Deployment Package. Sorry, no &lt;a href=&quot;https://aws.amazon.com/cloud9/&quot;&gt;Cloud9 IDE&lt;/a&gt; here.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;A VPC to tie down the task to. I use &lt;a href=&quot;https://github.com/lobster1234/my-aws-infrastructure&quot;&gt;my Terraform-based repo&lt;/a&gt; to bring up a VPC, and tear it down when done. If not, then make sure you have a public subnet, or a private subnet with NAT gateway tied to it. ECS will need to pull the container image over the internet, and will need outbound internet access to do so.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Since I am not diving deep into Task Definition, familiarity with creating one will be helpful. Refer to &lt;a href=&quot;https://lobster1234.github.io/2017/08/22/aws-ecs-notes/&quot;&gt;my earlier post&lt;/a&gt; on ECS for terminology and details.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;creating-the-docker-image&quot;&gt;Creating the Docker image&lt;/h3&gt;
+
+&lt;p&gt;This is the task that will simulate the batch job, &lt;code class=&quot;highlighter-rouge&quot;&gt;task.py&lt;/code&gt; -&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;time&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Task starting..'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;time&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sleep&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Task ended, took 5 seconds'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;And this is the Dockerfile -&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;FROM python:3.7.0a2-alpine3.6
+COPY task.py /tmp
+CMD python /tmp/task.py
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Next, we go ahead and build, and test the image.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ docker build .                              
+Sending build context to Docker daemon  4.096kB
+Step 1/3 : FROM python:3.7.0a2-alpine3.6
+ ---&amp;gt; e0e4e8202722
+Step 2/3 : COPY task.py /tmp
+ ---&amp;gt; 1a8de050909f
+Step 3/3 : CMD python /tmp/task.py
+ ---&amp;gt; Running in aad2bec4df49
+ ---&amp;gt; 65852146fb13
+Removing intermediate container aad2bec4df49
+Successfully built 65852146fb13
+
+$ docker run 65852146fb13
+Task starting..
+Task ended, took 5 seconds
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Now we can tag and push this image to ECR repo. Create a repo called &lt;code class=&quot;highlighter-rouge&quot;&gt;python-batch-job&lt;/code&gt; in &lt;a href=&quot;https://console.aws.amazon.com/ecs/home?region=us-east-1#/repositories&quot;&gt;ECR&lt;/a&gt;.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ docker tag 65852146fb13 python-batch-job:latest
+$ aws ecr get-login --no-include-email --region us-east-1
+$ docker login -u AWS -p **** https://************.dkr.ecr.us-east-1.amazonaws.com
+$ docker tag python-batch-job:latest ************.dkr.ecr.us-east-1.amazonaws.com/python-batch-job:latest
+$ docker push ************.dkr.ecr.us-east-1.amazonaws.com/python-batch-job:latest
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;task-definition&quot;&gt;Task Definition&lt;/h3&gt;
+
+&lt;p&gt;We will need to create an ECR Task Definition. To do so, we head over to the &lt;a href=&quot;https://console.aws.amazon.com/ecs/home?region=us-east-1#/taskDefinitions/create&quot;&gt;ECR Console&lt;/a&gt;, and pick Fargate.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/task_definition_launch_type.png&quot; alt=&quot;Fargate-1&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Regarding the next steps, assuming you’re familiar with ECS Task Definitions, create a Task Definition using the container image from ECR. You can leave everything as default, and pick &lt;code class=&quot;highlighter-rouge&quot;&gt;Task Memory&lt;/code&gt; as &lt;code class=&quot;highlighter-rouge&quot;&gt;0.5 GB&lt;/code&gt;, and &lt;code class=&quot;highlighter-rouge&quot;&gt;Task CPU&lt;/code&gt; as &lt;code class=&quot;highlighter-rouge&quot;&gt;0.25 vCPU&lt;/code&gt;. When adding the container, you can specify the Hard Limit to &lt;code class=&quot;highlighter-rouge&quot;&gt;128 MB&lt;/code&gt;, and &lt;code class=&quot;highlighter-rouge&quot;&gt;1&lt;/code&gt; CPU Unit (under Environment).&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/task_definition_detail.png&quot; alt=&quot;Fargate-2&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Since we are not using any AWS services in the task, we do not need a Task Role. The Task Execution IAM Role is automatically assigned to this task, called &lt;code class=&quot;highlighter-rouge&quot;&gt;ecsTaskExecutionRole&lt;/code&gt; which lets the task pull the image from ECR and write to CloudWatch logs.&lt;/p&gt;
+
+&lt;h3 id=&quot;fargate-cluster&quot;&gt;Fargate Cluster&lt;/h3&gt;
+
+&lt;p&gt;Even though we are not really provisioning any EC2 Clusters like ECS or Batch, we still need to create a cluster. This will not have any EC2 instances. The &lt;code class=&quot;highlighter-rouge&quot;&gt;Cluster&lt;/code&gt; is still an important construct that adds a level of control for IAM policies, etc.&lt;/p&gt;
+
+&lt;p&gt;Head over to &lt;a href=&quot;https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/create/new&quot;&gt;ECS&lt;/a&gt;, and create a Fargate Cluster. Do not ask to create a new VPC. Call it &lt;code class=&quot;highlighter-rouge&quot;&gt;fargatecluster&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/create_fargate_cluster.png&quot; alt=&quot;Fargate-3&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;package-the-deployment&quot;&gt;Package the Deployment&lt;/h3&gt;
+
+&lt;p&gt;We will now create a lambda function that can be called via a trigger. In case of batch, we can use CloudWatch to trigger the Lambda at the interval or cron schedule of our choice.&lt;/p&gt;
+
+&lt;p&gt;Here is the Lambda Code to run the task, as &lt;code class=&quot;highlighter-rouge&quot;&gt;run_task.py&lt;/code&gt;. Create a folder to stick this file in.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;boto3&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;handler&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;context&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;client&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;boto3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;client&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'ecs'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;response&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;client&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;run_task&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;cluster&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'fargatecluster'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# name of the cluster&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;launchType&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'FARGATE'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;taskDefinition&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'my-batch-job:1'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# replace with your task definition name and revision&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;count&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;platformVersion&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'LATEST'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;networkConfiguration&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;'awsvpcConfiguration'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;'subnets'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;'subnet-2ec3a94a'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# replace with your public subnet or a private with NAT&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;'subnet-413a9c6e'&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# Second is optional, but good idea to have two&lt;/span&gt;
+            &lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;'assignPublicIp'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'DISABLED'&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Next, we will use &lt;code class=&quot;highlighter-rouge&quot;&gt;pip&lt;/code&gt; to install &lt;code class=&quot;highlighter-rouge&quot;&gt;boto3 1.4.8&lt;/code&gt; in this folder, so we can package our deployment artifact.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ pip3 install boto3==1.4.8 -t .
+$ zip -r /tmp/run_task_lambda.zip *
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;This will create &lt;code class=&quot;highlighter-rouge&quot;&gt;/tmp/run_task_lambda.zip&lt;/code&gt; which is our deployment package.&lt;/p&gt;
+
+&lt;h3 id=&quot;create-the-lambda-function&quot;&gt;Create the Lambda Function&lt;/h3&gt;
+
+&lt;p&gt;The Lambda would need IAM role with 2 policies - one to run the task, and second to pass the &lt;code class=&quot;highlighter-rouge&quot;&gt;ecsTaskExecutionRole&lt;/code&gt; to the task.&lt;/p&gt;
+
+&lt;p&gt;Create a role in IAM, called &lt;code class=&quot;highlighter-rouge&quot;&gt;run_task_lambda_role&lt;/code&gt; with the following in-line policy, replacing the &lt;code class=&quot;highlighter-rouge&quot;&gt;*****&lt;/code&gt; with your AWS Account ID.&lt;/p&gt;
+
+&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;Version&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;2012-10-17&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;Statement&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;Sid&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Stmt1512361420000&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;Effect&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Allow&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;Action&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+                &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ecs:RunTask&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;Resource&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+                &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;*&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;Sid&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Stmt1512361593000&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;Effect&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Allow&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;Action&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+                &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;iam:PassRole&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;Resource&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+                &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;arn:aws:iam::************:role/ecsTaskExecutionRole&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Now, we create the Lambda using the &lt;a href=&quot;https://console.aws.amazon.com/lambda/home?region=us-east-1#/create&quot;&gt;Lambda Console&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/create_lambda_function.png&quot; alt=&quot;Fargate-4&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;On the next page, under &lt;code class=&quot;highlighter-rouge&quot;&gt;Function code&lt;/code&gt;, upload the &lt;code class=&quot;highlighter-rouge&quot;&gt;run_task_lambda.zip&lt;/code&gt;, and put &lt;code class=&quot;highlighter-rouge&quot;&gt;run_task.handler&lt;/code&gt; under &lt;code class=&quot;highlighter-rouge&quot;&gt;Handler&lt;/code&gt;. Click &lt;code class=&quot;highlighter-rouge&quot;&gt;Save&lt;/code&gt; so the package can be uploaded.&lt;/p&gt;
+
+&lt;p&gt;Once the function is saved, click &lt;code class=&quot;highlighter-rouge&quot;&gt;Test&lt;/code&gt; to give it a shot. If all goes well, it should print something like this -&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&quot;{'tasks': [{'taskArn': 'arn:aws:ecs:us-east-1:************:task/3f9ae8bf-207e-4956-b625-52a5a269c9a2', 'clusterArn':
+'arn:aws:ecs:us-east-1:************:cluster/fargatecluster', 'taskDefinitionArn':
+'arn:aws:ecs:us-east-1:************:task-definition/my-batch-job:1', 'overrides': {'containerOverrides': [{'name':
+'python-batch-container'}]}, 'lastStatus': 'PROVISIONING', 'desiredStatus': 'RUNNING', 'cpu': '256', 'memory': '512',
+'containers': [{'containerArn': 'arn:aws:ecs:us-east-1:************:container/fcd6372b-8884-4beb-b7f8-484e5658fec8',
+'taskArn': 'arn:aws:ecs:us-east-1:************:task/3f9ae8bf-207e-4956-b625-52a5a269c9a2', 'name': 'python-batch-container',
+'lastStatus': 'PENDING', 'networkInterfaces': []}], 'version': 1, 'createdAt': datetime.datetime(2017, 12, 4, 8, 4, 5, 717000,
+  tzinfo=tzlocal()), 'group': 'family:my-batch-job', 'launchType': 'FARGATE', 'platformVersion': '1.0.0', 'attachments':
+  [{'id': '1cfdc261-f810-4625-a070-d7596aa22eea', 'type': 'ElasticNetworkInterface', 'status': 'PRECREATED', 'details':
+  [{'name': 'subnetId', 'value': 'subnet-2ec3a94a'}]}]}], 'failures': [], 'ResponseMetadata': {'RequestId':
+  'b21a8d3d-d8c9-11e7-9000-014e69a44058', 'HTTPStatusCode': 200, 'HTTPHeaders': {'server': 'Server', 'date': 'Mon, 04 Dec 2017
+  08:04:05 GMT', 'content-type': 'application/x-amz-json-1.1', 'content-length': '1007', 'connection': 'keep-alive',
+  'x-amzn-requestid': 'b21a8d3d-d8c9-11e7-9000-014e69a44058'}, 'RetryAttempts': 0}}&quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Notice the response containing details of the task, and the task state as &lt;code class=&quot;highlighter-rouge&quot;&gt;PROVISIONING&lt;/code&gt;.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;START RequestId: b1667f61-d8c9-11e7-9ddf-f1af7a353833 Version: $LATEST
+END RequestId: b1667f61-d8c9-11e7-9ddf-f1af7a353833
+REPORT RequestId: b1667f61-d8c9-11e7-9ddf-f1af7a353833	Duration: 1891.77 ms
+Billed Duration: 1900 ms 	Memory Size: 128 MB	Max Memory Used: 38 MB
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;You can head over to ECS Console, and check the task running under the &lt;code class=&quot;highlighter-rouge&quot;&gt;fargatecluster&lt;/code&gt; details.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;If the task fails to run, it is very likely because it was launched in a subnet with no outbound internet access. Fix the subnets, redeploy the lambda after changing the subnet IDs in the code, and retry.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&quot;cloudwatch-event-trigger&quot;&gt;CloudWatch Event Trigger&lt;/h3&gt;
+
+&lt;p&gt;Now we can put this execution on a schedule using CloudWatch Events. We will create a scheduling rule, and configure it to trigger this lambda function.&lt;/p&gt;
+
+&lt;p&gt;Click &lt;code class=&quot;highlighter-rouge&quot;&gt;Create Rule&lt;/code&gt; on the &lt;a href=&quot;https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#events:&quot;&gt;CloudWatch Events&lt;/a&gt; menu to create a rule.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/cloudwatch_rule.png&quot; alt=&quot;Fargate-5&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;done&quot;&gt;Done!&lt;/h3&gt;
+
+&lt;p&gt;We can check the task being executing every 5 minutes (or whatever you’ve configured the rule to be) by looking at the ECS cluster console, or CloudWatch logs. You can also visit the Lambda monitoring section from the Lambda console to see the duration and frequency.&lt;/p&gt;
+
+&lt;h3 id=&quot;cleanup&quot;&gt;Cleanup&lt;/h3&gt;
+
+&lt;p&gt;To clean up, disable or delete the scheduling rule in CloudWatch, and delete the function from the Lambda Console. Be sure to delete the rule to avoid getting billed for executions on a fairly frequent rate.&lt;/p&gt;
+
+&lt;p&gt;Since Fargate is a fairly new service, I’d love to hear your feedback and comments.&lt;/p&gt;
+
+&lt;h3 style=&quot;text-align: center&quot; id=&quot;comments&quot;&gt;Comments&lt;/h3&gt;
+
+&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = &quot;https://lobster1234.github.io/2017/12/03/run-tasks-with-aws-fargate-and-lambda/&quot;;  
+this.page.identifier = &quot;/2017/12/03/run-tasks-with-aws-fargate-and-lambda&quot;;
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://lobster1234.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+&lt;/script&gt;
+
+&lt;noscript&gt;Please enable JavaScript to view the &lt;a href=&quot;https://disqus.com/?ref_noscript&quot;&gt;comments powered by Disqus.&lt;/a&gt;&lt;/noscript&gt;
+
+&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+
+
+      
+
+&lt;/script&gt;</content>
+
+      
+      
+      
+      
+      
+
+      
+        <author>
+            <name>Manish Pandit</name>
+          
+          
+        </author>
+      
+
+      
+        <category term="aws" />
+      
+        <category term="docker" />
+      
+        <category term="ecs" />
+      
+
+      
+
+      
+        <summary type="html">As with any other financial company, at Marqeta, we have a good number of batch jobs, which we are migrating over to AWS Batch. However, even in managed mode, AWS Batch needs us to define Compute Environments, which are clusters of EC2 instances running ECS (and Docker) agents. AWS Fargate was announced very recently at re:Invent 2017. Fargate adds a layer of abstraction on top of the Compute Environment, or the ECS Cluster. We no longer have to worry about the AMI, EC2 types, task placement, etc. In this post I cover the POC done to use Fargate over AWS Batch for batch processing, but this can also be used as a tutorial for running any type of tasks using Fargate. We create an ECS Task definition, a Fargate Cluster, and a Lambda to run the task using CloudWatch Event trigger.</summary>
+      
+
+      
+      
+    </entry>
+  
   
   
     <entry>
@@ -4542,195 +4836,6 @@ bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb get-item --table-nam
 
       
         <summary type="html">Localstack is a really useful project by Atlassian, which allows for local development using the AWS cloud stack. In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against. This post is a quick and handy gist of using AWS command line to work with localstack for S3, SNS, SQS, and DynamoDB.</summary>
-      
-
-      
-      
-    </entry>
-  
-  
-  
-    <entry>
-      
-      <title type="html">SparkJava Maven Archetype with .war generation</title>
-      
-      <link href="https://lobster1234.github.io/2017/04/04/sparkjava-maven-archetype-webapp/" rel="alternate" type="text/html" title="SparkJava Maven Archetype with .war generation" />
-      <published>2017-04-04T01:11:03-07:00</published>
-      <updated>2017-04-04T01:11:03-07:00</updated>
-      <id>https://lobster1234.github.io/2017/04/04/sparkjava-maven-archetype-webapp</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2017/04/04/sparkjava-maven-archetype-webapp/">&lt;p&gt;&lt;a href=&quot;http://sparkjava.com/&quot; target=&quot;_blank&quot;&gt;Spark Java&lt;/a&gt; is a Java 8 based lightweight framework which I highly recommend for writing APIs. It is so simple that it comes with an embedded jetty. However, in real world production you’d want to run it in an external container like Tomcat, JBoss, or Jetty (external), etc.
-I found a &lt;a href=&quot;https://github.com/ImaginateWayne/sparkjava-archetypes&quot; target=&quot;_blank&quot;&gt;SparkJava Hello World archetype&lt;/a&gt;, however, it uses the embedded jetty. I was able to fork the repo and add .war support to it.&lt;/p&gt;
-
-&lt;p&gt;The fork is &lt;a href=&quot;https://github.com/marqeta/sparkjava-archetypes/tree/master/sparkjava-helloworld-archetype&quot; target=&quot;_blank&quot;&gt;here&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;This post walks through the usage.&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;h3 id=&quot;clone-the-fork&quot;&gt;Clone the fork&lt;/h3&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  C02STG51GTFM:work mpandit$ git clone https://github.com/marqeta/sparkjava-archetypes.git
-  Cloning into 'sparkjava-archetypes'...
-  remote: Counting objects: 115, done.
-  remote: Compressing objects: 100% (13/13), done.
-  remote: Total 115 (delta 3), reused 0 (delta 0), pack-reused 101
-  Receiving objects: 100% (115/115), 13.20 KiB | 0 bytes/s, done.
-  Resolving deltas: 100% (18/18), done.
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;h3 id=&quot;install-the-archetype-in-your-local-m2&quot;&gt;Install the archetype in your local .m2&lt;/h3&gt;
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  C02STG51GTFM:work mpandit$ cd sparkjava-archetypes/
-  C02STG51GTFM:sparkjava-archetypes mpandit$ cd sparkjava-helloworld-archetype/
-  C02STG51GTFM:sparkjava-helloworld-archetype mpandit$ mvn install
-  INFO] Scanning for projects...
-  [INFO]                                                                         
-  [INFO] ------------------------------------------------------------------------
-  [INFO] Building Spark Java Hello World Archetype 1.0.0
-  [INFO] ------------------------------------------------------------------------
-  [INFO] ....
-  [INFO] ....
-  [INFO] ------------------------------------------------------------------------
-  [INFO] BUILD SUCCESS
-  [INFO] ------------------------------------------------------------------------
-  [INFO] Total time: 7.029 s
-  [INFO] Finished at: 2017-04-06T20:47:41-07:00
-  [INFO] Final Memory: 13M/245M
-  [INFO] ------------------------------------------------------------------------
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;h3 id=&quot;create-the-helloworld-project-using-this-archetype&quot;&gt;Create the HelloWorld project using this archetype&lt;/h3&gt;
-
-&lt;p&gt;You may want to replace the &lt;code class=&quot;highlighter-rouge&quot;&gt;groupId&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;artifactId&lt;/code&gt;, and &lt;code class=&quot;highlighter-rouge&quot;&gt;package&lt;/code&gt; to match your code structure.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;C02STG51GTFM:sparkjava-helloworld-archetype mpandit$ cd ~/work
-C02STG51GTFM:work mpandit$ mvn archetype:generate \
-&amp;gt;     -DarchetypeGroupId=com.sparkjava \
-&amp;gt;     -DarchetypeArtifactId=sparkjava-helloworld-archetype \
-&amp;gt;     -DarchetypeVersion=1.0.0 \
-&amp;gt;     -DgroupId=com.marqeta.mqpay \
-&amp;gt;     -DartifactId=webhooks-api \
-&amp;gt;     -Dversion=1.0-SNAPSHOT \
-&amp;gt;     -Dpackage=com.marqeta.mqpay
-
-[INFO] Scanning for projects...
-[INFO]                                                                         
-[INFO] ------------------------------------------------------------------------
-[INFO] Building Spark Java Hello World Archetype 1.0.0
-[INFO] ------------------------------------------------------------------------
-[INFO]
-[INFO] &amp;gt;&amp;gt;&amp;gt; maven-archetype-plugin:2.2:generate (default-cli) &amp;gt; generate-sources @ sparkjava-helloworld-archetype &amp;gt;&amp;gt;&amp;gt;
-[INFO]
-[INFO] &amp;lt;&amp;lt;&amp;lt; maven-archetype-plugin:2.2:generate (default-cli) &amp;lt; generate-sources @ sparkjava-helloworld-archetype &amp;lt;&amp;lt;&amp;lt;
-[INFO]
-[INFO] --- maven-archetype-plugin:2.2:generate (default-cli) @ sparkjava-helloworld-archetype ---
-[INFO] Generating project in Interactive mode
-[INFO] Archetype repository missing. Using the one from [com.sparkjava:sparkjava-helloworld-archetype:1.0.0] found in catalog local
-[INFO] Using property: groupId = com.marqeta.mqpay
-[INFO] Using property: artifactId = webhooks-api
-[INFO] Using property: version = 1.0-SNAPSHOT
-[INFO] Using property: package = com.marqeta.mqpay
-Confirm properties configuration:
-groupId: com.marqeta.mqpay
-artifactId: webhooks-api
-version: 1.0-SNAPSHOT
-package: com.marqeta.mqpay
- Y: :
-
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;p&gt;Hit enter, and you will notice a webhooks-api folder with the project in it.&lt;/p&gt;
-
-&lt;p&gt;You can notice the generated files - Most importantly the Spark Application and web.xml.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;C02STG51GTFM:work mpandit$ cd webhooks-api
-C02STG51GTFM:webhooks-api mpandit$ tree
-.
-├── README.md
-├── pom.xml
-└── src
-    └── main
-        ├── java
-        │   └── com
-        │       └── marqeta
-        │           └── mqpay
-        │               └── SparkJavaHelloWorld.java
-        └── webapp
-            └── WEB-INF
-                └── web.xml
-
-8 directories, 4 files
-
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;h3 id=&quot;build-the-project&quot;&gt;Build the Project&lt;/h3&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;C02STG51GTFM:webhooks-api mpandit$ mvn install
-[INFO] Scanning for projects...
-[INFO]                                                                         
-[INFO] ------------------------------------------------------------------------
-[INFO] Building webhooks-api 1.0-SNAPSHOT
-[INFO] ------------------------------------------------------------------------
-[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ webhooks-api ---
-[INFO] ..
-[INFO] ..
-[INFO] ..
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time: 2.140 s
-[INFO] Finished at: 2017-04-06T20:52:07-07:00
-[INFO] Final Memory: 21M/308M
-[INFO] ------------------------------------------------------------------------
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h3 id=&quot;deploy-the-generated-war-file&quot;&gt;Deploy the generated war file&lt;/h3&gt;
-&lt;p&gt;I have tomcat under &lt;code class=&quot;highlighter-rouge&quot;&gt;~/Downloads/tomcat&lt;/code&gt;. Replace it with your destination Servlet container’s webapp folder.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;C02STG51GTFM:webhooks-api mpandit$ cp target/webhooks-api-1.0-SNAPSHOT.war ~/Downloads/tomcat/webapps/
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h3 id=&quot;verify-if-it-all-worked&quot;&gt;Verify if it all worked&lt;/h3&gt;
-
-&lt;p&gt;We can do a simple curl, or browser to hit localhost.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;C02STG51GTFM:webhooks-api mpandit$ curl -i http://localhost:8080/webhooks-api-1.0-SNAPSHOT/hello
-HTTP/1.1 200
-Content-Type: text/html;charset=utf-8
-Transfer-Encoding: chunked
-Date: Fri, 07 Apr 2017 04:17:26 GMT
-
-Hello World!
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;You can modify the code in &lt;code class=&quot;highlighter-rouge&quot;&gt;SparkJavaHelloWorld.java&lt;/code&gt; to add more endpoints, or add new controllers (remember to add them to &lt;code class=&quot;highlighter-rouge&quot;&gt;web.xml&lt;/code&gt; so Spark can process them).&lt;/p&gt;</content>
-
-      
-      
-      
-      
-      
-
-      
-        <author>
-            <name>Manish Pandit</name>
-          
-          
-        </author>
-      
-
-      
-        <category term="maven" />
-      
-        <category term="sparkjava" />
-      
-
-      
-
-      
-        <summary type="html">Spark Java is a Java 8 based lightweight framework which I highly recommend for writing APIs. It is so simple that it comes with an embedded jetty. However, in real world production you’d want to run it in an external container like Tomcat, JBoss, or Jetty (external), etc. I found a SparkJava Hello World archetype, however, it uses the embedded jetty. I was able to fork the repo and add .war support to it. The fork is here This post walks through the usage.</summary>
       
 
       
