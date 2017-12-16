@@ -70,6 +70,7 @@
 <link rel="canonical" href="https://lobster1234.github.io/2017/12/14/aws-lambda-http-proxy/" />
 <meta property="og:url" content="https://lobster1234.github.io/2017/12/14/aws-lambda-http-proxy/" />
 <meta property="og:site_name" content="Manish Pandit’s Blog" />
+<meta property="og:image" content="https://lobster1234.github.io/assets/lambda_proxy.png" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2017-12-14T22:44:37-08:00" />
 <script type="application/ld+json">
@@ -78,6 +79,7 @@
 "headline": "HTTP/S Proxy Server for AWS Lambda Invocations",
 "author": {"@type": "Person",
 "name": "Manish Pandit"},
+"image": "https://lobster1234.github.io/assets/lambda_proxy.png",
 "datePublished": "2017-12-14T22:44:37-08:00",
 "description": "Lambda Functions are a FaaS implementation on Amazon Web Services. Setting them as HTTP/S endpoints over API Gateway can be complicated, and more often than not is an overkill for simple, internal APIs. Besides, API Gateway endpoints for Lambda are public, no matter how we slice and dice it. The recently announced VPC Link for API Gateway only allows the endpoints to route to a NLB target, not a Lambda. This is a lightweight HTTP/S proxy written in Java, which wraps a lambda invocation, mimicking the API Gateway-Lambda Proxy Integration.",
 "mainEntityOfPage": {"@type": "WebPage",
@@ -411,7 +413,7 @@ Server: Apache Tomcat/8.5.11
 
 <h3 id="typical-deployment-in-aws">Typical Deployment in AWS</h3>
 
-<p><img src="lambda_proxy.png" alt="AWS Deployment" /></p>
+<p><img src="https://lobster1234.github.io/assets/lambda_proxy.png" alt="AWS Deployment" /></p>
 
 <h3 id="errors">Errors</h3>
 
