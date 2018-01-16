@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2017-12-15T17:41:08-08:00</updated>
+  <updated>2018-01-15T21:27:11-08:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -25,6 +25,303 @@
     </author>
   
 
+  
+  
+    <entry>
+      
+      <title type="html">Multiple Functions in Serverless Framework with Java</title>
+      
+      <link href="https://lobster1234.github.io/2017/12/26/serverless-java-multiple-functions/" rel="alternate" type="text/html" title="Multiple Functions in Serverless Framework with Java" />
+      <published>2017-12-26T22:44:37-08:00</published>
+      <updated>2017-12-26T22:44:37-08:00</updated>
+      <id>https://lobster1234.github.io/2017/12/26/serverless-java-multiple-functions</id>
+      <content type="html" xml:base="https://lobster1234.github.io/2017/12/26/serverless-java-multiple-functions/">&lt;p&gt;&lt;a href=&quot;https://serverless.com&quot;&gt;Serverless Framework&lt;/a&gt; is an excellent choice for writing and deploying Lambda Functions in AWS. Having written a &lt;a href=&quot;https://lobster1234.github.io/categories/lambda/&quot;&gt;blog series&lt;/a&gt; on using it with Java8+Maven, I’ve been asked if there is a way to not have &lt;em&gt;too many&lt;/em&gt; handlers (One per API), and somehow provide multiple handler functions in the same java class. In this post I provide the structure that’d allow for multiple handlers using a single Java class.&lt;/p&gt;
+
+&lt;p&gt;This is particularly useful when the code is tightly coupled around a resource (CRUD) and writing a &lt;em&gt;handler&lt;/em&gt; class for each of C, R, U, D seems un-necessary, like it should.
+&lt;!--more--&gt;&lt;/p&gt;
+
+&lt;p&gt;This is achieved via the &lt;a href=&quot;https://serverless.com/framework/docs/providers/aws/guide/packaging/&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;package&lt;/code&gt;&lt;/a&gt; section of &lt;a href=&quot;https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;serverless.yml&lt;/code&gt;&lt;/a&gt;. Unfortunately the documentation does not cover Java8 as extensively as node or python. Hence this post.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Make sure you’ve Serverless installed, and the AWS CLI is configured with the necessary policies.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bash-3.2$ serverless -v
+1.25.0
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;ul&gt;
+  &lt;li&gt;Create a boilerplate serverless AWS Java8 Maven project.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bash-3.2$ mkdir multiple-handlers
+bash-3.2$ cd multiple-handlers/
+bash-3.2$ serverless create --template aws-java-maven
+Serverless: Generating boilerplate...
+Serverless: Successfully generated boilerplate for template: &quot;aws-java-maven&quot;
+Serverless: NOTE: Please update the &quot;service&quot; property in serverless.yml with your service name
+bash-3.2$ tree
+.
+├── pom.xml
+├── serverless.yml
+└── src
+    └── main
+        ├── java
+        │   └── com
+        │       └── serverless
+        │           ├── ApiGatewayResponse.java
+        │           ├── Handler.java
+        │           └── Response.java
+        └── resources
+            └── log4j.properties
+
+6 directories, 6 files
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;ul&gt;
+  &lt;li&gt;Check the &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless.yml&lt;/code&gt;, if you ignore all the comments, this is what it looks like -&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-yml highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;s&quot;&gt;service&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;aws-java-maven&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# NOTE: update this with your service name&lt;/span&gt;
+
+&lt;span class=&quot;s&quot;&gt;provider&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;aws&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;runtime&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;java8&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;# you can add packaging information here&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;package&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;artifact&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;target/hello-dev.jar&lt;/span&gt;
+
+&lt;span class=&quot;s&quot;&gt;functions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;hello&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;handler&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;com.serverless.Handler&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;package&lt;/code&gt; section is what tells serverless to locate the artifacts.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Let’s add another function to the auto-generated &lt;code class=&quot;highlighter-rouge&quot;&gt;Handler&lt;/code&gt; class, which already has one function defined called &lt;code class=&quot;highlighter-rouge&quot;&gt;handleRequest&lt;/code&gt; which maps to the lambda function &lt;code class=&quot;highlighter-rouge&quot;&gt;hello&lt;/code&gt;, as noticed in the &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless.yml&lt;/code&gt; above.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;We will add a new method called &lt;code class=&quot;highlighter-rouge&quot;&gt;handleAnotherRequest&lt;/code&gt; in the same class. To differentiate the output, we’ll change the &lt;code class=&quot;highlighter-rouge&quot;&gt;Response&lt;/code&gt; to output a different string than the auto-generated method. I replaced &lt;code class=&quot;highlighter-rouge&quot;&gt;Your&lt;/code&gt; with &lt;code class=&quot;highlighter-rouge&quot;&gt;Another&lt;/code&gt; in the new method.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bash-3.2$ vi src/main/java/com/serverless/Handler.java
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;com&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;serverless&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;java.util.Collections&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;java.util.Map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.apache.log4j.BasicConfigurator&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.apache.log4j.Logger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.amazonaws.services.lambda.runtime.Context&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.amazonaws.services.lambda.runtime.RequestHandler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Handler&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;implements&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;RequestHandler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ApiGatewayResponse&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+
+	&lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;final&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Logger&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;LOG&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Logger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getLogger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Handler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;class&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+
+	&lt;span class=&quot;nd&quot;&gt;@Override&lt;/span&gt;
+	&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ApiGatewayResponse&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;handleRequest&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Context&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;context&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+		&lt;span class=&quot;n&quot;&gt;BasicConfigurator&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;configure&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+
+		&lt;span class=&quot;n&quot;&gt;LOG&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;info&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;received: &quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+		&lt;span class=&quot;n&quot;&gt;Response&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;responseBody&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Response&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Go Serverless v1.x! Your function executed successfully!&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+		&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ApiGatewayResponse&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;builder&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt;
+				&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setStatusCode&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;200&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+				&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setObjectBody&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;responseBody&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+				&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setHeaders&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Collections&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;singletonMap&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;X-Powered-By&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;AWS Lambda &amp;amp; serverless&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt;
+				&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;build&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+	&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+	&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ApiGatewayResponse&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;handleAnotherRequest&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Context&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;context&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+		&lt;span class=&quot;n&quot;&gt;Response&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;responseBody&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Response&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Go Serverless v1.x! Another function executed successfully!&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+		&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ApiGatewayResponse&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;builder&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt;
+				&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setStatusCode&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;200&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+				&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setObjectBody&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;responseBody&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+				&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setHeaders&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Collections&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;singletonMap&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;X-Powered-By&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;AWS Lambda &amp;amp; serverless&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt;
+				&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;build&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+	&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Next, we define the &lt;code class=&quot;highlighter-rouge&quot;&gt;package&lt;/code&gt; section for each of the functions. This is where it get a little non-intuitive. We will need to modify the &lt;code class=&quot;highlighter-rouge&quot;&gt;package&lt;/code&gt; declaration in &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless.yml&lt;/code&gt; from &lt;code class=&quot;highlighter-rouge&quot;&gt;artifact&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;individually&lt;/code&gt; directive.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Replace &lt;code class=&quot;highlighter-rouge&quot;&gt;artifact&lt;/code&gt; under &lt;code class=&quot;highlighter-rouge&quot;&gt;package&lt;/code&gt; in &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless.yml&lt;/code&gt; with &lt;code class=&quot;highlighter-rouge&quot;&gt;individually: true&lt;/code&gt;. The &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless.yml&lt;/code&gt; header would look like this now -&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;s&quot;&gt;service&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;aws-java-maven&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# NOTE: update this with your service name&lt;/span&gt;
+
+&lt;span class=&quot;s&quot;&gt;provider&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;aws&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;runtime&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;java8&lt;/span&gt;
+
+&lt;span class=&quot;s&quot;&gt;package&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;individually&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;true&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;We then define packaging at the individual function level, like so -&lt;/p&gt;
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;s&quot;&gt;functions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;hello&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;handler&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;com.serverless.Handler::handleRequest&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;package&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;s&quot;&gt;artifact&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;target/hello-dev.jar&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;hello2&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;handler&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;com.serverless.Handler::handleAnotherRequest&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;package&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;s&quot;&gt;artifact&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;target/hello-dev.jar&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Notice that we’ve added another function, &lt;code class=&quot;highlighter-rouge&quot;&gt;hello2&lt;/code&gt; which has the same class, but maps to a different handler method. We have to duplicate the &lt;code class=&quot;highlighter-rouge&quot;&gt;artifact&lt;/code&gt; declaration, despite both functions being a part of the same class.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Now we’re ready to deploy and invoke the functions.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;This does not work with &lt;code class=&quot;highlighter-rouge&quot;&gt;invoke local&lt;/code&gt; as of this writing (1.25.0).&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;We need to build the project using &lt;code class=&quot;highlighter-rouge&quot;&gt;mvn&lt;/code&gt;&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bash-3.2$ mvn clean install
+[INFO] Scanning for projects...
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] Building hello dev
+[INFO] ------------------------------------------------------------------------
+[INFO]
+......
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 3.304 s
+[INFO] Finished at: 2018-01-15T18:12:53-08:00
+[INFO] Final Memory: 25M/310M
+[INFO] ------------------------------------------------------------------------
+bash-3.2$
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Now we deploy -&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bash-3.2$ serverless deploy
+Serverless: Packaging service...
+Serverless: Uploading CloudFormation file to S3...
+Serverless: Uploading artifacts...
+Serverless: Validating template...
+Serverless: Updating Stack...
+Serverless: Checking Stack update progress...
+...............
+Serverless: Stack update finished...
+Service Information
+service: aws-java-maven
+stage: dev
+region: us-east-1
+stack: aws-java-maven-dev
+api keys:
+  None
+endpoints:
+  None
+functions:
+  hello: aws-java-maven-dev-hello
+  hello2: aws-java-maven-dev-hello2
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Finally, we can test -&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bash-3.2$ serverless invoke -f hello
+{
+    &quot;statusCode&quot;: 200,
+    &quot;body&quot;: &quot;{\&quot;message\&quot;:\&quot;Go Serverless v1.x! Your function executed successfully!\&quot;,\&quot;input\&quot;:{}}&quot;,
+    &quot;headers&quot;: {
+        &quot;X-Powered-By&quot;: &quot;AWS Lambda &amp;amp; serverless&quot;
+    },
+    &quot;isBase64Encoded&quot;: false
+}
+bash-3.2$ serverless invoke -f hello2
+{
+    &quot;statusCode&quot;: 200,
+    &quot;body&quot;: &quot;{\&quot;message\&quot;:\&quot;Go Serverless v1.x! Another function executed successfully!\&quot;,\&quot;input\&quot;:{}}&quot;,
+    &quot;headers&quot;: {
+        &quot;X-Powered-By&quot;: &quot;AWS Lambda &amp;amp; serverless&quot;
+    },
+    &quot;isBase64Encoded&quot;: false
+}
+bash-3.2$
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;As you can notice, the two functions can be invoked using their function names, while residing in the same &lt;code class=&quot;highlighter-rouge&quot;&gt;Handler&lt;/code&gt; class. This is pretty useful when creating &lt;code class=&quot;highlighter-rouge&quot;&gt;CRUD&lt;/code&gt; operations on resources without having to create a &lt;code class=&quot;highlighter-rouge&quot;&gt;Handler&lt;/code&gt; class for each method.&lt;/p&gt;
+
+&lt;p&gt;Found this useful? Let me know in the comments below!&lt;/p&gt;
+
+&lt;h3 style=&quot;text-align: center&quot; id=&quot;comments&quot;&gt;Comments&lt;/h3&gt;
+
+&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = &quot;https://lobster1234.github.io/2017/12/26/serverless-java-multiple-functions/&quot;;  
+this.page.identifier = &quot;/2017/12/26/serverless-java-multiple-functions&quot;;
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://lobster1234.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+&lt;/script&gt;
+
+&lt;noscript&gt;Please enable JavaScript to view the &lt;a href=&quot;https://disqus.com/?ref_noscript&quot;&gt;comments powered by Disqus.&lt;/a&gt;&lt;/noscript&gt;
+
+&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+
+
+      
+
+&lt;/script&gt;</content>
+
+      
+      
+      
+      
+      
+
+      
+        <author>
+            <name>Manish Pandit</name>
+          
+          
+        </author>
+      
+
+      
+        <category term="aws" />
+      
+        <category term="lambda" />
+      
+
+      
+
+      
+        <summary type="html">Serverless Framework is an excellent choice for writing and deploying Lambda Functions in AWS. Having written a blog series on using it with Java8+Maven, I’ve been asked if there is a way to not have too many handlers (One per API), and somehow provide multiple handler functions in the same java class. In this post I provide the structure that’d allow for multiple handlers using a single Java class. This is particularly useful when the code is tightly coupled around a resource (CRUD) and writing a handler class for each of C, R, U, D seems un-necessary, like it should.</summary>
+      
+
+      
+      
+    </entry>
+  
   
   
     <entry>
@@ -4610,121 +4907,6 @@ bash-3.2$
 
       
         <summary type="html">We continue to build our Lambda functions beyond the Hello World that we saw in the previous post. Our end goal is to build an API, and make it available via Amazon API Gateway. We will build the foundation of our Lambda-API-Gateway set up in this tutorial. We will also set up DynamoDB. Feel free to replace DynamoDB with any persistance layer, or even a mock.</summary>
-      
-
-      
-      
-    </entry>
-  
-  
-  
-    <entry>
-      
-      <title type="html">Fish and iTerm2</title>
-      
-      <link href="https://lobster1234.github.io/2017/04/08/setting-up-fish-and-iterm2/" rel="alternate" type="text/html" title="Fish and iTerm2" />
-      <published>2017-04-08T04:44:37-07:00</published>
-      <updated>2017-04-08T04:44:37-07:00</updated>
-      <id>https://lobster1234.github.io/2017/04/08/setting-up-fish-and-iterm2</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2017/04/08/setting-up-fish-and-iterm2/">&lt;p&gt;So, out of boredom, I decided to upgrade my shell and terminal to something closer to 2017, instead of living in the early 90s. Clearly I’e been using &lt;code class=&quot;highlighter-rouge&quot;&gt;bash&lt;/code&gt; all these years - mostly on Ubuntu and lately on OSX. But I’ve always been &lt;em&gt;lazy and complacent&lt;/em&gt; with the terminal. I’ve always wanted to set up &lt;a href=&quot;http://fishshell.com&quot; target=&quot;_blank&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;fish&lt;/code&gt;&lt;/a&gt; - &lt;strong&gt;Friendly Interactive SHell&lt;/strong&gt;. for it’s git integration, and very rich interaction. Sure, all of this can be done on &lt;code class=&quot;highlighter-rouge&quot;&gt;bash&lt;/code&gt; or &lt;code class=&quot;highlighter-rouge&quot;&gt;zsh&lt;/code&gt; but I hate configuration, and combing hundreds of git repos for &lt;code class=&quot;highlighter-rouge&quot;&gt;bashfiles&lt;/code&gt; and find what works for me.&lt;/p&gt;
-
-&lt;p&gt;While at &lt;code class=&quot;highlighter-rouge&quot;&gt;fish&lt;/code&gt;, I also decided to upgrade the default Mac &lt;code class=&quot;highlighter-rouge&quot;&gt;terminal&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;iTerm2&lt;/code&gt;. This led me to a journey through installing fonts all the way to picking up the theme that works for me. But again, no configuration to mess with.&lt;/p&gt;
-
-&lt;!--more--&gt;
-&lt;h3 id=&quot;installing-fish&quot;&gt;Installing fish&lt;/h3&gt;
-
-&lt;p&gt;Since I have brew, I was able to simply do this&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  bash-3.2$ brew install fish
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;If you do not have brew, head over to &lt;a href=&quot;http://fishshell.com&quot; target=&quot;_blank&quot;&gt;fishshell.com&lt;/a&gt; for instructions on setting it up. They have MacPorts, Installer, and an executable.&lt;/p&gt;
-
-&lt;p&gt;Once installed, the default theme supports git repositories, in that, the prompt indicates the local repository state, has nice syntax highlighting on the command line, and typical things you’d expect from the shell of the 21st century.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/fish-1.png&quot; alt=&quot;Fish-1&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;You can see the prompt change, as well as a timestamp show up to the right of the window.&lt;/p&gt;
-
-&lt;p&gt;If you wish to make fish your default shell, add add &lt;code class=&quot;highlighter-rouge&quot;&gt;/usr/local/bin/fish&lt;/code&gt; at the very top of &lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/shells&lt;/code&gt;, and execute &lt;code class=&quot;highlighter-rouge&quot;&gt;chsh -s /usr/local/bin/fish&lt;/code&gt;. If not, then you can always type &lt;code class=&quot;highlighter-rouge&quot;&gt;fish&lt;/code&gt; in &lt;code class=&quot;highlighter-rouge&quot;&gt;bash&lt;/code&gt;.&lt;/p&gt;
-
-&lt;h3 id=&quot;installing-omf&quot;&gt;Installing omf&lt;/h3&gt;
-
-&lt;p&gt;Given the richness of fish with themes and plugins, it’s best to use &lt;code class=&quot;highlighter-rouge&quot;&gt;omf&lt;/code&gt; - &lt;a href=&quot;https://github.com/oh-my-fish/oh-my-fish&quot; target=&quot;_blank&quot;&gt;Oh My Fish&lt;/a&gt;, which is more or less a package manager for fish.&lt;/p&gt;
-
-&lt;p&gt;To install &lt;code class=&quot;highlighter-rouge&quot;&gt;omf&lt;/code&gt; -&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bash-3.2$ curl -L https://get.oh-my.fish | fish
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;Once &lt;code class=&quot;highlighter-rouge&quot;&gt;omf&lt;/code&gt; is installed, checking out themes etc. becomes a breeze. To do so, type &lt;code class=&quot;highlighter-rouge&quot;&gt;omf&lt;/code&gt; on the prompt to see the options. Typing &lt;code class=&quot;highlighter-rouge&quot;&gt;omf theme&lt;/code&gt; will show a big list, and in order to see what these themes look like, head over &lt;a href=&quot;https://github.com/oh-my-fish/oh-my-fish/blob/master/docs/Themes.md&quot; target=&quot;_blank&quot;&gt;here&lt;/a&gt; to preview them.&lt;/p&gt;
-
-&lt;p&gt;I liked &lt;code class=&quot;highlighter-rouge&quot;&gt;bobthefish&lt;/code&gt;, and installed it like so -&lt;/p&gt;
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;⋊&amp;gt; ~/work omf install bobthefish                                          05:04:17
-Updating https://github.com/oh-my-fish/packages-main master... Done!
-Installing package bobthefish
-✔ bobthefish successfully installed.
- ~/work                                          773ms   Sat Apr  8 05:07:06 2017
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;p&gt;You can always switch back to &lt;code class=&quot;highlighter-rouge&quot;&gt;default&lt;/code&gt; by typing &lt;code class=&quot;highlighter-rouge&quot;&gt;omf theme default&lt;/code&gt;. You can install many themes and switch back and forth between them till you’re comfortable with one of them.&lt;/p&gt;
-
-&lt;p&gt;However, this theme (and many others) uses fonts that would need to be installed.&lt;/p&gt;
-
-&lt;h3 id=&quot;installing-powerline-patched-fonts&quot;&gt;Installing Powerline Patched Fonts&lt;/h3&gt;
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;~/work  git clone https://github.com/powerline/fonts.git
-~/work  cd fonts                               
-~/w/fonts   master  ./install.sh
-Copying fonts...
-Powerline fonts installed to /Users/mpandit/Library/Fonts
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;p&gt;Feel free to remove the &lt;code class=&quot;highlighter-rouge&quot;&gt;fonts&lt;/code&gt; directory.&lt;/p&gt;
-
-&lt;h3 id=&quot;installing-iterm2&quot;&gt;Installing iTerm2&lt;/h3&gt;
-
-&lt;p&gt;Downloaded and installed &lt;a href=&quot;https://www.iterm2.com/&quot; target=&quot;_blank&quot;&gt;iTerm2&lt;/a&gt;, which is super simple to do.&lt;/p&gt;
-
-&lt;p&gt;Take a look at the Font Book, and pick the powerline font of your choice. I like &lt;code class=&quot;highlighter-rouge&quot;&gt;Ubuntu Mono&lt;/code&gt;. You can type &lt;code class=&quot;highlighter-rouge&quot;&gt;powerline&lt;/code&gt; in the little search textbox in Font Book to shorten the list. Once picked, set the font here -&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/fish-2.png&quot; alt=&quot;Fish-2&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Restart iTerm2, and you should be all set!&lt;/p&gt;
-
-&lt;h3 id=&quot;github-integration&quot;&gt;Github integration&lt;/h3&gt;
-
-&lt;p&gt;This image shows how the prompt changes as we make simple changes to a local git repo. I am using &lt;code class=&quot;highlighter-rouge&quot;&gt;bobthefish&lt;/code&gt; theme. See the theme details on how the prompt indicates various states like locally committed but un-pushed changes, etc.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/fish-3.png&quot; alt=&quot;Fish-3&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;As you can see, it is super helpful, with no configuration to get this going. This to me is one of the most useful and powerful features of &lt;code class=&quot;highlighter-rouge&quot;&gt;fish&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;Now that you have &lt;code class=&quot;highlighter-rouge&quot;&gt;fish&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;omf&lt;/code&gt; set up, play with the many options and if you have never used it before, you’ll be surprised how modern and developer friendly this set up is. The depth of autocomplete going beyond just file names, auto-suggestion, history navigation, and syntax coloring makes working on the terminal so much productive and painless!&lt;/p&gt;</content>
-
-      
-      
-      
-      
-      
-
-      
-        <author>
-            <name>Manish Pandit</name>
-          
-          
-        </author>
-      
-
-      
-        <category term="shell" />
-      
-
-      
-
-      
-        <summary type="html">So, out of boredom, I decided to upgrade my shell and terminal to something closer to 2017, instead of living in the early 90s. Clearly I’e been using bash all these years - mostly on Ubuntu and lately on OSX. But I’ve always been lazy and complacent with the terminal. I’ve always wanted to set up fish - Friendly Interactive SHell. for it’s git integration, and very rich interaction. Sure, all of this can be done on bash or zsh but I hate configuration, and combing hundreds of git repos for bashfiles and find what works for me. While at fish, I also decided to upgrade the default Mac terminal to iTerm2. This led me to a journey through installing fonts all the way to picking up the theme that works for me. But again, no configuration to mess with.</summary>
       
 
       

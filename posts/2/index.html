@@ -128,6 +128,102 @@
       <li>
         <header class="post-header">
           <h1 class="post-title">
+            <a class="post-link" href="/2017/10/14/fan-out-with-sns-and-sqs-gotcha/">Fanout SNS-SQS Gotcha</a>
+          </h1>
+
+          <p class="post-meta">Oct 14, 2017 • 
+  
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <a href="/categories/aws/">aws</a>
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+</p>
+        </header>
+
+        <div class="post-content">
+          <p>One of the very common architectural patterns is <em>fan-out</em> where an event is sent to multiple subscribers by a broker. An event can be like placing an order, which can then be handled by inventory service, record-keeping, as well as shipping service concurrently. These events can also be very frequent - like clickstreams, or search strings on a website. AWS allows for <a href="http://docs.aws.amazon.com/sns/latest/dg/SNS_Scenarios.html">fan-out architecture</a> with <a href="https://aws.amazon.com/sns/">SNS</a> topics, and <a href="https://aws.amazon.com/sqs/">SQS</a> queues. SQS queue(s) can subscribe to SNS topics and receive any message sent to the SNS topic(s). It is documented that <a href="http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues.html">FIFO queues</a> cannot be SNS subscribers <a href="https://forums.aws.amazon.com/thread.jspa?threadID=246962">here</a>.</p>
+
+<p>However, as I recently found out, SSE-enabled SQS queues cannot subscribe to SNS either. While AWS stops us from subscribing a FIFO queue to SNS, <a href="https://aws.amazon.com/blogs/aws/new-server-side-encryption-for-amazon-simple-queue-service-sqs/">SSE-enabled queues</a> are allowed to subscribe, but they never get any events. The purpose of this post is to document this previously undocumented behavior.</p>
+
+
+        </div>
+        
+          <p class="post-continue">
+            <a href="/2017/10/14/fan-out-with-sns-and-sqs-gotcha/">Read on &rarr;</a>
+          </p>
+        
+      </li>
+    
+      
+      
+
+      <li>
+        <header class="post-header">
+          <h1 class="post-title">
             <a class="post-link" href="/2017/10/10/logstash-with-aws-lambda/">Logstash logging with AWS Lambda</a>
           </h1>
 
@@ -849,173 +945,6 @@
         
           <p class="post-continue">
             <a href="/2017/08/22/aws-ecs-notes/">Read on &rarr;</a>
-          </p>
-        
-      </li>
-    
-      
-      
-
-      <li>
-        <header class="post-header">
-          <h1 class="post-title">
-            <a class="post-link" href="/2017/08/14/search-with-nutch-mongodb-solr/">Apache Nutch - Step by Step</a>
-          </h1>
-
-          <p class="post-meta">Aug 14, 2017 • 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/architecture/">architecture</a>,
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/search/">search</a>
-    
-  
-    
-  
-    
-  
-
-</p>
-        </header>
-
-        <div class="post-content">
-          <p>Search is one of the most fantastic areas of the technology industry, and has been addressed many, many times with different algorithms, producing varying degrees of success. We get so used to it, that often times I wish I had a Cmd-F while reading a real book.</p>
-
-<p>Recently we had our Quarterly Hack Week at <a href="https://www.marqeta.com" target="_blank_">Marqeta</a>, and one of the ideas was to build search around our public pages. These pages would include the public website assets, as well as the the API developer guides and documentation. This post is a quick summary of the infrastructure, setup, and gotchas of using Nutch 2.3.1 to build a site search - essentially notes from this hack week project.</p>
-
-<p><img src="https://lobster1234.github.io/assets/search.png" alt="Search" /></p>
-
-
-        </div>
-        
-          <p class="post-continue">
-            <a href="/2017/08/14/search-with-nutch-mongodb-solr/">Read on &rarr;</a>
           </p>
         
       </li>
