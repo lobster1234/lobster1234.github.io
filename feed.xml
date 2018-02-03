@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2018-01-15T21:27:11-08:00</updated>
+  <updated>2018-02-03T03:08:01-08:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -40,16 +40,18 @@
 &lt;p&gt;This is particularly useful when the code is tightly coupled around a resource (CRUD) and writing a &lt;em&gt;handler&lt;/em&gt; class for each of C, R, U, D seems un-necessary, like it should.
 &lt;!--more--&gt;&lt;/p&gt;
 
-&lt;p&gt;This is achieved via the &lt;a href=&quot;https://serverless.com/framework/docs/providers/aws/guide/packaging/&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;package&lt;/code&gt;&lt;/a&gt; section of &lt;a href=&quot;https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;serverless.yml&lt;/code&gt;&lt;/a&gt;. Unfortunately the documentation does not cover Java8 as extensively as node or python. Hence this post.&lt;/p&gt;
-
 &lt;ul&gt;
   &lt;li&gt;Make sure you’ve Serverless installed, and the AWS CLI is configured with the necessary policies.&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bash-3.2$ serverless -v
-1.25.0
+1.26.0
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;Please ensure your serverless is at least 1.26.0 - There was a fairly hacky way to do this before &lt;a href=&quot;https://github.com/serverless/serverless/pull/4596&quot;&gt;this pull request&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
 &lt;ul&gt;
   &lt;li&gt;Create a boilerplate serverless AWS Java8 Maven project.&lt;/li&gt;
 &lt;/ul&gt;
@@ -152,33 +154,16 @@ bash-3.2$ tree
 &lt;/div&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;Next, we define the &lt;code class=&quot;highlighter-rouge&quot;&gt;package&lt;/code&gt; section for each of the functions. This is where it get a little non-intuitive. We will need to modify the &lt;code class=&quot;highlighter-rouge&quot;&gt;package&lt;/code&gt; declaration in &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless.yml&lt;/code&gt; from &lt;code class=&quot;highlighter-rouge&quot;&gt;artifact&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;individually&lt;/code&gt; directive.&lt;/li&gt;
+  &lt;li&gt;We then define the individual functions, like so -
+    &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;s&quot;&gt;functions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;hello&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;handler&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;com.serverless.Handler::handleRequest&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;hello2&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;handler&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;com.serverless.Handler::handleAnotherRequest&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+  &lt;/li&gt;
 &lt;/ul&gt;
-
-&lt;p&gt;Replace &lt;code class=&quot;highlighter-rouge&quot;&gt;artifact&lt;/code&gt; under &lt;code class=&quot;highlighter-rouge&quot;&gt;package&lt;/code&gt; in &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless.yml&lt;/code&gt; with &lt;code class=&quot;highlighter-rouge&quot;&gt;individually: true&lt;/code&gt;. The &lt;code class=&quot;highlighter-rouge&quot;&gt;serverless.yml&lt;/code&gt; header would look like this now -&lt;/p&gt;
-
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;s&quot;&gt;service&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;aws-java-maven&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# NOTE: update this with your service name&lt;/span&gt;
-
-&lt;span class=&quot;s&quot;&gt;provider&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;aws&lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;runtime&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;java8&lt;/span&gt;
-
-&lt;span class=&quot;s&quot;&gt;package&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;individually&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;true&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;p&gt;We then define packaging at the individual function level, like so -&lt;/p&gt;
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;s&quot;&gt;functions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;hello&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;handler&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;com.serverless.Handler::handleRequest&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;package&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;s&quot;&gt;artifact&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;target/hello-dev.jar&lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;hello2&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;handler&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;com.serverless.Handler::handleAnotherRequest&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;package&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;s&quot;&gt;artifact&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;target/hello-dev.jar&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
 
 &lt;p&gt;Notice that we’ve added another function, &lt;code class=&quot;highlighter-rouge&quot;&gt;hello2&lt;/code&gt; which has the same class, but maps to a different handler method. We have to duplicate the &lt;code class=&quot;highlighter-rouge&quot;&gt;artifact&lt;/code&gt; declaration, despite both functions being a part of the same class.&lt;/p&gt;
 
@@ -187,7 +172,7 @@ bash-3.2$ tree
 &lt;/ul&gt;
 
 &lt;blockquote&gt;
-  &lt;p&gt;This does not work with &lt;code class=&quot;highlighter-rouge&quot;&gt;invoke local&lt;/code&gt; as of this writing (1.25.0).&lt;/p&gt;
+  &lt;p&gt;This does not work with &lt;code class=&quot;highlighter-rouge&quot;&gt;invoke local&lt;/code&gt; as of this writing (1.26.0).&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;p&gt;We need to build the project using &lt;code class=&quot;highlighter-rouge&quot;&gt;mvn&lt;/code&gt;&lt;/p&gt;

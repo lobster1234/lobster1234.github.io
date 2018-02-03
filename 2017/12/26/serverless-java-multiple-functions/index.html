@@ -271,16 +271,18 @@
 <p>This is particularly useful when the code is tightly coupled around a resource (CRUD) and writing a <em>handler</em> class for each of C, R, U, D seems un-necessary, like it should.
 <!--more--></p>
 
-<p>This is achieved via the <a href="https://serverless.com/framework/docs/providers/aws/guide/packaging/"><code class="highlighter-rouge">package</code></a> section of <a href="https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/"><code class="highlighter-rouge">serverless.yml</code></a>. Unfortunately the documentation does not cover Java8 as extensively as node or python. Hence this post.</p>
-
 <ul>
   <li>Make sure you’ve Serverless installed, and the AWS CLI is configured with the necessary policies.</li>
 </ul>
 
 <div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ serverless -v
-1.25.0
+1.26.0
 </code></pre>
 </div>
+<blockquote>
+  <p>Please ensure your serverless is at least 1.26.0 - There was a fairly hacky way to do this before <a href="https://github.com/serverless/serverless/pull/4596">this pull request</a>.</p>
+</blockquote>
+
 <ul>
   <li>Create a boilerplate serverless AWS Java8 Maven project.</li>
 </ul>
@@ -383,33 +385,16 @@ bash-3.2$ tree
 </div>
 
 <ul>
-  <li>Next, we define the <code class="highlighter-rouge">package</code> section for each of the functions. This is where it get a little non-intuitive. We will need to modify the <code class="highlighter-rouge">package</code> declaration in <code class="highlighter-rouge">serverless.yml</code> from <code class="highlighter-rouge">artifact</code> to <code class="highlighter-rouge">individually</code> directive.</li>
+  <li>We then define the individual functions, like so -
+    <div class="language-yaml highlighter-rouge"><pre class="highlight"><code><span class="s">functions</span><span class="pi">:</span>
+<span class="s">hello</span><span class="pi">:</span>
+  <span class="s">handler</span><span class="pi">:</span> <span class="s">com.serverless.Handler::handleRequest</span>
+<span class="s">hello2</span><span class="pi">:</span>
+  <span class="s">handler</span><span class="pi">:</span> <span class="s">com.serverless.Handler::handleAnotherRequest</span>
+</code></pre>
+    </div>
+  </li>
 </ul>
-
-<p>Replace <code class="highlighter-rouge">artifact</code> under <code class="highlighter-rouge">package</code> in <code class="highlighter-rouge">serverless.yml</code> with <code class="highlighter-rouge">individually: true</code>. The <code class="highlighter-rouge">serverless.yml</code> header would look like this now -</p>
-
-<div class="language-yaml highlighter-rouge"><pre class="highlight"><code><span class="s">service</span><span class="pi">:</span> <span class="s">aws-java-maven</span> <span class="c1"># NOTE: update this with your service name</span>
-
-<span class="s">provider</span><span class="pi">:</span>
-  <span class="s">name</span><span class="pi">:</span> <span class="s">aws</span>
-  <span class="s">runtime</span><span class="pi">:</span> <span class="s">java8</span>
-
-<span class="s">package</span><span class="pi">:</span>
-  <span class="s">individually</span><span class="pi">:</span> <span class="s">true</span>
-</code></pre>
-</div>
-<p>We then define packaging at the individual function level, like so -</p>
-<div class="language-yaml highlighter-rouge"><pre class="highlight"><code><span class="s">functions</span><span class="pi">:</span>
-  <span class="s">hello</span><span class="pi">:</span>
-    <span class="s">handler</span><span class="pi">:</span> <span class="s">com.serverless.Handler::handleRequest</span>
-    <span class="s">package</span><span class="pi">:</span>
-      <span class="s">artifact</span><span class="pi">:</span> <span class="s">target/hello-dev.jar</span>
-  <span class="s">hello2</span><span class="pi">:</span>
-    <span class="s">handler</span><span class="pi">:</span> <span class="s">com.serverless.Handler::handleAnotherRequest</span>
-    <span class="s">package</span><span class="pi">:</span>
-      <span class="s">artifact</span><span class="pi">:</span> <span class="s">target/hello-dev.jar</span>
-</code></pre>
-</div>
 
 <p>Notice that we’ve added another function, <code class="highlighter-rouge">hello2</code> which has the same class, but maps to a different handler method. We have to duplicate the <code class="highlighter-rouge">artifact</code> declaration, despite both functions being a part of the same class.</p>
 
@@ -418,7 +403,7 @@ bash-3.2$ tree
 </ul>
 
 <blockquote>
-  <p>This does not work with <code class="highlighter-rouge">invoke local</code> as of this writing (1.25.0).</p>
+  <p>This does not work with <code class="highlighter-rouge">invoke local</code> as of this writing (1.26.0).</p>
 </blockquote>
 
 <p>We need to build the project using <code class="highlighter-rouge">mvn</code></p>
