@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2018-02-03T03:08:01-08:00</updated>
+  <updated>2018-02-03T03:11:06-08:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -165,7 +165,7 @@ bash-3.2$ tree
   &lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;Notice that we’ve added another function, &lt;code class=&quot;highlighter-rouge&quot;&gt;hello2&lt;/code&gt; which has the same class, but maps to a different handler method. We have to duplicate the &lt;code class=&quot;highlighter-rouge&quot;&gt;artifact&lt;/code&gt; declaration, despite both functions being a part of the same class.&lt;/p&gt;
+&lt;p&gt;Notice that we’ve added another function, &lt;code class=&quot;highlighter-rouge&quot;&gt;hello2&lt;/code&gt; which has the same class, but maps to a different handler method.&lt;/p&gt;
 
 &lt;ul&gt;
   &lt;li&gt;Now we’re ready to deploy and invoke the functions.&lt;/li&gt;
