@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2018-03-27T22:33:30-07:00</updated>
+  <updated>2018-04-02T03:03:46-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -25,6 +25,280 @@
     </author>
   
 
+  
+  
+    <entry>
+      
+      <title type="html">Running ElasticMQ in ECS</title>
+      
+      <link href="https://lobster1234.github.io/2018/04/01/elasticmq-docker-ecs/" rel="alternate" type="text/html" title="Running ElasticMQ in ECS" />
+      <published>2018-04-01T00:44:37-07:00</published>
+      <updated>2018-04-01T00:44:37-07:00</updated>
+      <id>https://lobster1234.github.io/2018/04/01/elasticmq-docker-ecs</id>
+      <content type="html" xml:base="https://lobster1234.github.io/2018/04/01/elasticmq-docker-ecs/">&lt;p&gt;This post is an overview on running &lt;a href=&quot;https://github.com/adamw/elasticmq&quot;&gt;ElasticMQ&lt;/a&gt; in &lt;a href=&quot;https://aws.amazon.com/ecs/&quot;&gt;Amazon ECS&lt;/a&gt;. This can help &lt;em&gt;simulate&lt;/em&gt; &lt;a href=&quot;https://aws.amazon.com/sqs/&quot;&gt;SQS&lt;/a&gt; for development purposes, and running it in ECS would help with resourcing, as well as having an ALB to act as an &lt;code class=&quot;highlighter-rouge&quot;&gt;endpoint-url&lt;/code&gt;. I’ve used EC2 and not &lt;a href=&quot;https://aws.amazon.com/fargate/&quot;&gt;Fargate&lt;/a&gt;, but this can just as easily be launched as a Fargate task. While there is also &lt;a href=&quot;https://localstack.cloud/&quot;&gt;localstack&lt;/a&gt;, for this particular case, I just wanted to run SQS Mock and not all other services localstack comes bundled with.&lt;/p&gt;
+
+&lt;p&gt;Familiarity with ECS, specially around creating Task Definitions, Services, and associating them with Application Load Balancers will definitely help.&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;The Github Repository is &lt;a href=&quot;https://github.com/lobster1234/elasticmq-docker&quot;&gt;here&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;setup&quot;&gt;Setup&lt;/h2&gt;
+
+&lt;p&gt;First off, we create a custom configuration for ElasticMQ, mostly to ensure that the endpoint URL is different than &lt;code class=&quot;highlighter-rouge&quot;&gt;localhost&lt;/code&gt;, and maps to whatever ALB this service runs as.&lt;/p&gt;
+
+&lt;p&gt;Here is the custom configuration:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;include classpath(&quot;application.conf&quot;)
+
+node-address {
+    protocol = http
+    host = &quot;*&quot;
+    port = 9324
+    context-path = &quot;&quot;
+}
+
+rest-sqs {
+    enabled = true
+    bind-port = 9324
+    bind-hostname = &quot;0.0.0.0&quot;
+    sqs-limits = strict
+}
+
+generate-node-address = false
+
+queues {
+
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Next we create the &lt;code class=&quot;highlighter-rouge&quot;&gt;Dockerfile&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;FROM openjdk:8u151-alpine
+WORKDIR /tmp
+RUN wget  https://s3-eu-west-1.amazonaws.com/softwaremill-public/elasticmq-server-0.13.9.jar
+COPY custom.conf /tmp/
+EXPOSE 9324
+CMD  java -Dconfig.file=custom.conf -jar elasticmq-server-0.13.9.jar
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h2 id=&quot;build-and-deploy&quot;&gt;Build and Deploy&lt;/h2&gt;
+
+&lt;p&gt;To build the docker image :&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ git clone git@github.com:lobster1234/elasticmq-docker.git
+$ cd elasticmq-docker
+$ docker build .
+$ docker run -p9324:9324 &amp;lt;image_id&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;I’ve pushed this image on dockerhub as &lt;code class=&quot;highlighter-rouge&quot;&gt;lobster1234/elasticmq-docker&lt;/code&gt;. This can be used in ECS while creating the container definition.&lt;/p&gt;
+
+&lt;p&gt;As a reference, here is the task definition JSON for ECS.  As you can see, I’ve used &lt;code class=&quot;highlighter-rouge&quot;&gt;256MB&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;128vCPU&lt;/code&gt; for this task. I’ve also used us-east-1, and called the task as &lt;code class=&quot;highlighter-rouge&quot;&gt;elasticmq&lt;/code&gt;. Everything else is default ECS including log driver and IAM roles, etc.&lt;/p&gt;
+
+&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;executionRoleArn&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;arn:aws:iam::ACCOUNT_ID_HERE:role/ecsTaskExecutionRole&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;containerDefinitions&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;dnsSearchDomains&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;logConfiguration&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;logDriver&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;awslogs&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;options&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+          &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;awslogs-group&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;/ecs/elasticmq&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+          &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;awslogs-region&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;us-east-1&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+          &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;awslogs-stream-prefix&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ecs&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;entryPoint&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;portMappings&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+          &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;hostPort&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+          &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;protocol&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;tcp&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+          &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;containerPort&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;9324&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;command&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;linuxParameters&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;cpu&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;environment&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;ulimits&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;dnsServers&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;mountPoints&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;workingDirectory&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;dockerSecurityOptions&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;memory&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;memoryReservation&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;volumesFrom&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;image&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;lobster1234/elasticmq-docker&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;disableNetworking&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;healthCheck&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;essential&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;links&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;hostname&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;extraHosts&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;user&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;readonlyRootFilesystem&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;dockerLabels&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;privileged&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;elasticmq-container&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;placementConstraints&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;memory&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;256&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;taskRoleArn&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;arn:aws:iam::ACCOUNT_ID_HERE:role/ecsTaskExecutionRole&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;compatibilities&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;EC2&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;taskDefinitionArn&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;arn:aws:ecs:us-east-1:ACCOUNT_ID_HERE:task-definition/elasticmq:1&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;family&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;elasticmq&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;requiresAttributes&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;targetId&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;targetType&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;value&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;com.amazonaws.ecs.capability.task-iam-role&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;targetId&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;targetType&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;value&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ecs.capability.execution-role-awslogs&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;targetId&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;targetType&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;value&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;com.amazonaws.ecs.capability.logging-driver.awslogs&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;targetId&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;targetType&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;value&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+      &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;com.amazonaws.ecs.capability.docker-remote-api.1.19&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;requiresCompatibilities&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;EC2&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;networkMode&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;bridge&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;cpu&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;128&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;revision&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;status&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ACTIVE&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;volumes&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Next, you’d create an ECS Service using this task definition.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;When you’d create a service using this task, create only 1 instance. You’d create a new listener on the ALB (preferably &lt;code class=&quot;highlighter-rouge&quot;&gt;port 9324&lt;/code&gt;) with path as &lt;code class=&quot;highlighter-rouge&quot;&gt;/&lt;/code&gt;. Please edit the health check for the target group to check for a &lt;code class=&quot;highlighter-rouge&quot;&gt;HTTP 404&lt;/code&gt; and NOT &lt;code class=&quot;highlighter-rouge&quot;&gt;HTTP 200&lt;/code&gt; under &lt;code class=&quot;highlighter-rouge&quot;&gt;Success Codes&lt;/code&gt;.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;If not, then you’d end up getting unhealthy hosts and infinite drain and initial cycles.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;verify&quot;&gt;Verify&lt;/h2&gt;
+
+&lt;p&gt;I’ll use &lt;a href=&quot;https://github.com/awslabs/aws-shell&quot;&gt;aws-shell&lt;/a&gt; to verify that our ElasticMQ service is working as we expect.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; sqs create-queue --queue-name manish_test_queue --endpoint-url http://your_alb_dns_name:9324
+{
+    &quot;QueueUrl&quot;: &quot;http://your_alb_dns_name:9324/queue/manish_test_queue&quot;
+}
+aws&amp;gt; sqs list-queues --endpoint-url http://your_alb_dns_name:9324
+{
+    &quot;QueueUrls&quot;: [
+        &quot;http://your_alb_dns_name:9324/queue/manish_test_queue&quot;
+    ]
+}
+
+aws&amp;gt; sqs send-message --queue-url http://your_alb_dns_name:9324/queue/manish_test_queue --endpoint-url http://your_alb_dns_name:9324 --message-body &quot;foo&quot;
+{
+    &quot;MD5OfMessageBody&quot;: &quot;acbd18db4cc2f85cedef654fccc4a4d8&quot;,
+    &quot;MD5OfMessageAttributes&quot;: &quot;d41d8cd98f00b204e9800998ecf8427e&quot;,
+    &quot;MessageId&quot;: &quot;671a0afc-56b3-4db0-8b7b-e8a1fedf574f&quot;
+}
+
+aws&amp;gt; sqs receive-message --queue-url http://your_alb_dns_name:9324/queue/manish_test_queue --endpoint-url http://your_alb_dns_name:9324
+{
+    &quot;Messages&quot;: [
+        {
+            &quot;Body&quot;: &quot;foo&quot;,
+            &quot;ReceiptHandle&quot;: &quot;671a0afc-56b3-4db0-8b7b-e8a1fedf574f#ebff7f56-626c-409c-bc56-8c2ea509cff9&quot;,
+            &quot;MD5OfBody&quot;: &quot;acbd18db4cc2f85cedef654fccc4a4d8&quot;,
+            &quot;MessageId&quot;: &quot;671a0afc-56b3-4db0-8b7b-e8a1fedf574f&quot;
+        }
+    ]
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Hope this helps with running ElasticMQ under ECS. Questions or comments? Please let me know!&lt;/p&gt;
+
+&lt;h3 style=&quot;text-align: center&quot; id=&quot;comments&quot;&gt;Comments&lt;/h3&gt;
+
+&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = &quot;https://lobster1234.github.io/2018/04/01/elasticmq-docker-ecs/&quot;;  
+this.page.identifier = &quot;/2018/04/01/elasticmq-docker-ecs&quot;;
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://lobster1234.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+&lt;/script&gt;
+
+&lt;noscript&gt;Please enable JavaScript to view the &lt;a href=&quot;https://disqus.com/?ref_noscript&quot;&gt;comments powered by Disqus.&lt;/a&gt;&lt;/noscript&gt;
+
+&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+
+
+      
+
+&lt;/script&gt;</content>
+
+      
+      
+      
+      
+      
+
+      
+        <author>
+            <name>Manish Pandit</name>
+          
+          
+        </author>
+      
+
+      
+        <category term="aws" />
+      
+
+      
+
+      
+        <summary type="html">This post is an overview on running ElasticMQ in Amazon ECS. This can help simulate SQS for development purposes, and running it in ECS would help with resourcing, as well as having an ALB to act as an endpoint-url. I’ve used EC2 and not Fargate, but this can just as easily be launched as a Fargate task. While there is also localstack, for this particular case, I just wanted to run SQS Mock and not all other services localstack comes bundled with. Familiarity with ECS, specially around creating Task Definitions, Services, and associating them with Application Load Balancers will definitely help.</summary>
+      
+
+      
+      
+    </entry>
+  
   
   
     <entry>
@@ -4036,249 +4310,6 @@ Click &lt;strong&gt;Save&lt;/strong&gt;.&lt;/p&gt;
 
       
         <summary type="html">For beginners, Amazon Web Services has a Free Tier, which is very generous. However, as you start to stretch the free tier to it’s limits, it’s good to have billing alerts set up. Essentially you’ll get an email when your bill approaches a certain amount. Setting up billing alerts uses CloudWatch, which is not really the first service the beginners run into. This post shows how to set up AWS Billing Alerts, with screenshots, so you do not have to be familiar with CloudWatch to set one up. I strongly recommend setting the Billing Alerts up, regardless of free tier - having heard and seen horror stories in the recent past.</summary>
-      
-
-      
-      
-    </entry>
-  
-  
-  
-    <entry>
-      
-      <title type="html">Packer your AMIs for Immutable AWS Deployments</title>
-      
-      <link href="https://lobster1234.github.io/2017/04/23/packer-your-AMIs-for-immutable-aws-deployments/" rel="alternate" type="text/html" title="Packer your AMIs for Immutable AWS Deployments" />
-      <published>2017-04-23T23:44:37-07:00</published>
-      <updated>2017-04-23T23:44:37-07:00</updated>
-      <id>https://lobster1234.github.io/2017/04/23/packer-your-AMIs-for-immutable-aws-deployments</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2017/04/23/packer-your-AMIs-for-immutable-aws-deployments/">&lt;p&gt;In the world of MicroServices, &lt;em&gt;immutable deployments&lt;/em&gt; is a highly recommended strategy. It demands that every release get a fresh environment, all the way down to the lowest level - or in case of AWS, the &lt;a href=&quot;http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html&quot; target=&quot;_blank_&quot;&gt;AMI&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;An AMI can bundle the base operating system, application server/runtime, scripts, agents, etc. along with a versioned application artifact. In the spirit of &lt;em&gt;Infrastructure as Code&lt;/em&gt;, the AMI itself can be versioned as a simple json file, as we will see in this post.&lt;/p&gt;
-
-&lt;p&gt;With respect to Automation, creation of the AMI can be triggered as a &lt;em&gt;downstream&lt;/em&gt; Jenkins Job, after successful pre-release tests, and can then act as an &lt;em&gt;upstream&lt;/em&gt; Job for the Infrastructure Build-out using &lt;a href=&quot;https://aws.amazon.com/cloudformation/&quot; target=&quot;_blank_&quot;&gt;CloudFormation&lt;/a&gt;, or &lt;a href=&quot;https://www.terraform.io/&quot; target=&quot;_blank_&quot;&gt;Terraform&lt;/a&gt;. Once the infrastructure is built, it can be made &lt;em&gt;live&lt;/em&gt; via blue/green, red/black or any other deployment plan.&lt;/p&gt;
-
-&lt;p&gt;In this post, we will build an AMI that can be used to launch 100% identical instances in the infrastructure. We will use &lt;a href=&quot;https://packer.io&quot; target=&quot;_blank_&quot;&gt;Packer&lt;/a&gt; to build the AMI, and create Jenkins Jobs to simulate a simplified, real-world CI/CD pipeline.&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/packer.png&quot; alt=&quot;Packer Gitflow&quot; /&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;ami&quot;&gt;AMI&lt;/h2&gt;
-
-&lt;p&gt;An AMI, or Amazon Machine Image is a template that describes an instance - Operating System (Linux, Windows..), Architecture (i386, x86_64..), Virtualization (pvm, hvm), Block Device Mapping, Root Volume Type (EBS, Instance), and any other software packaged along. An AMI can be used to launch instances, usually in an Auto Scaling Group. An AMI is tied to a region, but can be copied over to other region(s). AMIs can be private (to an account), public, or shared across accounts. This privacy model controls which accounts can launch instances using this AMI. AMIs can be created from an instance via AWS CLI using the &lt;a href=&quot;http://docs.aws.amazon.com/cli/latest/reference/ec2/create-image.html&quot; target=&quot;_blank_&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;create-image&lt;/code&gt;&lt;/a&gt; command.&lt;/p&gt;
-
-&lt;h2 id=&quot;amis-and-immutable-deployments&quot;&gt;AMIs and Immutable Deployments&lt;/h2&gt;
-
-&lt;p&gt;An AMI can be thought of as the lowest level of control for a deployment. Going up the chain, there are application servers, with application artifacts (RPM, WAR, node package) at the highest level. The goal is to achieve immutability by bundling the artifact in the AMI (&lt;em&gt;baking in&lt;/em&gt;) so the instances created from this AMI would need no other configuration, and completely identical instances can be spun up in an automated manner. The logs on this instance can be monitored by pushing them out to a central logging service, such as Splunk or Loggly, or a home grown ELK setup. There should absolutely be no need to ssh into any of these instances.&lt;/p&gt;
-
-&lt;h2 id=&quot;packer&quot;&gt;Packer&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://packer.io&quot; target=&quot;_blank_&quot;&gt;Packer&lt;/a&gt; is a tool to automate building of AMIs (and other targeted Machine Images) from configuration files, or &lt;em&gt;templates&lt;/em&gt;. The templates are JSON files containing basic information about the AMI to be created, and can contain inline scripts to provision software on the resulting AMI. Any instances launched from this AMI will have the exact same configuration - from the Operating System to the deployed code. It is ideal to &lt;em&gt;not&lt;/em&gt; have any &lt;code class=&quot;highlighter-rouge&quot;&gt;ssh&lt;/code&gt; access on these instances either to achieve a much higher, or absolute level of immutability. That may take a few iterations and maturity cycles though.&lt;/p&gt;
-
-&lt;h2 id=&quot;setup&quot;&gt;Setup&lt;/h2&gt;
-
-&lt;p&gt;Refer to the &lt;a href=&quot;https://github.com/lobster1234/helloworld-api&quot; target=&quot;_blank_&quot;&gt;Hello World SparkJava App&lt;/a&gt;, which is created using the &lt;a href=&quot;https://github.com/lobster1234/sparkjava-archetypes&quot; target=&quot;_blank_&quot;&gt;SparkJava WAR Maven archetype&lt;/a&gt;. This WAR (versioned artifact) is available in github and will be &lt;em&gt;baked into&lt;/em&gt; the AMI. We will use Jenkins to create an AMI for a release version of our war file.&lt;/p&gt;
-
-&lt;p&gt;In the real world, the WAR will be a real service, and the artifact would have been uploaded to Nexus or Artifactory after successfully passing pre-release test cycle. In this case, the war is available as a &lt;code class=&quot;highlighter-rouge&quot;&gt;release&lt;/code&gt; in this github repo.&lt;/p&gt;
-
-&lt;p&gt;Download Packer from &lt;a href=&quot;https://www.packer.io/downloads.html&quot; target=&quot;_blank_&quot;&gt;packer.io&lt;/a&gt;. It would be ideal to have it run on your Jenkins node, as we will be using Jenkins to create an AMI.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bash-3.2$ packer                               
-Usage: packer [--version] [--help] &amp;lt;command&amp;gt; [&amp;lt;args&amp;gt;]
-
-Available commands are:
-   build       build image(s) from template
-   fix         fixes templates from old versions of packer
-   inspect     see components of a template
-   push        push a template and supporting files to a Packer build service
-   validate    check that a template is valid
-   version     Prints the Packer version
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;Before creating the Jenkins job, it would help to take a look at a typical, basic Packer template. This file is located &lt;a href=&quot;https://github.com/lobster1234/helloworld-api/blob/master/src/main/resources/packer.json&quot; target=&quot;_blank_&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
-
-&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;_comment&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Simple Packer Template using Amazon Linux 2017.03&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;variables&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;aws_access_key&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;aws_secret_key&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-  &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;builders&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;type&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;amazon-ebs&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;access_key&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;{{user `aws_access_key`}}&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;secret_key&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;{{user `aws_secret_key`}}&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;region&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;us-east-1&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;source_ami&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ami-c58c1dd3&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;instance_type&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;t2.micro&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;ssh_username&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ec2-user&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;ami_name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;HelloWorld Build-{{user `Build`}}&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-  &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;source_ami&lt;/code&gt; I’ve used here is latest release &lt;code class=&quot;highlighter-rouge&quot;&gt;2017.03&lt;/code&gt; (at the time of writing) of Amazon Linux in &lt;code class=&quot;highlighter-rouge&quot;&gt;us-east-1&lt;/code&gt;. You can view the AMI IDs &lt;a href=&quot;https://aws.amazon.com/amazon-linux-ami/&quot; target=&quot;_blank_&quot;&gt;here&lt;/a&gt;. The &lt;code class=&quot;highlighter-rouge&quot;&gt;source_ami&lt;/code&gt; is the base AMI - you may want to have a different base AMI for your company or project. In order to not think of this as a chicken and egg problem, the &lt;code class=&quot;highlighter-rouge&quot;&gt;source_ami&lt;/code&gt; can be &lt;a href=&quot;http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/creating-an-ami-ebs.html&quot; target=&quot;_blank_&quot;&gt;created from an EC2 instance&lt;/a&gt;, which has the desired software and block mappings etc. on it.&lt;/p&gt;
-
-&lt;p&gt;In this case we will just use the bare bones Amazon Linux AMI to build the image. The type defines &lt;code class=&quot;highlighter-rouge&quot;&gt;EBS-backed-store&lt;/code&gt; AMI in this case. Packer will build the AMI by creating an instance off of the &lt;code class=&quot;highlighter-rouge&quot;&gt;source_ami&lt;/code&gt;, run any installation scripts (to set up servers like Tomcat and deploying the WAR file), and register the image created after this process as a new AMI. The EC2 instance used to create the AMI will then be terminated by Packer.&lt;/p&gt;
-
-&lt;p&gt;All of this is defined under the &lt;code class=&quot;highlighter-rouge&quot;&gt;builders&lt;/code&gt; section of the template, which can have multiple builders. We then use the template’s variable system to inject the artifact build version and timestamp in the created AMI name. In the real world, this &lt;code class=&quot;highlighter-rouge&quot;&gt;Build&lt;/code&gt; variable will be a Jenkins parameter passed over by an upstream job.&lt;/p&gt;
-
-&lt;p&gt;Regarding the &lt;code class=&quot;highlighter-rouge&quot;&gt;aws_access_key&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;aws_secret_key&lt;/code&gt; - these can be passed to the Jenkins job as parameters, or ideally be pre-configured on the Jenkins node under &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.aws/credentials&lt;/code&gt;. More details on Packer Templates &lt;a href=&quot;https://www.packer.io/docs/templates/index.html&quot; target=&quot;_blank_&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
-
-&lt;h2 id=&quot;provisioning-the-ami&quot;&gt;Provisioning the AMI&lt;/h2&gt;
-
-&lt;p&gt;With the base AMI identified, we will need to install Tomcat, and deploy the WAR artifact in the AMI being created. This is achieved via a simple script, contained in a &lt;code class=&quot;highlighter-rouge&quot;&gt;provisioner&lt;/code&gt; section in &lt;code class=&quot;highlighter-rouge&quot;&gt;packer.json&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;The script would do the following -&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;Download and install &lt;code class=&quot;highlighter-rouge&quot;&gt;OpenJDK8&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;Tomcat8&lt;/code&gt;&lt;/li&gt;
-  &lt;li&gt;Download the artifact (again, I am just using a simple git release here)&lt;/li&gt;
-  &lt;li&gt;Deploy it under &lt;code class=&quot;highlighter-rouge&quot;&gt;Tomcat&lt;/code&gt;, and make &lt;code class=&quot;highlighter-rouge&quot;&gt;Tomcat&lt;/code&gt; start on bootup&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;_comment&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Simple Packer Template using Amazon Linux 2017.03&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;variables&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;aws_access_key&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;aws_secret_key&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-  &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;builders&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;type&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;amazon-ebs&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;access_key&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;{{user `aws_access_key`}}&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;secret_key&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;{{user `aws_secret_key`}}&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;region&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;us-east-1&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;source_ami&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ami-c58c1dd3&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;instance_type&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;t2.micro&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;ssh_username&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ec2-user&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;ami_name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;HelloWorld Build-{{user `Build`}}&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-  &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;provisioners&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;type&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;shell&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;inline&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-      &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;sleep 30&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-      &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;sudo yum update -y&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-      &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;sudo yum install java-1.8.0 java-1.8.0-openjdk-devel tomcat8-webapps -y&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-      &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;sudo yum remove java-1.7.0-openjdk  -y&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-      &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;sudo wget https://github.com/lobster1234/helloworld-api/files/953511/helloworld-api.war.gz -O /usr/share/tomcat8/webapps/helloworld-api.war.gz&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-      &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;sudo gunzip /usr/share/tomcat8/webapps/helloworld-api.war.gz&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-      &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;sudo chkconfig tomcat8 on&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-  &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;Now we are ready to run packer via Jenkins, but let us validate the JSON first.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bash-3.2$ packer validate packer.json
-Template validated successfully.
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h2 id=&quot;creating-the-jenkins-job-to-build-the-ami&quot;&gt;Creating the Jenkins Job to build the AMI&lt;/h2&gt;
-
-&lt;p&gt;This is the job that gets triggered after pre-release tests have passed, and an artifact is ready to be pulled. This is a &lt;code class=&quot;highlighter-rouge&quot;&gt;parameterized&lt;/code&gt; build, and the parameter(s) will help it pull the correct artifact for the version being built.&lt;/p&gt;
-
-&lt;p&gt;We call the Jenkins Job &lt;code class=&quot;highlighter-rouge&quot;&gt;hello-world-api-packer&lt;/code&gt;, created as a FreeStyle Project, pointed it to the git repo, and add the following under &lt;code class=&quot;highlighter-rouge&quot;&gt;Build/Execute Shell&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;/Downloads/packer build -var Build=$Build src/main/resources/packer.json&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;There is 1 string parameter, called &lt;code class=&quot;highlighter-rouge&quot;&gt;Build&lt;/code&gt;. Please see the &lt;code class=&quot;highlighter-rouge&quot;&gt;config.xml&lt;/code&gt; of this job in the References section below.&lt;/p&gt;
-
-&lt;p&gt;Once run, this is the job output -&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;/Downloads/packer build -var Build=$Build src/main/resources/packer.json
-[hello-world-api-packer] $ /bin/sh -xe /Users/mpandit/Downloads/tomcat/temp/hudson108285086652597491.sh
-+ /Users/mpandit/Downloads/packer build -var Build=1.0 src/main/resources/packer.json
-[1;32mamazon-ebs output will be in this color.
-
-amazon-ebs: Prevalidating AMI Name...
-amazon-ebs: Found Image ID: ami-c58c1dd3
-amazon-ebs: Creating temporary keypair: packer_58fed083-13d4-5740-0417-277163f775de
-amazon-ebs: Creating temporary security group for this instance...
-amazon-ebs: Authorizing access to port 22 the temporary security group...
-amazon-ebs: Launching a source AWS instance...
-amazon-ebs: Instance ID: i-0a0980f97a10aa4a0
-amazon-ebs: Waiting for instance (i-0a0980f97a10aa4a0) to become ready...
-amazon-ebs: Adding tags to source instance
-amazon-ebs: Adding tag: &quot;Name&quot;: &quot;Packer Builder&quot;
-amazon-ebs: Waiting for SSH to become available...
-amazon-ebs: Connected to SSH!
-amazon-ebs: Provisioning with shell script: /var/folders/vf/d0q4kjg964581kjjz4969dbny407x7/T/packer-shell299271769
-amazon-ebs: Stopping the source instance...
-amazon-ebs: Waiting for the instance to stop...
-amazon-ebs: Creating the AMI: HelloWorld Build-1.0
-amazon-ebs: AMI: ami-08fc671e
-amazon-ebs: Waiting for AMI to become ready...
-amazon-ebs: Terminating the source AWS instance...
-amazon-ebs: Cleaning up any extra volumes...
-amazon-ebs: No volumes to clean up, skipping
-amazon-ebs: Deleting temporary security group...
-amazon-ebs: Deleting temporary keypair...
-'amazon-ebs' finished.
-
-==&amp;gt; Builds finished. The artifacts of successful builds are:
---&amp;gt; amazon-ebs: AMIs were created:
-
-us-east-1: ami-08fc671e
-
-Finished: SUCCESS
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;As we can see, the new AMI has been created with an ID &lt;code class=&quot;highlighter-rouge&quot;&gt;ami-08fc671e&lt;/code&gt; in &lt;code class=&quot;highlighter-rouge&quot;&gt;us-east-1&lt;/code&gt; region. Since this AMI is private, It is visible under &lt;code class=&quot;highlighter-rouge&quot;&gt;My AMIs&lt;/code&gt; on the AWS Console.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/ami.png&quot; alt=&quot;AMI&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Upon selecting this AMI and launching an instance in a public subnet with a security group allowing TCP traffic to port &lt;code class=&quot;highlighter-rouge&quot;&gt;8080&lt;/code&gt; from &lt;code class=&quot;highlighter-rouge&quot;&gt;0.0.0.0/0&lt;/code&gt;, we can see the Tomcat landing page.&lt;/p&gt;
-
-&lt;p&gt;The resources below contain a fully functional pipeline - you’d need to configure &lt;a href=&quot;https://aws.amazon.com/cli/&quot; target=&quot;_blank_&quot;&gt;AWS CLI&lt;/a&gt; on the Jenkins node, and place &lt;code class=&quot;highlighter-rouge&quot;&gt;packer&lt;/code&gt; in &lt;code class=&quot;highlighter-rouge&quot;&gt;/Downloads&lt;/code&gt; folder on the node. You may want to change these paths if your folder structure is different.&lt;/p&gt;
-
-&lt;p&gt;Hope you found this tutorial useful, and can embark on the immutable deployment journey with Packer and AWS!&lt;/p&gt;
-
-&lt;h2 id=&quot;resources&quot;&gt;Resources&lt;/h2&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;a href=&quot;https://github.com/lobster1234/helloworld-api&quot; target=&quot;_blank_&quot;&gt;Hello World API Github Project&lt;/a&gt;, which also has the &lt;code class=&quot;highlighter-rouge&quot;&gt;packer.json&lt;/code&gt; under &lt;code class=&quot;highlighter-rouge&quot;&gt;src/main/resources&lt;/code&gt;.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;a href=&quot;https://gist.github.com/lobster1234/29b2b0cc8fea26e01a18d585ec97ffaf&quot; target=&quot;_blank_&quot;&gt;hello-world-api Jenkins Job&lt;/a&gt; to build the Hello World API Project and produce a WAR.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;a href=&quot;https://gist.github.com/lobster1234/c59b3ee2c558657c375ed4ec2b7310ab&quot; target=&quot;_blank_&quot;&gt;hello-world-api-packer Jenkins Job&lt;/a&gt; to create the AMI.&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;</content>
-
-      
-      
-      
-      
-      
-
-      
-        <author>
-            <name>Manish Pandit</name>
-          
-          
-        </author>
-      
-
-      
-        <category term="aws" />
-      
-        <category term="packer" />
-      
-        <category term="ci-cd" />
-      
-
-      
-
-      
-        <summary type="html">In the world of MicroServices, immutable deployments is a highly recommended strategy. It demands that every release get a fresh environment, all the way down to the lowest level - or in case of AWS, the AMI. An AMI can bundle the base operating system, application server/runtime, scripts, agents, etc. along with a versioned application artifact. In the spirit of Infrastructure as Code, the AMI itself can be versioned as a simple json file, as we will see in this post. With respect to Automation, creation of the AMI can be triggered as a downstream Jenkins Job, after successful pre-release tests, and can then act as an upstream Job for the Infrastructure Build-out using CloudFormation, or Terraform. Once the infrastructure is built, it can be made live via blue/green, red/black or any other deployment plan. In this post, we will build an AMI that can be used to launch 100% identical instances in the infrastructure. We will use Packer to build the AMI, and create Jenkins Jobs to simulate a simplified, real-world CI/CD pipeline.</summary>
       
 
       
