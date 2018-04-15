@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2018-04-02T03:03:46-07:00</updated>
+  <updated>2018-04-15T00:57:31-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -25,6 +25,190 @@
     </author>
   
 
+  
+  
+    <entry>
+      
+      <title type="html">IP Whitelisting with Amazon API Gateway</title>
+      
+      <link href="https://lobster1234.github.io/2018/04/14/amazon-api-gateway-ip-whitelisting/" rel="alternate" type="text/html" title="IP Whitelisting with Amazon API Gateway" />
+      <published>2018-04-14T00:44:37-07:00</published>
+      <updated>2018-04-14T00:44:37-07:00</updated>
+      <id>https://lobster1234.github.io/2018/04/14/amazon-api-gateway-ip-whitelisting</id>
+      <content type="html" xml:base="https://lobster1234.github.io/2018/04/14/amazon-api-gateway-ip-whitelisting/">&lt;p&gt;&lt;a href=&quot;https://aws.amazon.com/api-gateway/&quot;&gt;Amazon API Gateway&lt;/a&gt; is a great way to wrap Lambda functions as microservices exposed over HTTP/S, among many uses. However, any API Gateway endpoint is publically accessible. There are ways to restrict access using &lt;a href=&quot;https://docs.aws.amazon.com/apigateway/latest/developerguide/permissions.html&quot;&gt;IAM&lt;/a&gt; and &lt;a href=&quot;https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html&quot;&gt;Authorizers&lt;/a&gt;, but for simple task of IP whitelisting was always somewhat challenging, if not downright hack-y.&lt;/p&gt;
+
+&lt;p&gt;Recently &lt;a href=&quot;https://aws.amazon.com/about-aws/whats-new/2018/04/amazon-api-gateway-supports-resource-policies/&quot;&gt;AWS announced Resource Policies&lt;/a&gt; for API Gateway, which make IP whitelisting a breeze. This is extremely helpful for a company such as &lt;a href=&quot;https://www.marqeta.com&quot;&gt;mine&lt;/a&gt;, as we deal with a lot of integrations that rely on IP whitelisting as one of the many layers of security. In this post I will walk through setting up IP whitelisting on an API hosted on API Gateway. We will use API Gateway’s built in Mock API feature to create a simple API, and secure it via IP Whitelisting.&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h2 id=&quot;create-an-api&quot;&gt;Create an API&lt;/h2&gt;
+
+&lt;p&gt;We will start by creating a mock API in API Gateway. Log on to the &lt;a href=&quot;https://console.aws.amazon.com/apigateway/home?region=us-east-1#/apis/create&quot;&gt;Amazon API Gateway&lt;/a&gt; section on the console, and click to create a new API.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/apigw/create_new_api.png&quot; alt=&quot;apipw-1&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Next, create a new resource called &lt;code class=&quot;highlighter-rouge&quot;&gt;hello&lt;/code&gt; by clicking &lt;code class=&quot;highlighter-rouge&quot;&gt;Actions/Create Resource&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/apigw/create_resource.png&quot; alt=&quot;apipw-2&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We will now add a method to this resource by clicking &lt;code class=&quot;highlighter-rouge&quot;&gt;Actions/Create Method&lt;/code&gt; with the &lt;code class=&quot;highlighter-rouge&quot;&gt;hello&lt;/code&gt; resource selected. We will pick &lt;code class=&quot;highlighter-rouge&quot;&gt;GET&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/apigw/create_method_1.png&quot; alt=&quot;apipw-1&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;For this simple test, we’ll use &lt;code class=&quot;highlighter-rouge&quot;&gt;Mock&lt;/code&gt; integration for the method &lt;code class=&quot;highlighter-rouge&quot;&gt;GET /hello&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/apigw/create_method_2.png&quot; alt=&quot;apipw-1&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Here we can see the &lt;code class=&quot;highlighter-rouge&quot;&gt;GET&lt;/code&gt; method created successfully.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/apigw/method_created.png&quot; alt=&quot;apipw-1&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Now, we can deploy this API. Amazon API Gateway deploys APIs as a part of a &lt;em&gt;stage&lt;/em&gt;, so we get to create a stage as we deploy the API. Select &lt;code class=&quot;highlighter-rouge&quot;&gt;Actions/Deoply API&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/apigw/redeploy_api.png&quot; alt=&quot;apipw-1&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;You can pick any stage name, I used &lt;code class=&quot;highlighter-rouge&quot;&gt;dev&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/apigw/deploy_api.png&quot; alt=&quot;apipw-1&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Once deployed, you’ll see a stage editor, with the URL endpoint.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/apigw/invoke_url.png&quot; alt=&quot;apipw-1&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;This URL can be accessed as a public endpoint. The Mock API returns HTTP 200 when invoked.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ curl -i  https://wb6w08eb31.execute-api.us-east-1.amazonaws.com/dev/hello
+HTTP/2 200
+date: Sun, 15 Apr 2018 00:49:26 GMT
+content-type: application/json
+content-length: 0
+x-amzn-requestid: d8ea6b1b-4046-11e8-97a5-4d3c440fb2a7
+x-amz-apigw-id: FW4vhFdvoAMFRbQ=
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h2 id=&quot;whitelist-the-api&quot;&gt;Whitelist the API&lt;/h2&gt;
+
+&lt;p&gt;We will set up a whitelist where it is only accessible from our IP address. You can use a service like &lt;a href=&quot;http://www.whatsmyip.org/&quot;&gt;whatsmyip&lt;/a&gt; to get your IP address. If you’re like me and prefer command line, here it is -&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ dig +short myip.opendns.com @resolver1.opendns.com
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Now we will whitelist this IP address. Click &lt;code class=&quot;highlighter-rouge&quot;&gt;Resource Policy&lt;/code&gt; from the left menu.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/apigw/empty_resource_policy.png&quot; alt=&quot;apipw-1&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We will now need the ARN of the API method to build a policy. To get the ARN, go back to the stage page, and copy the ARN of the method.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/apigw/copy_method_arn.png&quot; alt=&quot;apipw-1&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Once copied, replace the ARN and IP placeholders below with the method ARN and your IP address respectively.&lt;/p&gt;
+
+&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;Version&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;2012-10-17&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;Statement&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;Effect&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Allow&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;Principal&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;*&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;Action&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;execute-api:Invoke&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;Resource&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;REPLACE_ME_WITH_METHOD_ARN&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;Condition&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+                &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;IpAddress&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+                    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;aws:SourceIp&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+                        &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;REPLACE_ME_WITH_YOUR_IP&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+                    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+                &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;We now need to &lt;em&gt;redeploy&lt;/em&gt; the API. Unlike IAM where policies take affect immediately, I could not see the Resource Policy behaving the same way.&lt;/p&gt;
+
+&lt;p&gt;Redeploy the API using the &lt;code class=&quot;highlighter-rouge&quot;&gt;dev&lt;/code&gt; stage. This will not change the URL.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/apigw/redeploy_after_change.png&quot; alt=&quot;apipw-1&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Thats it! The IP address is whitelisted. We can verify this via &lt;code class=&quot;highlighter-rouge&quot;&gt;curl&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;I used my wireless provider to check and ensure any other IP address is blocked from accessing the API. &lt;em&gt;Be sure to turn off the phone’s wifi if using this method.&lt;/em&gt;&lt;/p&gt;
+&lt;p style=&quot;text-align: center&quot;&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/apigw/blocked_url.jpeg&quot; alt=&quot;apipw-1&quot; height=&quot;50%&quot; width=&quot;50%&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Alternatively, you can switch to a different network, or IM the URL to a friend who is not sharing the same network to verify.&lt;/p&gt;
+
+&lt;h1 id=&quot;gotchas-and-tips&quot;&gt;Gotchas and Tips&lt;/h1&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Any changes to the Resource Policy will not reflect unless the API is redeployed as shown above.&lt;/li&gt;
+  &lt;li&gt;I could not find a way to attach the Resource Policy to the API in &lt;a href=&quot;https://www.serverless.com&quot;&gt;Serverless Framework&lt;/a&gt;.&lt;/li&gt;
+  &lt;li&gt;The API Gateway Endpoints cannot be restricted to whitelist the VPC using this technique. The endpoints are still public, and they will only see the NAT Gateway EIP as the inbound request.&lt;/li&gt;
+  &lt;li&gt;If an EC2 instance is accessing the API, the API Gateway will use it’s Public IP to evaluate the resource policy.&lt;/li&gt;
+  &lt;li&gt;Wildcards can be used for the resource ARN in the policy, like &lt;code class=&quot;highlighter-rouge&quot;&gt;&quot;Resource&quot;: &quot;arn:aws:execute-api:us-east-1:12345678900:*:*&quot;&lt;/code&gt; would apply the policy for all the API resources under the account ID &lt;code class=&quot;highlighter-rouge&quot;&gt;12345678900&lt;/code&gt;.&lt;/li&gt;
+  &lt;li&gt;It does take a 30-60 seconds for the change to be reflected after deploying the API. Make sure you’re using incognito mode or curl to avoid any browser caching.&lt;/li&gt;
+  &lt;li&gt;The same example above can be used to blacklist IP addresses, by replacing the &lt;code class=&quot;highlighter-rouge&quot;&gt;Allow&lt;/code&gt; with &lt;code class=&quot;highlighter-rouge&quot;&gt;Deny&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 style=&quot;text-align: center&quot; id=&quot;comments&quot;&gt;Comments&lt;/h3&gt;
+
+&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = &quot;https://lobster1234.github.io/2018/04/14/amazon-api-gateway-ip-whitelisting/&quot;;  
+this.page.identifier = &quot;/2018/04/14/amazon-api-gateway-ip-whitelisting&quot;;
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://lobster1234.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+&lt;/script&gt;
+
+&lt;noscript&gt;Please enable JavaScript to view the &lt;a href=&quot;https://disqus.com/?ref_noscript&quot;&gt;comments powered by Disqus.&lt;/a&gt;&lt;/noscript&gt;
+
+&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+
+
+      
+
+&lt;/script&gt;</content>
+
+      
+      
+      
+      
+      
+
+      
+        <author>
+            <name>Manish Pandit</name>
+          
+          
+        </author>
+      
+
+      
+        <category term="aws" />
+      
+
+      
+
+      
+        <summary type="html">Amazon API Gateway is a great way to wrap Lambda functions as microservices exposed over HTTP/S, among many uses. However, any API Gateway endpoint is publically accessible. There are ways to restrict access using IAM and Authorizers, but for simple task of IP whitelisting was always somewhat challenging, if not downright hack-y. Recently AWS announced Resource Policies for API Gateway, which make IP whitelisting a breeze. This is extremely helpful for a company such as mine, as we deal with a lot of integrations that rely on IP whitelisting as one of the many layers of security. In this post I will walk through setting up IP whitelisting on an API hosted on API Gateway. We will use API Gateway’s built in Mock API feature to create a simple API, and secure it via IP Whitelisting.</summary>
+      
+
+      
+      
+    </entry>
+  
   
   
     <entry>
@@ -4225,91 +4409,6 @@ Click &lt;strong&gt;Save&lt;/strong&gt;.&lt;/p&gt;
 
       
         <summary type="html">Amazon Route53 is a highly available and scalable DNS service. Route53 provides Domain Registrations and Transfers, DNS service to route traffic to the infrastructure (either within AWS or non-AWS), advanced routing policies like weighted and geo, and health check services that can be leveraged to perform traffic routing to different destination in the event of a failure. It provides more flexibility and seamless integration with AWS Services than any other DNS host can. One of the most common scenarios is the need to send traffic from a site registered at non-Route53 providers to an ELB, which Route53 supports via an Alias Record. In this post we will discuss moving the DNS - where requests to a domain hosted on a non-Route53 provider would resolve to Route53, and then point to an ELB which could be hosting a web property. However, the destination does not have to be an ELB, it can be any public IP. The other part is that of the Domain Registration itself, which can be transferred to Route53 if needed.</summary>
-      
-
-      
-      
-    </entry>
-  
-  
-  
-    <entry>
-      
-      <title type="html">Setting up AWS Billing Alerts</title>
-      
-      <link href="https://lobster1234.github.io/2017/04/28/setting-up-aws-billing-alerts/" rel="alternate" type="text/html" title="Setting up AWS Billing Alerts" />
-      <published>2017-04-28T23:44:37-07:00</published>
-      <updated>2017-04-28T23:44:37-07:00</updated>
-      <id>https://lobster1234.github.io/2017/04/28/setting-up-aws-billing-alerts</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2017/04/28/setting-up-aws-billing-alerts/">&lt;p&gt;For beginners, Amazon Web Services has a &lt;a href=&quot;https://aws.amazon.com/s/dm/optimization/server-side-test/free-tier/free_np/&quot; target=&quot;_blank_&quot;&gt;Free Tier&lt;/a&gt;, which is &lt;em&gt;very generous&lt;/em&gt;. However, as you start to stretch the free tier to it’s limits, it’s good to have billing alerts set up. Essentially you’ll get an email when your bill approaches a certain amount.&lt;/p&gt;
-
-&lt;p&gt;Setting up billing alerts uses &lt;a href=&quot;https://aws.amazon.com/cloudwatch/&quot; target=&quot;_blank_&quot;&gt;CloudWatch&lt;/a&gt;, which is not really the first service the beginners run into. This post shows how to set up AWS Billing Alerts, with screenshots, so you do not have to be familiar with CloudWatch to set one up. I strongly recommend setting the Billing Alerts up, regardless of free tier - having heard and seen horror stories in the recent past.&lt;/p&gt;
-
-&lt;!--more--&gt;
-&lt;p&gt;Log in to the &lt;a href=&quot;https://console.aws.amazon.com&quot; target=&quot;_blank_&quot;&gt;AWS Console&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;Next, search for &lt;em&gt;CloudWatch&lt;/em&gt;, and select it. You should see something like this -&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/billing-1.png&quot; alt=&quot;Cloudwatch-1&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Click &lt;strong&gt;Billing&lt;/strong&gt; from the left menu, which will show the below -&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/billing-2.png&quot; alt=&quot;Cloudwatch-2&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;On this screen, click &lt;strong&gt;Create Alarm&lt;/strong&gt;.&lt;/p&gt;
-
-&lt;p&gt;This will open up a form, where we will be able to set up threshold, as well as an email address to get notified on.&lt;/p&gt;
-
-&lt;p&gt;First, we set the dollar amount. The image below shows &lt;code class=&quot;highlighter-rouge&quot;&gt;$5&lt;/code&gt; as the threshold.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/billing-3.png&quot; alt=&quot;Cloudwatch-3&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Next, on the same screen, we set the notification. Under &lt;strong&gt;Actions&lt;/strong&gt;, click &lt;strong&gt;New List&lt;/strong&gt;. When the text field shows up, enter your email. Then click &lt;strong&gt;Create Alarm&lt;/strong&gt;.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/billing-4.png&quot; alt=&quot;Cloudwatch-4&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Once you do, this popup would prompt to confirm the email address that had just been entered.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/billing-5.png&quot; alt=&quot;Cloudwatch-5&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Look for a confirmation email in your inbox, and click the subscription confirmation link. The page would look something like this -&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/billing-6.png&quot; alt=&quot;Cloudwatch-6&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Click View Alarm, and you will see this page with the new alarm created. Initially the Alarm State will be &lt;strong&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;INSUFFICIENT_DATA&lt;/code&gt;&lt;/strong&gt;, which means the alarm has just been started, and cloudwatch needs to gather more data around this metric to determine the correct state.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/billing-7.png&quot; alt=&quot;Cloudwatch-7&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Give it a minute or two, and refresh the page, you will that the alarm is now in &lt;strong&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;OK&lt;/code&gt;&lt;/strong&gt; state.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/billing-8.png&quot; alt=&quot;Cloudwatch-8&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;If the billing exceeds the threshold, the alarm state will be &lt;strong&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;ALARM&lt;/code&gt;&lt;/strong&gt;, and a notification will be triggered. The state will remain &lt;strong&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;ALARM&lt;/code&gt;&lt;/strong&gt; unless a value satisfying the threshold is achieved.&lt;/p&gt;
-
-&lt;p&gt;Hope this post helps you keep a closer eye on your AWS account charges, and avoid any surprises. I’ve seen cases from runaway lambdas, to accidentally leaving expensive instance types running for weeks. Protection is the key!&lt;/p&gt;</content>
-
-      
-      
-      
-      
-      
-
-      
-        <author>
-            <name>Manish Pandit</name>
-          
-          
-        </author>
-      
-
-      
-        <category term="aws" />
-      
-
-      
-
-      
-        <summary type="html">For beginners, Amazon Web Services has a Free Tier, which is very generous. However, as you start to stretch the free tier to it’s limits, it’s good to have billing alerts set up. Essentially you’ll get an email when your bill approaches a certain amount. Setting up billing alerts uses CloudWatch, which is not really the first service the beginners run into. This post shows how to set up AWS Billing Alerts, with screenshots, so you do not have to be familiar with CloudWatch to set one up. I strongly recommend setting the Billing Alerts up, regardless of free tier - having heard and seen horror stories in the recent past.</summary>
       
 
       
