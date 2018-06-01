@@ -289,7 +289,7 @@
 <h3 id="create-a-client-app">Create a Client App</h3>
 
 <p>Let us create a client who can only <code class="highlighter-rouge">post</code> transactions by calling the transactions service. As you can see below, we configure this client to use <code class="highlighter-rouge">client_credentials</code> grant, and restrict it to using only <code class="highlighter-rouge">transactions/post</code> scope. The scopes are defined in <code class="highlighter-rouge">$resource_server_identifier/$scope_name</code> format. Also notice the <code class="highlighter-rouge">--generate-secret</code> argument, which will create a secret that we can use for our client credentials access token request.</p>
-<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; cognito-idp create-user-pool-client --user-pool-id us-east-1_0Pe***** --allowed-o-auth-flows client_credentials --client-name test --generate-secret --allowed-o-auth-scopes transactons/post --allowed-o-auth-flows-user-pool-client
+<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; cognito-idp create-user-pool-client --user-pool-id us-east-1_0Pe***** --allowed-o-auth-flows client_credentials --client-name test --generate-secret --allowed-o-auth-scopes transactions/post --allowed-o-auth-flows-user-pool-client
 {
     "UserPoolClient": {
         "UserPoolId": "us-east-1_0Pe*****",

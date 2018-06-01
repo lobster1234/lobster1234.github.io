@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2018-06-01T00:10:58-07:00</updated>
+  <updated>2018-06-01T00:26:32-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -135,7 +135,7 @@
 &lt;h3 id=&quot;create-a-client-app&quot;&gt;Create a Client App&lt;/h3&gt;
 
 &lt;p&gt;Let us create a client who can only &lt;code class=&quot;highlighter-rouge&quot;&gt;post&lt;/code&gt; transactions by calling the transactions service. As you can see below, we configure this client to use &lt;code class=&quot;highlighter-rouge&quot;&gt;client_credentials&lt;/code&gt; grant, and restrict it to using only &lt;code class=&quot;highlighter-rouge&quot;&gt;transactions/post&lt;/code&gt; scope. The scopes are defined in &lt;code class=&quot;highlighter-rouge&quot;&gt;$resource_server_identifier/$scope_name&lt;/code&gt; format. Also notice the &lt;code class=&quot;highlighter-rouge&quot;&gt;--generate-secret&lt;/code&gt; argument, which will create a secret that we can use for our client credentials access token request.&lt;/p&gt;
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; cognito-idp create-user-pool-client --user-pool-id us-east-1_0Pe***** --allowed-o-auth-flows client_credentials --client-name test --generate-secret --allowed-o-auth-scopes transactons/post --allowed-o-auth-flows-user-pool-client
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; cognito-idp create-user-pool-client --user-pool-id us-east-1_0Pe***** --allowed-o-auth-flows client_credentials --client-name test --generate-secret --allowed-o-auth-scopes transactions/post --allowed-o-auth-flows-user-pool-client
 {
     &quot;UserPoolClient&quot;: {
         &quot;UserPoolId&quot;: &quot;us-east-1_0Pe*****&quot;,
