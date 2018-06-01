@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2018-06-01T01:01:17-07:00</updated>
+  <updated>2018-06-01T01:06:30-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -187,9 +187,9 @@
 
 &lt;p&gt;Notice that I am using HTTP Basic to send the &lt;code class=&quot;highlighter-rouge&quot;&gt;client_id&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;client_secret&lt;/code&gt;. This is &lt;code class=&quot;highlighter-rouge&quot;&gt;base64(ClientId:ClientSecret)&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;If you have &lt;code class=&quot;highlighter-rouge&quot;&gt;base64&lt;/code&gt; utility installed, you can use it, like so, replacing &lt;code class=&quot;highlighter-rouge&quot;&gt;x&lt;/code&gt; with &lt;code class=&quot;highlighter-rouge&quot;&gt;ClientId&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;y&lt;/code&gt; with &lt;code class=&quot;highlighter-rouge&quot;&gt;ClientSecret&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;If you have &lt;code class=&quot;highlighter-rouge&quot;&gt;openssl&lt;/code&gt; installed, you can use it, like so, replacing &lt;code class=&quot;highlighter-rouge&quot;&gt;x&lt;/code&gt; with &lt;code class=&quot;highlighter-rouge&quot;&gt;ClientId&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;y&lt;/code&gt; with &lt;code class=&quot;highlighter-rouge&quot;&gt;ClientSecret&lt;/code&gt;.&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ echo 'x:y' |  base64
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ echo -n 'x:y' | openssl base64
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;p&gt;Once you have the base64 encoded HTTP Basic Authorization header, you can request the access token.&lt;/p&gt;

@@ -341,9 +341,9 @@
 
 <p>Notice that I am using HTTP Basic to send the <code class="highlighter-rouge">client_id</code> and <code class="highlighter-rouge">client_secret</code>. This is <code class="highlighter-rouge">base64(ClientId:ClientSecret)</code>.</p>
 
-<p>If you have <code class="highlighter-rouge">base64</code> utility installed, you can use it, like so, replacing <code class="highlighter-rouge">x</code> with <code class="highlighter-rouge">ClientId</code> and <code class="highlighter-rouge">y</code> with <code class="highlighter-rouge">ClientSecret</code>.</p>
+<p>If you have <code class="highlighter-rouge">openssl</code> installed, you can use it, like so, replacing <code class="highlighter-rouge">x</code> with <code class="highlighter-rouge">ClientId</code> and <code class="highlighter-rouge">y</code> with <code class="highlighter-rouge">ClientSecret</code>.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>$ echo 'x:y' |  base64
+<div class="highlighter-rouge"><pre class="highlight"><code>$ echo -n 'x:y' | openssl base64
 </code></pre>
 </div>
 <p>Once you have the base64 encoded HTTP Basic Authorization header, you can request the access token.</p>
