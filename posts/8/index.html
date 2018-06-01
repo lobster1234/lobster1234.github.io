@@ -35,15 +35,12 @@
   WebFontConfig = {
     google: { families: [ 'Bitter:400,700,400italic:latin' ] }
   };
-  (function() {
-    var wf = document.createElement('script');
-    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
-      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
-    wf.type = 'text/javascript';
-    wf.async = 'true';
-    var s = document.getElementsByTagName('script')[0];
+  (function(d) {
+    var wf = d.createElement('script'), s = d.scripts[0];
+    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
+    wf.async = true;
     s.parentNode.insertBefore(wf, s);
-  })();
+  })(document);
 </script>
 
   
@@ -60,8 +57,9 @@
   </script>
 
 
-  <!-- Begin Jekyll SEO tag v2.2.0 -->
+  <!-- Begin Jekyll SEO tag v2.4.0 -->
 <title>Manish Pandit’s Blog | A tech blog with gists, code, presentations, tutorials, and many goodies around programming, devops, cloud architectures, aws, google cloud platform, and infrastructure.</title>
+<meta name="generator" content="Jekyll v3.4.3" />
 <meta property="og:title" content="Manish Pandit’s Blog" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
@@ -70,15 +68,9 @@
 <link rel="canonical" href="https://lobster1234.github.io/posts/8/" />
 <meta property="og:url" content="https://lobster1234.github.io/posts/8/" />
 <meta property="og:site_name" content="Manish Pandit’s Blog" />
-<link rel="prev" href="https://lobster1234.github.io/posts/7/">
+<link rel="prev" href="https://lobster1234.github.io/posts/7/" />
 <script type="application/ld+json">
-{"@context": "http://schema.org",
-"@type": "WebPage",
-"headline": "Manish Pandit’s Blog",
-"author": {"@type": "Person",
-"name": "Manish Pandit"},
-"description": "A tech blog with gists, code, presentations, tutorials, and many goodies around programming, devops, cloud architectures, aws, google cloud platform, and infrastructure.",
-"url": "https://lobster1234.github.io/posts/8/"}</script>
+{"description":"A tech blog with gists, code, presentations, tutorials, and many goodies around programming, devops, cloud architectures, aws, google cloud platform, and infrastructure.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"WebPage","url":"https://lobster1234.github.io/posts/8/","headline":"Manish Pandit’s Blog","@context":"http://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -127,215 +119,321 @@
       <li>
         <header class="post-header">
           <h1 class="post-title">
+            <a class="post-link" href="/2016/01/10/decimal-to-binary/">Decimal to Binary</a>
+          </h1>
+
+          <p class="post-meta">Jan 10, 2016 •  •
+  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/algorithms/">algorithms</a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+
+
+ •
+  
+
+</p>
+        </header>
+
+        <div class="post-content">
+          <p>A Decimal to Binary conversion algorithm implementation.</p>
+
+
+        </div>
+        
+          <p class="post-continue">
+            <a href="/2016/01/10/decimal-to-binary/">Read on &rarr;</a>
+          </p>
+        
+      </li>
+    
+      
+      
+
+      <li>
+        <header class="post-header">
+          <h1 class="post-title">
             <a class="post-link" href="/2015/10/03/securing-apis-with-oauth-openid-connect/">Securing your APIs with OAuth, OpenID, and OpenID Connect</a>
           </h1>
 
-          <p class="post-meta">Oct 3, 2015 • 
+          <p class="post-meta">Oct 3, 2015 •  •
   
-  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/oauth/">oauth</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/openid/">openid</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
     
-  
+      
     
-  
+      
     
-      <a href="/categories/oauth/">oauth</a>,
+      
+        <a href="/categories/presentations/">presentations</a>
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/openid/">openid</a>,
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
 
-  
-  
-    
-  
-    
-  
-    
-      <a href="/categories/presentations/">presentations</a>
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
+ •
   
 
 </p>
@@ -362,143 +460,149 @@
             <a class="post-link" href="/2014/12/09/eratosthenes-sieve/">Prime Numbers: Sieve of Eratosthenes</a>
           </h1>
 
-          <p class="post-meta">Dec 9, 2014 • 
+          <p class="post-meta">Dec 9, 2014 •  •
   
-  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/data-structures/">data-structures</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
     
-  
+      
     
-  
+      
     
-      <a href="/categories/data-structures/">data-structures</a>,
+      
     
-  
+      
     
-  
+      
     
-  
+      
+        <a href="/categories/algorithms/">algorithms</a>
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
+    
+      
+    
+      
     
   
 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/algorithms/">algorithms</a>
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
+
+ •
   
 
 </p>
@@ -525,143 +629,149 @@
             <a class="post-link" href="/2014/05/28/api-antipatterns-apiconsf/">API Antipatterns : APICon SF</a>
           </h1>
 
-          <p class="post-meta">May 28, 2014 • 
+          <p class="post-meta">May 28, 2014 •  •
   
-  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/api/">api</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
     
-  
+      
     
-      <a href="/categories/api/">api</a>,
+      
     
-  
+      
+        <a href="/categories/presentations/">presentations</a>
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
+    
+      
+    
+      
     
   
 
-  
-  
-    
-  
-    
-  
-    
-      <a href="/categories/presentations/">presentations</a>
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
+
+ •
   
 
 </p>
@@ -690,212 +800,218 @@
             <a class="post-link" href="/2011/05/24/using-mongodb-for-ign-social-platform/">MongoSF : Using MongoDB for IGN&#39;s Social Platform</a>
           </h1>
 
-          <p class="post-meta">May 24, 2011 • 
-  
-  
-    
-      <a href="/categories/databases/">databases</a>,
-    
+          <p class="post-meta">May 24, 2011 •  •
   
     
-  
+    
+      
+        <a href="/categories/databases/">databases</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
+    
+      
+    
+      
+        <a href="/categories/mongodb/">mongodb</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
     
-  
+      
     
-  
+      
     
-  
+      
+        <a href="/categories/presentations/">presentations</a>
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
 
-  
-  
-    
-  
-    
-      <a href="/categories/mongodb/">mongodb</a>,
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
 
-  
-  
-    
-  
-    
-  
-    
-      <a href="/categories/presentations/">presentations</a>
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
+ •
   
 
 </p>

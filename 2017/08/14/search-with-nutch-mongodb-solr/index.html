@@ -35,15 +35,12 @@
   WebFontConfig = {
     google: { families: [ 'Bitter:400,700,400italic:latin' ] }
   };
-  (function() {
-    var wf = document.createElement('script');
-    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
-      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
-    wf.type = 'text/javascript';
-    wf.async = 'true';
-    var s = document.getElementsByTagName('script')[0];
+  (function(d) {
+    var wf = d.createElement('script'), s = d.scripts[0];
+    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
+    wf.async = true;
     s.parentNode.insertBefore(wf, s);
-  })();
+  })(document);
 </script>
 
   
@@ -60,8 +57,9 @@
   </script>
 
 
-  <!-- Begin Jekyll SEO tag v2.2.0 -->
+  <!-- Begin Jekyll SEO tag v2.4.0 -->
 <title>Apache Nutch - Step by Step | Manish Pandit’s Blog</title>
+<meta name="generator" content="Jekyll v3.4.3" />
 <meta property="og:title" content="Apache Nutch - Step by Step" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
@@ -74,17 +72,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2017-08-14T23:44:37-07:00" />
 <script type="application/ld+json">
-{"@context": "http://schema.org",
-"@type": "BlogPosting",
-"headline": "Apache Nutch - Step by Step",
-"author": {"@type": "Person",
-"name": "Manish Pandit"},
-"image": "https://lobster1234.github.io/assets/search.png",
-"datePublished": "2017-08-14T23:44:37-07:00",
-"description": "Search is one of the most fantastic areas of the technology industry, and has been addressed many, many times with different algorithms, producing varying degrees of success. We get so used to it, that often times I wish I had a Cmd-F while reading a real book. Recently we had our Quarterly Hack Week at Marqeta, and one of the ideas was to build search around our public pages. These pages would include the public website assets, as well as the the API developer guides and documentation. This post is a quick summary of the infrastructure, setup, and gotchas of using Nutch 2.3.1 to build a site search - essentially notes from this hack week project.",
-"mainEntityOfPage": {"@type": "WebPage",
-"@id": "https://lobster1234.github.io/2017/08/14/search-with-nutch-mongodb-solr/"},
-"url": "https://lobster1234.github.io/2017/08/14/search-with-nutch-mongodb-solr/"}</script>
+{"description":"Search is one of the most fantastic areas of the technology industry, and has been addressed many, many times with different algorithms, producing varying degrees of success. We get so used to it, that often times I wish I had a Cmd-F while reading a real book. Recently we had our Quarterly Hack Week at Marqeta, and one of the ideas was to build search around our public pages. These pages would include the public website assets, as well as the the API developer guides and documentation. This post is a quick summary of the infrastructure, setup, and gotchas of using Nutch 2.3.1 to build a site search - essentially notes from this hack week project.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"BlogPosting","url":"https://lobster1234.github.io/2017/08/14/search-with-nutch-mongodb-solr/","image":"https://lobster1234.github.io/assets/search.png","headline":"Apache Nutch - Step by Step","dateModified":"2017-08-14T23:44:37-07:00","datePublished":"2017-08-14T23:44:37-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/08/14/search-with-nutch-mongodb-solr/"},"@context":"http://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -125,144 +113,148 @@
     
       <h1 class="post-title" itemprop="name headline">Apache Nutch - Step by Step</h1>
     
-    <p class="post-meta"><time datetime="2017-08-14T23:44:37-07:00" itemprop="datePublished">Aug 14, 2017</time> • 
+    <p class="post-meta"><time datetime="2017-08-14T23:44:37-07:00" itemprop="datePublished">Aug 14, 2017</time> •
   
-  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/architecture/">architecture</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-      <a href="/categories/architecture/">architecture</a>,
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
+        <a href="/categories/search/">search</a>
+      
+    
+      
+    
+      
     
   
 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/search/">search</a>
-    
-  
-    
-  
-    
-  
+
 
 </p>
   </header>
@@ -543,6 +535,8 @@ s.setAttribute('data-timestamp', +new Date());
 </script>
 
   </div>
+
+  
 
 </article>
 

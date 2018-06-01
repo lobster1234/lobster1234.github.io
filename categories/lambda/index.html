@@ -35,15 +35,12 @@
   WebFontConfig = {
     google: { families: [ 'Bitter:400,700,400italic:latin' ] }
   };
-  (function() {
-    var wf = document.createElement('script');
-    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
-      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
-    wf.type = 'text/javascript';
-    wf.async = 'true';
-    var s = document.getElementsByTagName('script')[0];
+  (function(d) {
+    var wf = d.createElement('script'), s = d.scripts[0];
+    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
+    wf.async = true;
     s.parentNode.insertBefore(wf, s);
-  })();
+  })(document);
 </script>
 
   
@@ -60,8 +57,9 @@
   </script>
 
 
-  <!-- Begin Jekyll SEO tag v2.2.0 -->
+  <!-- Begin Jekyll SEO tag v2.4.0 -->
 <title>lambda | Manish Pandit’s Blog</title>
+<meta name="generator" content="Jekyll v3.4.3" />
 <meta property="og:title" content="lambda" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
@@ -71,13 +69,7 @@
 <meta property="og:url" content="https://lobster1234.github.io/categories/lambda/" />
 <meta property="og:site_name" content="Manish Pandit’s Blog" />
 <script type="application/ld+json">
-{"@context": "http://schema.org",
-"@type": "WebPage",
-"headline": "lambda",
-"author": {"@type": "Person",
-"name": "Manish Pandit"},
-"description": "A tech blog with gists, code, presentations, tutorials, and many goodies around programming, devops, cloud architectures, aws, google cloud platform, and infrastructure.",
-"url": "https://lobster1234.github.io/categories/lambda/"}</script>
+{"description":"A tech blog with gists, code, presentations, tutorials, and many goodies around programming, devops, cloud architectures, aws, google cloud platform, and infrastructure.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"WebPage","url":"https://lobster1234.github.io/categories/lambda/","headline":"lambda","@context":"http://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -124,149 +116,161 @@
       
 
       <li>
-        <span class="post-meta">Dec 26, 2017 • 
+        <span class="post-meta">
+          Dec 26, 2017
+          
+             •
   
-  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/aws/">aws</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-      <a href="/categories/aws/">aws</a>,
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
+        <a href="/categories/lambda/">lambda</a>
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
+    
+      
+    
+      
     
   
 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/lambda/">lambda</a>
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
 
-</span>
+
+
+          
+          
+        </span>
 
         <h2>
-          <a class="post-link" href="/2017/12/26/serverless-java-multiple-functions/">Multiple Functions in Serverless Framework with Java</a>
+          
+            <a class="post-link" href="/2017/12/26/serverless-java-multiple-functions/">Multiple Functions in Serverless Framework with Java</a>
+          
         </h2>
       </li>
     
@@ -274,149 +278,161 @@
       
 
       <li>
-        <span class="post-meta">Dec 14, 2017 • 
+        <span class="post-meta">
+          Dec 14, 2017
+          
+             •
   
-  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/aws/">aws</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-      <a href="/categories/aws/">aws</a>,
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
+        <a href="/categories/lambda/">lambda</a>
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
+    
+      
+    
+      
     
   
 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/lambda/">lambda</a>
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
 
-</span>
+
+
+          
+          
+        </span>
 
         <h2>
-          <a class="post-link" href="/2017/12/14/aws-lambda-http-proxy/">HTTP/S Proxy Server for AWS Lambda Invocations</a>
+          
+            <a class="post-link" href="/2017/12/14/aws-lambda-http-proxy/">HTTP/S Proxy Server for AWS Lambda Invocations</a>
+          
         </h2>
       </li>
     
@@ -424,356 +440,368 @@
       
 
       <li>
-        <span class="post-meta">Apr 15, 2017 • 
+        <span class="post-meta">
+          Apr 15, 2017
+          
+             •
   
-  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/aws/">aws</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/api-gateway/">api-gateway</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/lambda/">lambda</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/serverless/">serverless</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
     
-      <a href="/categories/aws/">aws</a>,
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
+        <a href="/categories/dynamodb/">dynamodb</a>
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/api-gateway/">api-gateway</a>,
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/lambda/">lambda</a>,
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/serverless/">serverless</a>,
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/dynamodb/">dynamodb</a>
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-
-</span>
+          
+          
+        </span>
 
         <h2>
-          <a class="post-link" href="/2017/04/15/serverless-framework-api-gateway-lambda-proxy/">AWS Lambda with Serverless Framework and Java/Maven - Part 3</a>
+          
+            <a class="post-link" href="/2017/04/15/serverless-framework-api-gateway-lambda-proxy/">AWS Lambda with Serverless Framework and Java/Maven - Part 3</a>
+          
         </h2>
       </li>
     
@@ -781,356 +809,368 @@
       
 
       <li>
-        <span class="post-meta">Apr 12, 2017 • 
+        <span class="post-meta">
+          Apr 12, 2017
+          
+             •
   
-  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/aws/">aws</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/api-gateway/">api-gateway</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/lambda/">lambda</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/serverless/">serverless</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
     
-      <a href="/categories/aws/">aws</a>,
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
+        <a href="/categories/dynamodb/">dynamodb</a>
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/api-gateway/">api-gateway</a>,
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/lambda/">lambda</a>,
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/serverless/">serverless</a>,
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/dynamodb/">dynamodb</a>
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-
-</span>
+          
+          
+        </span>
 
         <h2>
-          <a class="post-link" href="/2017/04/12/serverless-framework-aws-apigateway/">AWS Lambda with Serverless Framework and Java/Maven - Part 2</a>
+          
+            <a class="post-link" href="/2017/04/12/serverless-framework-aws-apigateway/">AWS Lambda with Serverless Framework and Java/Maven - Part 2</a>
+          
         </h2>
       </li>
     
@@ -1138,218 +1178,230 @@
       
 
       <li>
-        <span class="post-meta">Feb 28, 2017 • 
+        <span class="post-meta">
+          Feb 28, 2017
+          
+             •
   
-  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/aws/">aws</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/serverless/">serverless</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-      <a href="/categories/aws/">aws</a>,
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
+        <a href="/categories/lambda/">lambda</a>
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/serverless/">serverless</a>,
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/lambda/">lambda</a>
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
 
-</span>
+
+          
+          
+        </span>
 
         <h2>
-          <a class="post-link" href="/2017/02/28/serverless-framework-java-maven-part-1/">AWS Lambda with Serverless Framework and Java/Maven - Part 1</a>
+          
+            <a class="post-link" href="/2017/02/28/serverless-framework-java-maven-part-1/">AWS Lambda with Serverless Framework and Java/Maven - Part 1</a>
+          
         </h2>
       </li>
     
@@ -1357,218 +1409,230 @@
       
 
       <li>
-        <span class="post-meta">Feb 27, 2017 • 
+        <span class="post-meta">
+          Feb 27, 2017
+          
+             •
   
-  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/aws/">aws</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/serverless/">serverless</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-      <a href="/categories/aws/">aws</a>,
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
+        <a href="/categories/lambda/">lambda</a>
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/serverless/">serverless</a>,
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/lambda/">lambda</a>
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
 
-</span>
+
+          
+          
+        </span>
 
         <h2>
-          <a class="post-link" href="/2017/02/27/notes-from-aws-lambda-deep-dive-webinar/">Notes from AWS Lambda Deep Dive Webinar</a>
+          
+            <a class="post-link" href="/2017/02/27/notes-from-aws-lambda-deep-dive-webinar/">Notes from AWS Lambda Deep Dive Webinar</a>
+          
         </h2>
       </li>
     

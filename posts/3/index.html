@@ -35,15 +35,12 @@
   WebFontConfig = {
     google: { families: [ 'Bitter:400,700,400italic:latin' ] }
   };
-  (function() {
-    var wf = document.createElement('script');
-    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
-      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
-    wf.type = 'text/javascript';
-    wf.async = 'true';
-    var s = document.getElementsByTagName('script')[0];
+  (function(d) {
+    var wf = d.createElement('script'), s = d.scripts[0];
+    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
+    wf.async = true;
     s.parentNode.insertBefore(wf, s);
-  })();
+  })(document);
 </script>
 
   
@@ -60,8 +57,9 @@
   </script>
 
 
-  <!-- Begin Jekyll SEO tag v2.2.0 -->
+  <!-- Begin Jekyll SEO tag v2.4.0 -->
 <title>Manish Pandit’s Blog | A tech blog with gists, code, presentations, tutorials, and many goodies around programming, devops, cloud architectures, aws, google cloud platform, and infrastructure.</title>
+<meta name="generator" content="Jekyll v3.4.3" />
 <meta property="og:title" content="Manish Pandit’s Blog" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
@@ -70,16 +68,10 @@
 <link rel="canonical" href="https://lobster1234.github.io/posts/3/" />
 <meta property="og:url" content="https://lobster1234.github.io/posts/3/" />
 <meta property="og:site_name" content="Manish Pandit’s Blog" />
-<link rel="prev" href="https://lobster1234.github.io/posts/2/">
-<link rel="next" href="https://lobster1234.github.io/posts/4/">
+<link rel="prev" href="https://lobster1234.github.io/posts/2/" />
+<link rel="next" href="https://lobster1234.github.io/posts/4/" />
 <script type="application/ld+json">
-{"@context": "http://schema.org",
-"@type": "WebPage",
-"headline": "Manish Pandit’s Blog",
-"author": {"@type": "Person",
-"name": "Manish Pandit"},
-"description": "A tech blog with gists, code, presentations, tutorials, and many goodies around programming, devops, cloud architectures, aws, google cloud platform, and infrastructure.",
-"url": "https://lobster1234.github.io/posts/3/"}</script>
+{"description":"A tech blog with gists, code, presentations, tutorials, and many goodies around programming, devops, cloud architectures, aws, google cloud platform, and infrastructure.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"WebPage","url":"https://lobster1234.github.io/posts/3/","headline":"Manish Pandit’s Blog","@context":"http://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -128,146 +120,254 @@
       <li>
         <header class="post-header">
           <h1 class="post-title">
+            <a class="post-link" href="/2017/10/14/fan-out-with-sns-and-sqs-gotcha/">Fanout SNS-SQS Gotcha</a>
+          </h1>
+
+          <p class="post-meta">Oct 14, 2017 •  •
+  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/aws/">aws</a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+
+
+ •
+  
+
+</p>
+        </header>
+
+        <div class="post-content">
+          <p>One of the very common architectural patterns is <em>fan-out</em> where an event is sent to multiple subscribers by a broker. An event can be like placing an order, which can then be handled by inventory service, record-keeping, as well as shipping service concurrently. These events can also be very frequent - like clickstreams, or search strings on a website. AWS allows for <a href="http://docs.aws.amazon.com/sns/latest/dg/SNS_Scenarios.html">fan-out architecture</a> with <a href="https://aws.amazon.com/sns/">SNS</a> topics, and <a href="https://aws.amazon.com/sqs/">SQS</a> queues. SQS queue(s) can subscribe to SNS topics and receive any message sent to the SNS topic(s). It is documented that <a href="http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues.html">FIFO queues</a> cannot be SNS subscribers <a href="https://forums.aws.amazon.com/thread.jspa?threadID=246962">here</a>.</p>
+
+<p>However, as I recently found out, SSE-enabled SQS queues cannot subscribe to SNS either. While AWS stops us from subscribing a FIFO queue to SNS, <a href="https://aws.amazon.com/blogs/aws/new-server-side-encryption-for-amazon-simple-queue-service-sqs/">SSE-enabled queues</a> are allowed to subscribe, but they never get any events. The purpose of this post is to document this previously undocumented behavior.</p>
+
+
+        </div>
+        
+          <p class="post-continue">
+            <a href="/2017/10/14/fan-out-with-sns-and-sqs-gotcha/">Read on &rarr;</a>
+          </p>
+        
+      </li>
+    
+      
+      
+
+      <li>
+        <header class="post-header">
+          <h1 class="post-title">
             <a class="post-link" href="/2017/10/10/logstash-with-aws-lambda/">Logstash logging with AWS Lambda</a>
           </h1>
 
-          <p class="post-meta">Oct 10, 2017 • 
+          <p class="post-meta">Oct 10, 2017 •  •
   
-  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/aws/">aws</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-      <a href="/categories/aws/">aws</a>,
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
+        <a href="/categories/serverless/">serverless</a>
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
+    
+      
+    
+      
     
   
 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/serverless/">serverless</a>
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
+
+ •
   
 
 </p>
@@ -294,212 +394,218 @@
             <a class="post-link" href="/2017/10/07/aws-lambda-with-serverless-framework-and-java/">SVCC 2017 - AWS Lambda with Serverless Framework and Java</a>
           </h1>
 
-          <p class="post-meta">Oct 7, 2017 • 
+          <p class="post-meta">Oct 7, 2017 •  •
   
-  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/aws/">aws</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
+    
+      
+    
+      
+    
+      
+        <a href="/categories/presentations/">presentations</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-      <a href="/categories/aws/">aws</a>,
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
+        <a href="/categories/serverless/">serverless</a>
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
 
-  
-  
-    
-  
-    
-  
-    
-      <a href="/categories/presentations/">presentations</a>,
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/serverless/">serverless</a>
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
+ •
   
 
 </p>
@@ -530,74 +636,80 @@
             <a class="post-link" href="/2017/09/29/aws-kms-envelope-encryption/">AWS KMS and Envelope Encryption</a>
           </h1>
 
-          <p class="post-meta">Sep 29, 2017 • 
-  
-  
-    
+          <p class="post-meta">Sep 29, 2017 •  •
   
     
-  
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/aws/">aws</a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/aws/">aws</a>
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
+
+
+ •
   
 
 </p>
@@ -628,212 +740,218 @@
             <a class="post-link" href="/2017/08/22/aws-ecs-notes/">Using Amazon EC2 Container Service</a>
           </h1>
 
-          <p class="post-meta">Aug 22, 2017 • 
+          <p class="post-meta">Aug 22, 2017 •  •
   
-  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/aws/">aws</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/docker/">docker</a>,
+      
+    
+      
     
   
     
-  
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-      <a href="/categories/aws/">aws</a>,
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/ecs/">ecs</a>
+      
     
   
 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/docker/">docker</a>,
-    
-  
-    
-  
 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/ecs/">ecs</a>
-    
+ •
   
 
 </p>
@@ -849,173 +967,6 @@
         
           <p class="post-continue">
             <a href="/2017/08/22/aws-ecs-notes/">Read on &rarr;</a>
-          </p>
-        
-      </li>
-    
-      
-      
-
-      <li>
-        <header class="post-header">
-          <h1 class="post-title">
-            <a class="post-link" href="/2017/08/14/search-with-nutch-mongodb-solr/">Apache Nutch - Step by Step</a>
-          </h1>
-
-          <p class="post-meta">Aug 14, 2017 • 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/architecture/">architecture</a>,
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/search/">search</a>
-    
-  
-    
-  
-    
-  
-
-</p>
-        </header>
-
-        <div class="post-content">
-          <p>Search is one of the most fantastic areas of the technology industry, and has been addressed many, many times with different algorithms, producing varying degrees of success. We get so used to it, that often times I wish I had a Cmd-F while reading a real book.</p>
-
-<p>Recently we had our Quarterly Hack Week at <a href="https://www.marqeta.com" target="_blank_">Marqeta</a>, and one of the ideas was to build search around our public pages. These pages would include the public website assets, as well as the the API developer guides and documentation. This post is a quick summary of the infrastructure, setup, and gotchas of using Nutch 2.3.1 to build a site search - essentially notes from this hack week project.</p>
-
-<p><img src="https://lobster1234.github.io/assets/search.png" alt="Search" /></p>
-
-
-        </div>
-        
-          <p class="post-continue">
-            <a href="/2017/08/14/search-with-nutch-mongodb-solr/">Read on &rarr;</a>
           </p>
         
       </li>

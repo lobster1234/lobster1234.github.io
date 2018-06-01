@@ -35,15 +35,12 @@
   WebFontConfig = {
     google: { families: [ 'Bitter:400,700,400italic:latin' ] }
   };
-  (function() {
-    var wf = document.createElement('script');
-    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
-      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
-    wf.type = 'text/javascript';
-    wf.async = 'true';
-    var s = document.getElementsByTagName('script')[0];
+  (function(d) {
+    var wf = d.createElement('script'), s = d.scripts[0];
+    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
+    wf.async = true;
     s.parentNode.insertBefore(wf, s);
-  })();
+  })(document);
 </script>
 
   
@@ -60,8 +57,9 @@
   </script>
 
 
-  <!-- Begin Jekyll SEO tag v2.2.0 -->
+  <!-- Begin Jekyll SEO tag v2.4.0 -->
 <title>Amazon Aurora Notes | Manish Pandit’s Blog</title>
+<meta name="generator" content="Jekyll v3.4.3" />
 <meta property="og:title" content="Amazon Aurora Notes" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
@@ -73,16 +71,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2017-11-03T13:44:37-07:00" />
 <script type="application/ld+json">
-{"@context": "http://schema.org",
-"@type": "BlogPosting",
-"headline": "Amazon Aurora Notes",
-"author": {"@type": "Person",
-"name": "Manish Pandit"},
-"datePublished": "2017-11-03T13:44:37-07:00",
-"description": "At Marqeta, we strive to continually evolve our platform to make it scalable and highly performant. We rely heavily on MySQL, and have many MySQL instances hosted across data centers, as well as on EC2s for various purposes. While refactoring some of our APIs, we thought of giving Amazon Aurora a try. Having heard about Aurora’s performance and high availability, this was definitely a great opportunity. Setting up a single node cluster (one db.t2.small) via the Console was the first step. After a few clicks, we had our first Aurora Cluster running happily. Next step was to fire up our regression tests while pointing to a schema in Aurora. Our database fixtures worked like a charm, and we were surprised to see all of our (thousand+) tests pass - while we knew it was a MySQL drop in replacement, we still expected some drama. Great first impression!",
-"mainEntityOfPage": {"@type": "WebPage",
-"@id": "https://lobster1234.github.io/2017/11/03/amazon-aurora-rds-notes/"},
-"url": "https://lobster1234.github.io/2017/11/03/amazon-aurora-rds-notes/"}</script>
+{"description":"At Marqeta, we strive to continually evolve our platform to make it scalable and highly performant. We rely heavily on MySQL, and have many MySQL instances hosted across data centers, as well as on EC2s for various purposes. While refactoring some of our APIs, we thought of giving Amazon Aurora a try. Having heard about Aurora’s performance and high availability, this was definitely a great opportunity. Setting up a single node cluster (one db.t2.small) via the Console was the first step. After a few clicks, we had our first Aurora Cluster running happily. Next step was to fire up our regression tests while pointing to a schema in Aurora. Our database fixtures worked like a charm, and we were surprised to see all of our (thousand+) tests pass - while we knew it was a MySQL drop in replacement, we still expected some drama. Great first impression!","author":{"@type":"Person","name":"Manish Pandit"},"@type":"BlogPosting","url":"https://lobster1234.github.io/2017/11/03/amazon-aurora-rds-notes/","headline":"Amazon Aurora Notes","dateModified":"2017-11-03T13:44:37-07:00","datePublished":"2017-11-03T13:44:37-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/11/03/amazon-aurora-rds-notes/"},"@context":"http://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -123,73 +112,347 @@
     
       <h1 class="post-title" itemprop="name headline">Amazon Aurora Notes</h1>
     
-    <p class="post-meta"><time datetime="2017-11-03T13:44:37-07:00" itemprop="datePublished">Nov 3, 2017</time> • 
+    <p class="post-meta"><time datetime="2017-11-03T13:44:37-07:00" itemprop="datePublished">Nov 3, 2017</time> •
   
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/aws/">aws</a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
   
+
+
+ •
+  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
     
-  
+      
     
-  
+      
     
-      <a href="/categories/aws/">aws</a>
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
 
@@ -355,6 +618,8 @@ s.setAttribute('data-timestamp', +new Date());
 </script>
 
   </div>
+
+  
 
 </article>
 

@@ -35,15 +35,12 @@
   WebFontConfig = {
     google: { families: [ 'Bitter:400,700,400italic:latin' ] }
   };
-  (function() {
-    var wf = document.createElement('script');
-    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
-      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
-    wf.type = 'text/javascript';
-    wf.async = 'true';
-    var s = document.getElementsByTagName('script')[0];
+  (function(d) {
+    var wf = d.createElement('script'), s = d.scripts[0];
+    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
+    wf.async = true;
     s.parentNode.insertBefore(wf, s);
-  })();
+  })(document);
 </script>
 
   
@@ -60,8 +57,9 @@
   </script>
 
 
-  <!-- Begin Jekyll SEO tag v2.2.0 -->
+  <!-- Begin Jekyll SEO tag v2.4.0 -->
 <title>Migrating a Domain to Amazon Route53 | Manish Pandit’s Blog</title>
+<meta name="generator" content="Jekyll v3.4.3" />
 <meta property="og:title" content="Migrating a Domain to Amazon Route53" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
@@ -74,17 +72,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2017-05-10T23:44:37-07:00" />
 <script type="application/ld+json">
-{"@context": "http://schema.org",
-"@type": "BlogPosting",
-"headline": "Migrating a Domain to Amazon Route53",
-"author": {"@type": "Person",
-"name": "Manish Pandit"},
-"image": "https://lobster1234.github.io/assets/route53_post_image.png",
-"datePublished": "2017-05-10T23:44:37-07:00",
-"description": "Amazon Route53 is a highly available and scalable DNS service. Route53 provides Domain Registrations and Transfers, DNS service to route traffic to the infrastructure (either within AWS or non-AWS), advanced routing policies like weighted and geo, and health check services that can be leveraged to perform traffic routing to different destination in the event of a failure. It provides more flexibility and seamless integration with AWS Services than any other DNS host can. One of the most common scenarios is the need to send traffic from a site registered at non-Route53 providers to an ELB, which Route53 supports via an Alias Record. In this post we will discuss moving the DNS - where requests to a domain hosted on a non-Route53 provider would resolve to Route53, and then point to an ELB which could be hosting a web property. However, the destination does not have to be an ELB, it can be any public IP. The other part is that of the Domain Registration itself, which can be transferred to Route53 if needed.",
-"mainEntityOfPage": {"@type": "WebPage",
-"@id": "https://lobster1234.github.io/2017/05/10/migrating-a-domain-to-amazon-route53/"},
-"url": "https://lobster1234.github.io/2017/05/10/migrating-a-domain-to-amazon-route53/"}</script>
+{"description":"Amazon Route53 is a highly available and scalable DNS service. Route53 provides Domain Registrations and Transfers, DNS service to route traffic to the infrastructure (either within AWS or non-AWS), advanced routing policies like weighted and geo, and health check services that can be leveraged to perform traffic routing to different destination in the event of a failure. It provides more flexibility and seamless integration with AWS Services than any other DNS host can. One of the most common scenarios is the need to send traffic from a site registered at non-Route53 providers to an ELB, which Route53 supports via an Alias Record. In this post we will discuss moving the DNS - where requests to a domain hosted on a non-Route53 provider would resolve to Route53, and then point to an ELB which could be hosting a web property. However, the destination does not have to be an ELB, it can be any public IP. The other part is that of the Domain Registration itself, which can be transferred to Route53 if needed.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"BlogPosting","url":"https://lobster1234.github.io/2017/05/10/migrating-a-domain-to-amazon-route53/","image":"https://lobster1234.github.io/assets/route53_post_image.png","headline":"Migrating a Domain to Amazon Route53","dateModified":"2017-05-10T23:44:37-07:00","datePublished":"2017-05-10T23:44:37-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/05/10/migrating-a-domain-to-amazon-route53/"},"@context":"http://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -125,144 +113,148 @@
     
       <h1 class="post-title" itemprop="name headline">Migrating a Domain to Amazon Route53</h1>
     
-    <p class="post-meta"><time datetime="2017-05-10T23:44:37-07:00" itemprop="datePublished">May 10, 2017</time> • 
+    <p class="post-meta"><time datetime="2017-05-10T23:44:37-07:00" itemprop="datePublished">May 10, 2017</time> •
   
-  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/aws/">aws</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-      <a href="/categories/aws/">aws</a>,
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
+        <a href="/categories/route53/">route53</a>
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
+    
+      
+    
+      
     
   
 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/route53/">route53</a>
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
+
 
 </p>
   </header>
@@ -359,6 +351,8 @@ Click <strong>Save</strong>.</p>
 </ol>
 
   </div>
+
+  
 
 </article>
 

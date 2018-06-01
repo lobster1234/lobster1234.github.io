@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  
+  
+  <title>Server to Server Auth with Amazon Cognito</title>
+  <meta name="description" content="Amazon Cognito is a hosted service that provides federated identity, access controls, and user management with multi-factor authentication for web and mobile applications. The service is very rich - any application developer can set up the signup and login process with a few clicks in Amazon Cognito Console by federating with identity providers such as Google, Facebook, Twitter, etc. One of the best features of Cognito is Lambda integration (Triggers), which allows Lambda invocation on events like pre-signup, pre and post authentication, etc. In this post I will walk through a not so fancy, yet very useful Cognito feature - which is server to server authentication. This is one of the most common scenarios in a microservices world, where services need to talk to other services securely, and using an established standard such as OAuth2. This is also known as client_credentials Grant, or 2-legged OAuth. Amazon Cognito provides a simple and cost effective option to implement it.">
+  <meta name="keywords" content="aws, security, oauth, cognito">
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="https://lobster1234.github.io/2018/05/31/server-to-server-auth-with-amazon-cognito/">
+  
+  
+  <link rel="alternate" type="application/rss+xml" title="Manish Pandit&#39;s Blog" href="https://lobster1234.github.io/feed.xml">
+
+  
+
+  
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="lobster1234">
+  <meta name="twitter:title" content="Server to Server Auth with Amazon Cognito">
+  <meta name="twitter:description" content="Amazon Cognito is a hosted service that provides federated identity, access controls, and user management with multi-factor authentication for web and mobile applications. The service is very rich ...">
+  
+    <meta name="twitter:creator" content="lobster1234">
+  
+  
+
+  <script type="text/javascript">
+  WebFontConfig = {
+    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
+  };
+  (function(d) {
+    var wf = d.createElement('script'), s = d.scripts[0];
+    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
+    wf.async = true;
+    s.parentNode.insertBefore(wf, s);
+  })(document);
+</script>
+
+  
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-96931340-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+
+  <!-- Begin Jekyll SEO tag v2.4.0 -->
+<title>Server to Server Auth with Amazon Cognito | Manish Pandit’s Blog</title>
+<meta name="generator" content="Jekyll v3.4.3" />
+<meta property="og:title" content="Server to Server Auth with Amazon Cognito" />
+<meta name="author" content="Manish Pandit" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Amazon Cognito is a hosted service that provides federated identity, access controls, and user management with multi-factor authentication for web and mobile applications. The service is very rich - any application developer can set up the signup and login process with a few clicks in Amazon Cognito Console by federating with identity providers such as Google, Facebook, Twitter, etc. One of the best features of Cognito is Lambda integration (Triggers), which allows Lambda invocation on events like pre-signup, pre and post authentication, etc. In this post I will walk through a not so fancy, yet very useful Cognito feature - which is server to server authentication. This is one of the most common scenarios in a microservices world, where services need to talk to other services securely, and using an established standard such as OAuth2. This is also known as client_credentials Grant, or 2-legged OAuth. Amazon Cognito provides a simple and cost effective option to implement it." />
+<meta property="og:description" content="Amazon Cognito is a hosted service that provides federated identity, access controls, and user management with multi-factor authentication for web and mobile applications. The service is very rich - any application developer can set up the signup and login process with a few clicks in Amazon Cognito Console by federating with identity providers such as Google, Facebook, Twitter, etc. One of the best features of Cognito is Lambda integration (Triggers), which allows Lambda invocation on events like pre-signup, pre and post authentication, etc. In this post I will walk through a not so fancy, yet very useful Cognito feature - which is server to server authentication. This is one of the most common scenarios in a microservices world, where services need to talk to other services securely, and using an established standard such as OAuth2. This is also known as client_credentials Grant, or 2-legged OAuth. Amazon Cognito provides a simple and cost effective option to implement it." />
+<link rel="canonical" href="https://lobster1234.github.io/2018/05/31/server-to-server-auth-with-amazon-cognito/" />
+<meta property="og:url" content="https://lobster1234.github.io/2018/05/31/server-to-server-auth-with-amazon-cognito/" />
+<meta property="og:site_name" content="Manish Pandit’s Blog" />
+<meta property="og:image" content="https://lobster1234.github.io/assets/cognito.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2018-05-31T00:44:37-07:00" />
+<script type="application/ld+json">
+{"description":"Amazon Cognito is a hosted service that provides federated identity, access controls, and user management with multi-factor authentication for web and mobile applications. The service is very rich - any application developer can set up the signup and login process with a few clicks in Amazon Cognito Console by federating with identity providers such as Google, Facebook, Twitter, etc. One of the best features of Cognito is Lambda integration (Triggers), which allows Lambda invocation on events like pre-signup, pre and post authentication, etc. In this post I will walk through a not so fancy, yet very useful Cognito feature - which is server to server authentication. This is one of the most common scenarios in a microservices world, where services need to talk to other services securely, and using an established standard such as OAuth2. This is also known as client_credentials Grant, or 2-legged OAuth. Amazon Cognito provides a simple and cost effective option to implement it.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"BlogPosting","url":"https://lobster1234.github.io/2018/05/31/server-to-server-auth-with-amazon-cognito/","image":"https://lobster1234.github.io/assets/cognito.png","headline":"Server to Server Auth with Amazon Cognito","dateModified":"2018-05-31T00:44:37-07:00","datePublished":"2018-05-31T00:44:37-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2018/05/31/server-to-server-auth-with-amazon-cognito/"},"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Home</a>
+
+    <nav class="site-nav">
+      
+        
+        <a class="page-link" href="/about/">About</a>
+      
+        
+        <a class="page-link" href="/archives/">Archives</a>
+      
+        
+        <a class="page-link" href="https://www.twitter.com/lobster1234">Twitter</a>
+      
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    
+      <h1 class="post-title" itemprop="name headline">Server to Server Auth with Amazon Cognito</h1>
+    
+    <p class="post-meta"><time datetime="2018-05-31T00:44:37-07:00" itemprop="datePublished">May 31, 2018</time> •
+  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/aws/">aws</a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+
+
+
+</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p><a href="https://aws.amazon.com/cognito/">Amazon Cognito</a> is a hosted service that provides federated identity, access controls, and user management with multi-factor authentication for web and mobile applications. The service is very rich - any application developer can set up the signup and login process with a few clicks in Amazon Cognito Console by federating with identity providers such as Google, Facebook, Twitter, etc. One of the best features of Cognito is Lambda integration (<a href="https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-identity-pools-working-with-aws-lambda-triggers.html?icmpid=docs_cognito_console">Triggers</a>), which allows Lambda invocation on events like pre-signup, pre and post authentication, etc.</p>
+
+<p><img src="https://lobster1234.github.io/assets/cognito.png" alt="cognito" /></p>
+
+<p>In this post I will walk through a not so fancy, yet very useful Cognito feature - which is server to server authentication. This is one of the most common scenarios in a microservices world, where services need to talk to other services securely, and using an established standard such as <a href="https://oauth.net/2/">OAuth2</a>. This is also known as <a href="https://www.oauth.com/oauth2-servers/access-tokens/client-credentials/"><code class="highlighter-rouge">client_credentials</code> Grant</a>, or <code class="highlighter-rouge">2-legged OAuth</code>. Amazon Cognito provides a simple and cost effective option to implement it.</p>
+
+<!--more-->
+
+<h2 id="cognito-terminology">Cognito Terminology</h2>
+
+<p>For this post, I am assuming familiarity with OAuth2, so I will not be describing terms like Grants, Scopes, JWT and JWK in detail.</p>
+
+<ul>
+  <li>
+    <p><a href="https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-identity-pools.html">User Pools</a> : A user pool is collections of users. The users can be federated, can be manually set up, or imported. User Pools are the foundational entity in Cognito. You may compare this to a typical AD or LDAP directory.</p>
+  </li>
+  <li>
+    <p><a href="https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-identity.html">Identity Pools</a> : An identity pool allows access to AWS services via federated or custom identity. For example, at Marqeta, we have our dev AWS account federated with our Google Suite. This way we do not have to manage a separate directory of users who need to access the dev AWS account.</p>
+  </li>
+  <li>
+    <p><a href="https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-assign-domain.html">Domain</a> : A Domain is tied to a user pool in a 1:1 relationship, and is used to host the signup/login/challenge pages for the auth experience for the application.</p>
+  </li>
+  <li>
+    <p><a href="https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-client-apps.html">App Client</a> : A User Pool can have multiple app clients. App Clients are also where we set up OAuth2 grant types. This is similar to OAuth2 clients that can access resources using various grant types. The app client also has a list of associated <em>scopes</em> that it may allow requests for. These scopes are declared by the Resource Server(s) in the User Pool.</p>
+  </li>
+  <li>
+    <p><a href="https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-resource-servers.html">Resource Server</a> : A resource server is where the users’ data resides, and is protected by the configured User Pool. There can be multiple resource servers associated with a single User Pool. Think of a Resource Server as a microservice which handles <em>authenticated</em> requests. By the time the request makes it to the Resource Server, it has an <em>access token</em> which contains information about the authenticated user, and the session. The resource server(s) verify the authenticity and validity of the access token they receive. A resource server has an identifier (usually the URL of the service), and a list of scopes. Scopes are the granular level levels of access - like read, write, admin, etc.</p>
+  </li>
+  <li>
+    <p><a href="https://jwt.io/">JWT</a> : Cognito access tokens are JWT, which are signed with <a href="https://tools.ietf.org/html/rfc7517">JWK</a>. The JWT contains standard claims, but can also be extended to contain custom claims.</p>
+  </li>
+</ul>
+
+<p>In a typical set up, a User Pool will have a collection of users that have a means of authentication which is either custom or federated, Resource Server(s) which have protected data for those users, and Application Client(s) which will need to access that data on those users’ behalf. Managing this identity and access is self-contained in Cognito.</p>
+
+<h2 id="client-credentials-flow">Client Credentials Flow</h2>
+
+<p>While mentioning the terminology, I did not talk about server to server, or service to service identity much. This is where OAuth2 Client Credentials Flow comes in, and there is no user, or identity associated with the access request. The calling service obtains an access token, and the target service asserts that token to be valid before granting access to the protected data.</p>
+
+<p>In this scenario, Cognito’s User Pool is merely a placeholder, as we will have no users. The only <em>user</em> will be the app client. Before you think that we do not need a Domain as we will not be hosting any login pages, but we do. Instead of login pages, this domain will host the OAuth2 endpoint, <code class="highlighter-rouge">/oauth2/token</code>.</p>
+
+<p>We will use the AWS CLI and not use the Console, but feel free to perform the same actions via the Console. Alternatively, you may want to just check the console after each step to learn more about the constructs.</p>
+
+<h2 id="aws-cli">AWS CLI</h2>
+
+<p>If you have seen my previous posts, I prefer <a href="https://github.com/awslabs/aws-shell">aws-shell</a> over the plain CLI. But you can use the CLI by prefixing every command with <code class="highlighter-rouge">aws</code>. Please ensure the credentials being used have policies allowing Cognito operations.</p>
+
+<h3 id="create-a-cognito-user-pool">Create a Cognito User Pool</h3>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; cognito-idp create-user-pool --pool-name myblog
+</code></pre>
+</div>
+
+<p>This will produce a large JSON output. We can verify by listing the user pools, like so.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; cognito-idp list-user-pools --max-results 10
+
+  {
+      "UserPools": [
+          {
+              "Id": "us-east-1_0Pe*****",
+              "Name": "myblog",
+              "LambdaConfig": {},
+              "LastModifiedDate": 1527786443.052,
+              "CreationDate": 1527786443.052
+          }
+      ]
+  }
+</code></pre>
+</div>
+<p>The <code class="highlighter-rouge">Id</code> of the user pool is very important, as everything we create from now on will need it.</p>
+
+<h3 id="create-a-resource-server">Create a Resource Server</h3>
+
+<p>The resource server acts as a placeholder for scopes. Imagine a service to manage transactions, which will have scopes like post and get transactions.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; cognito-idp create-resource-server --name transactions --identifier transactions --user-pool-id us-east-1_0Pe***** --scopes ScopeName=get,ScopeDescription=get_tx ScopeName=post,ScopeDescription=post_tx
+
+{
+    "ResourceServer": {
+        "UserPoolId": "us-east-1_0Pe*****",
+        "Identifier": "transactions",
+        "Name": "transactions",
+        "Scopes": [
+            {
+                "ScopeName": "post",
+                "ScopeDescription": "post_tx"
+            },
+            {
+                "ScopeName": "get",
+                "ScopeDescription": "get_tx"
+            }
+        ]
+    }
+}
+</code></pre>
+</div>
+<h3 id="create-a-client-app">Create a Client App</h3>
+
+<p>Let us create a client who can only <code class="highlighter-rouge">post</code> transactions by calling the transactions service. As you can see below, we configure this client to use <code class="highlighter-rouge">client_credentials</code> grant, and restrict it to using only <code class="highlighter-rouge">transactions/post</code> scope. The scopes are defined in <code class="highlighter-rouge">$resource_server_identifier/$scope_name</code> format. Also notice the <code class="highlighter-rouge">--generate-secret</code> argument, which will create a secret that we can use for our client credentials access token request.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; cognito-idp create-user-pool-client --user-pool-id us-east-1_0Pe***** --allowed-o-auth-flows client_credentials --client-name test --generate-secret --allowed-o-auth-scopes transactons/post --allowed-o-auth-flows-user-pool-client
+{
+    "UserPoolClient": {
+        "UserPoolId": "us-east-1_0Pe*****",
+        "ClientName": "test",
+        "ClientId": "14aq5ll5b1it6f62uefe******",
+        "ClientSecret": "j22a2ha9httcbord******e4k29ra7s8026agrc89nhjg******",
+        "LastModifiedDate": 1527806667.264,
+        "CreationDate": 1527806667.264,
+        "RefreshTokenValidity": 30,
+        "AllowedOAuthFlows": [
+            "client_credentials"
+        ],
+        "AllowedOAuthScopes": [
+            "transactions/post"
+        ],
+        "AllowedOAuthFlowsUserPoolClient": true
+    }
+}
+
+</code></pre>
+</div>
+<p>Note the <code class="highlighter-rouge">ClientId</code> and <code class="highlighter-rouge">ClientSecret</code> in the response, as we’d need this to request an access token.</p>
+
+<h3 id="add-a-domain">Add a Domain</h3>
+
+<p>We will need to add a domain to this pool, so we can get a URL for <code class="highlighter-rouge">/oauth2/token</code> endpoint. Notice that I used a fairly odd name, because these domain names are global (yes, as they generate a public URL), so a generic name like <code class="highlighter-rouge">test</code> is probably already taken. Please use a name that is probably unique.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; cognito-idp create-user-pool-domain  --domain lobster1234 --user-pool-id us-east-1_0Pe*****
+{
+    "DomainDescription": {
+        "UserPoolId": "us-east-1_0Pe*****",
+        "AWSAccountId": "***431494***",
+        "Domain": "lobster1234",
+        "S3Bucket": "aws-cognito-prod-iad-assets",
+        "CloudFrontDistribution": "d3oia8etllorh5.cloudfront.net",
+        "Version": "20180531225618",
+        "Status": "ACTIVE"
+    }
+}
+
+</code></pre>
+</div>
+<blockquote>
+  <p>The DNS may take some time to propagate, so the URL may not work for a while (Took me 15 mins).</p>
+</blockquote>
+
+<p>This would translate into the OAuth2 URL as <code class="highlighter-rouge">https://lobster1234.auth.us-east-1.amazoncognito.com/oauth2/token</code></p>
+
+<h3 id="get-an-access-token">Get an Access Token</h3>
+
+<p>Notice that I am using HTTP Basic to send the <code class="highlighter-rouge">client_id</code> and <code class="highlighter-rouge">client_secret</code>. This is <code class="highlighter-rouge">base64(ClientId:ClientSecret)</code>.</p>
+
+<p>If you have <code class="highlighter-rouge">base64</code> utility installed, you can use it, like so, replacing <code class="highlighter-rouge">x</code> with <code class="highlighter-rouge">ClientId</code> and <code class="highlighter-rouge">y</code> with <code class="highlighter-rouge">ClientSecret</code>.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ echo 'x:y' |  base64
+</code></pre>
+</div>
+<p>Once you have the base64 encoded HTTP Basic Authorization header, you can request the access token.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>$ curl -X POST \
+  https://lobster1234.auth.us-east-1.amazoncognito.com/oauth2/token \
+  -H 'authorization: Basic ***********iMWl0NmY2MnVlZmVtNmFxaG46ajIyYTJ******HRjYm9yZGtucHR0Z2U0azI5cmE3czgwMjZhZ3J***************' \
+  -H 'content-type: application/x-www-form-urlencoded' \
+  -d 'grant_type=client_credentials&amp;scope=transactions%2Fpost'
+</code></pre>
+</div>
+<p>This should return an <code class="highlighter-rouge">access_token</code>, which is a JWT.</p>
+
+<div class="language-text highlighter-rouge"><pre class="highlight"><code>{
+    "access_token": "******************.eyJzdWIiOiIxNGFxNWxsNWIxaXQ2ZjYydWVmZW02YXFobiIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoidGVzdFwvZm9vIiwiYXV0aF90aW1lIjoxNTI3ODE3MzY2LCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb21cL3VzLWVhc3QtMV83RThJc3hDR0MiLCJleHAiOjE1Mjc4MjA5NjYsImlhdCI6MTUyNzgxNzM2NiwidmVyc2lvbiI6MiwianRpIjoiYWVlZWY1MGEtYjNiNS00MjAxLTlhOGYtOGI1ZjYzYTBlYmNjIiwiY2xpZW50X2lkIjoiMTRhcTVsbDViMWl0NmY2MnVlZmVtNmFxaG4ifQ.LaWN4NEUrR_2gGANnDx8zINMZteR7-E_moskq__zai5BLNpiCBnVtoLHwVH3FvDFVVesMCBmD02dRhZqXkttxEMUmetFybDtEkH2KWbalOmKvibl5JuPyQEqZ5S4DN9ZUZAqv3X48F2e0Eshck-*******************-0aDBMaMtJU-QMfeFJkN2UgKQhtzi2dbLBB06dQEd6gcxh-*****************",
+    "expires_in": 3600,
+    "token_type": "Bearer"
+}
+</code></pre>
+</div>
+
+<h3 id="validate-the-access-token">Validate the Access Token</h3>
+
+<blockquote>
+  <p>This section would need familiarity with JWT, JWK, and a bit of encryption standards.</p>
+</blockquote>
+
+<p>When a service calls the transactions service with this Bearer token in the <code class="highlighter-rouge">Authorization</code> header, the token would need to be validated. There are several libraries available to do so. The JWT is base64 encoded, and signed. It may be encrypted as well, as is done in a lot of financial/sensitive use cases.</p>
+
+<p>To peek in the access token, you may paste it in <a href="https://jwt.io">jtw.io</a>. You’ll see the following as the token is decoded.</p>
+
+<p>Header</p>
+<div class="language-text highlighter-rouge"><pre class="highlight"><code>{
+  "kid": "Lkek/Dt3d7ibTkq4Pz2LKpmIKTu5mR6A++DRfvmu5Vw=",
+  "alg": "RS256"
+}
+</code></pre>
+</div>
+<p>Payload</p>
+<div class="language-text highlighter-rouge"><pre class="highlight"><code>{
+  "sub": "14aq5ll5b1it6f62uefe******",
+  "token_use": "access",
+  "scope": "transactions/post",
+  "auth_time": 1527809373,
+  "iss": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_0Pe*****"",
+  "exp": 1527812973,
+  "iat": 1527809373,
+  "version": 2,
+  "jti": "864ec9c6-f3c9-4e3c-b9e1-dfe21e167e1e",
+  "client_id": "14aq5ll5b1it6f62uefe******"
+}
+</code></pre>
+</div>
+
+<p>If you need to perform signature validation, there is some extra effort.</p>
+
+<p>Cognito uses JWK to sign the token. In order to see the keys, visit https://cognito-idp.us-east-1.amazonaws.com/uus-east-1<em>0Pe*****/.well-known/jwks.json. This has the list of keys that Cognito would use to sign the access tokens. It is also known as JWKS - _JSON Web Key Set</em>.</p>
+
+<p>To verify the signature, you’d need to convert the JWK to PEM. I used node to do so. From that URL, copy the key identified by the <code class="highlighter-rouge">kid</code> in the access token’s header.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ npm install jsonwebtoken
+$ npm install jwk-to-pem
+&gt; node
+&gt; var jwkToPem = require('jwk-to-pem'),
+...     jwt = require('jsonwebtoken');
+undefined
+&gt; var jwk = {"alg":"RS256","e":"AQAB","kid":"Lkek/Dt3d7ibTkq4Pz2LKpmIKTu5mR6A++DRfvmu5Vw=","kty":"RSA","n":"lyZWsratUxICSfYTCH2gblgUvCpBmYUacNXfQ_3Ygk8mnKaDtkXfb8uVrWwj3Eqdv_hjDYPsYLzYiinjYrLGpFgzxwZbUYXFC49bxQOal28J2emDTiWOAYKC0a_glzcwKf74AWPeBZ8PRNOR6OPLwxnoKQ6PoKGcjonoJdydx-****************************-HJVSW1oS7_uJY-6qLQN4IPzXbaHzy9iJgTDbnd6f-htneHegoLHlSmEfYgnJ_jJBsXwXFAYVm9JLiDyhdZOl-*************************","use":"sig"}
+undefined
+&gt; pem = jwkToPem(jwk)
+'-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlyZWsratUxICSfYTCH2g\nblgUvCpBmYUacNXfQ/3Ygk8mnKaDtkXfb8uVrWwj3Eqdv/hjDYPsYLzYiinjYrLG\npFgzxwZbUYXFC49bxQOal28J2emDTiWOAYKC0a/glzcwKf74AWPeBZ8PRNOR6OPL\nwxnoKQ6PoKGcjonoJdydx+YhROgpj92w4kABlxuP91eht+HJVSW1oS7/uJY+6qLQ\nN4IPzXbaHzy9iJgTDbnd6f+htneHegoLHlSmEfYgnJ/jJBsXwXFAYVm9JLiDyhdZ\nOl+aSpSPQjXprlHz3Ksln5D8/Ic7yiQLtPostlZEovc0dzqGND2Hr686B1CkbGqZ\nnwIDAQAB\n-----END PUBLIC KEY-----\n'
+&gt; console.log(pem)
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlyZWsratUxICSfYTCH2g
+blgUvCpBmYUacNXfQ/3Ygk8mnKaDtkXfb8uVrWwj3Eqdv/hjDYPsYLzYiinjYrLG
+pFgzxwZbUYXFC49bxQOal28J2emDTiWOAYKC0a/glzcwKf74AWPeBZ8PRNOR6OPL
+wxnoKQ6PoKGcjonoJdydx+YhROgpj92w4kABlxuP91eht+HJVSW1oS7/uJY+6qLQ
+N4IPzXbaHzy9iJgTDbnd6f+htneHegoLHlSmEfYgnJ/jJBsXwXFAYVm9JLiDyhdZ
+Ol+aSpSPQjXprlHz3Ksln5D8/Ic7yiQLtPostlZEovc0dzqGND2Hr686B1CkbGqZ
+nwIDAQAB
+-----END PUBLIC KEY-----
+</code></pre>
+</div>
+<p>Now copy the pem, and paste it on jwt.io under “Verify Signature” section.</p>
+
+<p>If everything goes well, you’ll notice a “Signature Verified” message show up instead of “Invalid Signature”.</p>
+
+<p>This has to be done programmatically by the service that receives the access token along with an authenticated request for protected resources. Again, plenty of libraries available to do so. They’re listed on the jwt.io homepage.</p>
+
+<h3 style="text-align: center" id="comments">Comments</h3>
+
+<div id="disqus_thread"></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = "https://lobster1234.github.io/2018/05/31/server-to-server-auth-with-amazon-cognito/";  
+this.page.identifier = "/2018/05/31/server-to-server-auth-with-amazon-cognito";
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://lobster1234.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+<div id="disqus_thread"></div>
+<script>
+
+
+      
+
+</script>
+
+  </div>
+
+  
+
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <p>
+      
+
+&copy; Manish Pandit - Powered by <a href="https://jekyllrb.com">Jekyll</a> &amp; <a href="https://github.com/yous/whiteglass">whiteglass</a> - Subscribe via <a href="https://lobster1234.github.io/feed.xml">RSS</a>
+
+    </p>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

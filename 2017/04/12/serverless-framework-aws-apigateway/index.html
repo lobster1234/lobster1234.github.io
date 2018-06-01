@@ -35,15 +35,12 @@
   WebFontConfig = {
     google: { families: [ 'Bitter:400,700,400italic:latin' ] }
   };
-  (function() {
-    var wf = document.createElement('script');
-    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
-      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
-    wf.type = 'text/javascript';
-    wf.async = 'true';
-    var s = document.getElementsByTagName('script')[0];
+  (function(d) {
+    var wf = d.createElement('script'), s = d.scripts[0];
+    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
+    wf.async = true;
     s.parentNode.insertBefore(wf, s);
-  })();
+  })(document);
 </script>
 
   
@@ -60,8 +57,9 @@
   </script>
 
 
-  <!-- Begin Jekyll SEO tag v2.2.0 -->
+  <!-- Begin Jekyll SEO tag v2.4.0 -->
 <title>AWS Lambda with Serverless Framework and Java/Maven - Part 2 | Manish Pandit’s Blog</title>
+<meta name="generator" content="Jekyll v3.4.3" />
 <meta property="og:title" content="AWS Lambda with Serverless Framework and Java/Maven - Part 2" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
@@ -73,16 +71,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2017-04-12T23:44:37-07:00" />
 <script type="application/ld+json">
-{"@context": "http://schema.org",
-"@type": "BlogPosting",
-"headline": "AWS Lambda with Serverless Framework and Java/Maven - Part 2",
-"author": {"@type": "Person",
-"name": "Manish Pandit"},
-"datePublished": "2017-04-12T23:44:37-07:00",
-"description": "We continue to build our Lambda functions beyond the Hello World that we saw in the previous post. Our end goal is to build an API, and make it available via Amazon API Gateway. We will build the foundation of our Lambda-API-Gateway set up in this tutorial. We will also set up DynamoDB. Feel free to replace DynamoDB with any persistance layer, or even a mock.",
-"mainEntityOfPage": {"@type": "WebPage",
-"@id": "https://lobster1234.github.io/2017/04/12/serverless-framework-aws-apigateway/"},
-"url": "https://lobster1234.github.io/2017/04/12/serverless-framework-aws-apigateway/"}</script>
+{"description":"We continue to build our Lambda functions beyond the Hello World that we saw in the previous post. Our end goal is to build an API, and make it available via Amazon API Gateway. We will build the foundation of our Lambda-API-Gateway set up in this tutorial. We will also set up DynamoDB. Feel free to replace DynamoDB with any persistance layer, or even a mock.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"BlogPosting","url":"https://lobster1234.github.io/2017/04/12/serverless-framework-aws-apigateway/","headline":"AWS Lambda with Serverless Framework and Java/Maven - Part 2","dateModified":"2017-04-12T23:44:37-07:00","datePublished":"2017-04-12T23:44:37-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/04/12/serverless-framework-aws-apigateway/"},"@context":"http://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -123,351 +112,355 @@
     
       <h1 class="post-title" itemprop="name headline">AWS Lambda with Serverless Framework and Java/Maven - Part 2</h1>
     
-    <p class="post-meta"><time datetime="2017-04-12T23:44:37-07:00" itemprop="datePublished">Apr 12, 2017</time> • 
+    <p class="post-meta"><time datetime="2017-04-12T23:44:37-07:00" itemprop="datePublished">Apr 12, 2017</time> •
   
-  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/aws/">aws</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/api-gateway/">api-gateway</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/lambda/">lambda</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/serverless/">serverless</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
     
-      <a href="/categories/aws/">aws</a>,
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
+        <a href="/categories/dynamodb/">dynamodb</a>
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/api-gateway/">api-gateway</a>,
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/lambda/">lambda</a>,
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/serverless/">serverless</a>,
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/dynamodb/">dynamodb</a>
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
 
 </p>
   </header>
@@ -951,6 +944,8 @@ bash-3.2$
 <p>Thanks for staying with me so far!</p>
 
   </div>
+
+  
 
 </article>
 

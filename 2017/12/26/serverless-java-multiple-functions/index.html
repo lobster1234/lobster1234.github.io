@@ -35,15 +35,12 @@
   WebFontConfig = {
     google: { families: [ 'Bitter:400,700,400italic:latin' ] }
   };
-  (function() {
-    var wf = document.createElement('script');
-    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
-      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
-    wf.type = 'text/javascript';
-    wf.async = 'true';
-    var s = document.getElementsByTagName('script')[0];
+  (function(d) {
+    var wf = d.createElement('script'), s = d.scripts[0];
+    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
+    wf.async = true;
     s.parentNode.insertBefore(wf, s);
-  })();
+  })(document);
 </script>
 
   
@@ -60,8 +57,9 @@
   </script>
 
 
-  <!-- Begin Jekyll SEO tag v2.2.0 -->
+  <!-- Begin Jekyll SEO tag v2.4.0 -->
 <title>Multiple Functions in Serverless Framework with Java | Manish Pandit’s Blog</title>
+<meta name="generator" content="Jekyll v3.4.3" />
 <meta property="og:title" content="Multiple Functions in Serverless Framework with Java" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
@@ -73,16 +71,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2017-12-26T22:44:37-08:00" />
 <script type="application/ld+json">
-{"@context": "http://schema.org",
-"@type": "BlogPosting",
-"headline": "Multiple Functions in Serverless Framework with Java",
-"author": {"@type": "Person",
-"name": "Manish Pandit"},
-"datePublished": "2017-12-26T22:44:37-08:00",
-"description": "Serverless Framework is an excellent choice for writing and deploying Lambda Functions in AWS. Having written a blog series on using it with Java8+Maven, I’ve been asked if there is a way to not have too many handlers (One per API), and somehow provide multiple handler functions in the same java class. In this post I provide the structure that’d allow for multiple handlers using a single Java class. This is particularly useful when the code is tightly coupled around a resource (CRUD) and writing a handler class for each of C, R, U, D seems un-necessary, like it should.",
-"mainEntityOfPage": {"@type": "WebPage",
-"@id": "https://lobster1234.github.io/2017/12/26/serverless-java-multiple-functions/"},
-"url": "https://lobster1234.github.io/2017/12/26/serverless-java-multiple-functions/"}</script>
+{"description":"Serverless Framework is an excellent choice for writing and deploying Lambda Functions in AWS. Having written a blog series on using it with Java8+Maven, I’ve been asked if there is a way to not have too many handlers (One per API), and somehow provide multiple handler functions in the same java class. In this post I provide the structure that’d allow for multiple handlers using a single Java class. This is particularly useful when the code is tightly coupled around a resource (CRUD) and writing a handler class for each of C, R, U, D seems un-necessary, like it should.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"BlogPosting","url":"https://lobster1234.github.io/2017/12/26/serverless-java-multiple-functions/","headline":"Multiple Functions in Serverless Framework with Java","dateModified":"2017-12-26T22:44:37-08:00","datePublished":"2017-12-26T22:44:37-08:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/12/26/serverless-java-multiple-functions/"},"@context":"http://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -123,144 +112,148 @@
     
       <h1 class="post-title" itemprop="name headline">Multiple Functions in Serverless Framework with Java</h1>
     
-    <p class="post-meta"><time datetime="2017-12-26T22:44:37-08:00" itemprop="datePublished">Dec 26, 2017</time> • 
+    <p class="post-meta"><time datetime="2017-12-26T22:44:37-08:00" itemprop="datePublished">Dec 26, 2017</time> •
   
-  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/aws/">aws</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-      <a href="/categories/aws/">aws</a>,
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
+        <a href="/categories/lambda/">lambda</a>
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
+    
+      
+    
+      
     
   
 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/lambda/">lambda</a>
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
+
 
 </p>
   </header>
@@ -509,6 +502,8 @@ s.setAttribute('data-timestamp', +new Date());
 </script>
 
   </div>
+
+  
 
 </article>
 

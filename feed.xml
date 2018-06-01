@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2018-04-15T00:57:31-07:00</updated>
+  <updated>2018-05-31T23:41:10-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -29,9 +29,323 @@
   
     <entry>
       
+      <title type="html">Server to Server Auth with Amazon Cognito</title>
+      
+      
+      <link href="https://lobster1234.github.io/2018/05/31/server-to-server-auth-with-amazon-cognito/" rel="alternate" type="text/html" title="Server to Server Auth with Amazon Cognito" />
+      
+      <published>2018-05-31T00:44:37-07:00</published>
+      <updated>2018-05-31T00:44:37-07:00</updated>
+      <id>https://lobster1234.github.io/2018/05/31/server-to-server-auth-with-amazon-cognito</id>
+      <content type="html" xml:base="https://lobster1234.github.io/2018/05/31/server-to-server-auth-with-amazon-cognito/">&lt;p&gt;&lt;a href=&quot;https://aws.amazon.com/cognito/&quot;&gt;Amazon Cognito&lt;/a&gt; is a hosted service that provides federated identity, access controls, and user management with multi-factor authentication for web and mobile applications. The service is very rich - any application developer can set up the signup and login process with a few clicks in Amazon Cognito Console by federating with identity providers such as Google, Facebook, Twitter, etc. One of the best features of Cognito is Lambda integration (&lt;a href=&quot;https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-identity-pools-working-with-aws-lambda-triggers.html?icmpid=docs_cognito_console&quot;&gt;Triggers&lt;/a&gt;), which allows Lambda invocation on events like pre-signup, pre and post authentication, etc.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/cognito.png&quot; alt=&quot;cognito&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;In this post I will walk through a not so fancy, yet very useful Cognito feature - which is server to server authentication. This is one of the most common scenarios in a microservices world, where services need to talk to other services securely, and using an established standard such as &lt;a href=&quot;https://oauth.net/2/&quot;&gt;OAuth2&lt;/a&gt;. This is also known as &lt;a href=&quot;https://www.oauth.com/oauth2-servers/access-tokens/client-credentials/&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;client_credentials&lt;/code&gt; Grant&lt;/a&gt;, or &lt;code class=&quot;highlighter-rouge&quot;&gt;2-legged OAuth&lt;/code&gt;. Amazon Cognito provides a simple and cost effective option to implement it.&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h2 id=&quot;cognito-terminology&quot;&gt;Cognito Terminology&lt;/h2&gt;
+
+&lt;p&gt;For this post, I am assuming familiarity with OAuth2, so I will not be describing terms like Grants, Scopes, JWT and JWK in detail.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;a href=&quot;https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-identity-pools.html&quot;&gt;User Pools&lt;/a&gt; : A user pool is collections of users. The users can be federated, can be manually set up, or imported. User Pools are the foundational entity in Cognito. You may compare this to a typical AD or LDAP directory.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;a href=&quot;https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-identity.html&quot;&gt;Identity Pools&lt;/a&gt; : An identity pool allows access to AWS services via federated or custom identity. For example, at Marqeta, we have our dev AWS account federated with our Google Suite. This way we do not have to manage a separate directory of users who need to access the dev AWS account.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;a href=&quot;https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-assign-domain.html&quot;&gt;Domain&lt;/a&gt; : A Domain is tied to a user pool in a 1:1 relationship, and is used to host the signup/login/challenge pages for the auth experience for the application.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;a href=&quot;https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-client-apps.html&quot;&gt;App Client&lt;/a&gt; : A User Pool can have multiple app clients. App Clients are also where we set up OAuth2 grant types. This is similar to OAuth2 clients that can access resources using various grant types. The app client also has a list of associated &lt;em&gt;scopes&lt;/em&gt; that it may allow requests for. These scopes are declared by the Resource Server(s) in the User Pool.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;a href=&quot;https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-resource-servers.html&quot;&gt;Resource Server&lt;/a&gt; : A resource server is where the users’ data resides, and is protected by the configured User Pool. There can be multiple resource servers associated with a single User Pool. Think of a Resource Server as a microservice which handles &lt;em&gt;authenticated&lt;/em&gt; requests. By the time the request makes it to the Resource Server, it has an &lt;em&gt;access token&lt;/em&gt; which contains information about the authenticated user, and the session. The resource server(s) verify the authenticity and validity of the access token they receive. A resource server has an identifier (usually the URL of the service), and a list of scopes. Scopes are the granular level levels of access - like read, write, admin, etc.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;a href=&quot;https://jwt.io/&quot;&gt;JWT&lt;/a&gt; : Cognito access tokens are JWT, which are signed with &lt;a href=&quot;https://tools.ietf.org/html/rfc7517&quot;&gt;JWK&lt;/a&gt;. The JWT contains standard claims, but can also be extended to contain custom claims.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;In a typical set up, a User Pool will have a collection of users that have a means of authentication which is either custom or federated, Resource Server(s) which have protected data for those users, and Application Client(s) which will need to access that data on those users’ behalf. Managing this identity and access is self-contained in Cognito.&lt;/p&gt;
+
+&lt;h2 id=&quot;client-credentials-flow&quot;&gt;Client Credentials Flow&lt;/h2&gt;
+
+&lt;p&gt;While mentioning the terminology, I did not talk about server to server, or service to service identity much. This is where OAuth2 Client Credentials Flow comes in, and there is no user, or identity associated with the access request. The calling service obtains an access token, and the target service asserts that token to be valid before granting access to the protected data.&lt;/p&gt;
+
+&lt;p&gt;In this scenario, Cognito’s User Pool is merely a placeholder, as we will have no users. The only &lt;em&gt;user&lt;/em&gt; will be the app client. Before you think that we do not need a Domain as we will not be hosting any login pages, but we do. Instead of login pages, this domain will host the OAuth2 endpoint, &lt;code class=&quot;highlighter-rouge&quot;&gt;/oauth2/token&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;We will use the AWS CLI and not use the Console, but feel free to perform the same actions via the Console. Alternatively, you may want to just check the console after each step to learn more about the constructs.&lt;/p&gt;
+
+&lt;h2 id=&quot;aws-cli&quot;&gt;AWS CLI&lt;/h2&gt;
+
+&lt;p&gt;If you have seen my previous posts, I prefer &lt;a href=&quot;https://github.com/awslabs/aws-shell&quot;&gt;aws-shell&lt;/a&gt; over the plain CLI. But you can use the CLI by prefixing every command with &lt;code class=&quot;highlighter-rouge&quot;&gt;aws&lt;/code&gt;. Please ensure the credentials being used have policies allowing Cognito operations.&lt;/p&gt;
+
+&lt;h3 id=&quot;create-a-cognito-user-pool&quot;&gt;Create a Cognito User Pool&lt;/h3&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; cognito-idp create-user-pool --pool-name myblog
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;This will produce a large JSON output. We can verify by listing the user pools, like so.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; cognito-idp list-user-pools --max-results 10
+
+  {
+      &quot;UserPools&quot;: [
+          {
+              &quot;Id&quot;: &quot;us-east-1_0Pe*****&quot;,
+              &quot;Name&quot;: &quot;myblog&quot;,
+              &quot;LambdaConfig&quot;: {},
+              &quot;LastModifiedDate&quot;: 1527786443.052,
+              &quot;CreationDate&quot;: 1527786443.052
+          }
+      ]
+  }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;Id&lt;/code&gt; of the user pool is very important, as everything we create from now on will need it.&lt;/p&gt;
+
+&lt;h3 id=&quot;create-a-resource-server&quot;&gt;Create a Resource Server&lt;/h3&gt;
+
+&lt;p&gt;The resource server acts as a placeholder for scopes. Imagine a service to manage transactions, which will have scopes like post and get transactions.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; cognito-idp create-resource-server --name transactions --identifier transactions --user-pool-id us-east-1_0Pe***** --scopes ScopeName=get,ScopeDescription=get_tx ScopeName=post,ScopeDescription=post_tx
+
+{
+    &quot;ResourceServer&quot;: {
+        &quot;UserPoolId&quot;: &quot;us-east-1_0Pe*****&quot;,
+        &quot;Identifier&quot;: &quot;transactions&quot;,
+        &quot;Name&quot;: &quot;transactions&quot;,
+        &quot;Scopes&quot;: [
+            {
+                &quot;ScopeName&quot;: &quot;post&quot;,
+                &quot;ScopeDescription&quot;: &quot;post_tx&quot;
+            },
+            {
+                &quot;ScopeName&quot;: &quot;get&quot;,
+                &quot;ScopeDescription&quot;: &quot;get_tx&quot;
+            }
+        ]
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h3 id=&quot;create-a-client-app&quot;&gt;Create a Client App&lt;/h3&gt;
+
+&lt;p&gt;Let us create a client who can only &lt;code class=&quot;highlighter-rouge&quot;&gt;post&lt;/code&gt; transactions by calling the transactions service. As you can see below, we configure this client to use &lt;code class=&quot;highlighter-rouge&quot;&gt;client_credentials&lt;/code&gt; grant, and restrict it to using only &lt;code class=&quot;highlighter-rouge&quot;&gt;transactions/post&lt;/code&gt; scope. The scopes are defined in &lt;code class=&quot;highlighter-rouge&quot;&gt;$resource_server_identifier/$scope_name&lt;/code&gt; format. Also notice the &lt;code class=&quot;highlighter-rouge&quot;&gt;--generate-secret&lt;/code&gt; argument, which will create a secret that we can use for our client credentials access token request.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; cognito-idp create-user-pool-client --user-pool-id us-east-1_0Pe***** --allowed-o-auth-flows client_credentials --client-name test --generate-secret --allowed-o-auth-scopes transactons/post --allowed-o-auth-flows-user-pool-client
+{
+    &quot;UserPoolClient&quot;: {
+        &quot;UserPoolId&quot;: &quot;us-east-1_0Pe*****&quot;,
+        &quot;ClientName&quot;: &quot;test&quot;,
+        &quot;ClientId&quot;: &quot;14aq5ll5b1it6f62uefe******&quot;,
+        &quot;ClientSecret&quot;: &quot;j22a2ha9httcbord******e4k29ra7s8026agrc89nhjg******&quot;,
+        &quot;LastModifiedDate&quot;: 1527806667.264,
+        &quot;CreationDate&quot;: 1527806667.264,
+        &quot;RefreshTokenValidity&quot;: 30,
+        &quot;AllowedOAuthFlows&quot;: [
+            &quot;client_credentials&quot;
+        ],
+        &quot;AllowedOAuthScopes&quot;: [
+            &quot;transactions/post&quot;
+        ],
+        &quot;AllowedOAuthFlowsUserPoolClient&quot;: true
+    }
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Note the &lt;code class=&quot;highlighter-rouge&quot;&gt;ClientId&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;ClientSecret&lt;/code&gt; in the response, as we’d need this to request an access token.&lt;/p&gt;
+
+&lt;h3 id=&quot;add-a-domain&quot;&gt;Add a Domain&lt;/h3&gt;
+
+&lt;p&gt;We will need to add a domain to this pool, so we can get a URL for &lt;code class=&quot;highlighter-rouge&quot;&gt;/oauth2/token&lt;/code&gt; endpoint. Notice that I used a fairly odd name, because these domain names are global (yes, as they generate a public URL), so a generic name like &lt;code class=&quot;highlighter-rouge&quot;&gt;test&lt;/code&gt; is probably already taken. Please use a name that is probably unique.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; cognito-idp create-user-pool-domain  --domain lobster1234 --user-pool-id us-east-1_0Pe*****
+{
+    &quot;DomainDescription&quot;: {
+        &quot;UserPoolId&quot;: &quot;us-east-1_0Pe*****&quot;,
+        &quot;AWSAccountId&quot;: &quot;***431494***&quot;,
+        &quot;Domain&quot;: &quot;lobster1234&quot;,
+        &quot;S3Bucket&quot;: &quot;aws-cognito-prod-iad-assets&quot;,
+        &quot;CloudFrontDistribution&quot;: &quot;d3oia8etllorh5.cloudfront.net&quot;,
+        &quot;Version&quot;: &quot;20180531225618&quot;,
+        &quot;Status&quot;: &quot;ACTIVE&quot;
+    }
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;The DNS may take some time to propagate, so the URL may not work for a while (Took me 15 mins).&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;This would translate into the OAuth2 URL as &lt;code class=&quot;highlighter-rouge&quot;&gt;https://lobster1234.auth.us-east-1.amazoncognito.com/oauth2/token&lt;/code&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;get-an-access-token&quot;&gt;Get an Access Token&lt;/h3&gt;
+
+&lt;p&gt;Notice that I am using HTTP Basic to send the &lt;code class=&quot;highlighter-rouge&quot;&gt;client_id&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;client_secret&lt;/code&gt;. This is &lt;code class=&quot;highlighter-rouge&quot;&gt;base64(ClientId:ClientSecret)&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;If you have &lt;code class=&quot;highlighter-rouge&quot;&gt;base64&lt;/code&gt; utility installed, you can use it, like so, replacing &lt;code class=&quot;highlighter-rouge&quot;&gt;x&lt;/code&gt; with &lt;code class=&quot;highlighter-rouge&quot;&gt;ClientId&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;y&lt;/code&gt; with &lt;code class=&quot;highlighter-rouge&quot;&gt;ClientSecret&lt;/code&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ echo 'x:y' |  base64
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Once you have the base64 encoded HTTP Basic Authorization header, you can request the access token.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ curl -X POST \
+  https://lobster1234.auth.us-east-1.amazoncognito.com/oauth2/token \
+  -H 'authorization: Basic ***********iMWl0NmY2MnVlZmVtNmFxaG46ajIyYTJ******HRjYm9yZGtucHR0Z2U0azI5cmE3czgwMjZhZ3J***************' \
+  -H 'content-type: application/x-www-form-urlencoded' \
+  -d 'grant_type=client_credentials&amp;amp;scope=transactions%2Fpost'
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;This should return an &lt;code class=&quot;highlighter-rouge&quot;&gt;access_token&lt;/code&gt;, which is a JWT.&lt;/p&gt;
+
+&lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;{
+    &quot;access_token&quot;: &quot;******************.eyJzdWIiOiIxNGFxNWxsNWIxaXQ2ZjYydWVmZW02YXFobiIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoidGVzdFwvZm9vIiwiYXV0aF90aW1lIjoxNTI3ODE3MzY2LCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb21cL3VzLWVhc3QtMV83RThJc3hDR0MiLCJleHAiOjE1Mjc4MjA5NjYsImlhdCI6MTUyNzgxNzM2NiwidmVyc2lvbiI6MiwianRpIjoiYWVlZWY1MGEtYjNiNS00MjAxLTlhOGYtOGI1ZjYzYTBlYmNjIiwiY2xpZW50X2lkIjoiMTRhcTVsbDViMWl0NmY2MnVlZmVtNmFxaG4ifQ.LaWN4NEUrR_2gGANnDx8zINMZteR7-E_moskq__zai5BLNpiCBnVtoLHwVH3FvDFVVesMCBmD02dRhZqXkttxEMUmetFybDtEkH2KWbalOmKvibl5JuPyQEqZ5S4DN9ZUZAqv3X48F2e0Eshck-*******************-0aDBMaMtJU-QMfeFJkN2UgKQhtzi2dbLBB06dQEd6gcxh-*****************&quot;,
+    &quot;expires_in&quot;: 3600,
+    &quot;token_type&quot;: &quot;Bearer&quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;validate-the-access-token&quot;&gt;Validate the Access Token&lt;/h3&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;This section would need familiarity with JWT, JWK, and a bit of encryption standards.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;When a service calls the transactions service with this Bearer token in the &lt;code class=&quot;highlighter-rouge&quot;&gt;Authorization&lt;/code&gt; header, the token would need to be validated. There are several libraries available to do so. The JWT is base64 encoded, and signed. It may be encrypted as well, as is done in a lot of financial/sensitive use cases.&lt;/p&gt;
+
+&lt;p&gt;To peek in the access token, you may paste it in &lt;a href=&quot;https://jwt.io&quot;&gt;jtw.io&lt;/a&gt;. You’ll see the following as the token is decoded.&lt;/p&gt;
+
+&lt;p&gt;Header&lt;/p&gt;
+&lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;{
+  &quot;kid&quot;: &quot;Lkek/Dt3d7ibTkq4Pz2LKpmIKTu5mR6A++DRfvmu5Vw=&quot;,
+  &quot;alg&quot;: &quot;RS256&quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Payload&lt;/p&gt;
+&lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;{
+  &quot;sub&quot;: &quot;14aq5ll5b1it6f62uefe******&quot;,
+  &quot;token_use&quot;: &quot;access&quot;,
+  &quot;scope&quot;: &quot;transactions/post&quot;,
+  &quot;auth_time&quot;: 1527809373,
+  &quot;iss&quot;: &quot;https://cognito-idp.us-east-1.amazonaws.com/us-east-1_0Pe*****&quot;&quot;,
+  &quot;exp&quot;: 1527812973,
+  &quot;iat&quot;: 1527809373,
+  &quot;version&quot;: 2,
+  &quot;jti&quot;: &quot;864ec9c6-f3c9-4e3c-b9e1-dfe21e167e1e&quot;,
+  &quot;client_id&quot;: &quot;14aq5ll5b1it6f62uefe******&quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;If you need to perform signature validation, there is some extra effort.&lt;/p&gt;
+
+&lt;p&gt;Cognito uses JWK to sign the token. In order to see the keys, visit https://cognito-idp.us-east-1.amazonaws.com/uus-east-1&lt;em&gt;0Pe*****/.well-known/jwks.json. This has the list of keys that Cognito would use to sign the access tokens. It is also known as JWKS - _JSON Web Key Set&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;To verify the signature, you’d need to convert the JWK to PEM. I used node to do so. From that URL, copy the key identified by the &lt;code class=&quot;highlighter-rouge&quot;&gt;kid&lt;/code&gt; in the access token’s header.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ npm install jsonwebtoken
+$ npm install jwk-to-pem
+&amp;gt; node
+&amp;gt; var jwkToPem = require('jwk-to-pem'),
+...     jwt = require('jsonwebtoken');
+undefined
+&amp;gt; var jwk = {&quot;alg&quot;:&quot;RS256&quot;,&quot;e&quot;:&quot;AQAB&quot;,&quot;kid&quot;:&quot;Lkek/Dt3d7ibTkq4Pz2LKpmIKTu5mR6A++DRfvmu5Vw=&quot;,&quot;kty&quot;:&quot;RSA&quot;,&quot;n&quot;:&quot;lyZWsratUxICSfYTCH2gblgUvCpBmYUacNXfQ_3Ygk8mnKaDtkXfb8uVrWwj3Eqdv_hjDYPsYLzYiinjYrLGpFgzxwZbUYXFC49bxQOal28J2emDTiWOAYKC0a_glzcwKf74AWPeBZ8PRNOR6OPLwxnoKQ6PoKGcjonoJdydx-****************************-HJVSW1oS7_uJY-6qLQN4IPzXbaHzy9iJgTDbnd6f-htneHegoLHlSmEfYgnJ_jJBsXwXFAYVm9JLiDyhdZOl-*************************&quot;,&quot;use&quot;:&quot;sig&quot;}
+undefined
+&amp;gt; pem = jwkToPem(jwk)
+'-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlyZWsratUxICSfYTCH2g\nblgUvCpBmYUacNXfQ/3Ygk8mnKaDtkXfb8uVrWwj3Eqdv/hjDYPsYLzYiinjYrLG\npFgzxwZbUYXFC49bxQOal28J2emDTiWOAYKC0a/glzcwKf74AWPeBZ8PRNOR6OPL\nwxnoKQ6PoKGcjonoJdydx+YhROgpj92w4kABlxuP91eht+HJVSW1oS7/uJY+6qLQ\nN4IPzXbaHzy9iJgTDbnd6f+htneHegoLHlSmEfYgnJ/jJBsXwXFAYVm9JLiDyhdZ\nOl+aSpSPQjXprlHz3Ksln5D8/Ic7yiQLtPostlZEovc0dzqGND2Hr686B1CkbGqZ\nnwIDAQAB\n-----END PUBLIC KEY-----\n'
+&amp;gt; console.log(pem)
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlyZWsratUxICSfYTCH2g
+blgUvCpBmYUacNXfQ/3Ygk8mnKaDtkXfb8uVrWwj3Eqdv/hjDYPsYLzYiinjYrLG
+pFgzxwZbUYXFC49bxQOal28J2emDTiWOAYKC0a/glzcwKf74AWPeBZ8PRNOR6OPL
+wxnoKQ6PoKGcjonoJdydx+YhROgpj92w4kABlxuP91eht+HJVSW1oS7/uJY+6qLQ
+N4IPzXbaHzy9iJgTDbnd6f+htneHegoLHlSmEfYgnJ/jJBsXwXFAYVm9JLiDyhdZ
+Ol+aSpSPQjXprlHz3Ksln5D8/Ic7yiQLtPostlZEovc0dzqGND2Hr686B1CkbGqZ
+nwIDAQAB
+-----END PUBLIC KEY-----
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Now copy the pem, and paste it on jwt.io under “Verify Signature” section.&lt;/p&gt;
+
+&lt;p&gt;If everything goes well, you’ll notice a “Signature Verified” message show up instead of “Invalid Signature”.&lt;/p&gt;
+
+&lt;p&gt;This has to be done programmatically by the service that receives the access token along with an authenticated request for protected resources. Again, plenty of libraries available to do so. They’re listed on the jwt.io homepage.&lt;/p&gt;
+
+&lt;h3 style=&quot;text-align: center&quot; id=&quot;comments&quot;&gt;Comments&lt;/h3&gt;
+
+&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = &quot;https://lobster1234.github.io/2018/05/31/server-to-server-auth-with-amazon-cognito/&quot;;  
+this.page.identifier = &quot;/2018/05/31/server-to-server-auth-with-amazon-cognito&quot;;
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://lobster1234.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+&lt;/script&gt;
+
+&lt;noscript&gt;Please enable JavaScript to view the &lt;a href=&quot;https://disqus.com/?ref_noscript&quot;&gt;comments powered by Disqus.&lt;/a&gt;&lt;/noscript&gt;
+
+&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+
+
+      
+
+&lt;/script&gt;</content>
+
+      
+      
+      
+      
+      
+
+      
+        <author>
+            <name>Manish Pandit</name>
+          
+          
+        </author>
+      
+
+      
+        <category term="aws" />
+      
+
+      
+
+      
+        <summary type="html">Amazon Cognito is a hosted service that provides federated identity, access controls, and user management with multi-factor authentication for web and mobile applications. The service is very rich - any application developer can set up the signup and login process with a few clicks in Amazon Cognito Console by federating with identity providers such as Google, Facebook, Twitter, etc. One of the best features of Cognito is Lambda integration (Triggers), which allows Lambda invocation on events like pre-signup, pre and post authentication, etc. In this post I will walk through a not so fancy, yet very useful Cognito feature - which is server to server authentication. This is one of the most common scenarios in a microservices world, where services need to talk to other services securely, and using an established standard such as OAuth2. This is also known as client_credentials Grant, or 2-legged OAuth. Amazon Cognito provides a simple and cost effective option to implement it.</summary>
+      
+
+      
+      
+    </entry>
+  
+  
+  
+    <entry>
+      
       <title type="html">IP Whitelisting with Amazon API Gateway</title>
       
+      
       <link href="https://lobster1234.github.io/2018/04/14/amazon-api-gateway-ip-whitelisting/" rel="alternate" type="text/html" title="IP Whitelisting with Amazon API Gateway" />
+      
       <published>2018-04-14T00:44:37-07:00</published>
       <updated>2018-04-14T00:44:37-07:00</updated>
       <id>https://lobster1234.github.io/2018/04/14/amazon-api-gateway-ip-whitelisting</id>
@@ -215,7 +529,9 @@ s.setAttribute('data-timestamp', +new Date());
       
       <title type="html">Running ElasticMQ in ECS</title>
       
+      
       <link href="https://lobster1234.github.io/2018/04/01/elasticmq-docker-ecs/" rel="alternate" type="text/html" title="Running ElasticMQ in ECS" />
+      
       <published>2018-04-01T00:44:37-07:00</published>
       <updated>2018-04-01T00:44:37-07:00</updated>
       <id>https://lobster1234.github.io/2018/04/01/elasticmq-docker-ecs</id>
@@ -489,7 +805,9 @@ s.setAttribute('data-timestamp', +new Date());
       
       <title type="html">Disaster Recovery and Reliability</title>
       
+      
       <link href="https://lobster1234.github.io/2018/03/25/disaster-recovery-hybrid-cloud/" rel="alternate" type="text/html" title="Disaster Recovery and Reliability" />
+      
       <published>2018-03-25T00:44:37-07:00</published>
       <updated>2018-03-25T00:44:37-07:00</updated>
       <id>https://lobster1234.github.io/2018/03/25/disaster-recovery-hybrid-cloud</id>
@@ -566,7 +884,9 @@ s.setAttribute('data-timestamp', +new Date());
       
       <title type="html">OAuth2 Primer</title>
       
+      
       <link href="https://lobster1234.github.io/2018/03/19/oauth2-primer/" rel="alternate" type="text/html" title="OAuth2 Primer" />
+      
       <published>2018-03-19T00:44:37-07:00</published>
       <updated>2018-03-19T00:44:37-07:00</updated>
       <id>https://lobster1234.github.io/2018/03/19/oauth2-primer</id>
@@ -643,7 +963,9 @@ s.setAttribute('data-timestamp', +new Date());
       
       <title type="html">Multiple Functions in Serverless Framework with Java</title>
       
+      
       <link href="https://lobster1234.github.io/2017/12/26/serverless-java-multiple-functions/" rel="alternate" type="text/html" title="Multiple Functions in Serverless Framework with Java" />
+      
       <published>2017-12-26T22:44:37-08:00</published>
       <updated>2017-12-26T22:44:37-08:00</updated>
       <id>https://lobster1234.github.io/2017/12/26/serverless-java-multiple-functions</id>
@@ -925,7 +1247,9 @@ s.setAttribute('data-timestamp', +new Date());
       
       <title type="html">HTTP/S Proxy Server for AWS Lambda Invocations</title>
       
+      
       <link href="https://lobster1234.github.io/2017/12/14/aws-lambda-http-proxy/" rel="alternate" type="text/html" title="HTTP/S Proxy Server for AWS Lambda Invocations" />
+      
       <published>2017-12-14T22:44:37-08:00</published>
       <updated>2017-12-14T22:44:37-08:00</updated>
       <id>https://lobster1234.github.io/2017/12/14/aws-lambda-http-proxy</id>
@@ -1220,7 +1544,9 @@ s.setAttribute('data-timestamp', +new Date());
       
       <title type="html">Run tasks with AWS Fargate and Lambda</title>
       
+      
       <link href="https://lobster1234.github.io/2017/12/03/run-tasks-with-aws-fargate-and-lambda/" rel="alternate" type="text/html" title="Run tasks with AWS Fargate and Lambda" />
+      
       <published>2017-12-03T22:44:37-08:00</published>
       <updated>2017-12-03T22:44:37-08:00</updated>
       <id>https://lobster1234.github.io/2017/12/03/run-tasks-with-aws-fargate-and-lambda</id>
@@ -1517,7 +1843,9 @@ s.setAttribute('data-timestamp', +new Date());
       
       <title type="html">Scale By the Bay - Immutable AWS Deployments with Packer and Jenkins</title>
       
+      
       <link href="https://lobster1234.github.io/2017/11/17/immutable-aws-deployments-with-packer-and-jenkins/" rel="alternate" type="text/html" title="Scale By the Bay - Immutable AWS Deployments with Packer and Jenkins" />
+      
       <published>2017-11-17T12:44:37-08:00</published>
       <updated>2017-11-17T12:44:37-08:00</updated>
       <id>https://lobster1234.github.io/2017/11/17/immutable-aws-deployments-with-packer-and-jenkins</id>
@@ -1574,7 +1902,9 @@ s.setAttribute('data-timestamp', +new Date());
       
       <title type="html">Amazon Aurora Notes</title>
       
+      
       <link href="https://lobster1234.github.io/2017/11/03/amazon-aurora-rds-notes/" rel="alternate" type="text/html" title="Amazon Aurora Notes" />
+      
       <published>2017-11-03T13:44:37-07:00</published>
       <updated>2017-11-03T13:44:37-07:00</updated>
       <id>https://lobster1234.github.io/2017/11/03/amazon-aurora-rds-notes</id>
@@ -1777,7 +2107,9 @@ s.setAttribute('data-timestamp', +new Date());
       
       <title type="html">Fanout SNS-SQS Gotcha</title>
       
+      
       <link href="https://lobster1234.github.io/2017/10/14/fan-out-with-sns-and-sqs-gotcha/" rel="alternate" type="text/html" title="Fanout SNS-SQS Gotcha" />
+      
       <published>2017-10-14T13:44:37-07:00</published>
       <updated>2017-10-14T13:44:37-07:00</updated>
       <id>https://lobster1234.github.io/2017/10/14/fan-out-with-sns-and-sqs-gotcha</id>
@@ -1976,7 +2308,9 @@ s.setAttribute('data-timestamp', +new Date());
       
       <title type="html">Logstash logging with AWS Lambda</title>
       
+      
       <link href="https://lobster1234.github.io/2017/10/10/logstash-with-aws-lambda/" rel="alternate" type="text/html" title="Logstash logging with AWS Lambda" />
+      
       <published>2017-10-10T13:44:37-07:00</published>
       <updated>2017-10-10T13:44:37-07:00</updated>
       <id>https://lobster1234.github.io/2017/10/10/logstash-with-aws-lambda</id>
@@ -2175,7 +2509,9 @@ s.setAttribute('data-timestamp', +new Date());
       
       <title type="html">SVCC 2017 - AWS Lambda with Serverless Framework and Java</title>
       
+      
       <link href="https://lobster1234.github.io/2017/10/07/aws-lambda-with-serverless-framework-and-java/" rel="alternate" type="text/html" title="SVCC 2017 - AWS Lambda with Serverless Framework and Java" />
+      
       <published>2017-10-07T13:44:37-07:00</published>
       <updated>2017-10-07T13:44:37-07:00</updated>
       <id>https://lobster1234.github.io/2017/10/07/aws-lambda-with-serverless-framework-and-java</id>
@@ -2236,7 +2572,9 @@ s.setAttribute('data-timestamp', +new Date());
       
       <title type="html">AWS KMS and Envelope Encryption</title>
       
+      
       <link href="https://lobster1234.github.io/2017/09/29/aws-kms-envelope-encryption/" rel="alternate" type="text/html" title="AWS KMS and Envelope Encryption" />
+      
       <published>2017-09-29T23:44:37-07:00</published>
       <updated>2017-09-29T23:44:37-07:00</updated>
       <id>https://lobster1234.github.io/2017/09/29/aws-kms-envelope-encryption</id>
@@ -2479,7 +2817,9 @@ s.setAttribute('data-timestamp', +new Date());
       
       <title type="html">Using Amazon EC2 Container Service</title>
       
+      
       <link href="https://lobster1234.github.io/2017/08/22/aws-ecs-notes/" rel="alternate" type="text/html" title="Using Amazon EC2 Container Service" />
+      
       <published>2017-08-22T23:44:37-07:00</published>
       <updated>2017-08-22T23:44:37-07:00</updated>
       <id>https://lobster1234.github.io/2017/08/22/aws-ecs-notes</id>
@@ -2746,7 +3086,9 @@ s.setAttribute('data-timestamp', +new Date());
       
       <title type="html">Apache Nutch - Step by Step</title>
       
+      
       <link href="https://lobster1234.github.io/2017/08/14/search-with-nutch-mongodb-solr/" rel="alternate" type="text/html" title="Apache Nutch - Step by Step" />
+      
       <published>2017-08-14T23:44:37-07:00</published>
       <updated>2017-08-14T23:44:37-07:00</updated>
       <id>https://lobster1234.github.io/2017/08/14/search-with-nutch-mongodb-solr</id>
@@ -3060,7 +3402,9 @@ s.setAttribute('data-timestamp', +new Date());
       
       <title type="html">Caching - Gotchas &amp;amp; Lessons Learned</title>
       
+      
       <link href="https://lobster1234.github.io/2017/07/05/caching-gotchas-and-lessons-learned/" rel="alternate" type="text/html" title="Caching - Gotchas &amp; Lessons Learned" />
+      
       <published>2017-07-05T23:44:37-07:00</published>
       <updated>2017-07-05T23:44:37-07:00</updated>
       <id>https://lobster1234.github.io/2017/07/05/caching-gotchas-and-lessons-learned</id>
@@ -3188,7 +3532,9 @@ s.setAttribute('data-timestamp', +new Date());
       
       <title type="html">Boto 3 and SQS</title>
       
+      
       <link href="https://lobster1234.github.io/2017/06/25/boto-and-sqs/" rel="alternate" type="text/html" title="Boto 3 and SQS" />
+      
       <published>2017-06-25T23:44:37-07:00</published>
       <updated>2017-06-25T23:44:37-07:00</updated>
       <id>https://lobster1234.github.io/2017/06/25/boto-and-sqs</id>
@@ -3307,7 +3653,9 @@ Requires: s3transfer, jmespath, botocore
       
       <title type="html">Python Primer for Java Developers</title>
       
+      
       <link href="https://lobster1234.github.io/2017/05/25/python-java-primer/" rel="alternate" type="text/html" title="Python Primer for Java Developers" />
+      
       <published>2017-05-25T23:44:37-07:00</published>
       <updated>2017-05-25T23:44:37-07:00</updated>
       <id>https://lobster1234.github.io/2017/05/25/python-java-primer</id>
@@ -3886,7 +4234,9 @@ If n is even and greater than 20 , print Not Weird
       
       <title type="html">Get Started on Google Cloud with CLI</title>
       
+      
       <link href="https://lobster1234.github.io/2017/05/14/get-started-on-google-cloud-with-cli/" rel="alternate" type="text/html" title="Get Started on Google Cloud with CLI" />
+      
       <published>2017-05-14T23:44:37-07:00</published>
       <updated>2017-05-14T23:44:37-07:00</updated>
       <id>https://lobster1234.github.io/2017/05/14/get-started-on-google-cloud-with-cli</id>
@@ -4279,136 +4629,6 @@ gcloud&amp;gt;
 
       
         <summary type="html">After working with Amazon Web Services for a few years, I decided to take Google Cloud Platform for a spin. In this post we will get set up with Google Cloud Platform (GCP), and use the CLI to interact with it for a very basic use case (launch, delete an instance). I will also refer to AWS counterpart(s) as and when it makes sense. The idea is to conceptualize automated creation and teardown of entire environments using the idea of projects in GCP.</summary>
-      
-
-      
-      
-    </entry>
-  
-  
-  
-    <entry>
-      
-      <title type="html">Migrating a Domain to Amazon Route53</title>
-      
-      <link href="https://lobster1234.github.io/2017/05/10/migrating-a-domain-to-amazon-route53/" rel="alternate" type="text/html" title="Migrating a Domain to Amazon Route53" />
-      <published>2017-05-10T23:44:37-07:00</published>
-      <updated>2017-05-10T23:44:37-07:00</updated>
-      <id>https://lobster1234.github.io/2017/05/10/migrating-a-domain-to-amazon-route53</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2017/05/10/migrating-a-domain-to-amazon-route53/">&lt;p&gt;&lt;a href=&quot;https://aws.amazon.com/route53/&quot; target=&quot;_blank_&quot;&gt;Amazon Route53&lt;/a&gt; is a highly available and scalable DNS service. Route53 provides Domain Registrations and Transfers, DNS service to route traffic to the infrastructure (either within AWS or non-AWS), advanced routing policies like weighted and geo, and health check services that can be leveraged to perform traffic routing to different destination in the event of a failure. It provides more flexibility and seamless integration with AWS Services than any other DNS host can.&lt;/p&gt;
-
-&lt;p&gt;One of the most common scenarios is the need to send traffic from a site registered at non-Route53 providers to an ELB, which Route53 supports via an &lt;a href=&quot;http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resource-record-sets-choosing-alias-non-alias.html&quot; target=&quot;_blank_&quot;&gt;Alias Record&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;In this post we will discuss moving the DNS - where requests to a domain hosted on a non-Route53 provider would resolve to Route53, and then point to an ELB which could be hosting a web property. However, the destination does not have to be an ELB, it can be any public IP. The other part is that of the Domain Registration itself, which can be transferred to Route53 if needed.&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;&lt;strong&gt;Always move DNS before transferring the domain registration to avoid any outage during the transition.&lt;/strong&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;We will use a GoDaddy registered domain, which needs to resolve to an ELB which is fronting a Web Application.&lt;/p&gt;
-
-&lt;p&gt;If your provider is different, then these steps may not match 1:1 but will be similar.&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;
-    &lt;p&gt;Log in to the AWS Console, and search for &lt;strong&gt;Route53&lt;/strong&gt; on the landing page. Click the service name.
-&lt;img src=&quot;https://lobster1234.github.io/assets/dns-1.png&quot; alt=&quot;dns-1&quot; /&gt;&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Click the &lt;strong&gt;Get Started Now&lt;/strong&gt; under the &lt;strong&gt;DNS Management&lt;/strong&gt; section.
-&lt;img src=&quot;https://lobster1234.github.io/assets/dns-2.png&quot; alt=&quot;dns-2&quot; /&gt;&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Click the &lt;strong&gt;Create Hosted Zone&lt;/strong&gt; Button.
-&lt;img src=&quot;https://lobster1234.github.io/assets/dns-3.png&quot; alt=&quot;dns-3&quot; /&gt;&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;A form will show up in the right panel. Enter your domain name (skip the &lt;code class=&quot;highlighter-rouge&quot;&gt;www&lt;/code&gt;), and an optional description. Keep the &lt;code class=&quot;highlighter-rouge&quot;&gt;Public Hosted Zone&lt;/code&gt; selected. Click &lt;strong&gt;Create&lt;/strong&gt;.
-&lt;img src=&quot;https://lobster1234.github.io/assets/dns-4.png&quot; alt=&quot;dns-4&quot; /&gt;&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Once done, you will see the zone details, with only an &lt;code class=&quot;highlighter-rouge&quot;&gt;NS&lt;/code&gt; record set and a &lt;code class=&quot;highlighter-rouge&quot;&gt;SOA&lt;/code&gt; record set. &lt;code class=&quot;highlighter-rouge&quot;&gt;NS&lt;/code&gt; has a list of name servers, and &lt;code class=&quot;highlighter-rouge&quot;&gt;SOA&lt;/code&gt; is the &lt;code class=&quot;highlighter-rouge&quot;&gt;Start of Authority&lt;/code&gt; record, which at a minimum contains the primary name server host name. You will notice this is usually the first name server address from the &lt;code class=&quot;highlighter-rouge&quot;&gt;NS&lt;/code&gt; record record set. You can read more information on various DNS record set types &lt;a href=&quot;https://en.wikipedia.org/wiki/List_of_DNS_record_types&quot; target=&quot;_blank_&quot;&gt;here&lt;/a&gt;.
-&lt;img src=&quot;https://lobster1234.github.io/assets/dns-5.png&quot; alt=&quot;dns-5&quot; /&gt;&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Next, we need to add our record sets from GoDaddy to this hosted zone. To do this, we login to GoDaddy, click on &lt;strong&gt;Manage DNS&lt;/strong&gt; under the &lt;strong&gt;Domain&lt;/strong&gt; being moved.
-&lt;img src=&quot;https://lobster1234.github.io/assets/dns-13.png&quot; alt=&quot;dns-13&quot; /&gt;&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Scroll all the way down and notice a section called &lt;strong&gt;Advanced Features&lt;/strong&gt;. Click the link that says &lt;strong&gt;Export Zone File (Unix)&lt;/strong&gt;.
-&lt;img src=&quot;https://lobster1234.github.io/assets/dns-6.png&quot; alt=&quot;dns-6&quot; /&gt;&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Notice a file &lt;code class=&quot;highlighter-rouge&quot;&gt;your_domain_name.txt&lt;/code&gt; that has been downloaded. Open that file in any text editor of your choice.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Now come back to the &lt;strong&gt;Route 53&lt;/strong&gt; page with the &lt;strong&gt;Hosted Zone&lt;/strong&gt;, and click &lt;strong&gt;Import Zone File&lt;/strong&gt; at the top. A form will open up on the right. Copy and paste the contents of the &lt;code class=&quot;highlighter-rouge&quot;&gt;your_domain_name.txt&lt;/code&gt; file in this section, and click &lt;strong&gt;Import&lt;/strong&gt; button.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Click refresh at the top right or just refresh your browser and you’ll notice a much bigger list of record sets in the hosted domain. These have been imported from the GoDaddy Zone File.
-&lt;img src=&quot;https://lobster1234.github.io/assets/dns-7.png&quot; alt=&quot;dns-7&quot; /&gt;&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Now, we just need to point the Name Servers listed in GoDaddy for our Domain to Amazon’s. To do this, go to GoDaddy, and just above &lt;strong&gt;Advanced Features&lt;/strong&gt;, look for a section called &lt;strong&gt;Nameservers&lt;/strong&gt;.
-&lt;img src=&quot;https://lobster1234.github.io/assets/dns-9.png&quot; alt=&quot;dns-9&quot; /&gt;&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Click &lt;strong&gt;Change&lt;/strong&gt;&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Select &lt;strong&gt;Custom&lt;/strong&gt;
-&lt;img src=&quot;https://lobster1234.github.io/assets/dns-10.png&quot; alt=&quot;dns-10&quot; /&gt;&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Go back to &lt;strong&gt;Route 53&lt;/strong&gt;, and Notice the &lt;strong&gt;NS&lt;/strong&gt; type record in the Route53 recordset list.
-&lt;img src=&quot;https://lobster1234.github.io/assets/dns-8.png&quot; alt=&quot;dns-8&quot; /&gt;&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Copy paste the name servers from the &lt;strong&gt;NS&lt;/strong&gt; Type recordset one by one in the GoDaddy custom list. You will need to click &lt;strong&gt;Add Nameserver&lt;/strong&gt; twice to add 2 more rows for a total of 4 Amazon Nameservers.
-&lt;img src=&quot;https://lobster1234.github.io/assets/dns-11.png&quot; alt=&quot;dns-11&quot; /&gt;
-Click &lt;strong&gt;Save&lt;/strong&gt;.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;For ELB - Come back to the &lt;strong&gt;Route 53&lt;/strong&gt; page, and click the &lt;strong&gt;A&lt;/strong&gt; Type. On the right side, it will show an IPv4 Address. If you wish to change that to an ELB DNS, check the box that says &lt;strong&gt;Yes&lt;/strong&gt; for &lt;strong&gt;Alias&lt;/strong&gt;, and enter your ELB’s DNS name (A Record) as the &lt;strong&gt;Alias Target&lt;/strong&gt;. If there is no ELB, then the imported &lt;strong&gt;A&lt;/strong&gt; type record should already have a public IP address of your site, and no changes are needed.
-&lt;img src=&quot;https://lobster1234.github.io/assets/dns-12.png&quot; alt=&quot;dns-12&quot; /&gt;&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Give it a few minutes and keep verifying the name server change by using &lt;a href=&quot;http://dnscheck.pingdom.com/&quot; target=&quot;_blank_&quot;&gt;this excellent service by Pingdom&lt;/a&gt;. Enter your domain name, and if everything worked, you will notice the Amazon Nameservers show up under the &lt;strong&gt;Nameservers&lt;/strong&gt; section on the test results page. If you still see Godaddy’s &lt;code class=&quot;highlighter-rouge&quot;&gt;*.domaincontrol.com&lt;/code&gt; then give it a while and retry.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Once you see the Amazon Nameservers in this test, You should be all set! You can now choose to transfer your domain ownership from GoDaddy to Route53, but that is entirely optional.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;Pricing&lt;/strong&gt; - You will pay 50 cents a month for the first 25 hosted zones, and 40 cents for a billion DNS queries a month. More advanced features (healthchecks, routing policies) carry extra configuration and costs.&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;</content>
-
-      
-      
-      
-      
-      
-
-      
-        <author>
-            <name>Manish Pandit</name>
-          
-          
-        </author>
-      
-
-      
-        <category term="aws" />
-      
-        <category term="route53" />
-      
-
-      
-
-      
-        <summary type="html">Amazon Route53 is a highly available and scalable DNS service. Route53 provides Domain Registrations and Transfers, DNS service to route traffic to the infrastructure (either within AWS or non-AWS), advanced routing policies like weighted and geo, and health check services that can be leveraged to perform traffic routing to different destination in the event of a failure. It provides more flexibility and seamless integration with AWS Services than any other DNS host can. One of the most common scenarios is the need to send traffic from a site registered at non-Route53 providers to an ELB, which Route53 supports via an Alias Record. In this post we will discuss moving the DNS - where requests to a domain hosted on a non-Route53 provider would resolve to Route53, and then point to an ELB which could be hosting a web property. However, the destination does not have to be an ELB, it can be any public IP. The other part is that of the Domain Registration itself, which can be transferred to Route53 if needed.</summary>
       
 
       

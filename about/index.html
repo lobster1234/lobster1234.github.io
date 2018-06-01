@@ -35,15 +35,12 @@
   WebFontConfig = {
     google: { families: [ 'Bitter:400,700,400italic:latin' ] }
   };
-  (function() {
-    var wf = document.createElement('script');
-    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
-      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
-    wf.type = 'text/javascript';
-    wf.async = 'true';
-    var s = document.getElementsByTagName('script')[0];
+  (function(d) {
+    var wf = d.createElement('script'), s = d.scripts[0];
+    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
+    wf.async = true;
     s.parentNode.insertBefore(wf, s);
-  })();
+  })(document);
 </script>
 
   
@@ -60,8 +57,9 @@
   </script>
 
 
-  <!-- Begin Jekyll SEO tag v2.2.0 -->
+  <!-- Begin Jekyll SEO tag v2.4.0 -->
 <title>About | Manish Pandit’s Blog</title>
+<meta name="generator" content="Jekyll v3.4.3" />
 <meta property="og:title" content="About" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
@@ -71,14 +69,7 @@
 <meta property="og:url" content="https://lobster1234.github.io/about/" />
 <meta property="og:site_name" content="Manish Pandit’s Blog" />
 <script type="application/ld+json">
-{"@context": "http://schema.org",
-"@type": "WebSite",
-"name": "Manish Pandit’s Blog",
-"headline": "About",
-"author": {"@type": "Person",
-"name": "Manish Pandit"},
-"description": "A tech blog with gists, code, presentations, tutorials, and many goodies around programming, devops, cloud architectures, aws, google cloud platform, and infrastructure.",
-"url": "https://lobster1234.github.io/about/"}</script>
+{"name":"Manish Pandit’s Blog","description":"A tech blog with gists, code, presentations, tutorials, and many goodies around programming, devops, cloud architectures, aws, google cloud platform, and infrastructure.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"WebSite","url":"https://lobster1234.github.io/about/","headline":"About","@context":"http://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -125,6 +116,8 @@
 <p>I am on <a href="https://www.twitter.com/lobster1234" target="_blank">Twitter</a>,  <a href="https://www.linkedin.com/in/mpandit" target="_blank">LinkedIn</a>, and <a href="https://www.speakerdeck.com/mpandit" target="_blank">Speaker Deck</a>.</p>
 
   </div>
+
+  
 
 </article>
 

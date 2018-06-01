@@ -35,15 +35,12 @@
   WebFontConfig = {
     google: { families: [ 'Bitter:400,700,400italic:latin' ] }
   };
-  (function() {
-    var wf = document.createElement('script');
-    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
-      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
-    wf.type = 'text/javascript';
-    wf.async = 'true';
-    var s = document.getElementsByTagName('script')[0];
+  (function(d) {
+    var wf = d.createElement('script'), s = d.scripts[0];
+    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
+    wf.async = true;
     s.parentNode.insertBefore(wf, s);
-  })();
+  })(document);
 </script>
 
   
@@ -60,8 +57,9 @@
   </script>
 
 
-  <!-- Begin Jekyll SEO tag v2.2.0 -->
+  <!-- Begin Jekyll SEO tag v2.4.0 -->
 <title>Manish Pandit’s Blog | A tech blog with gists, code, presentations, tutorials, and many goodies around programming, devops, cloud architectures, aws, google cloud platform, and infrastructure.</title>
+<meta name="generator" content="Jekyll v3.4.3" />
 <meta property="og:title" content="Manish Pandit’s Blog" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
@@ -70,16 +68,9 @@
 <link rel="canonical" href="https://lobster1234.github.io/" />
 <meta property="og:url" content="https://lobster1234.github.io/" />
 <meta property="og:site_name" content="Manish Pandit’s Blog" />
-<link rel="next" href="https://lobster1234.github.io/posts/2/">
+<link rel="next" href="https://lobster1234.github.io/posts/2/" />
 <script type="application/ld+json">
-{"@context": "http://schema.org",
-"@type": "WebSite",
-"name": "Manish Pandit’s Blog",
-"headline": "Manish Pandit’s Blog",
-"author": {"@type": "Person",
-"name": "Manish Pandit"},
-"description": "A tech blog with gists, code, presentations, tutorials, and many goodies around programming, devops, cloud architectures, aws, google cloud platform, and infrastructure.",
-"url": "https://lobster1234.github.io/"}</script>
+{"name":"Manish Pandit’s Blog","description":"A tech blog with gists, code, presentations, tutorials, and many goodies around programming, devops, cloud architectures, aws, google cloud platform, and infrastructure.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"WebSite","url":"https://lobster1234.github.io/","headline":"Manish Pandit’s Blog","@context":"http://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -128,77 +119,187 @@
       <li>
         <header class="post-header">
           <h1 class="post-title">
+            <a class="post-link" href="/2018/05/31/server-to-server-auth-with-amazon-cognito/">Server to Server Auth with Amazon Cognito</a>
+          </h1>
+
+          <p class="post-meta">May 31, 2018 •  •
+  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/aws/">aws</a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+
+
+ •
+  
+
+</p>
+        </header>
+
+        <div class="post-content">
+          <p><a href="https://aws.amazon.com/cognito/">Amazon Cognito</a> is a hosted service that provides federated identity, access controls, and user management with multi-factor authentication for web and mobile applications. The service is very rich - any application developer can set up the signup and login process with a few clicks in Amazon Cognito Console by federating with identity providers such as Google, Facebook, Twitter, etc. One of the best features of Cognito is Lambda integration (<a href="https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-identity-pools-working-with-aws-lambda-triggers.html?icmpid=docs_cognito_console">Triggers</a>), which allows Lambda invocation on events like pre-signup, pre and post authentication, etc.</p>
+
+<p><img src="https://lobster1234.github.io/assets/cognito.png" alt="cognito" /></p>
+
+<p>In this post I will walk through a not so fancy, yet very useful Cognito feature - which is server to server authentication. This is one of the most common scenarios in a microservices world, where services need to talk to other services securely, and using an established standard such as <a href="https://oauth.net/2/">OAuth2</a>. This is also known as <a href="https://www.oauth.com/oauth2-servers/access-tokens/client-credentials/"><code class="highlighter-rouge">client_credentials</code> Grant</a>, or <code class="highlighter-rouge">2-legged OAuth</code>. Amazon Cognito provides a simple and cost effective option to implement it.</p>
+
+
+        </div>
+        
+          <p class="post-continue">
+            <a href="/2018/05/31/server-to-server-auth-with-amazon-cognito/">Read on &rarr;</a>
+          </p>
+        
+      </li>
+    
+      
+      
+
+      <li>
+        <header class="post-header">
+          <h1 class="post-title">
             <a class="post-link" href="/2018/04/14/amazon-api-gateway-ip-whitelisting/">IP Whitelisting with Amazon API Gateway</a>
           </h1>
 
-          <p class="post-meta">Apr 14, 2018 • 
-  
-  
-    
+          <p class="post-meta">Apr 14, 2018 •  •
   
     
-  
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/aws/">aws</a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/aws/">aws</a>
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
+
+
+ •
   
 
 </p>
@@ -227,74 +328,80 @@
             <a class="post-link" href="/2018/04/01/elasticmq-docker-ecs/">Running ElasticMQ in ECS</a>
           </h1>
 
-          <p class="post-meta">Apr 1, 2018 • 
-  
-  
-    
+          <p class="post-meta">Apr 1, 2018 •  •
   
     
-  
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/aws/">aws</a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/aws/">aws</a>
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
+
+
+ •
   
 
 </p>
@@ -323,74 +430,80 @@
             <a class="post-link" href="/2018/03/25/disaster-recovery-hybrid-cloud/">Disaster Recovery and Reliability</a>
           </h1>
 
-          <p class="post-meta">Mar 25, 2018 • 
-  
-  
-    
+          <p class="post-meta">Mar 25, 2018 •  •
   
     
-  
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/aws/">aws</a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/aws/">aws</a>
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
+
+
+ •
   
 
 </p>
@@ -420,74 +533,80 @@
             <a class="post-link" href="/2018/03/19/oauth2-primer/">OAuth2 Primer</a>
           </h1>
 
-          <p class="post-meta">Mar 19, 2018 • 
-  
-  
-    
+          <p class="post-meta">Mar 19, 2018 •  •
   
     
-  
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/oauth/">oauth</a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/oauth/">oauth</a>
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
+
+
+ •
   
 
 </p>
@@ -504,171 +623,6 @@
         
           <p class="post-continue">
             <a href="/2018/03/19/oauth2-primer/">Read on &rarr;</a>
-          </p>
-        
-      </li>
-    
-      
-      
-
-      <li>
-        <header class="post-header">
-          <h1 class="post-title">
-            <a class="post-link" href="/2017/12/26/serverless-java-multiple-functions/">Multiple Functions in Serverless Framework with Java</a>
-          </h1>
-
-          <p class="post-meta">Dec 26, 2017 • 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/aws/">aws</a>,
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/lambda/">lambda</a>
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-
-</p>
-        </header>
-
-        <div class="post-content">
-          <p><a href="https://serverless.com">Serverless Framework</a> is an excellent choice for writing and deploying Lambda Functions in AWS. Having written a <a href="https://lobster1234.github.io/categories/lambda/">blog series</a> on using it with Java8+Maven, I’ve been asked if there is a way to not have <em>too many</em> handlers (One per API), and somehow provide multiple handler functions in the same java class. In this post I provide the structure that’d allow for multiple handlers using a single Java class.</p>
-
-<p>This is particularly useful when the code is tightly coupled around a resource (CRUD) and writing a <em>handler</em> class for each of C, R, U, D seems un-necessary, like it should.</p>
-
-
-        </div>
-        
-          <p class="post-continue">
-            <a href="/2017/12/26/serverless-java-multiple-functions/">Read on &rarr;</a>
           </p>
         
       </li>

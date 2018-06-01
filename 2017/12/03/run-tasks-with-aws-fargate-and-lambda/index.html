@@ -35,15 +35,12 @@
   WebFontConfig = {
     google: { families: [ 'Bitter:400,700,400italic:latin' ] }
   };
-  (function() {
-    var wf = document.createElement('script');
-    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
-      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
-    wf.type = 'text/javascript';
-    wf.async = 'true';
-    var s = document.getElementsByTagName('script')[0];
+  (function(d) {
+    var wf = d.createElement('script'), s = d.scripts[0];
+    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
+    wf.async = true;
     s.parentNode.insertBefore(wf, s);
-  })();
+  })(document);
 </script>
 
   
@@ -60,8 +57,9 @@
   </script>
 
 
-  <!-- Begin Jekyll SEO tag v2.2.0 -->
+  <!-- Begin Jekyll SEO tag v2.4.0 -->
 <title>Run tasks with AWS Fargate and Lambda | Manish Pandit’s Blog</title>
+<meta name="generator" content="Jekyll v3.4.3" />
 <meta property="og:title" content="Run tasks with AWS Fargate and Lambda" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
@@ -74,17 +72,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2017-12-03T22:44:37-08:00" />
 <script type="application/ld+json">
-{"@context": "http://schema.org",
-"@type": "BlogPosting",
-"headline": "Run tasks with AWS Fargate and Lambda",
-"author": {"@type": "Person",
-"name": "Manish Pandit"},
-"image": "https://lobster1234.github.io/assets/fargate.png",
-"datePublished": "2017-12-03T22:44:37-08:00",
-"description": "As with any other financial company, at Marqeta, we have a good number of batch jobs, which we are migrating over to AWS Batch. However, even in managed mode, AWS Batch needs us to define Compute Environments, which are clusters of EC2 instances running ECS (and Docker) agents. AWS Fargate was announced very recently at re:Invent 2017. Fargate adds a layer of abstraction on top of the Compute Environment, or the ECS Cluster. We no longer have to worry about the AMI, EC2 types, task placement, etc. In this post I cover the POC done to use Fargate over AWS Batch for batch processing, but this can also be used as a tutorial for running any type of tasks using Fargate. We create an ECS Task definition, a Fargate Cluster, and a Lambda to run the task using CloudWatch Event trigger.",
-"mainEntityOfPage": {"@type": "WebPage",
-"@id": "https://lobster1234.github.io/2017/12/03/run-tasks-with-aws-fargate-and-lambda/"},
-"url": "https://lobster1234.github.io/2017/12/03/run-tasks-with-aws-fargate-and-lambda/"}</script>
+{"description":"As with any other financial company, at Marqeta, we have a good number of batch jobs, which we are migrating over to AWS Batch. However, even in managed mode, AWS Batch needs us to define Compute Environments, which are clusters of EC2 instances running ECS (and Docker) agents. AWS Fargate was announced very recently at re:Invent 2017. Fargate adds a layer of abstraction on top of the Compute Environment, or the ECS Cluster. We no longer have to worry about the AMI, EC2 types, task placement, etc. In this post I cover the POC done to use Fargate over AWS Batch for batch processing, but this can also be used as a tutorial for running any type of tasks using Fargate. We create an ECS Task definition, a Fargate Cluster, and a Lambda to run the task using CloudWatch Event trigger.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"BlogPosting","url":"https://lobster1234.github.io/2017/12/03/run-tasks-with-aws-fargate-and-lambda/","image":"https://lobster1234.github.io/assets/fargate.png","headline":"Run tasks with AWS Fargate and Lambda","dateModified":"2017-12-03T22:44:37-08:00","datePublished":"2017-12-03T22:44:37-08:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/12/03/run-tasks-with-aws-fargate-and-lambda/"},"@context":"http://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -125,213 +113,217 @@
     
       <h1 class="post-title" itemprop="name headline">Run tasks with AWS Fargate and Lambda</h1>
     
-    <p class="post-meta"><time datetime="2017-12-03T22:44:37-08:00" itemprop="datePublished">Dec 3, 2017</time> • 
+    <p class="post-meta"><time datetime="2017-12-03T22:44:37-08:00" itemprop="datePublished">Dec 3, 2017</time> •
   
-  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/aws/">aws</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
     
   
     
-  
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/docker/">docker</a>,
+      
+    
+      
     
   
     
-  
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-      <a href="/categories/aws/">aws</a>,
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
     
-  
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/ecs/">ecs</a>
+      
     
   
 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/docker/">docker</a>,
-    
-  
-    
-  
 
-  
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <a href="/categories/ecs/">ecs</a>
-    
-  
 
 </p>
   </header>
@@ -593,6 +585,8 @@ s.setAttribute('data-timestamp', +new Date());
 </script>
 
   </div>
+
+  
 
 </article>
 
