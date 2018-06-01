@@ -356,12 +356,12 @@
 </div>
 <p>This should return an <code class="highlighter-rouge">access_token</code>, which is a JWT.</p>
 
-<div class="language-text highlighter-rouge"><pre class="highlight"><code>{
-    "access_token": "******************.eyJzdWIiOiIxNGFxNWxsNWIxaXQ2ZjYydWVmZW02YXFobiIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoidGVzdFwvZm9vIiwiYXV0aF90aW1lIjoxNTI3ODE3MzY2LCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb21cL3VzLWVhc3QtMV83RThJc3hDR0MiLCJleHAiOjE1Mjc4MjA5NjYsImlhdCI6MTUyNzgxNzM2NiwidmVyc2lvbiI6MiwianRpIjoiYWVlZWY1MGEtYjNiNS00MjAxLTlhOGYtOGI1ZjYzYTBlYmNjIiwiY2xpZW50X2lkIjoiMTRhcTVsbDViMWl0NmY2MnVlZmVtNmFxaG4ifQ.LaWN4NEUrR_2gGANnDx8zINMZteR7-E_moskq__zai5BLNpiCBnVtoLHwVH3FvDFVVesMCBmD02dRhZqXkttxEMUmetFybDtEkH2KWbalOmKvibl5JuPyQEqZ5S4DN9ZUZAqv3X48F2e0Eshck-*******************-0aDBMaMtJU-QMfeFJkN2UgKQhtzi2dbLBB06dQEd6gcxh-*****************",
-    "expires_in": 3600,
-    "token_type": "Bearer"
-}
-</code></pre>
+<div class="language-json highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="w">
+    </span><span class="nt">"access_token"</span><span class="p">:</span><span class="w"> </span><span class="s2">"******************.eyJzdWIiOiIxNGFxNWxsNWIxaXQ2ZjYydWVmZW02YXFobiIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoidGVzdFwvZm9vIiwiYXV0aF90aW1lIjoxNTI3ODE3MzY2LCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb21cL3VzLWVhc3QtMV83RThJc3hDR0MiLCJleHAiOjE1Mjc4MjA5NjYsImlhdCI6MTUyNzgxNzM2NiwidmVyc2lvbiI6MiwianRpIjoiYWVlZWY1MGEtYjNiNS00MjAxLTlhOGYtOGI1ZjYzYTBlYmNjIiwiY2xpZW50X2lkIjoiMTRhcTVsbDViMWl0NmY2MnVlZmVtNmFxaG4ifQ.LaWN4NEUrR_2gGANnDx8zINMZteR7-E_moskq__zai5BLNpiCBnVtoLHwVH3FvDFVVesMCBmD02dRhZqXkttxEMUmetFybDtEkH2KWbalOmKvibl5JuPyQEqZ5S4DN9ZUZAqv3X48F2e0Eshck-*******************-0aDBMaMtJU-QMfeFJkN2UgKQhtzi2dbLBB06dQEd6gcxh-*****************"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"expires_in"</span><span class="p">:</span><span class="w"> </span><span class="mi">3600</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"token_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Bearer"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
 </div>
 
 <h3 id="validate-the-access-token">Validate the Access Token</h3>
@@ -375,31 +375,33 @@
 <p>To peek in the access token, you may paste it in <a href="https://jwt.io">jtw.io</a>. You’ll see the following as the token is decoded.</p>
 
 <p>Header</p>
-<div class="language-text highlighter-rouge"><pre class="highlight"><code>{
-  "kid": "Lkek/Dt3d7ibTkq4Pz2LKpmIKTu5mR6A++DRfvmu5Vw=",
-  "alg": "RS256"
-}
-</code></pre>
+<div class="language-json highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"kid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Lkek/Dt3d7ibTkq4Pz2LKpmIKTu5mR6A++DRfvmu5Vw="</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"alg"</span><span class="p">:</span><span class="w"> </span><span class="s2">"RS256"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
 </div>
 <p>Payload</p>
-<div class="language-text highlighter-rouge"><pre class="highlight"><code>{
-  "sub": "14aq5ll5b1it6f62uefe******",
-  "token_use": "access",
-  "scope": "transactions/post",
-  "auth_time": 1527809373,
-  "iss": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_0Pe*****"",
-  "exp": 1527812973,
-  "iat": 1527809373,
-  "version": 2,
-  "jti": "864ec9c6-f3c9-4e3c-b9e1-dfe21e167e1e",
-  "client_id": "14aq5ll5b1it6f62uefe******"
-}
-</code></pre>
+<div class="language-json highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"sub"</span><span class="p">:</span><span class="w"> </span><span class="s2">"14aq5ll5b1it6f62uefe******"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"token_use"</span><span class="p">:</span><span class="w"> </span><span class="s2">"access"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"scope"</span><span class="p">:</span><span class="w"> </span><span class="s2">"transactions/post"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"auth_time"</span><span class="p">:</span><span class="w"> </span><span class="mi">1527809373</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"iss"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://cognito-idp.us-east-1.amazonaws.com/us-east-1_0Pe*****"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"exp"</span><span class="p">:</span><span class="w"> </span><span class="mi">1527812973</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"iat"</span><span class="p">:</span><span class="w"> </span><span class="mi">1527809373</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"jti"</span><span class="p">:</span><span class="w"> </span><span class="s2">"864ec9c6-f3c9-4e3c-b9e1-dfe21e167e1e"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"client_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"14aq5ll5b1it6f62uefe******"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
 </div>
 
 <p>If you need to perform signature validation, there is some extra effort.</p>
 
-<p>Cognito uses JWK to sign the token. In order to see the keys, visit https://cognito-idp.us-east-1.amazonaws.com/uus-east-1<em>0Pe*****/.well-known/jwks.json. This has the list of keys that Cognito would use to sign the access tokens. It is also known as JWKS - _JSON Web Key Set</em>.</p>
+<p>Cognito uses JWK to sign the token. In order to see the keys, visit https://cognito-idp.us-east-1.amazonaws.com/uus-east-1_0Pe*****/.well-known/jwks.json.</p>
+
+<p>This has the list of keys that Cognito would use to sign the access tokens. It is also known as JWKS - <em>JSON Web Key Set</em>.</p>
 
 <p>To verify the signature, you’d need to convert the JWK to PEM. I used node to do so. From that URL, copy the key identified by the <code class="highlighter-rouge">kid</code> in the access token’s header.</p>
 
