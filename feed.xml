@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2018-06-01T01:06:30-07:00</updated>
+  <updated>2018-06-01T10:17:59-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -37,7 +37,7 @@
       <published>2018-05-31T00:44:37-07:00</published>
       <updated>2018-05-31T00:44:37-07:00</updated>
       <id>https://lobster1234.github.io/2018/05/31/server-to-server-auth-with-amazon-cognito</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2018/05/31/server-to-server-auth-with-amazon-cognito/">&lt;p&gt;&lt;a href=&quot;https://aws.amazon.com/cognito/&quot;&gt;Amazon Cognito&lt;/a&gt; is a hosted service that provides federated identity, access controls, and user management with multi-factor authentication for web and mobile applications. The service is very rich - any application developer can set up the signup and login process with a few clicks in Amazon Cognito Console by federating with identity providers such as Google, Facebook, Twitter, etc. One of the best features of Cognito is Lambda integration (&lt;a href=&quot;https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-identity-pools-working-with-aws-lambda-triggers.html?icmpid=docs_cognito_console&quot;&gt;Triggers&lt;/a&gt;), which allows Lambda invocation on events like pre-signup, pre and post authentication, etc.&lt;/p&gt;
+      <content type="html" xml:base="https://lobster1234.github.io/2018/05/31/server-to-server-auth-with-amazon-cognito/">&lt;p&gt;&lt;a href=&quot;https://aws.amazon.com/cognito/&quot;&gt;Amazon Cognito&lt;/a&gt; is a managed service that provides federated identity, access controls, and user management with multi-factor authentication for web and mobile applications. The service is very rich - any application developer can set up the signup and login process with a few clicks in Amazon Cognito Console by federating with identity providers such as Google, Facebook, Twitter, etc. One of the best features of Cognito is Lambda integration (&lt;a href=&quot;https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-identity-pools-working-with-aws-lambda-triggers.html?icmpid=docs_cognito_console&quot;&gt;Triggers&lt;/a&gt;), which allows Lambda invocation on events like pre-signup, pre and post authentication, etc.&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/cognito.png&quot; alt=&quot;cognito&quot; /&gt;&lt;/p&gt;
 
@@ -331,7 +331,7 @@ s.setAttribute('data-timestamp', +new Date());
       
 
       
-        <summary type="html">Amazon Cognito is a hosted service that provides federated identity, access controls, and user management with multi-factor authentication for web and mobile applications. The service is very rich - any application developer can set up the signup and login process with a few clicks in Amazon Cognito Console by federating with identity providers such as Google, Facebook, Twitter, etc. One of the best features of Cognito is Lambda integration (Triggers), which allows Lambda invocation on events like pre-signup, pre and post authentication, etc. In this post I will walk through a not so fancy, yet very useful Cognito feature - which is server to server authentication. This is one of the most common scenarios in a microservices world, where services need to talk to other services securely, and using an established standard such as OAuth2. This is also known as client_credentials Grant, or 2-legged OAuth. Amazon Cognito provides a simple and cost effective option to implement it.</summary>
+        <summary type="html">Amazon Cognito is a managed service that provides federated identity, access controls, and user management with multi-factor authentication for web and mobile applications. The service is very rich - any application developer can set up the signup and login process with a few clicks in Amazon Cognito Console by federating with identity providers such as Google, Facebook, Twitter, etc. One of the best features of Cognito is Lambda integration (Triggers), which allows Lambda invocation on events like pre-signup, pre and post authentication, etc. In this post I will walk through a not so fancy, yet very useful Cognito feature - which is server to server authentication. This is one of the most common scenarios in a microservices world, where services need to talk to other services securely, and using an established standard such as OAuth2. This is also known as client_credentials Grant, or 2-legged OAuth. Amazon Cognito provides a simple and cost effective option to implement it.</summary>
       
 
       
