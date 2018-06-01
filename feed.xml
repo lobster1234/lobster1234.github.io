@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2018-06-01T00:26:32-07:00</updated>
+  <updated>2018-06-01T00:40:48-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -178,7 +178,7 @@
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;blockquote&gt;
-  &lt;p&gt;The DNS may take some time to propagate, so the URL may not work for a while (Took me 15 mins).&lt;/p&gt;
+  &lt;p&gt;&lt;strong&gt;The DNS may take some time to propagate, so the URL may not work for a while (Took me 20 mins).&lt;/strong&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;p&gt;This would translate into the OAuth2 URL as &lt;code class=&quot;highlighter-rouge&quot;&gt;https://lobster1234.auth.us-east-1.amazoncognito.com/oauth2/token&lt;/code&gt;&lt;/p&gt;
