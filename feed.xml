@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2018-06-01T00:49:38-07:00</updated>
+  <updated>2018-06-01T01:01:17-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -253,9 +253,8 @@
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ npm install jsonwebtoken
 $ npm install jwk-to-pem
-&amp;gt; node
-&amp;gt; var jwkToPem = require('jwk-to-pem'),
-...     jwt = require('jsonwebtoken');
+$ node
+&amp;gt; var jwkToPem = require('jwk-to-pem'), jwt = require('jsonwebtoken');
 undefined
 &amp;gt; var jwk = {&quot;alg&quot;:&quot;RS256&quot;,&quot;e&quot;:&quot;AQAB&quot;,&quot;kid&quot;:&quot;Lkek/Dt3d7ibTkq4Pz2LKpmIKTu5mR6A++DRfvmu5Vw=&quot;,&quot;kty&quot;:&quot;RSA&quot;,&quot;n&quot;:&quot;lyZWsratUxICSfYTCH2gblgUvCpBmYUacNXfQ_3Ygk8mnKaDtkXfb8uVrWwj3Eqdv_hjDYPsYLzYiinjYrLGpFgzxwZbUYXFC49bxQOal28J2emDTiWOAYKC0a_glzcwKf74AWPeBZ8PRNOR6OPLwxnoKQ6PoKGcjonoJdydx-****************************-HJVSW1oS7_uJY-6qLQN4IPzXbaHzy9iJgTDbnd6f-htneHegoLHlSmEfYgnJ_jJBsXwXFAYVm9JLiDyhdZOl-*************************&quot;,&quot;use&quot;:&quot;sig&quot;}
 undefined
@@ -273,7 +272,7 @@ nwIDAQAB
 -----END PUBLIC KEY-----
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
-&lt;p&gt;Now copy the pem, and paste it on jwt.io under “Verify Signature” section.&lt;/p&gt;
+&lt;p&gt;Now copy the PEM, and paste it on jwt.io under “Verify Signature” section.&lt;/p&gt;
 
 &lt;p&gt;If everything goes well, you’ll notice a “Signature Verified” message show up instead of “Invalid Signature”.&lt;/p&gt;
 

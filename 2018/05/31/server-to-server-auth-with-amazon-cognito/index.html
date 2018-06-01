@@ -407,9 +407,8 @@
 
 <div class="highlighter-rouge"><pre class="highlight"><code>$ npm install jsonwebtoken
 $ npm install jwk-to-pem
-&gt; node
-&gt; var jwkToPem = require('jwk-to-pem'),
-...     jwt = require('jsonwebtoken');
+$ node
+&gt; var jwkToPem = require('jwk-to-pem'), jwt = require('jsonwebtoken');
 undefined
 &gt; var jwk = {"alg":"RS256","e":"AQAB","kid":"Lkek/Dt3d7ibTkq4Pz2LKpmIKTu5mR6A++DRfvmu5Vw=","kty":"RSA","n":"lyZWsratUxICSfYTCH2gblgUvCpBmYUacNXfQ_3Ygk8mnKaDtkXfb8uVrWwj3Eqdv_hjDYPsYLzYiinjYrLGpFgzxwZbUYXFC49bxQOal28J2emDTiWOAYKC0a_glzcwKf74AWPeBZ8PRNOR6OPLwxnoKQ6PoKGcjonoJdydx-****************************-HJVSW1oS7_uJY-6qLQN4IPzXbaHzy9iJgTDbnd6f-htneHegoLHlSmEfYgnJ_jJBsXwXFAYVm9JLiDyhdZOl-*************************","use":"sig"}
 undefined
@@ -427,7 +426,7 @@ nwIDAQAB
 -----END PUBLIC KEY-----
 </code></pre>
 </div>
-<p>Now copy the pem, and paste it on jwt.io under “Verify Signature” section.</p>
+<p>Now copy the PEM, and paste it on jwt.io under “Verify Signature” section.</p>
 
 <p>If everything goes well, you’ll notice a “Signature Verified” message show up instead of “Invalid Signature”.</p>
 
