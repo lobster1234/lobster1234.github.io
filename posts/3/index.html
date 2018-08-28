@@ -120,6 +120,106 @@
       <li>
         <header class="post-header">
           <h1 class="post-title">
+            <a class="post-link" href="/2017/11/03/amazon-aurora-rds-notes/">Amazon Aurora Notes</a>
+          </h1>
+
+          <p class="post-meta">Nov 3, 2017 •  •
+  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/aws/">aws</a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+
+
+ •
+  
+
+</p>
+        </header>
+
+        <div class="post-content">
+          <p>At <a href="https://www.marqeta.com">Marqeta</a>, we strive to continually evolve our platform to make it scalable and highly performant. We rely heavily on MySQL, and have many MySQL instances hosted across data centers, as well as on EC2s for various purposes. While refactoring some of our APIs, we thought of giving <a href="https://aws.amazon.com/rds/aurora/">Amazon Aurora</a> a try. Having heard about Aurora’s performance and high availability, this was definitely a great opportunity. Setting up a single node cluster (one <code class="highlighter-rouge">db.t2.small</code>) via the <a href="https://console.aws.amazon.com/rds/home?region=us-east-1">Console</a> was the first step. After a few clicks, we had our first Aurora Cluster running happily. Next step was to fire up our regression tests while pointing to a schema in Aurora. Our database fixtures worked like a charm, and we were surprised to see all of our (thousand+) tests pass - while we knew it was a MySQL <em>drop in replacement</em>, we still expected some drama. Great first impression!</p>
+
+
+        </div>
+        
+          <p class="post-continue">
+            <a href="/2017/11/03/amazon-aurora-rds-notes/">Read on &rarr;</a>
+          </p>
+        
+      </li>
+    
+      
+      
+
+      <li>
+        <header class="post-header">
+          <h1 class="post-title">
             <a class="post-link" href="/2017/10/14/fan-out-with-sns-and-sqs-gotcha/">Fanout SNS-SQS Gotcha</a>
           </h1>
 
@@ -727,246 +827,6 @@
         
           <p class="post-continue">
             <a href="/2017/09/29/aws-kms-envelope-encryption/">Read on &rarr;</a>
-          </p>
-        
-      </li>
-    
-      
-      
-
-      <li>
-        <header class="post-header">
-          <h1 class="post-title">
-            <a class="post-link" href="/2017/08/22/aws-ecs-notes/">Using Amazon EC2 Container Service</a>
-          </h1>
-
-          <p class="post-meta">Aug 22, 2017 •  •
-  
-    
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-        <a href="/categories/aws/">aws</a>,
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-  
-    
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-        <a href="/categories/docker/">docker</a>,
-      
-    
-      
-    
-  
-    
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-        <a href="/categories/ecs/">ecs</a>
-      
-    
-  
-
-
- •
-  
-
-</p>
-        </header>
-
-        <div class="post-content">
-          <p><a href="https://aws.amazon.com/ecs/" target="_blank_">Amazon ECS</a>, or EC2 Container Service is a Container Management Service for Docker containers. Similar to <a href="https://kubernetes.io/" target="_blank_">Kubernetes</a> in intent, the service allows users to provision Docker containers in a fully managed cluster of EC2s. This post is a quick summary of how to get up and running with your own ECS cluster.</p>
-
-<p>The motivation behind containers is to optimize the usage of underlying resources like CPU and Memory. Containerized infrastructure provides a dense compute environment, allowing us to pack more usage without having to spend $$ for idle/underutilized resources.</p>
-
-
-        </div>
-        
-          <p class="post-continue">
-            <a href="/2017/08/22/aws-ecs-notes/">Read on &rarr;</a>
           </p>
         
       </li>

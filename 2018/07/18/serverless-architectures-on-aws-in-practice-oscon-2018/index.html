@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  
+  
+  <title>Serverless Architectures on AWS in Practice</title>
+  <meta name="description" content="Slides from my talk at OSCON 2018. From functions to containers to databases, serverless is a huge paradigm shift. The ability to only pay for what we use and not worry about underlying infrastructure is very tempting to developers and DevOps engineers, and the rate of innovation in this area has been very rapid across all major public cloud providers. Serverless architectures are the natural evolution of microservices design. While Lambda has become synonymous with serverless in AWS, there are several new and upcoming patterns that take serverless architectures to the next level. Manish Pandit explains how to identify these patterns and put them to use. Using Marqeta’s efforts to move its payments infrastructure to the public cloud as an example, Manish explores the services that Marqeta considered, customized, hacked around, and successfully implemented as a part of this move.">
+  
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="https://lobster1234.github.io/2018/07/18/serverless-architectures-on-aws-in-practice-oscon-2018/">
+  
+  
+  <link rel="alternate" type="application/rss+xml" title="Manish Pandit&#39;s Blog" href="https://lobster1234.github.io/feed.xml">
+
+  
+
+  
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="lobster1234">
+  <meta name="twitter:title" content="Serverless Architectures on AWS in Practice">
+  <meta name="twitter:description" content="Slides from my talk at OSCON 2018. From functions to containers to databases, serverless is a huge paradigm shift. The ability to only pay for what we use and not worry about underlying infrastruct...">
+  
+    <meta name="twitter:creator" content="lobster1234">
+  
+  
+
+  <script type="text/javascript">
+  WebFontConfig = {
+    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
+  };
+  (function(d) {
+    var wf = d.createElement('script'), s = d.scripts[0];
+    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
+    wf.async = true;
+    s.parentNode.insertBefore(wf, s);
+  })(document);
+</script>
+
+  
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-96931340-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+
+  <!-- Begin Jekyll SEO tag v2.4.0 -->
+<title>Serverless Architectures on AWS in Practice | Manish Pandit’s Blog</title>
+<meta name="generator" content="Jekyll v3.4.3" />
+<meta property="og:title" content="Serverless Architectures on AWS in Practice" />
+<meta name="author" content="Manish Pandit" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Slides from my talk at OSCON 2018. From functions to containers to databases, serverless is a huge paradigm shift. The ability to only pay for what we use and not worry about underlying infrastructure is very tempting to developers and DevOps engineers, and the rate of innovation in this area has been very rapid across all major public cloud providers. Serverless architectures are the natural evolution of microservices design. While Lambda has become synonymous with serverless in AWS, there are several new and upcoming patterns that take serverless architectures to the next level. Manish Pandit explains how to identify these patterns and put them to use. Using Marqeta’s efforts to move its payments infrastructure to the public cloud as an example, Manish explores the services that Marqeta considered, customized, hacked around, and successfully implemented as a part of this move." />
+<meta property="og:description" content="Slides from my talk at OSCON 2018. From functions to containers to databases, serverless is a huge paradigm shift. The ability to only pay for what we use and not worry about underlying infrastructure is very tempting to developers and DevOps engineers, and the rate of innovation in this area has been very rapid across all major public cloud providers. Serverless architectures are the natural evolution of microservices design. While Lambda has become synonymous with serverless in AWS, there are several new and upcoming patterns that take serverless architectures to the next level. Manish Pandit explains how to identify these patterns and put them to use. Using Marqeta’s efforts to move its payments infrastructure to the public cloud as an example, Manish explores the services that Marqeta considered, customized, hacked around, and successfully implemented as a part of this move." />
+<link rel="canonical" href="https://lobster1234.github.io/2018/07/18/serverless-architectures-on-aws-in-practice-oscon-2018/" />
+<meta property="og:url" content="https://lobster1234.github.io/2018/07/18/serverless-architectures-on-aws-in-practice-oscon-2018/" />
+<meta property="og:site_name" content="Manish Pandit’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2018-07-18T13:44:37-07:00" />
+<script type="application/ld+json">
+{"description":"Slides from my talk at OSCON 2018. From functions to containers to databases, serverless is a huge paradigm shift. The ability to only pay for what we use and not worry about underlying infrastructure is very tempting to developers and DevOps engineers, and the rate of innovation in this area has been very rapid across all major public cloud providers. Serverless architectures are the natural evolution of microservices design. While Lambda has become synonymous with serverless in AWS, there are several new and upcoming patterns that take serverless architectures to the next level. Manish Pandit explains how to identify these patterns and put them to use. Using Marqeta’s efforts to move its payments infrastructure to the public cloud as an example, Manish explores the services that Marqeta considered, customized, hacked around, and successfully implemented as a part of this move.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"BlogPosting","url":"https://lobster1234.github.io/2018/07/18/serverless-architectures-on-aws-in-practice-oscon-2018/","headline":"Serverless Architectures on AWS in Practice","dateModified":"2018-07-18T13:44:37-07:00","datePublished":"2018-07-18T13:44:37-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2018/07/18/serverless-architectures-on-aws-in-practice-oscon-2018/"},"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Home</a>
+
+    <nav class="site-nav">
+      
+        
+        <a class="page-link" href="/about/">About</a>
+      
+        
+        <a class="page-link" href="/archives/">Archives</a>
+      
+        
+        <a class="page-link" href="https://www.twitter.com/lobster1234">Twitter</a>
+      
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    
+      <h1 class="post-title" itemprop="name headline">Serverless Architectures on AWS in Practice</h1>
+    
+    <p class="post-meta"><time datetime="2018-07-18T13:44:37-07:00" itemprop="datePublished">Jul 18, 2018</time> •
+  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/aws/">aws</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+    
+    
+      
+    
+      
+    
+      
+        <a href="/categories/presentations/">presentations</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/serverless/">serverless</a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+
+
+ •
+  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+
+</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>Slides from my talk at <a href="https://conferences.oreilly.com/oscon/oscon-or" target="_blank_">OSCON 2018</a>.</p>
+
+<p>From functions to containers to databases, serverless is a huge paradigm shift. The ability to only pay for what we use and not worry about underlying infrastructure is very tempting to developers and DevOps engineers, and the rate of innovation in this area has been very rapid across all major public cloud providers. Serverless architectures are the natural evolution of microservices design. While Lambda has become synonymous with serverless in AWS, there are several new and upcoming patterns that take serverless architectures to the next level.</p>
+
+<p>Manish Pandit explains how to identify these patterns and put them to use. Using Marqeta’s efforts to move its payments infrastructure to the public cloud as an example, Manish explores the services that Marqeta considered, customized, hacked around, and successfully implemented as a part of this move.
+<!--more--></p>
+
+<script async="" class="speakerdeck-embed" data-id="254c67b25a3649e5b24d18b3331505f9" data-ratio="1.77777777777778" src="//speakerdeck.com/assets/embed.js"></script>
+
+
+  </div>
+
+  
+
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <p>
+      
+
+&copy; Manish Pandit - Powered by <a href="https://jekyllrb.com">Jekyll</a> &amp; <a href="https://github.com/yous/whiteglass">whiteglass</a> - Subscribe via <a href="https://lobster1234.github.io/feed.xml">RSS</a>
+
+    </p>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
