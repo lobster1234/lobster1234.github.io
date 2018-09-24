@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2018-08-27T23:47:09-07:00</updated>
+  <updated>2018-09-24T00:53:14-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -519,7 +519,7 @@ x-amz-apigw-id: FW4vhFdvoAMFRbQ=
 
 &lt;ol&gt;
   &lt;li&gt;Any changes to the Resource Policy will not reflect unless the API is redeployed as shown above.&lt;/li&gt;
-  &lt;li&gt;I could not find a way to attach the Resource Policy to the API in &lt;a href=&quot;https://www.serverless.com&quot;&gt;Serverless Framework&lt;/a&gt;.&lt;/li&gt;
+  &lt;li&gt;I could not find a way to attach the Resource Policy to the API in &lt;a href=&quot;https://www.serverless.com&quot;&gt;Serverless Framework&lt;/a&gt;. &lt;strong&gt;Edit: This feature is now available in the latest Serverless Framework Version, with &lt;a href=&quot;https://github.com/serverless/serverless/pull/5071&quot;&gt;this merged PR&lt;/a&gt;.&lt;/strong&gt;&lt;/li&gt;
   &lt;li&gt;The API Gateway Endpoints cannot be restricted to whitelist the VPC using this technique. The endpoints are still public, and they will only see the NAT Gateway EIP as the inbound request.&lt;/li&gt;
   &lt;li&gt;If an EC2 instance is accessing the API, the API Gateway will use it’s Public IP to evaluate the resource policy.&lt;/li&gt;
   &lt;li&gt;Wildcards can be used for the resource ARN in the policy, like &lt;code class=&quot;highlighter-rouge&quot;&gt;&quot;Resource&quot;: &quot;arn:aws:execute-api:us-east-1:12345678900:*:*&quot;&lt;/code&gt; would apply the policy for all the API resources under the account ID &lt;code class=&quot;highlighter-rouge&quot;&gt;12345678900&lt;/code&gt;.&lt;/li&gt;

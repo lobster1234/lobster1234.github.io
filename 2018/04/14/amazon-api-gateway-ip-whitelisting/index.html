@@ -296,7 +296,7 @@ x-amz-apigw-id: FW4vhFdvoAMFRbQ=
 
 <ol>
   <li>Any changes to the Resource Policy will not reflect unless the API is redeployed as shown above.</li>
-  <li>I could not find a way to attach the Resource Policy to the API in <a href="https://www.serverless.com">Serverless Framework</a>.</li>
+  <li>I could not find a way to attach the Resource Policy to the API in <a href="https://www.serverless.com">Serverless Framework</a>. <strong>Edit: This feature is now available in the latest Serverless Framework Version, with <a href="https://github.com/serverless/serverless/pull/5071">this merged PR</a>.</strong></li>
   <li>The API Gateway Endpoints cannot be restricted to whitelist the VPC using this technique. The endpoints are still public, and they will only see the NAT Gateway EIP as the inbound request.</li>
   <li>If an EC2 instance is accessing the API, the API Gateway will use it’s Public IP to evaluate the resource policy.</li>
   <li>Wildcards can be used for the resource ARN in the policy, like <code class="highlighter-rouge">"Resource": "arn:aws:execute-api:us-east-1:12345678900:*:*"</code> would apply the policy for all the API resources under the account ID <code class="highlighter-rouge">12345678900</code>.</li>
