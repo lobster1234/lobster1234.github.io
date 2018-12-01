@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2018-11-30T16:11:07-08:00</updated>
+  <updated>2018-12-01T02:59:38-08:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -434,7 +434,7 @@
   &lt;li&gt;
     &lt;p&gt;Pre-signed URLs can be inserted in a page to share private content/user specific content.&lt;/p&gt;
   &lt;/li&gt;
-  &lt;li&gt;Read &lt;a href=&quot;(https://aws.amazon.com/s3/faqs/)&quot;&gt;S3 FAQs&lt;/a&gt; before the exam&lt;/li&gt;
+  &lt;li&gt;Read &lt;a href=&quot;https://aws.amazon.com/s3/faqs/&quot;&gt;S3 FAQs&lt;/a&gt; before the exam&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h2 id=&quot;cors&quot;&gt;CORS&lt;/h2&gt;
@@ -496,7 +496,7 @@
       &lt;li&gt;S3 Object URL - https://s3.amazonaws.com/{bucketname}/{key} &lt;strong&gt;no region&lt;/strong&gt;&lt;/li&gt;
       &lt;li&gt;S3 Bucket URL - https://s3-{region}.amazonaws.com/{bucketname}&lt;/li&gt;
       &lt;li&gt;S3 Cloudfront Origin URL - bucketname.s3.amazonaws.com &lt;strong&gt;no region, no protocol&lt;/strong&gt;&lt;/li&gt;
-      &lt;li&gt;S3 Static Website URL (note it is &lt;strong&gt;NOT&lt;/strong&gt; https)-  http://{bucketnme}.s3-website.{region}.amazonaws.com for the rest.&lt;/li&gt;
+      &lt;li&gt;S3 Static Website URL (note it is &lt;strong&gt;NOT&lt;/strong&gt; https)-  http://{bucketname}.s3-website.{region}.amazonaws.com for the rest.&lt;/li&gt;
     &lt;/ul&gt;
   &lt;/li&gt;
 &lt;/ul&gt;
@@ -524,14 +524,14 @@
   &lt;li&gt;A distribution is identified by a domain&lt;/li&gt;
   &lt;li&gt;Edge Locations can be written to (&lt;code class=&quot;highlighter-rouge&quot;&gt;PUT&lt;/code&gt;), this is used in S3 accelerated transfers.&lt;/li&gt;
   &lt;li&gt;Objects are cached at the edge location for a TTL (Max: 365 days, Default: 24 hours)&lt;/li&gt;
-  &lt;li&gt;It costs to invalidate the cache on an object basis (if we want to do it before the ttl expires)&lt;/li&gt;
+  &lt;li&gt;It costs to invalidate the cache on an object basis (if we want to do it before the TTL expires)&lt;/li&gt;
   &lt;li&gt;For performance of GET intensive workloads, use cloudfront&lt;/li&gt;
   &lt;li&gt;For performance of mixed workloads, hash the S3 key by adding a random prefix to the key name. By doing so, there is no IO Contention on the same partition.&lt;/li&gt;
   &lt;li&gt;S3 origins look like &lt;code class=&quot;highlighter-rouge&quot;&gt;bucketname.s3.amazonaws.com&lt;/code&gt;. (notice no region in the URL).&lt;/li&gt;
   &lt;li&gt;An Origin Access Identity is set up in the distribution which gives access to Cloudfront to read from the origin S3 bucket. The bucket policy is updated on the origin bucket to allow access to this identity.&lt;/li&gt;
   &lt;li&gt;Cloudfront uses pre-signed URLs and signed cookies to restrict access of content (just like S3)&lt;/li&gt;
   &lt;li&gt;The clouddront distribution URL gets a domain name &lt;code class=&quot;highlighter-rouge&quot;&gt;foobar.cloudfront.net&lt;/code&gt;. Please note that &lt;code class=&quot;highlighter-rouge&quot;&gt;foobar&lt;/code&gt; is &lt;em&gt;not&lt;/em&gt; the distribution ID.&lt;/li&gt;
-  &lt;li&gt;Cloudfront allows geo whitelisting OR blacklisting of countries.&lt;/li&gt;
+  &lt;li&gt;Cloudfront allows geo whitelisting OR blacklisting of countries. Cannot do both, has to be either.&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h1 id=&quot;ec2---elastic-compute-cloud&quot;&gt;EC2 - Elastic Compute Cloud&lt;/h1&gt;
@@ -870,6 +870,7 @@ i-00dfc2841e9b83d1e
 &lt;/ul&gt;
 
 &lt;h1 id=&quot;vpc&quot;&gt;VPC&lt;/h1&gt;
+
 &lt;ul&gt;
   &lt;li&gt;A virtual datacenter in the cloud (Virtual Private Cloud).&lt;/li&gt;
   &lt;li&gt;Number of IPs in a CIDR notation is &lt;code class=&quot;highlighter-rouge&quot;&gt;2^(32-N)&lt;/code&gt;. So, a &lt;code class=&quot;highlighter-rouge&quot;&gt;/32&lt;/code&gt; is &lt;code class=&quot;highlighter-rouge&quot;&gt;2^(0)&lt;/code&gt; which is 1.&lt;/li&gt;
@@ -1065,10 +1066,10 @@ i-00dfc2841e9b83d1e
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;https://d0.awsstatic.com/whitepapers/AWS_Cloud_Best_Practices.pdf&quot;&gt;Architecting for the Cloud: AWS Best Practices&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://aws.amazon.com/architecture/well-architected/&quot;&gt;Well Architected Framework&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://aws.amazon.com/premiumsupport/compare-plans/&quot;&gt;Support Plans&lt;/a&gt; and &lt;a href=&quot;https://aws.amazon.com/premiumsupport/pricing/&quot;&gt;their pricing&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://media.amazonwebservices.com/AWS_Disaster_Recovery.pdf&quot;&gt;Disaster Recovery&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h1 id=&quot;faqs-and-apisclis&quot;&gt;FAQs and APIs/CLIs&lt;/h1&gt;
+&lt;h1 id=&quot;faqs-apisclis-and-documentation&quot;&gt;FAQs, APIs/CLIs and Documentation&lt;/h1&gt;
 
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;https://aws.amazon.com/ec2/faqs/&quot;&gt;EC2&lt;/a&gt;&lt;/li&gt;
@@ -1077,7 +1078,16 @@ i-00dfc2841e9b83d1e
   &lt;li&gt;&lt;a href=&quot;https://aws.amazon.com/route53/faqs/&quot;&gt;Route 53&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://aws.amazon.com/rds/faqs/&quot;&gt;RDS&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://aws.amazon.com/sqs/faqs/&quot;&gt;SQS&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://aws.amazon.com/premiumsupport/compare-plans/&quot;&gt;Support Plans&lt;/a&gt; and &lt;a href=&quot;https://aws.amazon.com/premiumsupport/pricing/&quot;&gt;their pricing&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html&quot;&gt;Service Limits&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&quot;finally&quot;&gt;Finally&lt;/h1&gt;
+&lt;p&gt;Before you schedule the exam, measure your confidence in these areas in particular -&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Ins and outs of VPC, EBS and S3.&lt;/li&gt;
+  &lt;li&gt;Highly available, fault tolerant &lt;strong&gt;and&lt;/strong&gt; cost effective architectures (and a combination of these)&lt;/li&gt;
+  &lt;li&gt;Disaster Recovery&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h3 style=&quot;text-align: center&quot; id=&quot;comments&quot;&gt;Comments&lt;/h3&gt;

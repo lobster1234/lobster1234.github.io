@@ -657,7 +657,7 @@
   <li>
     <p>Pre-signed URLs can be inserted in a page to share private content/user specific content.</p>
   </li>
-  <li>Read <a href="(https://aws.amazon.com/s3/faqs/)">S3 FAQs</a> before the exam</li>
+  <li>Read <a href="https://aws.amazon.com/s3/faqs/">S3 FAQs</a> before the exam</li>
 </ul>
 
 <h2 id="cors">CORS</h2>
@@ -719,7 +719,7 @@
       <li>S3 Object URL - https://s3.amazonaws.com/{bucketname}/{key} <strong>no region</strong></li>
       <li>S3 Bucket URL - https://s3-{region}.amazonaws.com/{bucketname}</li>
       <li>S3 Cloudfront Origin URL - bucketname.s3.amazonaws.com <strong>no region, no protocol</strong></li>
-      <li>S3 Static Website URL (note it is <strong>NOT</strong> https)-  http://{bucketnme}.s3-website.{region}.amazonaws.com for the rest.</li>
+      <li>S3 Static Website URL (note it is <strong>NOT</strong> https)-  http://{bucketname}.s3-website.{region}.amazonaws.com for the rest.</li>
     </ul>
   </li>
 </ul>
@@ -747,14 +747,14 @@
   <li>A distribution is identified by a domain</li>
   <li>Edge Locations can be written to (<code class="highlighter-rouge">PUT</code>), this is used in S3 accelerated transfers.</li>
   <li>Objects are cached at the edge location for a TTL (Max: 365 days, Default: 24 hours)</li>
-  <li>It costs to invalidate the cache on an object basis (if we want to do it before the ttl expires)</li>
+  <li>It costs to invalidate the cache on an object basis (if we want to do it before the TTL expires)</li>
   <li>For performance of GET intensive workloads, use cloudfront</li>
   <li>For performance of mixed workloads, hash the S3 key by adding a random prefix to the key name. By doing so, there is no IO Contention on the same partition.</li>
   <li>S3 origins look like <code class="highlighter-rouge">bucketname.s3.amazonaws.com</code>. (notice no region in the URL).</li>
   <li>An Origin Access Identity is set up in the distribution which gives access to Cloudfront to read from the origin S3 bucket. The bucket policy is updated on the origin bucket to allow access to this identity.</li>
   <li>Cloudfront uses pre-signed URLs and signed cookies to restrict access of content (just like S3)</li>
   <li>The clouddront distribution URL gets a domain name <code class="highlighter-rouge">foobar.cloudfront.net</code>. Please note that <code class="highlighter-rouge">foobar</code> is <em>not</em> the distribution ID.</li>
-  <li>Cloudfront allows geo whitelisting OR blacklisting of countries.</li>
+  <li>Cloudfront allows geo whitelisting OR blacklisting of countries. Cannot do both, has to be either.</li>
 </ul>
 
 <h1 id="ec2---elastic-compute-cloud">EC2 - Elastic Compute Cloud</h1>
@@ -1093,6 +1093,7 @@ i-00dfc2841e9b83d1e
 </ul>
 
 <h1 id="vpc">VPC</h1>
+
 <ul>
   <li>A virtual datacenter in the cloud (Virtual Private Cloud).</li>
   <li>Number of IPs in a CIDR notation is <code class="highlighter-rouge">2^(32-N)</code>. So, a <code class="highlighter-rouge">/32</code> is <code class="highlighter-rouge">2^(0)</code> which is 1.</li>
@@ -1288,10 +1289,10 @@ i-00dfc2841e9b83d1e
 <ul>
   <li><a href="https://d0.awsstatic.com/whitepapers/AWS_Cloud_Best_Practices.pdf">Architecting for the Cloud: AWS Best Practices</a></li>
   <li><a href="https://aws.amazon.com/architecture/well-architected/">Well Architected Framework</a></li>
-  <li><a href="https://aws.amazon.com/premiumsupport/compare-plans/">Support Plans</a> and <a href="https://aws.amazon.com/premiumsupport/pricing/">their pricing</a></li>
+  <li><a href="https://media.amazonwebservices.com/AWS_Disaster_Recovery.pdf">Disaster Recovery</a></li>
 </ul>
 
-<h1 id="faqs-and-apisclis">FAQs and APIs/CLIs</h1>
+<h1 id="faqs-apisclis-and-documentation">FAQs, APIs/CLIs and Documentation</h1>
 
 <ul>
   <li><a href="https://aws.amazon.com/ec2/faqs/">EC2</a></li>
@@ -1300,7 +1301,16 @@ i-00dfc2841e9b83d1e
   <li><a href="https://aws.amazon.com/route53/faqs/">Route 53</a></li>
   <li><a href="https://aws.amazon.com/rds/faqs/">RDS</a></li>
   <li><a href="https://aws.amazon.com/sqs/faqs/">SQS</a></li>
+  <li><a href="https://aws.amazon.com/premiumsupport/compare-plans/">Support Plans</a> and <a href="https://aws.amazon.com/premiumsupport/pricing/">their pricing</a></li>
   <li><a href="https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html">Service Limits</a></li>
+</ul>
+
+<h1 id="finally">Finally</h1>
+<p>Before you schedule the exam, measure your confidence in these areas in particular -</p>
+<ul>
+  <li>Ins and outs of VPC, EBS and S3.</li>
+  <li>Highly available, fault tolerant <strong>and</strong> cost effective architectures (and a combination of these)</li>
+  <li>Disaster Recovery</li>
 </ul>
 
 <h3 style="text-align: center" id="comments">Comments</h3>
