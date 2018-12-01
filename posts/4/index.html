@@ -120,6 +120,110 @@
       <li>
         <header class="post-header">
           <h1 class="post-title">
+            <a class="post-link" href="/2017/09/29/aws-kms-envelope-encryption/">AWS KMS and Envelope Encryption</a>
+          </h1>
+
+          <p class="post-meta">Sep 29, 2017 •  •
+  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/aws/">aws</a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+
+
+ •
+  
+
+</p>
+        </header>
+
+        <div class="post-content">
+          <p>Every service needs encryption at one point or another - passwords to the database, credentials to an external service, or even entire filesystem or files. Sticking the secrets, or keys in configuration files seems a quick and easy option. However, it carries security risks, even if these configurations are managed outside of the source code. On top of it, the keys used to encrypt/decrypt the data bring additional security implications and requirements in terms of storage, audit, and lifecycle management.</p>
+
+<p><a href="https://aws.amazon.com/kms/">AWS KMS</a>, or AWS Key Management Service is a fully managed service to store and manage keys. Any AWS service which supports encryption - S3 buckets, EBS Volumes, SQS, etc. uses KMS under the hood. KMS is more than just a key manager, it can also be used to encrypt large volumes of data, using a technique called Envelope Encryption.</p>
+
+<p>In this post I will cover KMS, and the <em>why</em>, <em>what</em>, and <em>how</em> of Envelope Encryption.</p>
+
+
+        </div>
+        
+          <p class="post-continue">
+            <a href="/2017/09/29/aws-kms-envelope-encryption/">Read on &rarr;</a>
+          </p>
+        
+      </li>
+    
+      
+      
+
+      <li>
+        <header class="post-header">
+          <h1 class="post-title">
             <a class="post-link" href="/2017/08/22/aws-ecs-notes/">Using Amazon EC2 Container Service</a>
           </h1>
 
@@ -1001,175 +1105,6 @@
         
           <p class="post-continue">
             <a href="/2017/06/25/boto-and-sqs/">Read on &rarr;</a>
-          </p>
-        
-      </li>
-    
-      
-      
-
-      <li>
-        <header class="post-header">
-          <h1 class="post-title">
-            <a class="post-link" href="/2017/05/25/python-java-primer/">Python Primer for Java Developers</a>
-          </h1>
-
-          <p class="post-meta">May 25, 2017 •  •
-  
-    
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-        <a href="/categories/python/">python</a>,
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-  
-    
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-        <a href="/categories/java/">java</a>
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-  
-
-
- •
-  
-
-</p>
-        </header>
-
-        <div class="post-content">
-          <p>I took these notes while ramping up on Python, to be able to contribute to a few Github projects, deploy AWS Lambdas quicker, and use <a href="https://github.com/boto/boto3" target="_blank_">boto3</a> for quite a few projects. Plus I find it a very light, frictionless, quick and easy scripting language to have in the arsenal. This information can be particularly useful to anyone who is coming from a Java background, and wants to compare and contrast the two languages’ basic constructs and syntax.</p>
-
-
-        </div>
-        
-          <p class="post-continue">
-            <a href="/2017/05/25/python-java-primer/">Read on &rarr;</a>
           </p>
         
       </li>
