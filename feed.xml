@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2018-12-01T02:59:38-08:00</updated>
+  <updated>2018-12-25T14:31:23-08:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -25,6 +25,241 @@
     </author>
   
 
+  
+  
+    <entry>
+      
+      <title type="html">Lambda Layers</title>
+      
+      
+      <link href="https://lobster1234.github.io/2018/12/20/lambda-layers/" rel="alternate" type="text/html" title="Lambda Layers" />
+      
+      <published>2018-12-20T12:44:37-08:00</published>
+      <updated>2018-12-20T12:44:37-08:00</updated>
+      <id>https://lobster1234.github.io/2018/12/20/lambda-layers</id>
+      <content type="html" xml:base="https://lobster1234.github.io/2018/12/20/lambda-layers/">&lt;p&gt;At &lt;a href=&quot;https://twitter.com/AWSreInvent/status/1068200715733020673&quot;&gt;reInvent 2018&lt;/a&gt;, AWS announced &lt;a href=&quot;https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html&quot;&gt;Lambda Layers&lt;/a&gt;, bringing Lambda construct closer to that of an AMI. Put simply, layers are dependencies that can be made available to the function at runtime. Currently there can be 5 &lt;em&gt;layers&lt;/em&gt; associated with a function. Layers help with isolating common dependencies, as well as keeping the runtime consistent in terms of versions - just like the AMIs do. In this post I’ll walk through creating a Python layer, and associating it with a function. I’ll use the CLI, &lt;a href=&quot;https://github.com/awslabs/aws-shell&quot;&gt;aws-shell&lt;/a&gt; to accomplish this.
+&lt;!--more--&gt;&lt;/p&gt;
+
+&lt;p&gt;In this walkthrough, we will associate the Python Github Client, &lt;a href=&quot;https://pygithub.readthedocs.io/en/latest/introduction.html&quot;&gt;PyGithub&lt;/a&gt;, with a Layer, so it is available to our lambda function. I needed this for another project which will be blogged later.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ pwd
+/Users/mpandit/work/pygithub
+$ python --version
+Python 2.7.10
+$ pip install pygithub -t .
+$ chmod -R 755 .
+$ zip -r ../pygithub_layer.zip *
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;This will create a &lt;code class=&quot;highlighter-rouge&quot;&gt;pygithub_layer.zip&lt;/code&gt; in &lt;code class=&quot;highlighter-rouge&quot;&gt;/Users/mpandit/work&lt;/code&gt; folder. This archive has the layer that’d be uploaded to AWS.&lt;/p&gt;
+
+&lt;p&gt;Next, we will fire up AWS Shell to upload this Layer on AWS. We will add &lt;code class=&quot;highlighter-rouge&quot;&gt;_2_7&lt;/code&gt; in the layer name to identify the version.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ aws-shell
+aws&amp;gt; lambda publish-layer-version --layer-name pygithub_layer_2_7 --zip-file fileb:///Users/mpandit/work/pygithub_layer.zip
+{
+    &quot;Content&quot;: {
+        &quot;CodeSize&quot;: 4914196,
+        &quot;CodeSha256&quot;: &quot;VhdxY5459HdfsYBeWdrfCQ0Aedo3+SYaf8h0q6JprX8=&quot;,
+        &quot;Location&quot;: &quot;https://prod-04-2014-layers.s3.amazonaws.com/snapshots/:***********:/pygithub_layer_2_7-4f80490e-1d22-4116-b613-abc92b348342?versionId=ET41H_K4V..&quot;
+    },
+    &quot;LayerVersionArn&quot;: &quot;arn:aws:lambda:us-east-1:***********:layer:pygithub_layer_2_7:1&quot;,
+    &quot;Version&quot;: 1,
+    &quot;Description&quot;: &quot;&quot;,
+    &quot;CreatedDate&quot;: &quot;2018-12-22T10:02:37.038+0000&quot;,
+    &quot;LayerArn&quot;: &quot;arn:aws:lambda:us-east-1:***********:layer:pygithub_layer_2_7&quot;
+}
+aws&amp;gt; lambda list-layers
+{
+    &quot;Layers&quot;: [
+        {
+            &quot;LayerName&quot;: &quot;pygithub_layer_2_7&quot;,
+            &quot;LayerArn&quot;: &quot;arn:aws:lambda:us-east-1:***********:layer:pygithub_layer_2_7&quot;,
+            &quot;LatestMatchingVersion&quot;: {
+                &quot;LayerVersionArn&quot;: &quot;arn:aws:lambda:us-east-1:***********:layer:pygithub_layer_2_7:1&quot;,
+                &quot;Version&quot;: 1,
+                &quot;CreatedDate&quot;: &quot;2018-12-22T10:02:37.038+0000&quot;
+            }
+        }
+    ]
+}
+aws&amp;gt; lambda list-functions
+{
+    &quot;Functions&quot;: [
+        {
+            &quot;TracingConfig&quot;: {
+                &quot;Mode&quot;: &quot;PassThrough&quot;
+            },
+            &quot;Version&quot;: &quot;$LATEST&quot;,
+            &quot;CodeSha256&quot;: &quot;r3fwRZPDEUt5qgjfBKrKnoTnyZ9a63M6tOw47kvCwi4=&quot;,
+            &quot;FunctionName&quot;: &quot;blogpublisher&quot;,
+            &quot;VpcConfig&quot;: {
+                &quot;SubnetIds&quot;: [],
+                &quot;VpcId&quot;: &quot;&quot;,
+                &quot;SecurityGroupIds&quot;: []
+            },
+            &quot;MemorySize&quot;: 128,
+            &quot;RevisionId&quot;: &quot;d8476397-5a13-490d-b70c-31ce8ac75612&quot;,
+            &quot;CodeSize&quot;: 379,
+            &quot;FunctionArn&quot;: &quot;arn:aws:lambda:us-east-1:***********:function:blogpublisher&quot;,
+            &quot;Handler&quot;: &quot;lambda_function.lambda_handler&quot;,
+            &quot;Role&quot;: &quot;arn:aws:iam:***********:role/lambda_basic_execution&quot;,
+            &quot;Timeout&quot;: 100,
+            &quot;LastModified&quot;: &quot;2018-12-22T09:20:25.436+0000&quot;,
+            &quot;Runtime&quot;: &quot;python2.7&quot;,
+            &quot;Description&quot;: &quot;&quot;
+        }
+    ]
+}
+aws&amp;gt; lambda  update-function-configuration --layers arn:aws:lambda:us-east-1:***********:layer:pygithub_layer_2_7:1 --function-name blogpublisher
+{
+    &quot;Layers&quot;: [
+        {
+            &quot;CodeSize&quot;: 4914196,
+            &quot;Arn&quot;: &quot;arn:aws:lambda:us-east-1:***********:layer:pygithub_layer_2_7:1&quot;
+        }
+    ],
+    &quot;FunctionName&quot;: &quot;blogpublisher&quot;,
+    &quot;LastModified&quot;: &quot;2018-12-22T10:09:41.946+0000&quot;,
+    &quot;RevisionId&quot;: &quot;ecc6d869-c73f-4270-8042-f8603f050a4c&quot;,
+    &quot;MemorySize&quot;: 128,
+    &quot;Version&quot;: &quot;$LATEST&quot;,
+    &quot;Role&quot;: &quot;arn:aws:iam:***********:role/lambda_basic_execution&quot;,
+    &quot;Timeout&quot;: 100,
+    &quot;Runtime&quot;: &quot;python2.7&quot;,
+    &quot;TracingConfig&quot;: {
+        &quot;Mode&quot;: &quot;PassThrough&quot;
+    },
+    &quot;CodeSha256&quot;: &quot;r3fwRZPDEUt5qgjfBKrKnoTnyZ9a63M6tOw47kvCwi4=&quot;,
+    &quot;Description&quot;: &quot;&quot;,
+    &quot;VpcConfig&quot;: {
+        &quot;SubnetIds&quot;: [],
+        &quot;VpcId&quot;: &quot;&quot;,
+        &quot;SecurityGroupIds&quot;: []
+    },
+    &quot;CodeSize&quot;: 379,
+    &quot;FunctionArn&quot;: &quot;arn:aws:lambda:us-east-1:***********:function:blogpublisher&quot;,
+    &quot;Handler&quot;: &quot;lambda_function.lambda_handler&quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The above commands confirm that the layer is uploaded, and associated with the function &lt;code class=&quot;highlighter-rouge&quot;&gt;blogpublisher&lt;/code&gt;. Now we can code the function and use the layer, which is made available to us at runtime.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;I had to add &lt;code class=&quot;highlighter-rouge&quot;&gt;/opt/&lt;/code&gt; to the path, as the runtime expands the layers in &lt;code class=&quot;highlighter-rouge&quot;&gt;/opt&lt;/code&gt;. I could not get it to work without adding this, probably coz I am a Python n00b. There has to be a better way, but this works too.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;You’ll need a Github personal access token with proper permissions, which can be created &lt;a href=&quot;https://github.com/settings/tokens&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;sys&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;path&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/opt/&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# This line took me 2 hours to figure out.&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;github&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Github&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# This is coming from the layer&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;lambda_handler&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;context&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;g&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Github&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'replace_with_your_personal_access_token'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;repo&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;g&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_user&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_repos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;repo&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Once ran, we can see the repositories, like so -&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;START RequestId: b0c02335-0892-11e9-a1cb-6fdc63bf3cc9 Version: $LATEST
+dockerfiles
+dockerfiles-mirror
+dotfiles
+elasticmq-docker
+helloworld-api
+lambda-proxy
+lobster1234.github.io
+localstack
+m101j-hw3-23
+munin-mongo-collections
+my-aws-infrastructure
+og-aws
+play-salat
+RxJava
+Scala-For-the-Impatient-Exercises
+scalatra-website
+SimianArmy
+sparkjava-archetypes
+SVCC2013
+swagger-core
+vagrant-demo
+END RequestId: b0c02335-0892-11e9-a1cb-6fdc63bf3cc9
+REPORT RequestId: b0c02335-0892-11e9-a1cb-6fdc63bf3cc9	Duration: 1559.17 ms	Billed Duration: 1600 ms 	Memory Size: 128 MB	Max Memory Used: 44 MB
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 style=&quot;text-align: center&quot; id=&quot;comments&quot;&gt;Comments&lt;/h3&gt;
+
+&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = &quot;https://lobster1234.github.io/2018/12/20/lambda-layers/&quot;;  
+this.page.identifier = &quot;/2018/12/20/lambda-layers&quot;;
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://lobster1234.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+&lt;/script&gt;
+
+&lt;noscript&gt;Please enable JavaScript to view the &lt;a href=&quot;https://disqus.com/?ref_noscript&quot;&gt;comments powered by Disqus.&lt;/a&gt;&lt;/noscript&gt;
+
+&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+
+
+      
+
+&lt;/script&gt;</content>
+
+      
+      
+      
+      
+      
+
+      
+        <author>
+            <name>Manish Pandit</name>
+          
+          
+        </author>
+      
+
+      
+        <category term="aws" />
+      
+        <category term="serverless" />
+      
+
+      
+        <category term="aws," />
+      
+        <category term="lambda," />
+      
+        <category term="serverless" />
+      
+
+      
+        <summary type="html">At reInvent 2018, AWS announced Lambda Layers, bringing Lambda construct closer to that of an AMI. Put simply, layers are dependencies that can be made available to the function at runtime. Currently there can be 5 layers associated with a function. Layers help with isolating common dependencies, as well as keeping the runtime consistent in terms of versions - just like the AMIs do. In this post I’ll walk through creating a Python layer, and associating it with a function. I’ll use the CLI, aws-shell to accomplish this.</summary>
+      
+
+      
+      
+    </entry>
+  
   
   
     <entry>
@@ -1142,6 +1377,10 @@ s.setAttribute('data-timestamp', +new Date());
         <category term="certification" />
       
 
+      
+        <category term="aws," />
+      
+        <category term="certification" />
       
 
       
@@ -4711,127 +4950,6 @@ s.setAttribute('data-timestamp', +new Date());
 
       
         <summary type="html">It has been said time and again - “There are only two hard things in Computer Science: cache invalidation and naming things”. Having run into both of these problems in my professional career, I figured I could write a post, summarizing the lessons I have learned along the way by seeing and building various caching architectures across many companies, big and small. Just like threading, caching is easy to code, but often creates more problems than it intends to solve. These problems can arise from - you guessed it - invalidation, sub-par efficiency, inconsistency, and many more. It is also one of my favorite topics for technical interviews :)</summary>
-      
-
-      
-      
-    </entry>
-  
-  
-  
-    <entry>
-      
-      <title type="html">Boto 3 and SQS</title>
-      
-      
-      <link href="https://lobster1234.github.io/2017/06/25/boto-and-sqs/" rel="alternate" type="text/html" title="Boto 3 and SQS" />
-      
-      <published>2017-06-25T23:44:37-07:00</published>
-      <updated>2017-06-25T23:44:37-07:00</updated>
-      <id>https://lobster1234.github.io/2017/06/25/boto-and-sqs</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2017/06/25/boto-and-sqs/">&lt;p&gt;&lt;a href=&quot;https://github.com/boto/boto3&quot; target=&quot;_blank_&quot;&gt;Boto 3&lt;/a&gt; is the AWS SDK for Python. In fact, this SDK is the reason I picked up Python - so I can do stuff with AWS with a few lines of Python in a script instead of a full blown Java setup. Its fun, easy, and pretty much feels like working on a CLI with a rich programming language to back it up. In this post we will use &lt;a href=&quot;http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/Welcome.html&quot; target=&quot;_blank_&quot;&gt;SQS&lt;/a&gt; and boto 3 to perform basic operations on the service.
-&lt;!--more--&gt;&lt;/p&gt;
-
-&lt;p&gt;SQS is a highly available and scalable PaaS for Messaging. This allows for decoupling various components of the architecture, and cleaner hand-off of responsibilities across them. We use SQS heavily at &lt;a href=&quot;https://www.marqeta.com&quot; target=&quot;_blank_&quot;&gt;Marqeta&lt;/a&gt; for various integration patterns.&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;If you’re used to JMS, then you may need some pivoting, as SQS is not exactly a JMS provider, but there is a &lt;a href=&quot;http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-java-message-service-jms-client.html&quot; target=&quot;_blank_&quot;&gt;library&lt;/a&gt; that can be used as a bridge between JMS and SQS.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h3 id=&quot;setup&quot;&gt;Setup&lt;/h3&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;
-    &lt;p&gt;You should already have an &lt;a href=&quot;https://aws.amazon.com/free/&quot; target=&quot;_blank_&quot;&gt;AWS account&lt;/a&gt;, and AWS configured on your development machine via AWS CLI’s &lt;code class=&quot;highlighter-rouge&quot;&gt;aws configure&lt;/code&gt; command. Here is a &lt;a href=&quot;https://lobster1234.github.io/2017/02/17/marqeta-aws-sqs-lab/&quot; target=&quot;_blank_&quot;&gt;quick tutorial&lt;/a&gt; to familiarize yourself with SQS.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;You should already have python3 and pip3 installed. Please see &lt;a href=&quot;https://lobster1234.github.io/2017/05/25/python-java-primer/&quot; target=&quot;_blank_&quot;&gt;this post&lt;/a&gt; for details on installing and getting started with Python 3.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;To install Boto 3, type &lt;code class=&quot;highlighter-rouge&quot;&gt;pip3 install boto3&lt;/code&gt; on the shell prompt.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Verify that Boto 3 is installed -&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;pre&gt;&lt;code class=&quot;language-bash-3&quot;&gt;bash-3.2$ pip3 show boto3
-Name: boto3
-Version: 1.4.4
-Summary: The AWS SDK for Python
-Home-page: https://github.com/boto/boto3
-Author: Amazon Web Services
-Author-email: UNKNOWN
-License: Apache License 2.0
-Location: /Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages
-Requires: s3transfer, jmespath, botocore
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;We will use a standard queue, for &lt;a href=&quot;http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues.html&quot; target=&quot;_blank_&quot;&gt;FIFO Queues&lt;/a&gt;, see notes in the comments below.&lt;/p&gt;
-
-&lt;h3 id=&quot;the-code&quot;&gt;The Code&lt;/h3&gt;
-&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#!/usr/local/bin/python3&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;boto3&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# create a boto3 client&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;client&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;boto3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;client&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'sqs'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# create the test queue&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# for a FIFO queue, the name must end in .fifo, and you must pass FifoQueue = True&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;client&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;create_queue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;QueueName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'test_queue'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# get a list of queues, we get back a dict with 'QueueUrls' as a key with a list of queue URLs&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;queues&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;client&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;list_queues&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;QueueNamePrefix&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'test_queue'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# we filter to narrow down the list&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;test_queue_url&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;queues&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'QueueUrls'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# send 100 messages to this queue&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;100&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
-    &lt;span class=&quot;c&quot;&gt;# we set a simple message body for each message&lt;/span&gt;
-    &lt;span class=&quot;c&quot;&gt;# for FIFO queues, a 'MessageGroupId' is required, which is a 128 char alphanumeric string&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;enqueue_response&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;client&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;send_message&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;QueueUrl&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;test_queue_url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;MessageBody&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'This is test message #'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
-    &lt;span class=&quot;c&quot;&gt;# the response contains MD5 of the body, a message Id, MD5 of message attributes, and a sequence number (for FIFO queues)&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Message ID : '&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;enqueue_response&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'MessageId'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# next, we dequeue these messages - 10 messages at a time (SQS max limit) till the queue is exhausted.&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# in production/real setup, I suggest using long polling as you get billed for each request, regardless of an empty response&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;messages&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;client&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;receive_message&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;QueueUrl&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;test_queue_url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;MaxNumberOfMessages&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# adjust MaxNumberOfMessages if needed&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'Messages'&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;messages&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# when the queue is exhausted, the response dict contains no 'Messages' key&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;message&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;messages&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Messages'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]:&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# 'Messages' is a list&lt;/span&gt;
-            &lt;span class=&quot;c&quot;&gt;# process the messages&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Body'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
-            &lt;span class=&quot;c&quot;&gt;# next, we delete the message from the queue so no one else will process it again&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;client&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;delete_message&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;QueueUrl&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;test_queue_url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ReceiptHandle&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'ReceiptHandle'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Queue is now empty'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;break&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;Please refer to Boto 3 SQS documentation &lt;a href=&quot;http://boto3.readthedocs.io/en/latest/reference/services/sqs.html&quot; target=&quot;_blank_&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;</content>
-
-      
-      
-      
-      
-      
-
-      
-        <author>
-            <name>Manish Pandit</name>
-          
-          
-        </author>
-      
-
-      
-        <category term="boto" />
-      
-        <category term="python" />
-      
-        <category term="aws" />
-      
-        <category term="sqs" />
-      
-
-      
-
-      
-        <summary type="html">Boto 3 is the AWS SDK for Python. In fact, this SDK is the reason I picked up Python - so I can do stuff with AWS with a few lines of Python in a script instead of a full blown Java setup. Its fun, easy, and pretty much feels like working on a CLI with a rich programming language to back it up. In this post we will use SQS and boto 3 to perform basic operations on the service.</summary>
       
 
       

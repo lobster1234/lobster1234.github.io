@@ -119,6 +119,175 @@
       <li>
         <header class="post-header">
           <h1 class="post-title">
+            <a class="post-link" href="/2018/12/20/lambda-layers/">Lambda Layers</a>
+          </h1>
+
+          <p class="post-meta">Dec 20, 2018 •  •
+  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/aws/">aws</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/serverless/">serverless</a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+
+
+ •
+  
+
+</p>
+        </header>
+
+        <div class="post-content">
+          <p>At <a href="https://twitter.com/AWSreInvent/status/1068200715733020673">reInvent 2018</a>, AWS announced <a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">Lambda Layers</a>, bringing Lambda construct closer to that of an AMI. Put simply, layers are dependencies that can be made available to the function at runtime. Currently there can be 5 <em>layers</em> associated with a function. Layers help with isolating common dependencies, as well as keeping the runtime consistent in terms of versions - just like the AMIs do. In this post I’ll walk through creating a Python layer, and associating it with a function. I’ll use the CLI, <a href="https://github.com/awslabs/aws-shell">aws-shell</a> to accomplish this.</p>
+
+
+        </div>
+        
+          <p class="post-continue">
+            <a href="/2018/12/20/lambda-layers/">Read on &rarr;</a>
+          </p>
+        
+      </li>
+    
+      
+      
+
+      <li>
+        <header class="post-header">
+          <h1 class="post-title">
             <a class="post-link" href="/2018/11/29/aws-certified-solutions-architect-associate-2018-exam-notes/">AWS Certified Solutions Architect Associate 2018 Notes</a>
           </h1>
 
@@ -730,108 +899,6 @@
         
           <p class="post-continue">
             <a href="/2018/04/14/amazon-api-gateway-ip-whitelisting/">Read on &rarr;</a>
-          </p>
-        
-      </li>
-    
-      
-      
-
-      <li>
-        <header class="post-header">
-          <h1 class="post-title">
-            <a class="post-link" href="/2018/04/01/elasticmq-docker-ecs/">Running ElasticMQ in ECS</a>
-          </h1>
-
-          <p class="post-meta">Apr 1, 2018 •  •
-  
-    
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-        <a href="/categories/aws/">aws</a>
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-  
-
-
- •
-  
-
-</p>
-        </header>
-
-        <div class="post-content">
-          <p>This post is an overview on running <a href="https://github.com/adamw/elasticmq">ElasticMQ</a> in <a href="https://aws.amazon.com/ecs/">Amazon ECS</a>. This can help <em>simulate</em> <a href="https://aws.amazon.com/sqs/">SQS</a> for development purposes, and running it in ECS would help with resourcing, as well as having an ALB to act as an <code class="highlighter-rouge">endpoint-url</code>. I’ve used EC2 and not <a href="https://aws.amazon.com/fargate/">Fargate</a>, but this can just as easily be launched as a Fargate task. While there is also <a href="https://localstack.cloud/">localstack</a>, for this particular case, I just wanted to run SQS Mock and not all other services localstack comes bundled with.</p>
-
-<p>Familiarity with ECS, specially around creating Task Definitions, Services, and associating them with Application Load Balancers will definitely help.</p>
-
-
-        </div>
-        
-          <p class="post-continue">
-            <a href="/2018/04/01/elasticmq-docker-ecs/">Read on &rarr;</a>
           </p>
         
       </li>
