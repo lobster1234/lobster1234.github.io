@@ -351,11 +351,13 @@ $ aws s3 ls
 </code></pre>
 </div>
 
-<p>As mentioned earlier, another way to achieve this is using the environment variable, <code class="highlighter-rouge">AWS_SHARED_CREDENTIALS_FILE</code>. In that case, the script will be much simpler, like so</p>
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c">#!/bin/bash</span>
-<span class="nb">export </span><span class="nv">AWS_SHARED_CREDENTIALS_FILE</span><span class="o">=</span>~/.aws/credentials.<span class="nv">$1</span>
-</code></pre>
-</div>
+<p>As mentioned earlier, another way to achieve this is using the environment variable, <code class="highlighter-rouge">AWS_SHARED_CREDENTIALS_FILE</code>, which would mean setting up this environment variable to the location of the credentials file.</p>
+
+<p><code class="highlighter-rouge">export AWS_SHARED_CREDENTIALS_FILE=~/.aws/credentials.personal</code></p>
+
+<p>or</p>
+
+<p><code class="highlighter-rouge">export AWS_SHARED_CREDENTIALS_FILE=~/.aws/credentials.svcserverless</code></p>
 
 <h3 style="text-align: center" id="comments">Comments</h3>
 
