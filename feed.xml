@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2019-01-02T11:06:22-08:00</updated>
+  <updated>2019-01-04T00:18:50-08:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -25,6 +25,178 @@
     </author>
   
 
+  
+  
+    <entry>
+      
+      <title type="html">Managing Multiple AWS Credentials</title>
+      
+      
+      <link href="https://lobster1234.github.io/2019/01/03/managing-multiple-aws-credentials/" rel="alternate" type="text/html" title="Managing Multiple AWS Credentials" />
+      
+      <published>2019-01-03T12:44:37-08:00</published>
+      <updated>2019-01-03T12:44:37-08:00</updated>
+      <id>https://lobster1234.github.io/2019/01/03/managing-multiple-aws-credentials</id>
+      <content type="html" xml:base="https://lobster1234.github.io/2019/01/03/managing-multiple-aws-credentials/">&lt;p&gt;Simple script to manage multiple &lt;a href=&quot;https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html&quot;&gt;AWS credentials&lt;/a&gt; when using the CLI or SDKs.
+&lt;!--more--&gt;
+As much as using &lt;code class=&quot;highlighter-rouge&quot;&gt;aws_access_key_id&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;aws_secret_access_key&lt;/code&gt; is not ideal, it is the only sane way to work with AWS programmatically or via CLIs from a non-EC2 environment, such as a developer laptop. This is achieved via a &lt;code class=&quot;highlighter-rouge&quot;&gt;credentials&lt;/code&gt; file under &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.aws&lt;/code&gt; by default.&lt;/p&gt;
+
+&lt;p&gt;More often that not, the developers would need multiple sets of credentials - say, for a personal account + dev account at work + test account at work.&lt;/p&gt;
+
+&lt;p&gt;There is a provision of &lt;code class=&quot;highlighter-rouge&quot;&gt;profiles&lt;/code&gt; that can be used to set up multiple credentials in one file. I personally find this a bit hard to manage, and would rather split the credentials in their own &lt;code class=&quot;highlighter-rouge&quot;&gt;credentials&lt;/code&gt; file. Then we can either use the environment variable &lt;code class=&quot;highlighter-rouge&quot;&gt;AWS_SHARED_CREDENTIALS_FILE&lt;/code&gt; to point to the desired file, or use symlinks.&lt;/p&gt;
+
+&lt;p&gt;This post shows my set up, which works pretty well. There is still human factor involved, just like it would be to remember to set the right profile.&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;p&gt;First, I split out the credentials into their own files (vs. profiles). This has credentials for 3 IAM users, each with different policies attached, and my personal profile being entirely different account altogether.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ cat credentials
+[default]
+#personal
+aws_access_key_id = AKIA****************
+aws_secret_access_key = a************************************ABC
+[svcserverless]
+aws_access_key_id = AKIA****************
+aws_secret_access_key = b************************************DEF
+[svcec2readonly]
+aws_access_key_id = AKIA****************
+aws_secret_access_key = c************************************GHI
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;When split, we end up with 3 &lt;code class=&quot;highlighter-rouge&quot;&gt;credentials&lt;/code&gt; files.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;credentials.personal&lt;/em&gt;&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[default]
+aws_access_key_id = AKIA****************
+aws_secret_access_key = a************************************ABC
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;em&gt;credentials.svcserverless&lt;/em&gt;&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[default]
+aws_access_key_id = AKIA****************
+aws_secret_access_key = b************************************DEF
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;em&gt;credentials.svcec2readonly&lt;/em&gt;&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[default]
+aws_access_key_id = AKIA****************
+aws_secret_access_key = c************************************GHI
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Next comes a script which will switch the &lt;code class=&quot;highlighter-rouge&quot;&gt;credentials&lt;/code&gt; file according to what’s needed.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;switch.sh&lt;/em&gt;&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#!/bin/bash&lt;/span&gt;
+rm ~/.aws/credentials
+ln -s ~/.aws/credentials.&lt;span class=&quot;nv&quot;&gt;$1&lt;/span&gt;  ~/.aws/credentials
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;I copied this script to &lt;code class=&quot;highlighter-rouge&quot;&gt;~/bin&lt;/code&gt; which is in my &lt;code class=&quot;highlighter-rouge&quot;&gt;$PATH&lt;/code&gt; after &lt;code class=&quot;highlighter-rouge&quot;&gt;chmod +x&lt;/code&gt;‘ing it.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ chmod +x switch.sh
+$ cp switch.sh ~/bin
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;This makes credential switching much easier, like so -&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ switch.sh svcserverless
+
+$ ls -altrh ~/.aws
+-rw-------   1 mpandit  staff    43B Apr 24  2018 config
+-rw-------   1 mpandit  staff   116B Jan  3 18:48 credentials.svcserverless
+-rw-------   1 mpandit  staff   116B Jan  3 18:49 credentials.svcec2readonly
+-rw-------   1 mpandit  staff   116B Jan  3 18:50 credentials.personal
+lrwxr-xr-x   1 mpandit  staff    40B Jan  3 23:23 credentials -&amp;gt; /Users/mpandit/.aws/credentials.svcserverless
+
+$ aws s3 ls
+2018-04-12 17:14:15 mpandit-serverless-dev-deploy
+2018-05-23 13:45:31 mpandit-serverless-deployment-bucket
+2018-04-23 12:33:37 mpandit-sls-deployment-bucket-test
+
+$ switch.sh personal
+
+$ aws s3 ls  
+2018-04-14 00:12:59 aws-java-maven-dev-serverlessdeploymentbucket-lm2r7tvgdp3v
+2017-10-13 11:03:23 aws-java-maven-test-serverlessdeploymentbucket-1jt3eyy0xc3f0
+2017-08-23 13:11:36 cf-templates-olp5joy4pfd0-us-east-1
+2017-03-03 22:36:54 helloworld-dev-serverlessdeploymentbucket-3c6q18d7rv4g
+2017-09-29 01:36:06 lobster1234-cloudtrail-audit-log
+2017-06-22 12:01:16 lobster1234-infrastructure
+2018-11-22 19:42:36 mpandit-versioned
+2018-12-14 01:32:50 myblog-jekyll-output
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;As mentioned earlier, another way to achieve this is using the environment variable, &lt;code class=&quot;highlighter-rouge&quot;&gt;AWS_SHARED_CREDENTIALS_FILE&lt;/code&gt;. In that case, the script will be much simpler, like so&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;AWS_SHARED_CREDENTIALS_FILE&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;~/.aws/credentials.&lt;span class=&quot;nv&quot;&gt;$1&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 style=&quot;text-align: center&quot; id=&quot;comments&quot;&gt;Comments&lt;/h3&gt;
+
+&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = &quot;https://lobster1234.github.io/2019/01/03/managing-multiple-aws-credentials/&quot;;  
+this.page.identifier = &quot;/2019/01/03/managing-multiple-aws-credentials&quot;;
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://lobster1234.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+&lt;/script&gt;
+
+&lt;noscript&gt;Please enable JavaScript to view the &lt;a href=&quot;https://disqus.com/?ref_noscript&quot;&gt;comments powered by Disqus.&lt;/a&gt;&lt;/noscript&gt;
+
+&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+
+
+      
+
+&lt;/script&gt;</content>
+
+      
+      
+      
+      
+      
+
+      
+        <author>
+            <name>Manish Pandit</name>
+          
+          
+        </author>
+      
+
+      
+        <category term="aws" />
+      
+
+      
+        <category term="aws" />
+      
+
+      
+        <summary type="html">Simple script to manage multiple AWS credentials when using the CLI or SDKs.</summary>
+      
+
+      
+      
+    </entry>
+  
   
   
     <entry>
@@ -4822,136 +4994,6 @@ s.setAttribute('data-timestamp', +new Date());
 
       
         <summary type="html">Search is one of the most fantastic areas of the technology industry, and has been addressed many, many times with different algorithms, producing varying degrees of success. We get so used to it, that often times I wish I had a Cmd-F while reading a real book. Recently we had our Quarterly Hack Week at Marqeta, and one of the ideas was to build search around our public pages. These pages would include the public website assets, as well as the the API developer guides and documentation. This post is a quick summary of the infrastructure, setup, and gotchas of using Nutch 2.3.1 to build a site search - essentially notes from this hack week project.</summary>
-      
-
-      
-      
-    </entry>
-  
-  
-  
-    <entry>
-      
-      <title type="html">Caching - Gotchas &amp;amp; Lessons Learned</title>
-      
-      
-      <link href="https://lobster1234.github.io/2017/07/05/caching-gotchas-and-lessons-learned/" rel="alternate" type="text/html" title="Caching - Gotchas &amp; Lessons Learned" />
-      
-      <published>2017-07-05T23:44:37-07:00</published>
-      <updated>2017-07-05T23:44:37-07:00</updated>
-      <id>https://lobster1234.github.io/2017/07/05/caching-gotchas-and-lessons-learned</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2017/07/05/caching-gotchas-and-lessons-learned/">&lt;p&gt;It has been said &lt;a href=&quot;https://martinfowler.com/bliki/TwoHardThings.html&quot; target=&quot;_blank_&quot;&gt;time and again&lt;/a&gt; - &lt;em&gt;“There are only two hard things in Computer Science: cache invalidation and naming things”.&lt;/em&gt; Having run into both of these problems in my professional career, I figured I could write a post, summarizing the lessons I have learned along the way by seeing and building various caching architectures across many companies, big and small.&lt;/p&gt;
-
-&lt;p&gt;Just like threading, caching is easy to code, but often creates more problems than it intends to solve. These problems can arise from - you guessed it - invalidation,  sub-par efficiency, inconsistency, and many more. It is also one of my favorite topics for technical interviews :)
-&lt;!--more--&gt;&lt;/p&gt;
-&lt;h1 id=&quot;caching---an-oversimplified-introduction&quot;&gt;Caching - An Oversimplified Introduction&lt;/h1&gt;
-
-&lt;p&gt;By definition, a &lt;em&gt;cache&lt;/em&gt; is a storage which stores the result from a previous data access, in order to make it available more efficiently for future accesses. Cached data usually has a defined &lt;em&gt;time to live&lt;/em&gt;, or &lt;em&gt;TTL&lt;/em&gt; so it can be evicted, and replaced with more recent state. When data is found in the cache, it is called a &lt;em&gt;hit&lt;/em&gt;, and a failure results in a &lt;em&gt;miss&lt;/em&gt;. When a &lt;em&gt;miss&lt;/em&gt; happens, the underlying data store is accessed, and the result is placed in the cache with a &lt;em&gt;TTL&lt;/em&gt;, and the cycle goes on.&lt;/p&gt;
-
-&lt;p&gt;&lt;em&gt;Hit ratio&lt;/em&gt; (&lt;code class=&quot;highlighter-rouge&quot;&gt;nHits:nMisses&lt;/code&gt;) is a metric used to measure caching efficiency - a higher &lt;em&gt;hit ratio&lt;/em&gt; would mean efficient caching, while a lower &lt;em&gt;hit ratio&lt;/em&gt; would mean the cache is not really helping as much as it should. This is the case when the cached data is highly mutable, and gets &lt;em&gt;invalidated&lt;/em&gt; way too often to be of any value for future requests.&lt;/p&gt;
-
-&lt;p&gt;With this introduction, here are the lessons learned, and best practices:&lt;/p&gt;
-
-&lt;h1 id=&quot;1-take-it-easy&quot;&gt;1. Take it easy&lt;/h1&gt;
-&lt;p&gt;Caching is super easy to implement. It also has the charm that attracts many architects and developers, giving a false impression of being a low hanging fruit. However, do not get carried away. Identify the immutable vs. mutable objects in your application, as having a large imbalance between these may make caching a blessing or a curse. Identify the usage patterns around your data. Start small by caching the immutable data, and monitor the performance of the application. Measure the &lt;em&gt;hit ratio&lt;/em&gt; before moving on to the more aggressive approaches. Make data-driven decisions.&lt;/p&gt;
-
-&lt;h1 id=&quot;2-not-all-caches-are-alike&quot;&gt;2. Not all caches are alike&lt;/h1&gt;
-&lt;p&gt;A cache can be &lt;em&gt;in-process&lt;/em&gt; (taking the memory space of the application server), or &lt;em&gt;global&lt;/em&gt; (out-of-process). For example, &lt;a href=&quot;http://www.ehcache.org/&quot; target=&quot;_blank_&quot;&gt;EHCache&lt;/a&gt; is an in-process cache, while &lt;a href=&quot;https://memcached.org/&quot; target=&quot;_blank_&quot;&gt;Memcached&lt;/a&gt; or &lt;a href=&quot;https://redis.io&quot; target=&quot;_blank_&quot;&gt;Redis&lt;/a&gt; are global cache servers. There are pros and cons to these. Some architectures also do a mix-and-match, which is why knowing your data usage patterns is the first step in designing a good caching strategy. The in-process cache will add state to the server, and, if in a cluster, there is a good chance each instance will end up with a different state of the data, causing inconsistency. However, for immutable data, in-process caches work great. As does a simple Map. Global caches hold a &lt;em&gt;shared state&lt;/em&gt; of the application, but need extra infrastructure. Global caches can be clustered, and provide a single, consistent view of cached data.&lt;/p&gt;
-
-&lt;h1 id=&quot;3-design-for-high-availability&quot;&gt;3. Design for High Availability&lt;/h1&gt;
-&lt;p&gt;In-process caches are more available than global caches if we mitigate the consistency issues. Global caches are a different story. In the event of global caches failures, based on the client, the connections will time out, thereby taking up network time and locking threads. A failure will also cause a huge load on the back end, snowballing into increased database contention, possibly rippling across multiple applications which are relying on your application’s API. Highly available caching is implemented via cache replication and/or persistent caches. This replication can happen via shards, and/or in a master/slave type configuration. &lt;a href=&quot;https://www.couchbase.com&quot; target=&quot;_blank_&quot;&gt;Couchbase&lt;/a&gt; provides replication via Couchbase cluster. Redis provides a highly available &lt;a href=&quot;https://redis.io/topics/sentinel&quot; target=&quot;_blank_&quot;&gt;Redis Sentinel&lt;/a&gt;. Consider these servers instead of inventing one of your own, unless absolutely necessary. &lt;a href=&quot;https://varnish-cache.org/&quot; target=&quot;_blank_&quot;&gt;Varnish HTTP Cache&lt;/a&gt; is an HTTP cache, useful for caching HTTP responses with a built in &lt;code class=&quot;highlighter-rouge&quot;&gt;grace period&lt;/code&gt;, where the cache serves stale data for an amount of time even if the back-end is unavailable.&lt;/p&gt;
-
-&lt;h1 id=&quot;4-beware-of-cache-hotspots&quot;&gt;4. Beware of Cache Hotspots&lt;/h1&gt;
-&lt;p&gt;Hotspots are created when a value tied to key becomes all too popular. An example can be a breaking news story cached in one of the servers. In this event, the global server containing the key being accessed heavily ends up degrading performance for other keys on the same server. This can be avoided via a &lt;em&gt;near/far cache architecture&lt;/em&gt;, where a cache server with &lt;em&gt;very low TTL&lt;/em&gt; runs on the local instance (localhost), and the application looks up the key in the &lt;em&gt;near server&lt;/em&gt; first, and in the event of a miss, reaches out to the &lt;em&gt;far server&lt;/em&gt;. The low TTL (few seconds) ensures that the data is not too stale, while the far cache server does not have to get hit that hard in a hotspot situation.&lt;/p&gt;
-
-&lt;h1 id=&quot;5-namespace-your-keys&quot;&gt;5. Namespace your Keys&lt;/h1&gt;
-&lt;p&gt;Keys are the identifiers against which the values are stored in the cache. Key collisions can have nightmarish results. Have a good naming strategy for the keys, especially when sharing a global cache cluster across multiple application servers. Have a common function to take the application name, object name, and object ID and spit out a key. This is particularly important for multi-tenant servers, where they’d need to cache multiple, identical key names. Tenant A’s person_1234 is not the same as Tenant B’s person_1234. If all the IDs are GUIDs, that can offer some help, but most often the IDs are auto-inc numeric primary keys. The keys are also distributed via a hash functions, usually implemented in the client (like spymemcached). This ensures consistent key distribution across the members of a cache cluster. You may want to write your own hash function if the one provided by the cache provider is not up to the requirements.&lt;/p&gt;
-
-&lt;h1 id=&quot;6-do-not-update&quot;&gt;6. Do not Update&lt;/h1&gt;
-&lt;p&gt;Do not bother updating the cache on state changes. Just delete the key from the cache, and let the next read take care of caching the value. It may seem like a good idea to update the cache with the fresh data in the event of a state change, but it is not worth the effort. Not only this tends to have race conditions in a clustered environment, in write-heavy scenarios, data consistency becomes an issue as well. Just have your state change methods invalidate the key.&lt;/p&gt;
-
-&lt;h1 id=&quot;7-build-a-secure-auditable-invalidation-mechanism&quot;&gt;7. Build a secure, auditable, invalidation mechanism&lt;/h1&gt;
-&lt;p&gt;Realistically, no one should update the database directly while bypassing the API or the server code. However, this is an all too common scenario in the real world. This creates a situation where the cache does not hold the right state that the database has. The options are limited - delete the key, or wait for the key to expire. These options may not work if the keys are hashed (vs. human readable like &lt;code class=&quot;highlighter-rouge&quot;&gt;myapp.myperson.1234&lt;/code&gt;), or the TTL is too high. I have seen cache servers having to be bounced after this, causing a snowball effect as the database gets overloaded, akin to a complete failure of a cache server. To avoid this, create an API endpoint that would take basic parameters to form a key, create and hash the key, and delete that key from the cache. Best way is to have a &lt;em&gt;parameterized jenkins job&lt;/em&gt; for this operation - which provides security and auditing out of the box.&lt;/p&gt;
-
-&lt;h1 id=&quot;8-be-aware-of-the-key-and-value-size-limits&quot;&gt;8. Be aware of the key and value size limits&lt;/h1&gt;
-&lt;p&gt;Different cache servers have different limits. Memcached key names cannot be greater than 250 bytes, and values cannot be larger than 1 MB. Redis has much larger limits, 512 MB for key and value. For memcached, keep this in mind when namespacing. A good idea is to MD5 or hash the key name to ensure consistent and unique key of acceptable length. Similarly, based on the efficiency trade-offs, you may want to compress or change the serialization format of the values as appropriate.&lt;/p&gt;
-
-&lt;h1 id=&quot;9-http-cache-is-not-the-same-as-application-cache&quot;&gt;9. HTTP Cache is not the same as Application Cache&lt;/h1&gt;
-&lt;p&gt;While so far we have discussed objets from the database being cached, there are cases where it makes a lot of sense to cache at the HTTP level, i.e. the HTTP response from an API, or an entire HTML response from a webserver. CDNs (Content Delivery Networks) are giant HTTP Caches. This is a also common scenario in &lt;em&gt;edge caching&lt;/em&gt;, where the cache sits at the HTTP layer to cache static content with much larger TTLs. In case of APIs, the HTTP GET API URL is used as the key name. If going this route, be aware of the query strings that may have been used to modify the response. If the API supports features like field filtering, projections, sort, etc - the URL based caching may have a lower hit ratio, or inconsistent results. It is a good idea to account for these features while constructing the key. Caching the response for &lt;code class=&quot;highlighter-rouge&quot;&gt;?expand=address,business&lt;/code&gt; should also result in a &lt;em&gt;hit&lt;/em&gt; for &lt;code class=&quot;highlighter-rouge&quot;&gt;?expand=business,address&lt;/code&gt;.&lt;/p&gt;
-
-&lt;h1 id=&quot;10-use-http-cache-headers-for-http-responses&quot;&gt;10. Use HTTP Cache Headers for HTTP Responses&lt;/h1&gt;
-&lt;p&gt;This is where we move caching from the server, to the client. In other words, we can instruct the requester of our APIs or HTTP Content to cache the response at their end. Instead of building our own vernacular for these instructions, use the standard HTTP Spec. The &lt;a href=&quot;https://tools.ietf.org/html/rfc7234&quot; target=&quot;_blank_&quot;&gt;HTTP RFC 7234&lt;/a&gt; describes how HTTP content caching should behave, particularly when the client is a browser. The same directives and headers should also be used for all HTTP responses. For example, the directive &lt;code class=&quot;highlighter-rouge&quot;&gt;no-cache&lt;/code&gt; would instruct the client to never cache the response, while &lt;code class=&quot;highlighter-rouge&quot;&gt;max-age&lt;/code&gt; would instruct the client to safely re-use the response till it expires (as defined by the &lt;code class=&quot;highlighter-rouge&quot;&gt;max-age&lt;/code&gt; value, or the TTL in seconds). Regardless of a webpage or a JSON response from an API, it is a good idea to adhere to HTTP Spec.&lt;/p&gt;
-
-&lt;p&gt;Here is an example of cache headers returned by Google -&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  bash-3.2$ curl --head https://www.google.com
-  HTTP/1.1 200 OK
-  Expires: -1
-  Cache-Control: private, max-age=0
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h1 id=&quot;11-centralize-the-cache-interface-and-keep-it-simple&quot;&gt;11. Centralize the Cache Interface, and keep it simple&lt;/h1&gt;
-&lt;p&gt;Last but not the least, design all the cache operations to go through a single class instead of spreading it everywhere. This has many benefits, like centralizing the the logic for key name creation, providing vendor independent method for the rest of the application to interact with the cache, and also, optimize the serialization of the objects (like replacing Java Object Serialization with Kyro or protobuf). This also provides a way for cache key lookups and invalidations with human-friendly key names, despite the cache having hashed key names. For instance, in Java, this can be a &lt;code class=&quot;highlighter-rouge&quot;&gt;Singleton&lt;/code&gt; sitting in a commons-jar used across all the applications sharing a cache cluster.&lt;/p&gt;
-
-&lt;p&gt;In conclusion, while no solution is wrong, it is best to apply caching to get the biggest bang for the buck, reduce infrastructure overhead, and satisfy the consistency and availability requirements. Caching strategy for a Financial Application will be entirely different than that of a Social Networking App, which will be entirely different than a Content/Media Application. Caching is not a one size fits all proposition. However, I hope that by using the notes above, you can design an efficient, data-driven caching strategy across all tiers of your application.&lt;/p&gt;
-
-&lt;h1 style=&quot;text-align: center&quot; id=&quot;comments&quot;&gt;Comments&lt;/h1&gt;
-
-&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
-&lt;script&gt;
-
-/**
-*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
-/*
-var disqus_config = function () {
-this.page.url = &quot;https://lobster1234.github.io/2017/07/05/caching-gotchas-and-lessons-learned/&quot;;  
-this.page.identifier = &quot;/2017/07/05/caching-gotchas-and-lessons-learned&quot;;
-};
-*/
-(function() { // DON'T EDIT BELOW THIS LINE
-var d = document, s = d.createElement('script');
-s.src = 'https://lobster1234.disqus.com/embed.js';
-s.setAttribute('data-timestamp', +new Date());
-(d.head || d.body).appendChild(s);
-})();
-&lt;/script&gt;
-
-&lt;noscript&gt;Please enable JavaScript to view the &lt;a href=&quot;https://disqus.com/?ref_noscript&quot;&gt;comments powered by Disqus.&lt;/a&gt;&lt;/noscript&gt;
-
-&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
-&lt;script&gt;
-
-
-      
-
-&lt;/script&gt;</content>
-
-      
-      
-      
-      
-      
-
-      
-        <author>
-            <name>Manish Pandit</name>
-          
-          
-        </author>
-      
-
-      
-        <category term="architecture" />
-      
-        <category term="caching" />
-      
-
-      
-
-      
-        <summary type="html">It has been said time and again - “There are only two hard things in Computer Science: cache invalidation and naming things”. Having run into both of these problems in my professional career, I figured I could write a post, summarizing the lessons I have learned along the way by seeing and building various caching architectures across many companies, big and small. Just like threading, caching is easy to code, but often creates more problems than it intends to solve. These problems can arise from - you guessed it - invalidation, sub-par efficiency, inconsistency, and many more. It is also one of my favorite topics for technical interviews :)</summary>
       
 
       

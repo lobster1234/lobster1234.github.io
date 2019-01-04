@@ -120,6 +120,178 @@
       <li>
         <header class="post-header">
           <h1 class="post-title">
+            <a class="post-link" href="/2017/12/14/aws-lambda-http-proxy/">HTTP/S Proxy Server for AWS Lambda Invocations</a>
+          </h1>
+
+          <p class="post-meta">Dec 14, 2017 •  •
+  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/aws/">aws</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/lambda/">lambda</a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+
+
+ •
+  
+
+</p>
+        </header>
+
+        <div class="post-content">
+          <p><a href="https://aws.amazon.com/lambda/">Lambda Functions</a> are a FaaS implementation on Amazon Web Services. Setting them as HTTP/S endpoints over API Gateway can be complicated, and more often than not is an overkill for simple, internal APIs.
+Besides, API Gateway endpoints for Lambda are public, no matter how we slice and dice it. The recently announced VPC Link for API Gateway only allows the endpoints to route to a NLB target, not a Lambda.</p>
+
+<p><a href="https://github.com/lobster1234/lambda-proxy">This</a> is a lightweight HTTP/S proxy written in Java, which wraps a lambda invocation, mimicking the API Gateway-Lambda Proxy Integration.</p>
+
+
+        </div>
+        
+          <p class="post-continue">
+            <a href="/2017/12/14/aws-lambda-http-proxy/">Read on &rarr;</a>
+          </p>
+        
+      </li>
+    
+      
+      
+
+      <li>
+        <header class="post-header">
+          <h1 class="post-title">
             <a class="post-link" href="/2017/12/03/run-tasks-with-aws-fargate-and-lambda/">Run tasks with AWS Fargate and Lambda</a>
           </h1>
 
@@ -725,175 +897,6 @@
         
           <p class="post-continue">
             <a href="/2017/10/14/fan-out-with-sns-and-sqs-gotcha/">Read on &rarr;</a>
-          </p>
-        
-      </li>
-    
-      
-      
-
-      <li>
-        <header class="post-header">
-          <h1 class="post-title">
-            <a class="post-link" href="/2017/10/10/logstash-with-aws-lambda/">Logstash logging with AWS Lambda</a>
-          </h1>
-
-          <p class="post-meta">Oct 10, 2017 •  •
-  
-    
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-        <a href="/categories/aws/">aws</a>,
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-  
-    
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-        <a href="/categories/serverless/">serverless</a>
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-  
-
-
- •
-  
-
-</p>
-        </header>
-
-        <div class="post-content">
-          <p>Its a challenge to log messages with a Lambda, given that there is no server to run the agents or forwarders (splunk, filebeat, etc.) on. Here is a quick and easy tutorial to set up <a href="https://www.elastic.co/products">ELK</a> logging by writing directly to <a href="https://www.elastic.co/products/logstash">logstash</a> via the <a href="https://github.com/logstash/logstash-logback-encoder">TCP appender</a> and logback. This is for a Java/Maven based Lambda.</p>
-
-
-        </div>
-        
-          <p class="post-continue">
-            <a href="/2017/10/10/logstash-with-aws-lambda/">Read on &rarr;</a>
           </p>
         
       </li>

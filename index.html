@@ -119,6 +119,106 @@
       <li>
         <header class="post-header">
           <h1 class="post-title">
+            <a class="post-link" href="/2019/01/03/managing-multiple-aws-credentials/">Managing Multiple AWS Credentials</a>
+          </h1>
+
+          <p class="post-meta">Jan 3, 2019 •  •
+  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/aws/">aws</a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+
+
+ •
+  
+
+</p>
+        </header>
+
+        <div class="post-content">
+          <p>Simple script to manage multiple <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html">AWS credentials</a> when using the CLI or SDKs.</p>
+
+
+        </div>
+        
+          <p class="post-continue">
+            <a href="/2019/01/03/managing-multiple-aws-credentials/">Read on &rarr;</a>
+          </p>
+        
+      </li>
+    
+      
+      
+
+      <li>
+        <header class="post-header">
+          <h1 class="post-title">
             <a class="post-link" href="/2018/12/20/lambda-layers/">Lambda Layers</a>
           </h1>
 
@@ -799,108 +899,6 @@
         
           <p class="post-continue">
             <a href="/2018/05/31/server-to-server-auth-with-amazon-cognito/">Read on &rarr;</a>
-          </p>
-        
-      </li>
-    
-      
-      
-
-      <li>
-        <header class="post-header">
-          <h1 class="post-title">
-            <a class="post-link" href="/2018/04/14/amazon-api-gateway-ip-whitelisting/">IP Whitelisting with Amazon API Gateway</a>
-          </h1>
-
-          <p class="post-meta">Apr 14, 2018 •  •
-  
-    
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-        <a href="/categories/aws/">aws</a>
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-  
-
-
- •
-  
-
-</p>
-        </header>
-
-        <div class="post-content">
-          <p><a href="https://aws.amazon.com/api-gateway/">Amazon API Gateway</a> is a great way to wrap Lambda functions as microservices exposed over HTTP/S, among many uses. However, any API Gateway endpoint is publically accessible. There are ways to restrict access using <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/permissions.html">IAM</a> and <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html">Authorizers</a>, but for simple task of IP whitelisting was always somewhat challenging, if not downright hack-y.</p>
-
-<p>Recently <a href="https://aws.amazon.com/about-aws/whats-new/2018/04/amazon-api-gateway-supports-resource-policies/">AWS announced Resource Policies</a> for API Gateway, which make IP whitelisting a breeze. This is extremely helpful for a company such as <a href="https://www.marqeta.com">mine</a>, as we deal with a lot of integrations that rely on IP whitelisting as one of the many layers of security. In this post I will walk through setting up IP whitelisting on an API hosted on API Gateway. We will use API Gateway’s built in Mock API feature to create a simple API, and secure it via IP Whitelisting.</p>
-
-
-        </div>
-        
-          <p class="post-continue">
-            <a href="/2018/04/14/amazon-api-gateway-ip-whitelisting/">Read on &rarr;</a>
           </p>
         
       </li>
