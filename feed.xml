@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2019-01-04T00:29:45-08:00</updated>
+  <updated>2019-01-06T02:16:21-08:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -87,10 +87,14 @@ aws_secret_access_key = c************************************GHI
 &lt;p&gt;Next comes a script which will switch the &lt;code class=&quot;highlighter-rouge&quot;&gt;credentials&lt;/code&gt; file according to what’s needed.&lt;/p&gt;
 
 &lt;p&gt;&lt;em&gt;switch.sh&lt;/em&gt;&lt;/p&gt;
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#!/bin/bash&lt;/span&gt;
-rm ~/.aws/credentials
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$# &lt;/span&gt;-eq 0 &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;then
+    &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Error: Provide the AWS credentials profile name&quot;&lt;/span&gt;
+    &lt;span class=&quot;nb&quot;&gt;exit&lt;/span&gt; -1
+&lt;span class=&quot;k&quot;&gt;fi
+&lt;/span&gt;rm ~/.aws/credentials
 ln -s ~/.aws/credentials.&lt;span class=&quot;nv&quot;&gt;$1&lt;/span&gt;  ~/.aws/credentials
-
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;p&gt;I copied this script to &lt;code class=&quot;highlighter-rouge&quot;&gt;~/bin&lt;/code&gt; which is in my &lt;code class=&quot;highlighter-rouge&quot;&gt;$PATH&lt;/code&gt; after &lt;code class=&quot;highlighter-rouge&quot;&gt;chmod +x&lt;/code&gt;‘ing it.&lt;/p&gt;

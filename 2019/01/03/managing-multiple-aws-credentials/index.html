@@ -309,10 +309,14 @@ aws_secret_access_key = c************************************GHI
 <p>Next comes a script which will switch the <code class="highlighter-rouge">credentials</code> file according to what’s needed.</p>
 
 <p><em>switch.sh</em></p>
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="c">#!/bin/bash</span>
-rm ~/.aws/credentials
+<div class="language-sh highlighter-rouge"><pre class="highlight"><code><span class="c">#!/bin/bash</span>
+<span class="k">if</span> <span class="o">[</span> <span class="nv">$# </span>-eq 0 <span class="o">]</span>
+  <span class="k">then
+    </span><span class="nb">echo</span> <span class="s2">"Error: Provide the AWS credentials profile name"</span>
+    <span class="nb">exit</span> -1
+<span class="k">fi
+</span>rm ~/.aws/credentials
 ln -s ~/.aws/credentials.<span class="nv">$1</span>  ~/.aws/credentials
-
 </code></pre>
 </div>
 <p>I copied this script to <code class="highlighter-rouge">~/bin</code> which is in my <code class="highlighter-rouge">$PATH</code> after <code class="highlighter-rouge">chmod +x</code>‘ing it.</p>
