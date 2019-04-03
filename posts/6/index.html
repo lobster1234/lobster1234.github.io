@@ -120,6 +120,179 @@
       <li>
         <header class="post-header">
           <h1 class="post-title">
+            <a class="post-link" href="/2017/05/10/migrating-a-domain-to-amazon-route53/">Migrating a Domain to Amazon Route53</a>
+          </h1>
+
+          <p class="post-meta">May 10, 2017 •  •
+  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/aws/">aws</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/route53/">route53</a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+
+
+ •
+  
+
+</p>
+        </header>
+
+        <div class="post-content">
+          <p><a href="https://aws.amazon.com/route53/" target="_blank_">Amazon Route53</a> is a highly available and scalable DNS service. Route53 provides Domain Registrations and Transfers, DNS service to route traffic to the infrastructure (either within AWS or non-AWS), advanced routing policies like weighted and geo, and health check services that can be leveraged to perform traffic routing to different destination in the event of a failure. It provides more flexibility and seamless integration with AWS Services than any other DNS host can.</p>
+
+<p>One of the most common scenarios is the need to send traffic from a site registered at non-Route53 providers to an ELB, which Route53 supports via an <a href="http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resource-record-sets-choosing-alias-non-alias.html" target="_blank_">Alias Record</a>.</p>
+
+<p>In this post we will discuss moving the DNS - where requests to a domain hosted on a non-Route53 provider would resolve to Route53, and then point to an ELB which could be hosting a web property. However, the destination does not have to be an ELB, it can be any public IP. The other part is that of the Domain Registration itself, which can be transferred to Route53 if needed.</p>
+
+
+        </div>
+        
+          <p class="post-continue">
+            <a href="/2017/05/10/migrating-a-domain-to-amazon-route53/">Read on &rarr;</a>
+          </p>
+        
+      </li>
+    
+      
+      
+
+      <li>
+        <header class="post-header">
+          <h1 class="post-title">
             <a class="post-link" href="/2017/04/28/setting-up-aws-billing-alerts/">Setting up AWS Billing Alerts</a>
           </h1>
 
@@ -1212,108 +1385,6 @@
         
           <p class="post-continue">
             <a href="/2017/04/12/serverless-framework-aws-apigateway/">Read on &rarr;</a>
-          </p>
-        
-      </li>
-    
-      
-      
-
-      <li>
-        <header class="post-header">
-          <h1 class="post-title">
-            <a class="post-link" href="/2017/04/08/setting-up-fish-and-iterm2/">Fish and iTerm2</a>
-          </h1>
-
-          <p class="post-meta">Apr 8, 2017 •  •
-  
-    
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-        <a href="/categories/shell/">shell</a>
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-  
-
-
- •
-  
-
-</p>
-        </header>
-
-        <div class="post-content">
-          <p>So, out of boredom, I decided to upgrade my shell and terminal to something closer to 2017, instead of living in the early 90s. Clearly I’e been using <code class="highlighter-rouge">bash</code> all these years - mostly on Ubuntu and lately on OSX. But I’ve always been <em>lazy and complacent</em> with the terminal. I’ve always wanted to set up <a href="http://fishshell.com" target="_blank"><code class="highlighter-rouge">fish</code></a> - <strong>Friendly Interactive SHell</strong>. for it’s git integration, and very rich interaction. Sure, all of this can be done on <code class="highlighter-rouge">bash</code> or <code class="highlighter-rouge">zsh</code> but I hate configuration, and combing hundreds of git repos for <code class="highlighter-rouge">bashfiles</code> and find what works for me.</p>
-
-<p>While at <code class="highlighter-rouge">fish</code>, I also decided to upgrade the default Mac <code class="highlighter-rouge">terminal</code> to <code class="highlighter-rouge">iTerm2</code>. This led me to a journey through installing fonts all the way to picking up the theme that works for me. But again, no configuration to mess with.</p>
-
-
-        </div>
-        
-          <p class="post-continue">
-            <a href="/2017/04/08/setting-up-fish-and-iterm2/">Read on &rarr;</a>
           </p>
         
       </li>
