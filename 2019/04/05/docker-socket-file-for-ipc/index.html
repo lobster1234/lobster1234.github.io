@@ -263,6 +263,8 @@
 
 <!--more-->
 
+<p>Before we get to the socket file, here is a quick refresher on Unix Sockets and typical Docker setup for context.</p>
+
 <h2 id="unix-sockets">Unix Sockets</h2>
 
 <p>The term <code class="highlighter-rouge">Sockets</code> commonly refers to <code class="highlighter-rouge">IP Sockets</code>. These are the ones that are bound to a port (and address), we send TCP requests to, and get responses from.</p>
@@ -283,7 +285,7 @@ srw-------   1 root             daemon              0 Mar 29 11:46 vpncontrol.so
 <p>Docker installation on the Mac via <a href="https://www.docker.com/products/docker-desktop">Docker Desktop</a> has three components to it -</p>
 
 <ol>
-  <li>The Docker Daemon (aka Docker Server) - On a Mac, which runs atop HyperKit Hypervisor as a <a href="https://github.com/linuxkit/linuxkit">LinuxKit VM</a>.</li>
+  <li>The Docker Daemon (aka Docker Server), which runs atop HyperKit Hypervisor as a <a href="https://github.com/linuxkit/linuxkit">LinuxKit VM</a>.</li>
   <li>The Docker CLI (<code class="highlighter-rouge">docker</code> ,<code class="highlighter-rouge">docker-compose</code>, and <code class="highlighter-rouge">docker-machine</code>).</li>
   <li>The <a href="https://docs.docker.com/engine/api/v1.37/">Docker REST API</a>, which is explosed via a Unix Socket at <code class="highlighter-rouge">/var/run/docker.sock</code> by default.</li>
 </ol>

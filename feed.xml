@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2019-04-07T03:01:47-07:00</updated>
+  <updated>2019-04-07T03:39:29-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -41,6 +41,8 @@
 
 &lt;!--more--&gt;
 
+&lt;p&gt;Before we get to the socket file, here is a quick refresher on Unix Sockets and typical Docker setup for context.&lt;/p&gt;
+
 &lt;h2 id=&quot;unix-sockets&quot;&gt;Unix Sockets&lt;/h2&gt;
 
 &lt;p&gt;The term &lt;code class=&quot;highlighter-rouge&quot;&gt;Sockets&lt;/code&gt; commonly refers to &lt;code class=&quot;highlighter-rouge&quot;&gt;IP Sockets&lt;/code&gt;. These are the ones that are bound to a port (and address), we send TCP requests to, and get responses from.&lt;/p&gt;
@@ -61,7 +63,7 @@ srw-------   1 root             daemon              0 Mar 29 11:46 vpncontrol.so
 &lt;p&gt;Docker installation on the Mac via &lt;a href=&quot;https://www.docker.com/products/docker-desktop&quot;&gt;Docker Desktop&lt;/a&gt; has three components to it -&lt;/p&gt;
 
 &lt;ol&gt;
-  &lt;li&gt;The Docker Daemon (aka Docker Server) - On a Mac, which runs atop HyperKit Hypervisor as a &lt;a href=&quot;https://github.com/linuxkit/linuxkit&quot;&gt;LinuxKit VM&lt;/a&gt;.&lt;/li&gt;
+  &lt;li&gt;The Docker Daemon (aka Docker Server), which runs atop HyperKit Hypervisor as a &lt;a href=&quot;https://github.com/linuxkit/linuxkit&quot;&gt;LinuxKit VM&lt;/a&gt;.&lt;/li&gt;
   &lt;li&gt;The Docker CLI (&lt;code class=&quot;highlighter-rouge&quot;&gt;docker&lt;/code&gt; ,&lt;code class=&quot;highlighter-rouge&quot;&gt;docker-compose&lt;/code&gt;, and &lt;code class=&quot;highlighter-rouge&quot;&gt;docker-machine&lt;/code&gt;).&lt;/li&gt;
   &lt;li&gt;The &lt;a href=&quot;https://docs.docker.com/engine/api/v1.37/&quot;&gt;Docker REST API&lt;/a&gt;, which is explosed via a Unix Socket at &lt;code class=&quot;highlighter-rouge&quot;&gt;/var/run/docker.sock&lt;/code&gt; by default.&lt;/li&gt;
 &lt;/ol&gt;
