@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2019-04-07T03:43:03-07:00</updated>
+  <updated>2019-04-07T03:55:28-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -78,7 +78,7 @@ srw-------   1 root             daemon              0 Mar 29 11:46 vpncontrol.so
 
 &lt;p&gt;&lt;a href=&quot;https://curl.haxx.se/&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;curl&lt;/code&gt;&lt;/a&gt; is the swiss army knife for any communication. We can use &lt;code class=&quot;highlighter-rouge&quot;&gt;curl&lt;/code&gt; to act as a client and use the &lt;a href=&quot;https://docs.docker.com/engine/api/v1.37/&quot;&gt;Docker REST API&lt;/a&gt;. It’s a good idea to familiarize yourself with &lt;code class=&quot;highlighter-rouge&quot;&gt;curl&lt;/code&gt; and all the powers this little command holds. Trust me on this.&lt;/p&gt;
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;curl&lt;/code&gt; can talk to a Unix Socket via the &lt;code class=&quot;highlighter-rouge&quot;&gt;--unix-socket&lt;/code&gt; flag. Since Docker Server API is exposed as rest, we’d need to send commands over HTTP. Also, as this server is local (remeember, the file system), we can pass &lt;em&gt;any&lt;/em&gt; hostname in the URL (or stick to &lt;code class=&quot;highlighter-rouge&quot;&gt;localhost&lt;/code&gt;, that will work fine too!). The server does not care about the hostname, just the path.&lt;/p&gt;
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;curl&lt;/code&gt; can talk to a Unix Socket via the &lt;code class=&quot;highlighter-rouge&quot;&gt;--unix-socket&lt;/code&gt; flag. Since Docker Server API is exposed as REST, we’d need to send commands over HTTP. Also, as this server is local (remeember, the file system), we can pass &lt;em&gt;any&lt;/em&gt; hostname in the URL (or stick to &lt;code class=&quot;highlighter-rouge&quot;&gt;localhost&lt;/code&gt;, that will work fine too!). The server does not care about the hostname, just the path.&lt;/p&gt;
 
 &lt;h2 id=&quot;lets-go&quot;&gt;Lets go!&lt;/h2&gt;
 
@@ -211,10 +211,10 @@ redis               latest              a55fbf438dfd        11 days ago         
       &quot;6379/tcp&quot;: {}
     }
   }
-  ]
+}
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
-&lt;p&gt;Again, the CLI command to do so would be &lt;code class=&quot;highlighter-rouge&quot;&gt;docker inspect &amp;lt;imageId&amp;gt;&lt;/code&gt; (response truncated). Note that this is an exact copy of the API response.&lt;/p&gt;
+&lt;p&gt;Again, the CLI command to do so would be &lt;code class=&quot;highlighter-rouge&quot;&gt;docker inspect &amp;lt;imageId&amp;gt;&lt;/code&gt; (response truncated). Note the similarity between the two responses.&lt;/p&gt;
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bash-3.2$ docker inspect a55fbf438dfd | jq
 [
   {
@@ -238,10 +238,9 @@ redis               latest              a55fbf438dfd        11 days ago         
       &quot;AttachStderr&quot;: false,
       &quot;ExposedPorts&quot;: {
         &quot;6379/tcp&quot;: {}
-      }
     }
   }
-]
+ ]
 
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
@@ -308,7 +307,7 @@ c025ae0e698e        redis:latest        &quot;docker-entrypoint.s…&quot;   25 
 &lt;/div&gt;
 
 &lt;h3 id=&quot;stream-events&quot;&gt;Stream Events&lt;/h3&gt;
-&lt;p&gt;The Docker API is very rich, allowing processes like sidecars and monitoring systems to perform many operations. I’ll end this with one of my favorites - &lt;code class=&quot;highlighter-rouge&quot;&gt;events&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;I’ll end this sequence of APIs with my favorite - &lt;code class=&quot;highlighter-rouge&quot;&gt;events&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;/events&lt;/code&gt; API allows streaming of events on the Docker Server. This can be used to build rich interfaces, or pipelines among many possiblities.&lt;/p&gt;
 
@@ -347,6 +346,8 @@ bash-3.2$
 &lt;/div&gt;
 &lt;p&gt;Notice that we’re seeing streaming events, as they occur on the Docker Server. We can stop the redis container, and see that show up in the event stream as well.&lt;/p&gt;
 
+&lt;p&gt;Also we can see the full sequence for &lt;code class=&quot;highlighter-rouge&quot;&gt;docker run&lt;/code&gt;, which is &lt;code class=&quot;highlighter-rouge&quot;&gt;pull_image-&amp;gt;create_container-&amp;gt;network_connect-&amp;gt;start_container&lt;/code&gt;.&lt;/p&gt;
+
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bash-3.2$ docker ps
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
 c025ae0e698e        redis:latest        &quot;docker-entrypoint.s…&quot;   37 minutes ago      Up 37 minutes       0.0.0.0:6379-&amp;gt;6379/tcp   infallible_roentgen
@@ -363,7 +364,7 @@ c025ae0e698e
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;p&gt;Notice the &lt;code class=&quot;highlighter-rouge&quot;&gt;kill -&amp;gt; die -&amp;gt; network disconnect -&amp;gt; volume unmount -&amp;gt; stop&lt;/code&gt; event sequence triggered by the &lt;code class=&quot;highlighter-rouge&quot;&gt;docker stop&lt;/code&gt; command.&lt;/p&gt;
+&lt;p&gt;Notice the &lt;code class=&quot;highlighter-rouge&quot;&gt;kill-&amp;gt;die-&amp;gt;network_disconnect-&amp;gt;volume_unmount-&amp;gt;stop&lt;/code&gt; event sequence triggered by the &lt;code class=&quot;highlighter-rouge&quot;&gt;docker stop&lt;/code&gt; command.&lt;/p&gt;
 
 &lt;p&gt;Almost all the APIs are accessible via Docker CLI. This post should help connect the dots when certain containers ask to &lt;code class=&quot;highlighter-rouge&quot;&gt;mount /var/run/docker.sock&lt;/code&gt;. This file provides a very rich (and fast!) IPC channel with the Docker Server, which can then be used for various functions like cluster management, monitoring, discovery, routing, etc.&lt;/p&gt;
 

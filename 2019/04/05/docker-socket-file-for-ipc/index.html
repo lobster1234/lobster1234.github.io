@@ -300,7 +300,7 @@ srw-------   1 root             daemon              0 Mar 29 11:46 vpncontrol.so
 
 <p><a href="https://curl.haxx.se/"><code class="highlighter-rouge">curl</code></a> is the swiss army knife for any communication. We can use <code class="highlighter-rouge">curl</code> to act as a client and use the <a href="https://docs.docker.com/engine/api/v1.37/">Docker REST API</a>. It’s a good idea to familiarize yourself with <code class="highlighter-rouge">curl</code> and all the powers this little command holds. Trust me on this.</p>
 
-<p><code class="highlighter-rouge">curl</code> can talk to a Unix Socket via the <code class="highlighter-rouge">--unix-socket</code> flag. Since Docker Server API is exposed as rest, we’d need to send commands over HTTP. Also, as this server is local (remeember, the file system), we can pass <em>any</em> hostname in the URL (or stick to <code class="highlighter-rouge">localhost</code>, that will work fine too!). The server does not care about the hostname, just the path.</p>
+<p><code class="highlighter-rouge">curl</code> can talk to a Unix Socket via the <code class="highlighter-rouge">--unix-socket</code> flag. Since Docker Server API is exposed as REST, we’d need to send commands over HTTP. Also, as this server is local (remeember, the file system), we can pass <em>any</em> hostname in the URL (or stick to <code class="highlighter-rouge">localhost</code>, that will work fine too!). The server does not care about the hostname, just the path.</p>
 
 <h2 id="lets-go">Lets go!</h2>
 
@@ -433,10 +433,10 @@ redis               latest              a55fbf438dfd        11 days ago         
       "6379/tcp": {}
     }
   }
-  ]
+}
 </code></pre>
 </div>
-<p>Again, the CLI command to do so would be <code class="highlighter-rouge">docker inspect &lt;imageId&gt;</code> (response truncated). Note that this is an exact copy of the API response.</p>
+<p>Again, the CLI command to do so would be <code class="highlighter-rouge">docker inspect &lt;imageId&gt;</code> (response truncated). Note the similarity between the two responses.</p>
 <div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ docker inspect a55fbf438dfd | jq
 [
   {
@@ -460,10 +460,9 @@ redis               latest              a55fbf438dfd        11 days ago         
       "AttachStderr": false,
       "ExposedPorts": {
         "6379/tcp": {}
-      }
     }
   }
-]
+ ]
 
 </code></pre>
 </div>
@@ -530,7 +529,7 @@ c025ae0e698e        redis:latest        "docker-entrypoint.s…"   25 minutes ag
 </div>
 
 <h3 id="stream-events">Stream Events</h3>
-<p>The Docker API is very rich, allowing processes like sidecars and monitoring systems to perform many operations. I’ll end this with one of my favorites - <code class="highlighter-rouge">events</code>.</p>
+<p>I’ll end this sequence of APIs with my favorite - <code class="highlighter-rouge">events</code>.</p>
 
 <p>The <code class="highlighter-rouge">/events</code> API allows streaming of events on the Docker Server. This can be used to build rich interfaces, or pipelines among many possiblities.</p>
 
@@ -569,6 +568,8 @@ bash-3.2$
 </div>
 <p>Notice that we’re seeing streaming events, as they occur on the Docker Server. We can stop the redis container, and see that show up in the event stream as well.</p>
 
+<p>Also we can see the full sequence for <code class="highlighter-rouge">docker run</code>, which is <code class="highlighter-rouge">pull_image-&gt;create_container-&gt;network_connect-&gt;start_container</code>.</p>
+
 <div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ docker ps
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
 c025ae0e698e        redis:latest        "docker-entrypoint.s…"   37 minutes ago      Up 37 minutes       0.0.0.0:6379-&gt;6379/tcp   infallible_roentgen
@@ -585,7 +586,7 @@ c025ae0e698e
 </span></code></pre>
 </div>
 
-<p>Notice the <code class="highlighter-rouge">kill -&gt; die -&gt; network disconnect -&gt; volume unmount -&gt; stop</code> event sequence triggered by the <code class="highlighter-rouge">docker stop</code> command.</p>
+<p>Notice the <code class="highlighter-rouge">kill-&gt;die-&gt;network_disconnect-&gt;volume_unmount-&gt;stop</code> event sequence triggered by the <code class="highlighter-rouge">docker stop</code> command.</p>
 
 <p>Almost all the APIs are accessible via Docker CLI. This post should help connect the dots when certain containers ask to <code class="highlighter-rouge">mount /var/run/docker.sock</code>. This file provides a very rich (and fast!) IPC channel with the Docker Server, which can then be used for various functions like cluster management, monitoring, discovery, routing, etc.</p>
 
