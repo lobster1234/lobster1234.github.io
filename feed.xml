@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2019-04-07T03:39:29-07:00</updated>
+  <updated>2019-04-07T03:43:03-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -68,7 +68,9 @@ srw-------   1 root             daemon              0 Mar 29 11:46 vpncontrol.so
   &lt;li&gt;The &lt;a href=&quot;https://docs.docker.com/engine/api/v1.37/&quot;&gt;Docker REST API&lt;/a&gt;, which is explosed via a Unix Socket at &lt;code class=&quot;highlighter-rouge&quot;&gt;/var/run/docker.sock&lt;/code&gt; by default.&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;Things are a little different when using &lt;a href=&quot;https://docs.docker.com/toolbox/overview/&quot;&gt;Docker Toolbox&lt;/a&gt; (legacy), which uses &lt;code class=&quot;highlighter-rouge&quot;&gt;docker-machine&lt;/code&gt; to launch the LinuxKit VM in VirtualBox. The &lt;code class=&quot;highlighter-rouge&quot;&gt;/var/run/docker.sock&lt;/code&gt; replaces &lt;code class=&quot;highlighter-rouge&quot;&gt;docker-machine&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Things are a little different when using &lt;a href=&quot;https://docs.docker.com/toolbox/overview/&quot;&gt;Docker Toolbox&lt;/a&gt; (legacy), which uses &lt;code class=&quot;highlighter-rouge&quot;&gt;docker-machine&lt;/code&gt; to launch the LinuxKit VM in VirtualBox.&lt;/p&gt;
+
+&lt;p&gt;In Docker Desktop, &lt;code class=&quot;highlighter-rouge&quot;&gt;/var/run/docker.sock&lt;/code&gt; replaces &lt;code class=&quot;highlighter-rouge&quot;&gt;docker-machine&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;Docker Server uses this socket to listen to the REST API, and the clients use the socket to send API requests to the server. The CLI is &lt;em&gt;one&lt;/em&gt; such client.&lt;/p&gt;
 

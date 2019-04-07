@@ -290,7 +290,9 @@ srw-------   1 root             daemon              0 Mar 29 11:46 vpncontrol.so
   <li>The <a href="https://docs.docker.com/engine/api/v1.37/">Docker REST API</a>, which is explosed via a Unix Socket at <code class="highlighter-rouge">/var/run/docker.sock</code> by default.</li>
 </ol>
 
-<p>Things are a little different when using <a href="https://docs.docker.com/toolbox/overview/">Docker Toolbox</a> (legacy), which uses <code class="highlighter-rouge">docker-machine</code> to launch the LinuxKit VM in VirtualBox. The <code class="highlighter-rouge">/var/run/docker.sock</code> replaces <code class="highlighter-rouge">docker-machine</code>.</p>
+<p>Things are a little different when using <a href="https://docs.docker.com/toolbox/overview/">Docker Toolbox</a> (legacy), which uses <code class="highlighter-rouge">docker-machine</code> to launch the LinuxKit VM in VirtualBox.</p>
+
+<p>In Docker Desktop, <code class="highlighter-rouge">/var/run/docker.sock</code> replaces <code class="highlighter-rouge">docker-machine</code>.</p>
 
 <p>Docker Server uses this socket to listen to the REST API, and the clients use the socket to send API requests to the server. The CLI is <em>one</em> such client.</p>
 
