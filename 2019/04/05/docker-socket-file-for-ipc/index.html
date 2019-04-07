@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  
+  
+  <title>Docker Socket File for IPC</title>
+  <meta name="description" content="While setting up a Consul cluster, I decided to dig a bit deeper into the whole /var/run/docker.sock phenomenon. While it is fairly common that a lot of Service Meshes like Consul, and System Monitoring Services like Newrelic and DataDog ask to mount /var/run/docker.sock, I must admit I’ve always been curious about this particular socket (vs. taking the mount step for granted). These are my notes from calling Docker Server by curl-ing the socket.">
+  
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="https://lobster1234.github.io/2019/04/05/docker-socket-file-for-ipc/">
+  
+  
+  <link rel="alternate" type="application/rss+xml" title="Manish Pandit&#39;s Blog" href="https://lobster1234.github.io/feed.xml">
+
+  
+
+  
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="lobster1234">
+  <meta name="twitter:title" content="Docker Socket File for IPC">
+  <meta name="twitter:description" content="While setting up a Consul cluster, I decided to dig a bit deeper into the whole /var/run/docker.sock phenomenon. While it is fairly common that a lot of Service Meshes like Consul, and System Monit...">
+  
+    <meta name="twitter:creator" content="lobster1234">
+  
+  
+
+  <script type="text/javascript">
+  WebFontConfig = {
+    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
+  };
+  (function(d) {
+    var wf = d.createElement('script'), s = d.scripts[0];
+    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
+    wf.async = true;
+    s.parentNode.insertBefore(wf, s);
+  })(document);
+</script>
+
+  
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-96931340-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+
+  <!-- Begin Jekyll SEO tag v2.4.0 -->
+<title>Docker Socket File for IPC | Manish Pandit’s Blog</title>
+<meta name="generator" content="Jekyll v3.4.3" />
+<meta property="og:title" content="Docker Socket File for IPC" />
+<meta name="author" content="Manish Pandit" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="While setting up a Consul cluster, I decided to dig a bit deeper into the whole /var/run/docker.sock phenomenon. While it is fairly common that a lot of Service Meshes like Consul, and System Monitoring Services like Newrelic and DataDog ask to mount /var/run/docker.sock, I must admit I’ve always been curious about this particular socket (vs. taking the mount step for granted). These are my notes from calling Docker Server by curl-ing the socket." />
+<meta property="og:description" content="While setting up a Consul cluster, I decided to dig a bit deeper into the whole /var/run/docker.sock phenomenon. While it is fairly common that a lot of Service Meshes like Consul, and System Monitoring Services like Newrelic and DataDog ask to mount /var/run/docker.sock, I must admit I’ve always been curious about this particular socket (vs. taking the mount step for granted). These are my notes from calling Docker Server by curl-ing the socket." />
+<link rel="canonical" href="https://lobster1234.github.io/2019/04/05/docker-socket-file-for-ipc/" />
+<meta property="og:url" content="https://lobster1234.github.io/2019/04/05/docker-socket-file-for-ipc/" />
+<meta property="og:site_name" content="Manish Pandit’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-04-05T13:44:37-07:00" />
+<script type="application/ld+json">
+{"description":"While setting up a Consul cluster, I decided to dig a bit deeper into the whole /var/run/docker.sock phenomenon. While it is fairly common that a lot of Service Meshes like Consul, and System Monitoring Services like Newrelic and DataDog ask to mount /var/run/docker.sock, I must admit I’ve always been curious about this particular socket (vs. taking the mount step for granted). These are my notes from calling Docker Server by curl-ing the socket.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"BlogPosting","url":"https://lobster1234.github.io/2019/04/05/docker-socket-file-for-ipc/","headline":"Docker Socket File for IPC","dateModified":"2019-04-05T13:44:37-07:00","datePublished":"2019-04-05T13:44:37-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2019/04/05/docker-socket-file-for-ipc/"},"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Home</a>
+
+    <nav class="site-nav">
+      
+        
+        <a class="page-link" href="/about/">About</a>
+      
+        
+        <a class="page-link" href="/archives/">Archives</a>
+      
+        
+        <a class="page-link" href="https://www.twitter.com/lobster1234">Twitter</a>
+      
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    
+      <h1 class="post-title" itemprop="name headline">Docker Socket File for IPC</h1>
+    
+    <p class="post-meta"><time datetime="2019-04-05T13:44:37-07:00" itemprop="datePublished">Apr 5, 2019</time> •
+  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/architecture/">architecture</a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+
+
+ •
+  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+
+</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>While setting up a <a href="https://consul.io">Consul</a> cluster, I decided to dig a bit deeper into the whole <code class="highlighter-rouge">/var/run/docker.sock</code> phenomenon. While it is fairly common that a lot of Service Meshes like Consul, and System Monitoring Services like <a href="https://newrelic.com">Newrelic</a> and <a href="https://datadog.com">DataDog</a> ask to mount <code class="highlighter-rouge">/var/run/docker.sock</code>, I must admit I’ve always been curious about this particular socket (vs. taking the mount step for granted). These are my notes from calling Docker Server by <em>curl-ing</em> the socket.</p>
+
+<!--more-->
+
+<h2 id="unix-sockets">Unix Sockets</h2>
+
+<p>The term <code class="highlighter-rouge">Sockets</code> commonly refers to <code class="highlighter-rouge">IP Sockets</code>. These are the ones that are bound to a port (and address), we send TCP requests to, and get responses from.</p>
+
+<p>Another type of Socket is a <code class="highlighter-rouge">Unix Socket</code>, which I never really ran into as much after school, except in recent few years when dealing with Docker runtime. As a refresher, these sockets are used for IPC (Interprocess Communication). They’re also called Unix Domain Sockets (UDS). Unix Sockets use local filesystem for communication, while IP Sockets use the network. This makes Unix Sockets <em>faster</em> - but then again, they are confined to local communication only. Kind of like what <em>containers</em> would use to talk to the <em>docker host</em> on the same <em>machine</em>.</p>
+
+<p>A good way to look at them is to list the <code class="highlighter-rouge">/var/run</code> folder, here is my Mac -</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ ls -al /var/run | grep sock
+srw-rw-rw-   1 root             daemon              0 Mar 29 11:46 com.docker.vmnetd.sock
+lrwxr-xr-x   1 mpandit          1498914130         68 Mar 29 11:48 docker.sock -&gt; /Users/mpandit/Library/Containers/com.docker.docker/Data/docker.sock
+srwxrwxrwx   1 root             daemon              0 Mar 29 11:46 portmap.socket
+srw-rw-rw-   1 root             daemon              0 Mar 29 11:46 systemkeychaincheck.socket
+srw-------   1 root             daemon              0 Mar 29 11:46 vpncontrol.sock
+</code></pre>
+</div>
+<h2 id="docker-on-macos">Docker on MacOS</h2>
+
+<p>Docker installation on the Mac via <a href="https://www.docker.com/products/docker-desktop">Docker Desktop</a> has three components to it -</p>
+
+<ol>
+  <li>The Docker Daemon (aka Docker Server) - On a Mac, which runs atop HyperKit Hypervisor as a <a href="https://github.com/linuxkit/linuxkit">LinuxKit VM</a>.</li>
+  <li>The Docker CLI (<code class="highlighter-rouge">docker</code> ,<code class="highlighter-rouge">docker-compose</code>, and <code class="highlighter-rouge">docker-machine</code>).</li>
+  <li>The <a href="https://docs.docker.com/engine/api/v1.37/">Docker REST API</a>, which is explosed via a Unix Socket at <code class="highlighter-rouge">/var/run/docker.sock</code> by default.</li>
+</ol>
+
+<p>Things are a little different when using <a href="https://docs.docker.com/toolbox/overview/">Docker Toolbox</a> (legacy), which uses <code class="highlighter-rouge">docker-machine</code> to launch the LinuxKit VM in VirtualBox. The <code class="highlighter-rouge">/var/run/docker.sock</code> replaces <code class="highlighter-rouge">docker-machine</code>.</p>
+
+<p>Docker Server uses this socket to listen to the REST API, and the clients use the socket to send API requests to the server. The CLI is <em>one</em> such client.</p>
+
+<h2 id="using-curl">Using curl</h2>
+
+<p><a href="https://curl.haxx.se/"><code class="highlighter-rouge">curl</code></a> is the swiss army knife for any communication. We can use <code class="highlighter-rouge">curl</code> to act as a client and use the <a href="https://docs.docker.com/engine/api/v1.37/">Docker REST API</a>. It’s a good idea to familiarize yourself with <code class="highlighter-rouge">curl</code> and all the powers this little command holds. Trust me on this.</p>
+
+<p><code class="highlighter-rouge">curl</code> can talk to a Unix Socket via the <code class="highlighter-rouge">--unix-socket</code> flag. Since Docker Server API is exposed as rest, we’d need to send commands over HTTP. Also, as this server is local (remeember, the file system), we can pass <em>any</em> hostname in the URL (or stick to <code class="highlighter-rouge">localhost</code>, that will work fine too!). The server does not care about the hostname, just the path.</p>
+
+<h2 id="lets-go">Lets go!</h2>
+
+<p>We can start fresh, or if you already have a bunch of containers running, that is fine too. Your output may look a little different, but the commands will work just fine.</p>
+
+<p>For this post, I’ll start with no images, or containers on the system.</p>
+
+<p><strong>Do not run system prune unless you’ve used it before, or are sure about wiping your Docker setup clean. In doubt? Skip to the next step.</strong></p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ docker system prune -a
+WARNING! This will remove:
+        - all stopped containers
+        - all networks not used by at least one container
+        - all images without at least one container associated to them
+        - all build cache
+Are you sure you want to continue? [y/N] y
+Deleted Containers:
+1a5e227d2251507e71fff25dfca60e9aea1f9a61d4a7cde078b8b2b357d70a71
+f9dc7950dcd9b29a85197030579487f40cebbb2556f56180b6ca4929d3f61c9d
+
+Deleted Images:
+untagged: nginx:latest
+untagged: nginx@sha256:c8a861b8a1eeef6d48955a6c6d5dff8e2580f13ff4d0f549e082e7c82a8617a2
+deleted: sha256:2bcb04bdb83f7c5dc30f0edaca1609a716bda1c7d2244d4f5fbbdfef33da366c
+deleted: sha256:dfce9ec5eeabad339cf90fce93b20f179926d5819359141e49e0006a52c066ca
+deleted: sha256:166d13b0f0cb542034a2aef1c034ee2271e1d6aaee4490f749e72d1c04449c5b
+
+Total reclaimed space: 54.01MB
+bash-3.2$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+bash-3.2$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+bash-3.2$
+
+</code></pre>
+</div>
+<p>Again, you may have images in the cache, and containers running. That is perfectly fine.</p>
+
+<p>Lets start a <code class="highlighter-rouge">redis</code> image, which we will use for the rest of the commands.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ docker run -d -p 6379:6379 redis:latest
+Unable to find image 'redis:latest' locally
+latest: Pulling from library/redis
+Digest: sha256:000339fb57e0ddf2d48d72f3341e47a8ca3b1beae9bdcb25a96323095b72a79b
+Status: Downloaded newer image for redis:latest
+c025ae0e698eae82e8d783089693c5ada75b9c10ff01e3884255ed019b12c569
+</code></pre>
+</div>
+<p>We just started a <code class="highlighter-rouge">redis</code> container, with ID <code class="highlighter-rouge">c025ae0e698eae82e8d783089693c5ada75b9c10ff01e3884255ed019b12c569</code>, which is listening on port <code class="highlighter-rouge">6379</code>.</p>
+
+<p>We can validate it via <code class="highlighter-rouge">redis-cli</code> or <code class="highlighter-rouge">telnet</code>. Type <code class="highlighter-rouge">INFO</code> and then <code class="highlighter-rouge">QUIT</code> to exit the session.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ telnet localhost 6379
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+INFO
+$3304
+# Server
+redis_version:5.0.3
+redis_git_sha1:00000000
+.....
+# Keyspace
+db0:keys=2,expires=0,avg_ttl=0
+
+QUIT
++OK
+Connection closed by foreign host.
+</code></pre>
+</div>
+<h3 id="get-images">Get images</h3>
+
+<p>We can use the images API to get the images. <em>Note that we can use any hostname</em>. We are connecting to the socket, and calling an API <code class="highlighter-rouge">/images/json</code> to get the images.</p>
+
+<p>I use <a href="https://stedolan.github.io/jq/"><code class="highlighter-rouge">jq</code></a> to format the output, among other things. Check it out - <code class="highlighter-rouge">brew install jq</code></p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$  curl --unix-socket /var/run/docker.sock http://foo/images/json | jq
+  [
+  {
+    "Containers": -1,
+    "Created": 1553647740,
+    "Id": "sha256:a55fbf438dfd878424c402e365ef3d80c634f07d0f5832193880ee1b95626e4e",
+    "Labels": null,
+    "ParentId": "",
+    "RepoDigests": [
+      "redis@sha256:000339fb57e0ddf2d48d72f3341e47a8ca3b1beae9bdcb25a96323095b72a79b"
+    ],
+    "RepoTags": [
+      "redis:latest"
+    ],
+    "SharedSize": -1,
+    "Size": 95000962,
+    "VirtualSize": 95000962
+  }
+]
+</code></pre>
+</div>
+<p>Compare this to another API client - the CLI</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+redis               latest              a55fbf438dfd        11 days ago         95MB
+</code></pre>
+</div>
+<p>Notice the CLI renders the same output in a much more readable manner.</p>
+
+<h3 id="inspect-an-image">Inspect an Image</h3>
+
+<p>The API is <code class="highlighter-rouge">/images/{id}/json</code>. The output is huge, so I’ll truncate it.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$  curl --unix-socket /var/run/docker.sock http://foo/images/a55fbf438dfd/json | jq
+{
+  "Id": "sha256:a55fbf438dfd878424c402e365ef3d80c634f07d0f5832193880ee1b95626e4e",
+  "RepoTags": [
+    "redis:latest"
+  ],
+  "RepoDigests": [
+    "redis@sha256:000339fb57e0ddf2d48d72f3341e47a8ca3b1beae9bdcb25a96323095b72a79b"
+  ],
+  "Parent": "",
+  "Comment": "",
+  "Created": "2019-03-27T00:49:00.123917534Z",
+  "Container": "6113cb2d4e6d2d4f375b72c8f5d5c953e3e7f4c22bfad42d5dd0aabf163b79bd",
+  "ContainerConfig": {
+    "Hostname": "6113cb2d4e6d",
+    "Domainname": "",
+    "User": "",
+    "AttachStdin": false,
+    "AttachStdout": false,
+    "AttachStderr": false,
+    "ExposedPorts": {
+      "6379/tcp": {}
+    }
+  }
+  ]
+</code></pre>
+</div>
+<p>Again, the CLI command to do so would be <code class="highlighter-rouge">docker inspect &lt;imageId&gt;</code> (response truncated). Note that this is an exact copy of the API response.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ docker inspect a55fbf438dfd | jq
+[
+  {
+    "Id": "sha256:a55fbf438dfd878424c402e365ef3d80c634f07d0f5832193880ee1b95626e4e",
+    "RepoTags": [
+      "redis:latest"
+    ],
+    "RepoDigests": [
+      "redis@sha256:000339fb57e0ddf2d48d72f3341e47a8ca3b1beae9bdcb25a96323095b72a79b"
+    ],
+    "Parent": "",
+    "Comment": "",
+    "Created": "2019-03-27T00:49:00.123917534Z",
+    "Container": "6113cb2d4e6d2d4f375b72c8f5d5c953e3e7f4c22bfad42d5dd0aabf163b79bd",
+    "ContainerConfig": {
+      "Hostname": "6113cb2d4e6d",
+      "Domainname": "",
+      "User": "",
+      "AttachStdin": false,
+      "AttachStdout": false,
+      "AttachStderr": false,
+      "ExposedPorts": {
+        "6379/tcp": {}
+      }
+    }
+  }
+]
+
+</code></pre>
+</div>
+<h3 id="tag-an-image">Tag an image</h3>
+<p>Adding this example to perform a <code class="highlighter-rouge">write</code> operation. Let us tag the <code class="highlighter-rouge">redis</code> image with a tag, <code class="highlighter-rouge">foo</code>. We use the <code class="highlighter-rouge">POST</code> operation <code class="highlighter-rouge">/images/{id}/tag</code> and pass <code class="highlighter-rouge">repo</code> and <code class="highlighter-rouge">tag</code> as query params. I found this a bit odd, as <code class="highlighter-rouge">POST</code> with query string params is not something we run into often (or ever?). But here it is -</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$  curl -i -X POST --unix-socket /var/run/docker.sock "http://foo/images/a55fbf438dfd/tag?repo=redis&amp;tag=foo"
+HTTP/1.1 201 Created
+Api-Version: 1.39
+Content-Length: 0
+Date: Sun, 07 Apr 2019 08:47:38 GMT
+Docker-Experimental: true
+Ostype: linux
+Server: Docker/18.09.2 (linux)
+</code></pre>
+</div>
+<p>We can verify this further (beyond the <code class="highlighter-rouge">201</code> response)</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+redis               foo                 a55fbf438dfd        11 days ago         95MB
+redis               latest              a55fbf438dfd        11 days ago         95MB
+</code></pre>
+</div>
+
+<h3 id="get-containers">Get Containers</h3>
+<p>Here we will use the <code class="highlighter-rouge">/containers/json</code> just like <code class="highlighter-rouge">/images/json</code> -</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$  curl  --unix-socket /var/run/docker.sock "http://foo/containers/json" | jq
+[
+  {
+    "Id": "c025ae0e698eae82e8d783089693c5ada75b9c10ff01e3884255ed019b12c569",
+    "Names": [
+      "/infallible_roentgen"
+    ],
+    "Image": "redis:latest",
+    "ImageID": "sha256:a55fbf438dfd878424c402e365ef3d80c634f07d0f5832193880ee1b95626e4e",
+    "Command": "docker-entrypoint.sh redis-server",
+    "Created": 1554625562,
+    "Ports": [
+      {
+        "IP": "0.0.0.0",
+        "PrivatePort": 6379,
+        "PublicPort": 6379,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {},
+    "State": "running",
+    "Status": "Up 24 minutes",
+    "HostConfig": {
+      "NetworkMode": "default"
+    }
+    ]
+  }
+]
+</code></pre>
+</div>
+
+<p>The CLI, you ask?</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
+c025ae0e698e        redis:latest        "docker-entrypoint.s…"   25 minutes ago      Up 25 minutes       0.0.0.0:6379-&gt;6379/tcp   infallible_roentgen
+</code></pre>
+</div>
+
+<h3 id="stream-events">Stream Events</h3>
+<p>The Docker API is very rich, allowing processes like sidecars and monitoring systems to perform many operations. I’ll end this with one of my favorites - <code class="highlighter-rouge">events</code>.</p>
+
+<p>The <code class="highlighter-rouge">/events</code> API allows streaming of events on the Docker Server. This can be used to build rich interfaces, or pipelines among many possiblities.</p>
+
+<p>Note that we’re adding <code class="highlighter-rouge">--no-buffer</code> to <code class="highlighter-rouge">curl</code> to print output as the events occur, flushing the output right away.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$  curl --no-buffer --unix-socket /var/run/docker.sock http://foo/events
+</code></pre>
+</div>
+<p>In a new terminal window, we start another container, <code class="highlighter-rouge">nginx</code>. We will also verify that it works.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ docker run -d -p 80:80 nginx:latest
+Unable to find image 'nginx:latest' locally
+latest: Pulling from library/nginx
+Status: Downloaded newer image for nginx:latest
+a9cc0132647be42cdcf3d2d4d5ea7ba1e980d5895978b97c1bf3735ed4408042
+bash-3.2$ curl --head http://localhost:80
+HTTP/1.1 200 OK
+Server: nginx/1.15.10
+Date: Sun, 07 Apr 2019 09:00:22 GMT
+Content-Type: text/html
+Content-Length: 612
+Last-Modified: Tue, 26 Mar 2019 14:04:38 GMT
+Connection: keep-alive
+ETag: "5c9a3176-264"
+Accept-Ranges: bytes
+bash-3.2$
+</code></pre>
+</div>
+<p>If we go back to the terminal which was running the <code class="highlighter-rouge">/events</code> call, we see the following output -</p>
+
+<div class="language-json highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="nt">"status"</span><span class="p">:</span><span class="s2">"pull"</span><span class="p">,</span><span class="nt">"id"</span><span class="p">:</span><span class="s2">"nginx:latest"</span><span class="p">,</span><span class="nt">"Type"</span><span class="p">:</span><span class="s2">"image"</span><span class="p">,</span><span class="nt">"Action"</span><span class="p">:</span><span class="s2">"pull"</span><span class="p">,</span><span class="nt">"Actor"</span><span class="p">:{</span><span class="nt">"ID"</span><span class="p">:</span><span class="s2">"nginx:latest"</span><span class="p">,</span><span class="nt">"Attributes"</span><span class="p">:{</span><span class="nt">"maintainer"</span><span class="p">:</span><span class="s2">"NGINX Docker Maintainers \u003cdocker-maint@nginx.com\u003e"</span><span class="p">,</span><span class="nt">"name"</span><span class="p">:</span><span class="s2">"nginx"</span><span class="p">}},</span><span class="nt">"scope"</span><span class="p">:</span><span class="s2">"local"</span><span class="p">,</span><span class="nt">"time"</span><span class="p">:</span><span class="mi">1554627574</span><span class="p">,</span><span class="nt">"timeNano"</span><span class="p">:</span><span class="mi">1554627574220666900</span><span class="p">}</span><span class="w">
+</span><span class="p">{</span><span class="nt">"status"</span><span class="p">:</span><span class="s2">"create"</span><span class="p">,</span><span class="nt">"id"</span><span class="p">:</span><span class="s2">"a9cc0132647be42cdcf3d2d4d5ea7ba1e980d5895978b97c1bf3735ed4408042"</span><span class="p">,</span><span class="nt">"from"</span><span class="p">:</span><span class="s2">"nginx:latest"</span><span class="p">,</span><span class="nt">"Type"</span><span class="p">:</span><span class="s2">"container"</span><span class="p">,</span><span class="nt">"Action"</span><span class="p">:</span><span class="s2">"create"</span><span class="p">,</span><span class="nt">"Actor"</span><span class="p">:{</span><span class="nt">"ID"</span><span class="p">:</span><span class="s2">"a9cc0132647be42cdcf3d2d4d5ea7ba1e980d5895978b97c1bf3735ed4408042"</span><span class="p">,</span><span class="nt">"Attributes"</span><span class="p">:{</span><span class="nt">"image"</span><span class="p">:</span><span class="s2">"nginx:latest"</span><span class="p">,</span><span class="nt">"maintainer"</span><span class="p">:</span><span class="s2">"NGINX Docker Maintainers \u003cdocker-maint@nginx.com\u003e"</span><span class="p">,</span><span class="nt">"name"</span><span class="p">:</span><span class="s2">"focused_hodgkin"</span><span class="p">}},</span><span class="nt">"scope"</span><span class="p">:</span><span class="s2">"local"</span><span class="p">,</span><span class="nt">"time"</span><span class="p">:</span><span class="mi">1554627574</span><span class="p">,</span><span class="nt">"timeNano"</span><span class="p">:</span><span class="mi">1554627574386805100</span><span class="p">}</span><span class="w">
+</span><span class="p">{</span><span class="nt">"Type"</span><span class="p">:</span><span class="s2">"network"</span><span class="p">,</span><span class="nt">"Action"</span><span class="p">:</span><span class="s2">"connect"</span><span class="p">,</span><span class="nt">"Actor"</span><span class="p">:{</span><span class="nt">"ID"</span><span class="p">:</span><span class="s2">"11b3729299eba1d7ea896f3c41ad7f1797ed5730831352a7cc13e9aed7e9bf27"</span><span class="p">,</span><span class="nt">"Attributes"</span><span class="p">:{</span><span class="nt">"container"</span><span class="p">:</span><span class="s2">"a9cc0132647be42cdcf3d2d4d5ea7ba1e980d5895978b97c1bf3735ed4408042"</span><span class="p">,</span><span class="nt">"name"</span><span class="p">:</span><span class="s2">"bridge"</span><span class="p">,</span><span class="nt">"type"</span><span class="p">:</span><span class="s2">"bridge"</span><span class="p">}},</span><span class="nt">"scope"</span><span class="p">:</span><span class="s2">"local"</span><span class="p">,</span><span class="nt">"time"</span><span class="p">:</span><span class="mi">1554627574</span><span class="p">,</span><span class="nt">"timeNano"</span><span class="p">:</span><span class="mi">1554627574567980600</span><span class="p">}</span><span class="w">
+</span><span class="p">{</span><span class="nt">"status"</span><span class="p">:</span><span class="s2">"start"</span><span class="p">,</span><span class="nt">"id"</span><span class="p">:</span><span class="s2">"a9cc0132647be42cdcf3d2d4d5ea7ba1e980d5895978b97c1bf3735ed4408042"</span><span class="p">,</span><span class="nt">"from"</span><span class="p">:</span><span class="s2">"nginx:latest"</span><span class="p">,</span><span class="nt">"Type"</span><span class="p">:</span><span class="s2">"container"</span><span class="p">,</span><span class="nt">"Action"</span><span class="p">:</span><span class="s2">"start"</span><span class="p">,</span><span class="nt">"Actor"</span><span class="p">:{</span><span class="nt">"ID"</span><span class="p">:</span><span class="s2">"a9cc0132647be42cdcf3d2d4d5ea7ba1e980d5895978b97c1bf3735ed4408042"</span><span class="p">,</span><span class="nt">"Attributes"</span><span class="p">:{</span><span class="nt">"image"</span><span class="p">:</span><span class="s2">"nginx:latest"</span><span class="p">,</span><span class="nt">"maintainer"</span><span class="p">:</span><span class="s2">"NGINX Docker Maintainers \u003cdocker-maint@nginx.com\u003e"</span><span class="p">,</span><span class="nt">"name"</span><span class="p">:</span><span class="s2">"focused_hodgkin"</span><span class="p">}},</span><span class="nt">"scope"</span><span class="p">:</span><span class="s2">"local"</span><span class="p">,</span><span class="nt">"time"</span><span class="p">:</span><span class="mi">1554627575</span><span class="p">,</span><span class="nt">"timeNano"</span><span class="p">:</span><span class="mi">1554627575041391200</span><span class="p">}</span><span class="w">
+</span></code></pre>
+</div>
+<p>Notice that we’re seeing streaming events, as they occur on the Docker Server. We can stop the redis container, and see that show up in the event stream as well.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
+c025ae0e698e        redis:latest        "docker-entrypoint.s…"   37 minutes ago      Up 37 minutes       0.0.0.0:6379-&gt;6379/tcp   infallible_roentgen
+bash-3.2$ docker stop c025ae0e698e
+c025ae0e698e
+</code></pre>
+</div>
+<p>And we have the events!</p>
+<div class="language-json highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="nt">"status"</span><span class="p">:</span><span class="s2">"kill"</span><span class="p">,</span><span class="nt">"id"</span><span class="p">:</span><span class="s2">"c025ae0e698eae82e8d783089693c5ada75b9c10ff01e3884255ed019b12c569"</span><span class="p">,</span><span class="nt">"from"</span><span class="p">:</span><span class="s2">"redis:latest"</span><span class="p">,</span><span class="nt">"Type"</span><span class="p">:</span><span class="s2">"container"</span><span class="p">,</span><span class="nt">"Action"</span><span class="p">:</span><span class="s2">"kill"</span><span class="p">,</span><span class="nt">"Actor"</span><span class="p">:{</span><span class="nt">"ID"</span><span class="p">:</span><span class="s2">"c025ae0e698eae82e8d783089693c5ada75b9c10ff01e3884255ed019b12c569"</span><span class="p">,</span><span class="nt">"Attributes"</span><span class="p">:{</span><span class="nt">"image"</span><span class="p">:</span><span class="s2">"redis:latest"</span><span class="p">,</span><span class="nt">"name"</span><span class="p">:</span><span class="s2">"infallible_roentgen"</span><span class="p">,</span><span class="nt">"signal"</span><span class="p">:</span><span class="s2">"15"</span><span class="p">}},</span><span class="nt">"scope"</span><span class="p">:</span><span class="s2">"local"</span><span class="p">,</span><span class="nt">"time"</span><span class="p">:</span><span class="mi">1554627858</span><span class="p">,</span><span class="nt">"timeNano"</span><span class="p">:</span><span class="mi">1554627858776466300</span><span class="p">}</span><span class="w">
+</span><span class="p">{</span><span class="nt">"status"</span><span class="p">:</span><span class="s2">"die"</span><span class="p">,</span><span class="nt">"id"</span><span class="p">:</span><span class="s2">"c025ae0e698eae82e8d783089693c5ada75b9c10ff01e3884255ed019b12c569"</span><span class="p">,</span><span class="nt">"from"</span><span class="p">:</span><span class="s2">"redis:latest"</span><span class="p">,</span><span class="nt">"Type"</span><span class="p">:</span><span class="s2">"container"</span><span class="p">,</span><span class="nt">"Action"</span><span class="p">:</span><span class="s2">"die"</span><span class="p">,</span><span class="nt">"Actor"</span><span class="p">:{</span><span class="nt">"ID"</span><span class="p">:</span><span class="s2">"c025ae0e698eae82e8d783089693c5ada75b9c10ff01e3884255ed019b12c569"</span><span class="p">,</span><span class="nt">"Attributes"</span><span class="p">:{</span><span class="nt">"exitCode"</span><span class="p">:</span><span class="s2">"0"</span><span class="p">,</span><span class="nt">"image"</span><span class="p">:</span><span class="s2">"redis:latest"</span><span class="p">,</span><span class="nt">"name"</span><span class="p">:</span><span class="s2">"infallible_roentgen"</span><span class="p">}},</span><span class="nt">"scope"</span><span class="p">:</span><span class="s2">"local"</span><span class="p">,</span><span class="nt">"time"</span><span class="p">:</span><span class="mi">1554627859</span><span class="p">,</span><span class="nt">"timeNano"</span><span class="p">:</span><span class="mi">1554627859011940300</span><span class="p">}</span><span class="w">
+</span><span class="p">{</span><span class="nt">"Type"</span><span class="p">:</span><span class="s2">"network"</span><span class="p">,</span><span class="nt">"Action"</span><span class="p">:</span><span class="s2">"disconnect"</span><span class="p">,</span><span class="nt">"Actor"</span><span class="p">:{</span><span class="nt">"ID"</span><span class="p">:</span><span class="s2">"11b3729299eba1d7ea896f3c41ad7f1797ed5730831352a7cc13e9aed7e9bf27"</span><span class="p">,</span><span class="nt">"Attributes"</span><span class="p">:{</span><span class="nt">"container"</span><span class="p">:</span><span class="s2">"c025ae0e698eae82e8d783089693c5ada75b9c10ff01e3884255ed019b12c569"</span><span class="p">,</span><span class="nt">"name"</span><span class="p">:</span><span class="s2">"bridge"</span><span class="p">,</span><span class="nt">"type"</span><span class="p">:</span><span class="s2">"bridge"</span><span class="p">}},</span><span class="nt">"scope"</span><span class="p">:</span><span class="s2">"local"</span><span class="p">,</span><span class="nt">"time"</span><span class="p">:</span><span class="mi">1554627859</span><span class="p">,</span><span class="nt">"timeNano"</span><span class="p">:</span><span class="mi">1554627859413159900</span><span class="p">}</span><span class="w">
+</span><span class="p">{</span><span class="nt">"Type"</span><span class="p">:</span><span class="s2">"volume"</span><span class="p">,</span><span class="nt">"Action"</span><span class="p">:</span><span class="s2">"unmount"</span><span class="p">,</span><span class="nt">"Actor"</span><span class="p">:{</span><span class="nt">"ID"</span><span class="p">:</span><span class="s2">"14e0049f6dd0cb3493d39b6d6ce709a95620d15f8d1f50bdfe6d63372896be62"</span><span class="p">,</span><span class="nt">"Attributes"</span><span class="p">:{</span><span class="nt">"container"</span><span class="p">:</span><span class="s2">"c025ae0e698eae82e8d783089693c5ada75b9c10ff01e3884255ed019b12c569"</span><span class="p">,</span><span class="nt">"driver"</span><span class="p">:</span><span class="s2">"local"</span><span class="p">}},</span><span class="nt">"scope"</span><span class="p">:</span><span class="s2">"local"</span><span class="p">,</span><span class="nt">"time"</span><span class="p">:</span><span class="mi">1554627859</span><span class="p">,</span><span class="nt">"timeNano"</span><span class="p">:</span><span class="mi">1554627859500455300</span><span class="p">}</span><span class="w">
+</span><span class="p">{</span><span class="nt">"status"</span><span class="p">:</span><span class="s2">"stop"</span><span class="p">,</span><span class="nt">"id"</span><span class="p">:</span><span class="s2">"c025ae0e698eae82e8d783089693c5ada75b9c10ff01e3884255ed019b12c569"</span><span class="p">,</span><span class="nt">"from"</span><span class="p">:</span><span class="s2">"redis:latest"</span><span class="p">,</span><span class="nt">"Type"</span><span class="p">:</span><span class="s2">"container"</span><span class="p">,</span><span class="nt">"Action"</span><span class="p">:</span><span class="s2">"stop"</span><span class="p">,</span><span class="nt">"Actor"</span><span class="p">:{</span><span class="nt">"ID"</span><span class="p">:</span><span class="s2">"c025ae0e698eae82e8d783089693c5ada75b9c10ff01e3884255ed019b12c569"</span><span class="p">,</span><span class="nt">"Attributes"</span><span class="p">:{</span><span class="nt">"image"</span><span class="p">:</span><span class="s2">"redis:latest"</span><span class="p">,</span><span class="nt">"name"</span><span class="p">:</span><span class="s2">"infallible_roentgen"</span><span class="p">}},</span><span class="nt">"scope"</span><span class="p">:</span><span class="s2">"local"</span><span class="p">,</span><span class="nt">"time"</span><span class="p">:</span><span class="mi">1554627859</span><span class="p">,</span><span class="nt">"timeNano"</span><span class="p">:</span><span class="mi">1554627859510757400</span><span class="p">}</span><span class="w">
+</span></code></pre>
+</div>
+
+<p>Notice the <code class="highlighter-rouge">kill -&gt; die -&gt; network disconnect -&gt; volume unmount -&gt; stop</code> event sequence triggered by the <code class="highlighter-rouge">docker stop</code> command.</p>
+
+<p>Almost all the APIs are accessible via Docker CLI. This post should help connect the dots when certain containers ask to <code class="highlighter-rouge">mount /var/run/docker.sock</code>. This file provides a very rich (and fast!) IPC channel with the Docker Server, which can then be used for various functions like cluster management, monitoring, discovery, routing, etc.</p>
+
+<p>I’d appreciate your comments and feedback below.</p>
+
+<h3 style="text-align: center" id="comments">Comments</h3>
+
+<div id="disqus_thread"></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = "https://lobster1234.github.io/2019/04/05/docker-socket-file-for-ipc/";  
+this.page.identifier = "/2019/04/05/docker-socket-file-for-ipc";
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://lobster1234.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+<div id="disqus_thread"></div>
+<script>
+
+
+      
+</script>
+
+  </div>
+
+  
+
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <p>
+      
+
+&copy; Manish Pandit - Powered by <a href="https://jekyllrb.com">Jekyll</a> &amp; <a href="https://github.com/yous/whiteglass">whiteglass</a> - Subscribe via <a href="https://lobster1234.github.io/feed.xml">RSS</a>
+
+    </p>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

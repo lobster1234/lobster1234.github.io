@@ -119,6 +119,106 @@
       <li>
         <header class="post-header">
           <h1 class="post-title">
+            <a class="post-link" href="/2019/04/05/docker-socket-file-for-ipc/">Docker Socket File for IPC</a>
+          </h1>
+
+          <p class="post-meta">Apr 5, 2019 •  •
+  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/architecture/">architecture</a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+
+
+ •
+  
+
+</p>
+        </header>
+
+        <div class="post-content">
+          <p>While setting up a <a href="https://consul.io">Consul</a> cluster, I decided to dig a bit deeper into the whole <code class="highlighter-rouge">/var/run/docker.sock</code> phenomenon. While it is fairly common that a lot of Service Meshes like Consul, and System Monitoring Services like <a href="https://newrelic.com">Newrelic</a> and <a href="https://datadog.com">DataDog</a> ask to mount <code class="highlighter-rouge">/var/run/docker.sock</code>, I must admit I’ve always been curious about this particular socket (vs. taking the mount step for granted). These are my notes from calling Docker Server by <em>curl-ing</em> the socket.</p>
+
+
+        </div>
+        
+          <p class="post-continue">
+            <a href="/2019/04/05/docker-socket-file-for-ipc/">Read on &rarr;</a>
+          </p>
+        
+      </li>
+    
+      
+      
+
+      <li>
+        <header class="post-header">
+          <h1 class="post-title">
             <a class="post-link" href="/2019/03/27/feature-flags-and-toggles/">Feature Flags and Toggles</a>
           </h1>
 
@@ -722,248 +822,6 @@
         
           <p class="post-continue">
             <a href="/2018/11/29/aws-certified-solutions-architect-associate-2018-exam-notes/">Read on &rarr;</a>
-          </p>
-        
-      </li>
-    
-      
-      
-
-      <li>
-        <header class="post-header">
-          <h1 class="post-title">
-            <a class="post-link" href="/2018/07/18/serverless-architectures-on-aws-in-practice-oscon-2018/">Serverless Architectures on AWS in Practice</a>
-          </h1>
-
-          <p class="post-meta">Jul 18, 2018 •  •
-  
-    
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-        <a href="/categories/aws/">aws</a>,
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-  
-    
-    
-      
-    
-      
-    
-      
-        <a href="/categories/presentations/">presentations</a>,
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-  
-    
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-        <a href="/categories/serverless/">serverless</a>
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-  
-
-
- •
-  
-
-</p>
-        </header>
-
-        <div class="post-content">
-          <p>Slides from my talk at <a href="https://conferences.oreilly.com/oscon/oscon-or" target="_blank_">OSCON 2018</a>.</p>
-
-<p>From functions to containers to databases, serverless is a huge paradigm shift. The ability to only pay for what we use and not worry about underlying infrastructure is very tempting to developers and DevOps engineers, and the rate of innovation in this area has been very rapid across all major public cloud providers. Serverless architectures are the natural evolution of microservices design. While Lambda has become synonymous with serverless in AWS, there are several new and upcoming patterns that take serverless architectures to the next level.</p>
-
-<p>Manish Pandit explains how to identify these patterns and put them to use. Using Marqeta’s efforts to move its payments infrastructure to the public cloud as an example, Manish explores the services that Marqeta considered, customized, hacked around, and successfully implemented as a part of this move.</p>
-
-
-        </div>
-        
-          <p class="post-continue">
-            <a href="/2018/07/18/serverless-architectures-on-aws-in-practice-oscon-2018/">Read on &rarr;</a>
           </p>
         
       </li>
