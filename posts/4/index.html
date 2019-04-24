@@ -120,6 +120,177 @@
       <li>
         <header class="post-header">
           <h1 class="post-title">
+            <a class="post-link" href="/2017/11/17/immutable-aws-deployments-with-packer-and-jenkins/">Scale By the Bay - Immutable AWS Deployments with Packer and Jenkins</a>
+          </h1>
+
+          <p class="post-meta">Nov 17, 2017 •  •
+  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/aws/">aws</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+    
+    
+      
+    
+      
+    
+      
+        <a href="/categories/presentations/">presentations</a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+
+
+ •
+  
+
+</p>
+        </header>
+
+        <div class="post-content">
+          <p>Slides from my talk at <a href="http://scale.bythebay.io/" target="_blank_">Scale By the Bay 2017</a>.</p>
+
+<p>In this session I will talk about Immutable Deployments - which have become almost essential in the world of Microservices. As the frequency of deployments across multiple services increases with increasing granularity, it is critical to have repeatable, predictable and immutable deployments serving our customers. In practice, this is achieved via several DevOps tools. We will use Hashicorp <a href="https://www.packer.io">Packer</a> and Jenkins to build a simple, immutable AWS deployment of a <a href="https://github.com/lobster1234/helloworld-api">hello-world microservice</a>. Familiarity with AWS is recommended, but not required for this talk.</p>
+
+
+        </div>
+        
+          <p class="post-continue">
+            <a href="/2017/11/17/immutable-aws-deployments-with-packer-and-jenkins/">Read on &rarr;</a>
+          </p>
+        
+      </li>
+    
+      
+      
+
+      <li>
+        <header class="post-header">
+          <h1 class="post-title">
             <a class="post-link" href="/2017/11/03/amazon-aurora-rds-notes/">Amazon Aurora Notes</a>
           </h1>
 
@@ -723,110 +894,6 @@
         
           <p class="post-continue">
             <a href="/2017/10/07/aws-lambda-with-serverless-framework-and-java/">Read on &rarr;</a>
-          </p>
-        
-      </li>
-    
-      
-      
-
-      <li>
-        <header class="post-header">
-          <h1 class="post-title">
-            <a class="post-link" href="/2017/09/29/aws-kms-envelope-encryption/">AWS KMS and Envelope Encryption</a>
-          </h1>
-
-          <p class="post-meta">Sep 29, 2017 •  •
-  
-    
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-        <a href="/categories/aws/">aws</a>
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-  
-
-
- •
-  
-
-</p>
-        </header>
-
-        <div class="post-content">
-          <p>Every service needs encryption at one point or another - passwords to the database, credentials to an external service, or even entire filesystem or files. Sticking the secrets, or keys in configuration files seems a quick and easy option. However, it carries security risks, even if these configurations are managed outside of the source code. On top of it, the keys used to encrypt/decrypt the data bring additional security implications and requirements in terms of storage, audit, and lifecycle management.</p>
-
-<p><a href="https://aws.amazon.com/kms/">AWS KMS</a>, or AWS Key Management Service is a fully managed service to store and manage keys. Any AWS service which supports encryption - S3 buckets, EBS Volumes, SQS, etc. uses KMS under the hood. KMS is more than just a key manager, it can also be used to encrypt large volumes of data, using a technique called Envelope Encryption.</p>
-
-<p>In this post I will cover KMS, and the <em>why</em>, <em>what</em>, and <em>how</em> of Envelope Encryption.</p>
-
-
-        </div>
-        
-          <p class="post-continue">
-            <a href="/2017/09/29/aws-kms-envelope-encryption/">Read on &rarr;</a>
           </p>
         
       </li>

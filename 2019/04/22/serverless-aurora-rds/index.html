@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  
+  
+  <title>Serverless Aurora RDS</title>
+  <meta name="description" content="Amazon RDS is a fully managed Relational Database Service in the AWS Public Cloud. Amazon Aurora is a MySQL and Postgre compatible database with much better performance at scale with all the enhancements and rewriting AWS has put in. For more context on Aurora, here is my post on Aurora. Very recently, Amazon’s Fulfillment Unit moved off of Oracle on to Aurora Postgres + DynamoDB. Aurora RDS has a lot of practical configurations applicable to pretty much all production workloads (multi region, multi-flavored read replicas FTW!). The ones I like the most are Aurora Global Database, and Aurora Serverless. In this post I will talk about Aurora Serverless, while saving Aurora Global Database for a later time. Amazon Aurora Serverless is an on-demand, out of the box auto-scaled Aurora MySQL 5.6 Database which is Serverless, in that it will start, scale, and stop automatically. As all RDS engines, it is fully managed.">
+  
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="https://lobster1234.github.io/2019/04/22/serverless-aurora-rds/">
+  
+  
+  <link rel="alternate" type="application/rss+xml" title="Manish Pandit&#39;s Blog" href="https://lobster1234.github.io/feed.xml">
+
+  
+
+  
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="lobster1234">
+  <meta name="twitter:title" content="Serverless Aurora RDS">
+  <meta name="twitter:description" content="Amazon RDS is a fully managed Relational Database Service in the AWS Public Cloud. Amazon Aurora is a MySQL and Postgre compatible database with much better performance at scale with all the enhanc...">
+  
+    <meta name="twitter:creator" content="lobster1234">
+  
+  
+
+  <script type="text/javascript">
+  WebFontConfig = {
+    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
+  };
+  (function(d) {
+    var wf = d.createElement('script'), s = d.scripts[0];
+    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
+    wf.async = true;
+    s.parentNode.insertBefore(wf, s);
+  })(document);
+</script>
+
+  
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-96931340-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+
+  <!-- Begin Jekyll SEO tag v2.4.0 -->
+<title>Serverless Aurora RDS | Manish Pandit’s Blog</title>
+<meta name="generator" content="Jekyll v3.4.3" />
+<meta property="og:title" content="Serverless Aurora RDS" />
+<meta name="author" content="Manish Pandit" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Amazon RDS is a fully managed Relational Database Service in the AWS Public Cloud. Amazon Aurora is a MySQL and Postgre compatible database with much better performance at scale with all the enhancements and rewriting AWS has put in. For more context on Aurora, here is my post on Aurora. Very recently, Amazon’s Fulfillment Unit moved off of Oracle on to Aurora Postgres + DynamoDB. Aurora RDS has a lot of practical configurations applicable to pretty much all production workloads (multi region, multi-flavored read replicas FTW!). The ones I like the most are Aurora Global Database, and Aurora Serverless. In this post I will talk about Aurora Serverless, while saving Aurora Global Database for a later time. Amazon Aurora Serverless is an on-demand, out of the box auto-scaled Aurora MySQL 5.6 Database which is Serverless, in that it will start, scale, and stop automatically. As all RDS engines, it is fully managed." />
+<meta property="og:description" content="Amazon RDS is a fully managed Relational Database Service in the AWS Public Cloud. Amazon Aurora is a MySQL and Postgre compatible database with much better performance at scale with all the enhancements and rewriting AWS has put in. For more context on Aurora, here is my post on Aurora. Very recently, Amazon’s Fulfillment Unit moved off of Oracle on to Aurora Postgres + DynamoDB. Aurora RDS has a lot of practical configurations applicable to pretty much all production workloads (multi region, multi-flavored read replicas FTW!). The ones I like the most are Aurora Global Database, and Aurora Serverless. In this post I will talk about Aurora Serverless, while saving Aurora Global Database for a later time. Amazon Aurora Serverless is an on-demand, out of the box auto-scaled Aurora MySQL 5.6 Database which is Serverless, in that it will start, scale, and stop automatically. As all RDS engines, it is fully managed." />
+<link rel="canonical" href="https://lobster1234.github.io/2019/04/22/serverless-aurora-rds/" />
+<meta property="og:url" content="https://lobster1234.github.io/2019/04/22/serverless-aurora-rds/" />
+<meta property="og:site_name" content="Manish Pandit’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-04-22T13:44:37-07:00" />
+<script type="application/ld+json">
+{"description":"Amazon RDS is a fully managed Relational Database Service in the AWS Public Cloud. Amazon Aurora is a MySQL and Postgre compatible database with much better performance at scale with all the enhancements and rewriting AWS has put in. For more context on Aurora, here is my post on Aurora. Very recently, Amazon’s Fulfillment Unit moved off of Oracle on to Aurora Postgres + DynamoDB. Aurora RDS has a lot of practical configurations applicable to pretty much all production workloads (multi region, multi-flavored read replicas FTW!). The ones I like the most are Aurora Global Database, and Aurora Serverless. In this post I will talk about Aurora Serverless, while saving Aurora Global Database for a later time. Amazon Aurora Serverless is an on-demand, out of the box auto-scaled Aurora MySQL 5.6 Database which is Serverless, in that it will start, scale, and stop automatically. As all RDS engines, it is fully managed.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"BlogPosting","url":"https://lobster1234.github.io/2019/04/22/serverless-aurora-rds/","headline":"Serverless Aurora RDS","dateModified":"2019-04-22T13:44:37-07:00","datePublished":"2019-04-22T13:44:37-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2019/04/22/serverless-aurora-rds/"},"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">Home</a>
+
+    <nav class="site-nav">
+      
+        
+        <a class="page-link" href="/about/">About</a>
+      
+        
+        <a class="page-link" href="/archives/">Archives</a>
+      
+        
+        <a class="page-link" href="https://www.twitter.com/lobster1234">Twitter</a>
+      
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    
+      <h1 class="post-title" itemprop="name headline">Serverless Aurora RDS</h1>
+    
+    <p class="post-meta"><time datetime="2019-04-22T13:44:37-07:00" itemprop="datePublished">Apr 22, 2019</time> •
+  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/aws/">aws</a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+
+
+ •
+  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+
+</p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p><a href="">Amazon RDS</a> is a fully managed Relational Database Service in the AWS Public Cloud. <a href="https://aws.amazon.com/rds/aurora/">Amazon Aurora</a> is a MySQL and Postgre compatible database with much better performance at scale with all the enhancements and rewriting AWS has put in. For more context on Aurora, here is <a href="https://lobster1234.github.io/2017/11/03/amazon-aurora-rds-notes/">my post on Aurora</a>.</p>
+
+<p>Very recently, Amazon’s Fulfillment Unit <a href="https://twitter.com/jdarrow/status/1111629087947132928">moved off of Oracle</a> on to Aurora Postgres + DynamoDB.</p>
+
+<p>Aurora RDS has a lot of practical configurations applicable to pretty much all production workloads (multi region, multi-flavored read replicas FTW!). The ones I like the most are <a href="https://aws.amazon.com/rds/aurora/global-database/">Aurora Global Database</a>, and <a href="https://aws.amazon.com/rds/aurora/serverless/">Aurora Serverless</a>. In this post I will talk about Aurora Serverless, while saving Aurora Global Database for a later time.</p>
+
+<p><a href="https://aws.amazon.com/rds/aurora/serverless/">Amazon Aurora Serverless</a> is an on-demand, out of the box auto-scaled Aurora MySQL 5.6 Database which is <em>Serverless</em>, in that it will start, scale, and stop automatically. As all RDS engines, it is fully managed.</p>
+
+<!--more-->
+
+<h2 id="use-cases">Use Cases</h2>
+
+<p>Combined with autoscaling, on-demand startup and shutdown, and per-second pricing, Aurora Serverless is a great fit for workloads that are infrequent and/or variable. Some of the examples can be -</p>
+
+<ul>
+  <li>Test workloads, where a database instance is only really need during the test runs, and can be “torn down” after the tests have finished running.</li>
+  <li>Batch Jobs, where the database is available for the batch job to store state, or any other related data associated with the job.</li>
+  <li>Benchmarking the database requirements for a new application before provisioning an Aurora RDS Cluster. However, I feel performance testing on Aurora Serverless could be a stretch, as it’d autoscale, while the Production RDS (non-Serverless) will not.</li>
+  <li>Unpredictable workloads, where database capacity needs to be autoscaled. I would not really do this in a production environment, as quite a few of Aurora RDS features are not available with Serverless Configuration, like -
+    <ul>
+      <li>Replicas</li>
+      <li>IAM Database Authentication</li>
+      <li>Restoring from S3</li>
+      <li><a href="https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless.html">Few other limitations</a> that can be a deal-breaker for some production workloads</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="serverless-autoscale">Serverless Autoscale</h2>
+
+<p>Lets get some clarity on Aurora Serverless Autoscale. Usually we see the term <em>autoscale</em> used with EC2 instances, ECS Services, Lambdas, DynamoDB, etc. It is common knowledge that a relational database cannot <em>autoscale</em>. It can, however, <em>manual-scale</em> (or <em>script-scale</em>) vertically (beefier instance type) or horizontally (read relicas for reads).</p>
+
+<p>Serverless Aurora does <em>autoscale</em>.</p>
+
+<h3 id="compute--memory">Compute &amp; Memory</h3>
+
+<p>Aurora Serverless uses <code class="highlighter-rouge">ACU</code> (Aurora Capacity Unit) as its capacity unit. This is comparable to provisioning an RDS Instance Types (<code class="highlighter-rouge">db.t3.micro</code>, <code class="highlighter-rouge">db.r5.4xlarge</code>, etc.) which have a fixed amount of compute, network IO, storage IO, and memory. We <em>provision</em> <code class="highlighter-rouge">ACUs</code> instead of picking instance types. An <code class="highlighter-rouge">ACU</code> represents a combination of compute and memory capacity.</p>
+
+<p>The units range from <code class="highlighter-rouge">2 ACUs (4GB RAM)</code> to <code class="highlighter-rouge">256 ACUs (488GB RAM)</code>.</p>
+
+<p>We specify the <code class="highlighter-rouge">minimum ACUs</code> and <code class="highlighter-rouge">maximum ACUs</code>, which limit the cluster’s scale down and scale up respectively. Aurora Serverless scales up based on the number of connections, CPU usage, and memory usage. This scale up event is initiated at a <em>scaling point</em>. Same is applicable for scaling down, which has a cooldown period of <code class="highlighter-rouge">15 minutes</code> after a scale up event, and <code class="highlighter-rouge">310 seconds (~5 mins)</code> after each cool down event.</p>
+
+<h3 id="storage">Storage</h3>
+
+<p>The storage <em>autoscales</em> from <code class="highlighter-rouge">10 GB</code> to <code class="highlighter-rouge">64 TB</code> (just like Aurora RDS).</p>
+
+<h2 id="setup">Setup</h2>
+
+<p>Aurora Serverless set up is accessible on the AWS Console just like other RDS Engines. However, it does <strong>not</strong> qualify for Free Tier. Also, it is only available for MySQL 5.6 compatible edition.</p>
+
+<ol>
+  <li>
+    <p>From the console, search for RDS to land on the <a href="https://console.aws.amazon.com/rds/home?region=us-east-1">RDS home</a>.</p>
+  </li>
+  <li>
+    <p>Aurora Serverless is not available in all regions. I use us-east-1, you may want to switch to that if you do not see the configuration option in the steps below.</p>
+  </li>
+  <li>
+    <p>Click the orange <strong>Create Database</strong> button.</p>
+
+    <p><img src="https://lobster1234.github.io/assets/serverless-aurora/create_database.png" alt="sls-1" /></p>
+  </li>
+  <li>
+    <p>On the next screen, select <strong>Amazon Aurora</strong> with <strong>MySQL 5.6-compatible</strong> Edition. Also note that the <strong>Only enable options eligible for RDS Free Usage Tier</strong> checkbox is off, as Aurora RDS does not quality for Free Tier. Click <strong>Next</strong>.</p>
+
+    <p><img src="https://lobster1234.github.io/assets/serverless-aurora/aurora_page_1.png" alt="sls-2" /></p>
+  </li>
+  <li>
+    <p>Select <strong>Serverless</strong>. You’ll notice the options for DB Instance Class dissappear. Under <strong>Settings</strong>, pick a cluster identifier, master username, and a password that you can remember. Click <strong>Next</strong>.</p>
+
+    <p><img src="https://lobster1234.github.io/assets/serverless-aurora/aurora_page_2.png" alt="sls-3" /></p>
+  </li>
+  <li>
+    <p>Next screen is where we pick the <code class="highlighter-rouge">ACUs</code>. To keep costs in check, I’ll pick <code class="highlighter-rouge">2</code> ACUs as minumum and <code class="highlighter-rouge">4</code> as maximum.</p>
+
+    <p><img src="https://lobster1234.github.io/assets/serverless-aurora/advanced_settings.png" alt="sls-4" /></p>
+  </li>
+  <li>
+    <p>Under <strong>Network &amp; Security</strong>, we can keep defaults. <strong>Note</strong> that there are is no option to provision a public endpoint for Aurora Serverless, unlike other RDS Configurations. In other words, Serverless Aurora can only be accessed from within a VPC, and/or a peered network.</p>
+  </li>
+  <li>
+    <p>If we expand the <strong>Additional Configuration</strong>, there are options for parameter groups, backup retention, and encryption. Notice that Aurora Serverless is <em>always</em> encrypted at rest using the default RDS CMK (<code class="highlighter-rouge">aws/rds</code>). You may specify another CMK. For now we leave everything as default. Click <strong>Create Database</strong>.</p>
+  </li>
+  <li>
+    <p>The next screen shows the the cluster being created. Notice the size of <code class="highlighter-rouge">4 capacity units</code> once it is created. It took about 3 minutes for me.</p>
+
+    <p><img src="https://lobster1234.github.io/assets/serverless-aurora/created.png" alt="sls-5" /></p>
+  </li>
+  <li>
+    <p>If we click on the DB Identifier, it will take us to the cluster details page. This is where we can get information about connecting to the cluster, as well as configuration, logs, etc. Feel free to click around. Notice that <strong>Logs &amp; Events</strong> is empty. Even though we have our cluster set up, since there are no connections to it, there is no activity. Hence <em>autoscale</em>!</p>
+
+    <p><img src="https://lobster1234.github.io/assets/serverless-aurora/cluster_details.png" alt="sls-6" /></p>
+  </li>
+</ol>
+
+<h2 id="connectivity">Connectivity</h2>
+
+<ol>
+  <li>
+    <p>To connect to the cluster, we’d need the <code class="highlighter-rouge">Endpoint</code> from <code class="highlighter-rouge">step 10</code>. Mine looks like <code class="highlighter-rouge">my-aurora-serverless.cluster-cwl9ckkpdjxu.us-east-1.rds.amazonaws.com</code>. The port number is 3306, which cannot be changed for Aurora Serverless.</p>
+  </li>
+  <li>
+    <p>Provision an EC2 instance in the same VPC. Since I used the default VPC, I’ll have the instance with a public IP, so I can <code class="highlighter-rouge">ssh</code> into it from my laptop’s IP. I already have a security group configured to do so, which I’ll attach to the instance. If this seems unfamiliar, please see EC2 documentation on launching an EC2 instance in a VPC. If there is an instance already provisioned and you can get to it, do so!</p>
+  </li>
+  <li>
+    <p>Next, we install mysql client on the instance. I am using Amazon Linux AMI on a <code class="highlighter-rouge">t2.micro</code> instance type.</p>
+
+    <div class="highlighter-rouge"><pre class="highlight"><code> [ec2-user@ip-172-31-61-122 ~]$ uname -a
+ Linux ip-172-31-61-122.ec2.internal 4.14.104-95.84.amzn2.x86_64 #1 SMP Sat Mar 2 00:40:20 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux
+ [ec2-user@ip-172-31-61-122 ~]$ sudo yum update -y
+ Loaded plugins: extras_suggestions, langpacks, priorities, update-motd
+ Resolving Dependencies
+ --&gt; Running transaction check
+ ---&gt; Package bind-libs.x86_64 32:9.9.4-73.amzn2.1.1 will be updated
+ ---&gt; Package bind-libs.x86_64 32:9.9.4-73.amzn2.1.2 will be an update
+ ---&gt; Package bind-libs-lite.x86_64 32:9.9.4-73.amzn2.1.1 will be updated
+ ---&gt; Package bind-libs-lite.x86_64 32:9.9.4-73.amzn2.1.2 will be an update
+ ---&gt; Package bind-license.noarch 32:9.9.4-73.amzn2.1.1 will be updated
+ ...
+</code></pre>
+    </div>
+
+    <div class="highlighter-rouge"><pre class="highlight"><code> [ec2-user@ip-172-31-61-122 ~]$ sudo yum install mysql -y
+ ..
+ ..
+ Installed:
+ mariadb.x86_64 1:5.5.62-1.amzn2.0.1
+
+ Complete!
+</code></pre>
+    </div>
+  </li>
+  <li>We can now connect to our cluster.
+    <div class="highlighter-rouge"><pre class="highlight"><code> [ec2-user@ip-172-31-61-122 ~]$ mysql -u mpandit -p -h my-aurora-serverless.cluster-cwl9ckkpdjxu.us-east-1.rds.amazonaws.com
+ Enter password:
+
+ ^C
+</code></pre>
+    </div>
+    <p>This step will time out, if we went with all the default settings during Setup. This is because the RDS Security Group that was automatically created only allows <code class="highlighter-rouge">3306</code> inbound from our IP address. We will need to open up that security group to our VPC. To navigate to the security group, go to <a href="https://console.aws.amazon.com/ec2/v2/home?region=us-east-1#SecurityGroups:sort=groupId">Subnets</a>, and look for a Security Group named <code class="highlighter-rouge">rds-launch-wizard</code>. Verify the date/time in the description, as well as VPC ID to ensure you’re picking up the right one, in case you have multiple of them across many VPCs. If you click that Security Group and go to <strong>Inbound</strong> tab, you can see that it only allows inbound from a <code class="highlighter-rouge">/32</code> IP, which is your public IP. This IP is your internet gateway (Wifi Router, Internet Modem) IP. Let us open it up to our VPC. We can either enter our VPC CIDR, the VPC’s default security group, or just the one instance’s private IP. To keep things simple, I’ll use the instance’s private IP. This is different than the public IP used to ssh into the server. To get the server’s private IP, we can use the instance metadata endpoint.</p>
+
+    <div class="highlighter-rouge"><pre class="highlight"><code> [ec2-user@ip-172-31-61-122 ~]$ curl http://169.254.169.254/1.0/meta-data/local-ipv4
+ 172.31.61.122
+ [ec2-user@ip-172-31-61-122 ~]$
+</code></pre>
+    </div>
+    <p>We can take this IP and stick it in the RDS security group, as <code class="highlighter-rouge">172.31.61.122/32</code> replacing the <code class="highlighter-rouge">&lt;myIP&gt;/32</code>. This will only allow access from the instance we’re on, and not from anywhere else.</p>
+
+    <p><img src="https://lobster1234.github.io/assets/serverless-aurora/security_group.png" alt="sls-7" /></p>
+  </li>
+  <li>
+    <p>Once done, we go back to our EC2 instance and retry the above connection attempt.</p>
+
+    <p><strong>BE PATIENT DURING THIS STEP!</strong></p>
+    <div class="highlighter-rouge"><pre class="highlight"><code> [ec2-user@ip-172-31-61-122 ~]$ mysql -u mpandit -p -h my-aurora-serverless.cluster-cwl9ckkpdjxu.us-east-1.rds.amazonaws.com
+ Enter password:
+
+ Welcome to the MariaDB monitor.  Commands end with ; or \g.
+ Your MySQL connection id is 10
+ Server version: 5.6.10 MySQL Community Server (GPL)
+
+ Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+ Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+ MySQL [(none)]&gt;
+</code></pre>
+    </div>
+    <p>Please note  that it will take a while (~30 seconds for me) for this to work. This is because the cluster will take some time to initialize and start. Now lets go to the Cluster Console and check the events log.</p>
+  </li>
+  <li>We can now play with this cluster, like so
+    <div class="highlighter-rouge"><pre class="highlight"><code> MySQL [(none)]&gt; create database addressbook;
+ Query OK, 1 row affected (0.01 sec)
+
+ MySQL [(none)]&gt; use addressbook;
+ Database changed
+ MySQL [addressbook]&gt; create table address ( name varchar(100), city varchar(50), zip varchar(10) );
+ Query OK, 0 rows affected (0.03 sec)
+
+ MySQL [addressbook]&gt; insert into address (name, city, zip) values ('Joe','Dublin','94568');
+ Query OK, 1 row affected (0.00 sec)
+
+ MySQL [addressbook]&gt; select * from address;
+ +------+--------+-------+
+ | name | city   | zip   |
+ +------+--------+-------+
+ | Joe  | Dublin | 94568 |
+ +------+--------+-------+
+ 1 row in set (0.01 sec)
+</code></pre>
+    </div>
+  </li>
+  <li>
+    <p>On the <strong>Logs &amp; events</strong> tab, we can notice the cluster activity. Note how it scaled down the cluster from <code class="highlighter-rouge">4 ACUs</code> to <code class="highlighter-rouge">2 ACUs</code> since we are not really doing much.</p>
+
+    <p><img src="https://lobster1234.github.io/assets/serverless-aurora/events_1.png" alt="sls-8" /></p>
+  </li>
+  <li>
+    <p>On the <strong>Monitoring</strong> tab, we can see the scaling activity, as well as the number of connections as <code class="highlighter-rouge">1</code> which is the MySQL client from the EC2 instance. If yours looks different, do not worry. I reconnected a few times after existing out of the connection.</p>
+
+    <p><img src="https://lobster1234.github.io/assets/serverless-aurora/monitoring.png" alt="sls-9" /></p>
+  </li>
+  <li>
+    <p>Now let us close the MySQL client and wait for the Aurora Serverless to shut down the cluster entirely.</p>
+
+    <div class="highlighter-rouge"><pre class="highlight"><code>    
+MySQL [addressbook]&gt; exit;
+Bye
+    
+</code></pre>
+    </div>
+  </li>
+  <li>In the <strong>Configuration</strong> tab, notice that <code class="highlighter-rouge">Pause compute capacity after consecutive minutes of inactivity</code> which says <code class="highlighter-rouge">5 minutes</code>. After 5 minutes of us terminating the MySQL session, we should expect the cluster to scale down to <code class="highlighter-rouge">zero ACUs</code>.</li>
+</ol>
+
+<p><img src="https://lobster1234.github.io/assets/serverless-aurora/events_2.png" alt="sls-10" /></p>
+
+<p>Refresh the page and you’ll notice the <strong>Current capacity</strong> to indicate <code class="highlighter-rouge">0 capacity units</code>, as our cluster has shut down, or <code class="highlighter-rouge">paused</code>. If we reconnect from MySQL client, and be patient, the cluster will come alive, or <code class="highlighter-rouge">unpause</code>, or <code class="highlighter-rouge">scale up</code> from <code class="highlighter-rouge">0 ACUs</code>.</p>
+
+<p><img src="https://lobster1234.github.io/assets/serverless-aurora/final.png" alt="sls-11" /></p>
+
+<h2 id="cleanup">Cleanup</h2>
+
+<p>To avoid unwanted charges, we will delete this cluster. However, since we left the <strong>Enable Deletion Protection</strong> checked as default setting, we’ll need to mofify the cluster to disable it. Click <strong>Modify</strong> and scroll all the way down, and uncheck the <strong>Enable Deletion Protection</strong> checkbox, click <strong>Continue</strong>. On the next screen, click the <strong>Apply immediately</strong> radio button, and, click <strong>Modify Cluster</strong>.</p>
+
+<p>Now click <strong>Actions</strong> and click <strong>Delete</strong>. Pick <strong>No</strong> to create final snapshot, and check the acknoweldgement checkbox. Click <strong>Delete DB cluster</strong>.</p>
+
+<p>Terminate the EC2 instance as well, if you created one while following this post and do not need it anymore.</p>
+
+<h2 id="gotchas">Gotchas</h2>
+
+<p>Now that we have seen Aurora Serverless in action, here are a few gotchas :</p>
+
+<ol>
+  <li>Set the DB connection timeout to at least a minute, if not more. This is for the initial connection latency, while the cluster is <code class="highlighter-rouge">unpaused</code> and <code class="highlighter-rouge">scaled up</code> from Zero ACUs.</li>
+  <li>Make sure the connections are closed - as long as there is even one connection, the cluster will sit at minumum ACUs and not pause. For example, AWS Batch containers will exit upon completion, terminating any connections. In cases where the process does not exit, ensure to close the connection pool to avoid this situation.</li>
+  <li>Configure the RDS Security group securely, make sure you only allow connections from known and needed hosts.</li>
+  <li>The port number cannot be changed from 3306.</li>
+  <li>There are no replicas, the instance is all we got.</li>
+  <li>Do not use Aurora Serverless for <em>always on</em> type applications. This will not be cost effective.</li>
+  <li>Design the test harness where the initialization and destruction is guaranteed to run pre and post test runs, if using this set up for running tests. In other words, if the tests exist uncleanly, there is a chance that the connection(s) will continue to be established to the database, preventing a pause.</li>
+</ol>
+
+<h2 id="pricing">Pricing</h2>
+
+<p>The pricing is a little tricky, we pay by the ACUs, the IO requests, and storage. For us-east-1, the cost basis is <code class="highlighter-rouge">$0.06 ACU per hour</code>, <code class="highlighter-rouge">$0.10 per GB per month</code> for storage, and  <code class="highlighter-rouge">$0.20 per 1MM IO Requests</code>. The ACUs are billed <em>per second</em> with a minimum of <code class="highlighter-rouge">5 minutes</code> every time the cluster is <em>running</em> or <em>unpaused</em>.</p>
+
+<p>The exercise above did cost us a little, as mentioned earlier.</p>
+
+<h2 id="references">References</h2>
+
+<ul>
+  <li><a href="https://aws.amazon.com/rds/aurora/faqs/">Amazon Aurora RDS FAQs</a></li>
+  <li><a href="https://aws.amazon.com/rds/aurora/serverless/">Amazon Aurora Serverless Product Site</a></li>
+  <li><a href="https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless.html">Amazon Aurora Serverless Documentation</a></li>
+</ul>
+
+<p>I’d appreciate your comments and feedback below.</p>
+
+<h3 style="text-align: center" id="comments">Comments</h3>
+
+<div id="disqus_thread"></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = "https://lobster1234.github.io/2019/04/22/serverless-aurora-rds/";  
+this.page.identifier = "/2019/04/22/serverless-aurora-rds";
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://lobster1234.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+<div id="disqus_thread"></div>
+<script>
+
+
+      
+
+</script>
+
+  </div>
+
+  
+
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <p>
+      
+
+&copy; Manish Pandit - Powered by <a href="https://jekyllrb.com">Jekyll</a> &amp; <a href="https://github.com/yous/whiteglass">whiteglass</a> - Subscribe via <a href="https://lobster1234.github.io/feed.xml">RSS</a>
+
+    </p>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

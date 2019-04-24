@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2019-04-07T03:55:28-07:00</updated>
+  <updated>2019-04-24T02:58:34-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -25,6 +25,339 @@
     </author>
   
 
+  
+  
+    <entry>
+      
+      <title type="html">Serverless Aurora RDS</title>
+      
+      
+      <link href="https://lobster1234.github.io/2019/04/22/serverless-aurora-rds/" rel="alternate" type="text/html" title="Serverless Aurora RDS" />
+      
+      <published>2019-04-22T13:44:37-07:00</published>
+      <updated>2019-04-22T13:44:37-07:00</updated>
+      <id>https://lobster1234.github.io/2019/04/22/serverless-aurora-rds</id>
+      <content type="html" xml:base="https://lobster1234.github.io/2019/04/22/serverless-aurora-rds/">&lt;p&gt;&lt;a href=&quot;&quot;&gt;Amazon RDS&lt;/a&gt; is a fully managed Relational Database Service in the AWS Public Cloud. &lt;a href=&quot;https://aws.amazon.com/rds/aurora/&quot;&gt;Amazon Aurora&lt;/a&gt; is a MySQL and Postgre compatible database with much better performance at scale with all the enhancements and rewriting AWS has put in. For more context on Aurora, here is &lt;a href=&quot;https://lobster1234.github.io/2017/11/03/amazon-aurora-rds-notes/&quot;&gt;my post on Aurora&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Very recently, Amazon’s Fulfillment Unit &lt;a href=&quot;https://twitter.com/jdarrow/status/1111629087947132928&quot;&gt;moved off of Oracle&lt;/a&gt; on to Aurora Postgres + DynamoDB.&lt;/p&gt;
+
+&lt;p&gt;Aurora RDS has a lot of practical configurations applicable to pretty much all production workloads (multi region, multi-flavored read replicas FTW!). The ones I like the most are &lt;a href=&quot;https://aws.amazon.com/rds/aurora/global-database/&quot;&gt;Aurora Global Database&lt;/a&gt;, and &lt;a href=&quot;https://aws.amazon.com/rds/aurora/serverless/&quot;&gt;Aurora Serverless&lt;/a&gt;. In this post I will talk about Aurora Serverless, while saving Aurora Global Database for a later time.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://aws.amazon.com/rds/aurora/serverless/&quot;&gt;Amazon Aurora Serverless&lt;/a&gt; is an on-demand, out of the box auto-scaled Aurora MySQL 5.6 Database which is &lt;em&gt;Serverless&lt;/em&gt;, in that it will start, scale, and stop automatically. As all RDS engines, it is fully managed.&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h2 id=&quot;use-cases&quot;&gt;Use Cases&lt;/h2&gt;
+
+&lt;p&gt;Combined with autoscaling, on-demand startup and shutdown, and per-second pricing, Aurora Serverless is a great fit for workloads that are infrequent and/or variable. Some of the examples can be -&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Test workloads, where a database instance is only really need during the test runs, and can be “torn down” after the tests have finished running.&lt;/li&gt;
+  &lt;li&gt;Batch Jobs, where the database is available for the batch job to store state, or any other related data associated with the job.&lt;/li&gt;
+  &lt;li&gt;Benchmarking the database requirements for a new application before provisioning an Aurora RDS Cluster. However, I feel performance testing on Aurora Serverless could be a stretch, as it’d autoscale, while the Production RDS (non-Serverless) will not.&lt;/li&gt;
+  &lt;li&gt;Unpredictable workloads, where database capacity needs to be autoscaled. I would not really do this in a production environment, as quite a few of Aurora RDS features are not available with Serverless Configuration, like -
+    &lt;ul&gt;
+      &lt;li&gt;Replicas&lt;/li&gt;
+      &lt;li&gt;IAM Database Authentication&lt;/li&gt;
+      &lt;li&gt;Restoring from S3&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless.html&quot;&gt;Few other limitations&lt;/a&gt; that can be a deal-breaker for some production workloads&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;serverless-autoscale&quot;&gt;Serverless Autoscale&lt;/h2&gt;
+
+&lt;p&gt;Lets get some clarity on Aurora Serverless Autoscale. Usually we see the term &lt;em&gt;autoscale&lt;/em&gt; used with EC2 instances, ECS Services, Lambdas, DynamoDB, etc. It is common knowledge that a relational database cannot &lt;em&gt;autoscale&lt;/em&gt;. It can, however, &lt;em&gt;manual-scale&lt;/em&gt; (or &lt;em&gt;script-scale&lt;/em&gt;) vertically (beefier instance type) or horizontally (read relicas for reads).&lt;/p&gt;
+
+&lt;p&gt;Serverless Aurora does &lt;em&gt;autoscale&lt;/em&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;compute--memory&quot;&gt;Compute &amp;amp; Memory&lt;/h3&gt;
+
+&lt;p&gt;Aurora Serverless uses &lt;code class=&quot;highlighter-rouge&quot;&gt;ACU&lt;/code&gt; (Aurora Capacity Unit) as its capacity unit. This is comparable to provisioning an RDS Instance Types (&lt;code class=&quot;highlighter-rouge&quot;&gt;db.t3.micro&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;db.r5.4xlarge&lt;/code&gt;, etc.) which have a fixed amount of compute, network IO, storage IO, and memory. We &lt;em&gt;provision&lt;/em&gt; &lt;code class=&quot;highlighter-rouge&quot;&gt;ACUs&lt;/code&gt; instead of picking instance types. An &lt;code class=&quot;highlighter-rouge&quot;&gt;ACU&lt;/code&gt; represents a combination of compute and memory capacity.&lt;/p&gt;
+
+&lt;p&gt;The units range from &lt;code class=&quot;highlighter-rouge&quot;&gt;2 ACUs (4GB RAM)&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;256 ACUs (488GB RAM)&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;We specify the &lt;code class=&quot;highlighter-rouge&quot;&gt;minimum ACUs&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;maximum ACUs&lt;/code&gt;, which limit the cluster’s scale down and scale up respectively. Aurora Serverless scales up based on the number of connections, CPU usage, and memory usage. This scale up event is initiated at a &lt;em&gt;scaling point&lt;/em&gt;. Same is applicable for scaling down, which has a cooldown period of &lt;code class=&quot;highlighter-rouge&quot;&gt;15 minutes&lt;/code&gt; after a scale up event, and &lt;code class=&quot;highlighter-rouge&quot;&gt;310 seconds (~5 mins)&lt;/code&gt; after each cool down event.&lt;/p&gt;
+
+&lt;h3 id=&quot;storage&quot;&gt;Storage&lt;/h3&gt;
+
+&lt;p&gt;The storage &lt;em&gt;autoscales&lt;/em&gt; from &lt;code class=&quot;highlighter-rouge&quot;&gt;10 GB&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;64 TB&lt;/code&gt; (just like Aurora RDS).&lt;/p&gt;
+
+&lt;h2 id=&quot;setup&quot;&gt;Setup&lt;/h2&gt;
+
+&lt;p&gt;Aurora Serverless set up is accessible on the AWS Console just like other RDS Engines. However, it does &lt;strong&gt;not&lt;/strong&gt; qualify for Free Tier. Also, it is only available for MySQL 5.6 compatible edition.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;From the console, search for RDS to land on the &lt;a href=&quot;https://console.aws.amazon.com/rds/home?region=us-east-1&quot;&gt;RDS home&lt;/a&gt;.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Aurora Serverless is not available in all regions. I use us-east-1, you may want to switch to that if you do not see the configuration option in the steps below.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Click the orange &lt;strong&gt;Create Database&lt;/strong&gt; button.&lt;/p&gt;
+
+    &lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/serverless-aurora/create_database.png&quot; alt=&quot;sls-1&quot; /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;On the next screen, select &lt;strong&gt;Amazon Aurora&lt;/strong&gt; with &lt;strong&gt;MySQL 5.6-compatible&lt;/strong&gt; Edition. Also note that the &lt;strong&gt;Only enable options eligible for RDS Free Usage Tier&lt;/strong&gt; checkbox is off, as Aurora RDS does not quality for Free Tier. Click &lt;strong&gt;Next&lt;/strong&gt;.&lt;/p&gt;
+
+    &lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/serverless-aurora/aurora_page_1.png&quot; alt=&quot;sls-2&quot; /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Select &lt;strong&gt;Serverless&lt;/strong&gt;. You’ll notice the options for DB Instance Class dissappear. Under &lt;strong&gt;Settings&lt;/strong&gt;, pick a cluster identifier, master username, and a password that you can remember. Click &lt;strong&gt;Next&lt;/strong&gt;.&lt;/p&gt;
+
+    &lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/serverless-aurora/aurora_page_2.png&quot; alt=&quot;sls-3&quot; /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Next screen is where we pick the &lt;code class=&quot;highlighter-rouge&quot;&gt;ACUs&lt;/code&gt;. To keep costs in check, I’ll pick &lt;code class=&quot;highlighter-rouge&quot;&gt;2&lt;/code&gt; ACUs as minumum and &lt;code class=&quot;highlighter-rouge&quot;&gt;4&lt;/code&gt; as maximum.&lt;/p&gt;
+
+    &lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/serverless-aurora/advanced_settings.png&quot; alt=&quot;sls-4&quot; /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Under &lt;strong&gt;Network &amp;amp; Security&lt;/strong&gt;, we can keep defaults. &lt;strong&gt;Note&lt;/strong&gt; that there are is no option to provision a public endpoint for Aurora Serverless, unlike other RDS Configurations. In other words, Serverless Aurora can only be accessed from within a VPC, and/or a peered network.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;If we expand the &lt;strong&gt;Additional Configuration&lt;/strong&gt;, there are options for parameter groups, backup retention, and encryption. Notice that Aurora Serverless is &lt;em&gt;always&lt;/em&gt; encrypted at rest using the default RDS CMK (&lt;code class=&quot;highlighter-rouge&quot;&gt;aws/rds&lt;/code&gt;). You may specify another CMK. For now we leave everything as default. Click &lt;strong&gt;Create Database&lt;/strong&gt;.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;The next screen shows the the cluster being created. Notice the size of &lt;code class=&quot;highlighter-rouge&quot;&gt;4 capacity units&lt;/code&gt; once it is created. It took about 3 minutes for me.&lt;/p&gt;
+
+    &lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/serverless-aurora/created.png&quot; alt=&quot;sls-5&quot; /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;If we click on the DB Identifier, it will take us to the cluster details page. This is where we can get information about connecting to the cluster, as well as configuration, logs, etc. Feel free to click around. Notice that &lt;strong&gt;Logs &amp;amp; Events&lt;/strong&gt; is empty. Even though we have our cluster set up, since there are no connections to it, there is no activity. Hence &lt;em&gt;autoscale&lt;/em&gt;!&lt;/p&gt;
+
+    &lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/serverless-aurora/cluster_details.png&quot; alt=&quot;sls-6&quot; /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;connectivity&quot;&gt;Connectivity&lt;/h2&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;To connect to the cluster, we’d need the &lt;code class=&quot;highlighter-rouge&quot;&gt;Endpoint&lt;/code&gt; from &lt;code class=&quot;highlighter-rouge&quot;&gt;step 10&lt;/code&gt;. Mine looks like &lt;code class=&quot;highlighter-rouge&quot;&gt;my-aurora-serverless.cluster-cwl9ckkpdjxu.us-east-1.rds.amazonaws.com&lt;/code&gt;. The port number is 3306, which cannot be changed for Aurora Serverless.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Provision an EC2 instance in the same VPC. Since I used the default VPC, I’ll have the instance with a public IP, so I can &lt;code class=&quot;highlighter-rouge&quot;&gt;ssh&lt;/code&gt; into it from my laptop’s IP. I already have a security group configured to do so, which I’ll attach to the instance. If this seems unfamiliar, please see EC2 documentation on launching an EC2 instance in a VPC. If there is an instance already provisioned and you can get to it, do so!&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Next, we install mysql client on the instance. I am using Amazon Linux AMI on a &lt;code class=&quot;highlighter-rouge&quot;&gt;t2.micro&lt;/code&gt; instance type.&lt;/p&gt;
+
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; [ec2-user@ip-172-31-61-122 ~]$ uname -a
+ Linux ip-172-31-61-122.ec2.internal 4.14.104-95.84.amzn2.x86_64 #1 SMP Sat Mar 2 00:40:20 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux
+ [ec2-user@ip-172-31-61-122 ~]$ sudo yum update -y
+ Loaded plugins: extras_suggestions, langpacks, priorities, update-motd
+ Resolving Dependencies
+ --&amp;gt; Running transaction check
+ ---&amp;gt; Package bind-libs.x86_64 32:9.9.4-73.amzn2.1.1 will be updated
+ ---&amp;gt; Package bind-libs.x86_64 32:9.9.4-73.amzn2.1.2 will be an update
+ ---&amp;gt; Package bind-libs-lite.x86_64 32:9.9.4-73.amzn2.1.1 will be updated
+ ---&amp;gt; Package bind-libs-lite.x86_64 32:9.9.4-73.amzn2.1.2 will be an update
+ ---&amp;gt; Package bind-license.noarch 32:9.9.4-73.amzn2.1.1 will be updated
+ ...
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; [ec2-user@ip-172-31-61-122 ~]$ sudo yum install mysql -y
+ ..
+ ..
+ Installed:
+ mariadb.x86_64 1:5.5.62-1.amzn2.0.1
+
+ Complete!
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;We can now connect to our cluster.
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; [ec2-user@ip-172-31-61-122 ~]$ mysql -u mpandit -p -h my-aurora-serverless.cluster-cwl9ckkpdjxu.us-east-1.rds.amazonaws.com
+ Enter password:
+
+ ^C
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+    &lt;p&gt;This step will time out, if we went with all the default settings during Setup. This is because the RDS Security Group that was automatically created only allows &lt;code class=&quot;highlighter-rouge&quot;&gt;3306&lt;/code&gt; inbound from our IP address. We will need to open up that security group to our VPC. To navigate to the security group, go to &lt;a href=&quot;https://console.aws.amazon.com/ec2/v2/home?region=us-east-1#SecurityGroups:sort=groupId&quot;&gt;Subnets&lt;/a&gt;, and look for a Security Group named &lt;code class=&quot;highlighter-rouge&quot;&gt;rds-launch-wizard&lt;/code&gt;. Verify the date/time in the description, as well as VPC ID to ensure you’re picking up the right one, in case you have multiple of them across many VPCs. If you click that Security Group and go to &lt;strong&gt;Inbound&lt;/strong&gt; tab, you can see that it only allows inbound from a &lt;code class=&quot;highlighter-rouge&quot;&gt;/32&lt;/code&gt; IP, which is your public IP. This IP is your internet gateway (Wifi Router, Internet Modem) IP. Let us open it up to our VPC. We can either enter our VPC CIDR, the VPC’s default security group, or just the one instance’s private IP. To keep things simple, I’ll use the instance’s private IP. This is different than the public IP used to ssh into the server. To get the server’s private IP, we can use the instance metadata endpoint.&lt;/p&gt;
+
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; [ec2-user@ip-172-31-61-122 ~]$ curl http://169.254.169.254/1.0/meta-data/local-ipv4
+ 172.31.61.122
+ [ec2-user@ip-172-31-61-122 ~]$
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+    &lt;p&gt;We can take this IP and stick it in the RDS security group, as &lt;code class=&quot;highlighter-rouge&quot;&gt;172.31.61.122/32&lt;/code&gt; replacing the &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;myIP&amp;gt;/32&lt;/code&gt;. This will only allow access from the instance we’re on, and not from anywhere else.&lt;/p&gt;
+
+    &lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/serverless-aurora/security_group.png&quot; alt=&quot;sls-7&quot; /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Once done, we go back to our EC2 instance and retry the above connection attempt.&lt;/p&gt;
+
+    &lt;p&gt;&lt;strong&gt;BE PATIENT DURING THIS STEP!&lt;/strong&gt;&lt;/p&gt;
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; [ec2-user@ip-172-31-61-122 ~]$ mysql -u mpandit -p -h my-aurora-serverless.cluster-cwl9ckkpdjxu.us-east-1.rds.amazonaws.com
+ Enter password:
+
+ Welcome to the MariaDB monitor.  Commands end with ; or \g.
+ Your MySQL connection id is 10
+ Server version: 5.6.10 MySQL Community Server (GPL)
+
+ Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+ Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+ MySQL [(none)]&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+    &lt;p&gt;Please note  that it will take a while (~30 seconds for me) for this to work. This is because the cluster will take some time to initialize and start. Now lets go to the Cluster Console and check the events log.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;We can now play with this cluster, like so
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; MySQL [(none)]&amp;gt; create database addressbook;
+ Query OK, 1 row affected (0.01 sec)
+
+ MySQL [(none)]&amp;gt; use addressbook;
+ Database changed
+ MySQL [addressbook]&amp;gt; create table address ( name varchar(100), city varchar(50), zip varchar(10) );
+ Query OK, 0 rows affected (0.03 sec)
+
+ MySQL [addressbook]&amp;gt; insert into address (name, city, zip) values ('Joe','Dublin','94568');
+ Query OK, 1 row affected (0.00 sec)
+
+ MySQL [addressbook]&amp;gt; select * from address;
+ +------+--------+-------+
+ | name | city   | zip   |
+ +------+--------+-------+
+ | Joe  | Dublin | 94568 |
+ +------+--------+-------+
+ 1 row in set (0.01 sec)
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;On the &lt;strong&gt;Logs &amp;amp; events&lt;/strong&gt; tab, we can notice the cluster activity. Note how it scaled down the cluster from &lt;code class=&quot;highlighter-rouge&quot;&gt;4 ACUs&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;2 ACUs&lt;/code&gt; since we are not really doing much.&lt;/p&gt;
+
+    &lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/serverless-aurora/events_1.png&quot; alt=&quot;sls-8&quot; /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;On the &lt;strong&gt;Monitoring&lt;/strong&gt; tab, we can see the scaling activity, as well as the number of connections as &lt;code class=&quot;highlighter-rouge&quot;&gt;1&lt;/code&gt; which is the MySQL client from the EC2 instance. If yours looks different, do not worry. I reconnected a few times after existing out of the connection.&lt;/p&gt;
+
+    &lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/serverless-aurora/monitoring.png&quot; alt=&quot;sls-9&quot; /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Now let us close the MySQL client and wait for the Aurora Serverless to shut down the cluster entirely.&lt;/p&gt;
+
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    
+MySQL [addressbook]&amp;gt; exit;
+Bye
+    
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;In the &lt;strong&gt;Configuration&lt;/strong&gt; tab, notice that &lt;code class=&quot;highlighter-rouge&quot;&gt;Pause compute capacity after consecutive minutes of inactivity&lt;/code&gt; which says &lt;code class=&quot;highlighter-rouge&quot;&gt;5 minutes&lt;/code&gt;. After 5 minutes of us terminating the MySQL session, we should expect the cluster to scale down to &lt;code class=&quot;highlighter-rouge&quot;&gt;zero ACUs&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/serverless-aurora/events_2.png&quot; alt=&quot;sls-10&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Refresh the page and you’ll notice the &lt;strong&gt;Current capacity&lt;/strong&gt; to indicate &lt;code class=&quot;highlighter-rouge&quot;&gt;0 capacity units&lt;/code&gt;, as our cluster has shut down, or &lt;code class=&quot;highlighter-rouge&quot;&gt;paused&lt;/code&gt;. If we reconnect from MySQL client, and be patient, the cluster will come alive, or &lt;code class=&quot;highlighter-rouge&quot;&gt;unpause&lt;/code&gt;, or &lt;code class=&quot;highlighter-rouge&quot;&gt;scale up&lt;/code&gt; from &lt;code class=&quot;highlighter-rouge&quot;&gt;0 ACUs&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/serverless-aurora/final.png&quot; alt=&quot;sls-11&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;cleanup&quot;&gt;Cleanup&lt;/h2&gt;
+
+&lt;p&gt;To avoid unwanted charges, we will delete this cluster. However, since we left the &lt;strong&gt;Enable Deletion Protection&lt;/strong&gt; checked as default setting, we’ll need to mofify the cluster to disable it. Click &lt;strong&gt;Modify&lt;/strong&gt; and scroll all the way down, and uncheck the &lt;strong&gt;Enable Deletion Protection&lt;/strong&gt; checkbox, click &lt;strong&gt;Continue&lt;/strong&gt;. On the next screen, click the &lt;strong&gt;Apply immediately&lt;/strong&gt; radio button, and, click &lt;strong&gt;Modify Cluster&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;Now click &lt;strong&gt;Actions&lt;/strong&gt; and click &lt;strong&gt;Delete&lt;/strong&gt;. Pick &lt;strong&gt;No&lt;/strong&gt; to create final snapshot, and check the acknoweldgement checkbox. Click &lt;strong&gt;Delete DB cluster&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;Terminate the EC2 instance as well, if you created one while following this post and do not need it anymore.&lt;/p&gt;
+
+&lt;h2 id=&quot;gotchas&quot;&gt;Gotchas&lt;/h2&gt;
+
+&lt;p&gt;Now that we have seen Aurora Serverless in action, here are a few gotchas :&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Set the DB connection timeout to at least a minute, if not more. This is for the initial connection latency, while the cluster is &lt;code class=&quot;highlighter-rouge&quot;&gt;unpaused&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;scaled up&lt;/code&gt; from Zero ACUs.&lt;/li&gt;
+  &lt;li&gt;Make sure the connections are closed - as long as there is even one connection, the cluster will sit at minumum ACUs and not pause. For example, AWS Batch containers will exit upon completion, terminating any connections. In cases where the process does not exit, ensure to close the connection pool to avoid this situation.&lt;/li&gt;
+  &lt;li&gt;Configure the RDS Security group securely, make sure you only allow connections from known and needed hosts.&lt;/li&gt;
+  &lt;li&gt;The port number cannot be changed from 3306.&lt;/li&gt;
+  &lt;li&gt;There are no replicas, the instance is all we got.&lt;/li&gt;
+  &lt;li&gt;Do not use Aurora Serverless for &lt;em&gt;always on&lt;/em&gt; type applications. This will not be cost effective.&lt;/li&gt;
+  &lt;li&gt;Design the test harness where the initialization and destruction is guaranteed to run pre and post test runs, if using this set up for running tests. In other words, if the tests exist uncleanly, there is a chance that the connection(s) will continue to be established to the database, preventing a pause.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;pricing&quot;&gt;Pricing&lt;/h2&gt;
+
+&lt;p&gt;The pricing is a little tricky, we pay by the ACUs, the IO requests, and storage. For us-east-1, the cost basis is &lt;code class=&quot;highlighter-rouge&quot;&gt;$0.06 ACU per hour&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;$0.10 per GB per month&lt;/code&gt; for storage, and  &lt;code class=&quot;highlighter-rouge&quot;&gt;$0.20 per 1MM IO Requests&lt;/code&gt;. The ACUs are billed &lt;em&gt;per second&lt;/em&gt; with a minimum of &lt;code class=&quot;highlighter-rouge&quot;&gt;5 minutes&lt;/code&gt; every time the cluster is &lt;em&gt;running&lt;/em&gt; or &lt;em&gt;unpaused&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;The exercise above did cost us a little, as mentioned earlier.&lt;/p&gt;
+
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://aws.amazon.com/rds/aurora/faqs/&quot;&gt;Amazon Aurora RDS FAQs&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://aws.amazon.com/rds/aurora/serverless/&quot;&gt;Amazon Aurora Serverless Product Site&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless.html&quot;&gt;Amazon Aurora Serverless Documentation&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;I’d appreciate your comments and feedback below.&lt;/p&gt;
+
+&lt;h3 style=&quot;text-align: center&quot; id=&quot;comments&quot;&gt;Comments&lt;/h3&gt;
+
+&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = &quot;https://lobster1234.github.io/2019/04/22/serverless-aurora-rds/&quot;;  
+this.page.identifier = &quot;/2019/04/22/serverless-aurora-rds&quot;;
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://lobster1234.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+&lt;/script&gt;
+
+&lt;noscript&gt;Please enable JavaScript to view the &lt;a href=&quot;https://disqus.com/?ref_noscript&quot;&gt;comments powered by Disqus.&lt;/a&gt;&lt;/noscript&gt;
+
+&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+
+
+      
+
+&lt;/script&gt;</content>
+
+      
+      
+      
+      
+      
+
+      
+        <author>
+            <name>Manish Pandit</name>
+          
+          
+        </author>
+      
+
+      
+        <category term="aws" />
+      
+
+      
+        <category term="aws" />
+      
+
+      
+        <summary type="html">Amazon RDS is a fully managed Relational Database Service in the AWS Public Cloud. Amazon Aurora is a MySQL and Postgre compatible database with much better performance at scale with all the enhancements and rewriting AWS has put in. For more context on Aurora, here is my post on Aurora. Very recently, Amazon’s Fulfillment Unit moved off of Oracle on to Aurora Postgres + DynamoDB. Aurora RDS has a lot of practical configurations applicable to pretty much all production workloads (multi region, multi-flavored read replicas FTW!). The ones I like the most are Aurora Global Database, and Aurora Serverless. In this post I will talk about Aurora Serverless, while saving Aurora Global Database for a later time. Amazon Aurora Serverless is an on-demand, out of the box auto-scaled Aurora MySQL 5.6 Database which is Serverless, in that it will start, scale, and stop automatically. As all RDS engines, it is fully managed.</summary>
+      
+
+      
+      
+    </entry>
+  
   
   
     <entry>
@@ -4629,251 +4962,6 @@ s.setAttribute('data-timestamp', +new Date());
 
       
         <summary type="html">Slides from my talk at Silicon Valley Code Camp 2017. Serverless is a node.js based framework that makes creating, deploying, and managing serverless functions a breeze. We will use AWS Lambda as our FaaS (Function-as-a-Service) provider, although Serverless supports IBM OpenWhisk and Microsoft Azure as well. In this session, we will talk about Serverless Applications, and Create and deploy a java-maven based AWS Lambda API. We will also explore the command line interface to manage lambda, which is provided out of the box by serverless framework.</summary>
-      
-
-      
-      
-    </entry>
-  
-  
-  
-    <entry>
-      
-      <title type="html">AWS KMS and Envelope Encryption</title>
-      
-      
-      <link href="https://lobster1234.github.io/2017/09/29/aws-kms-envelope-encryption/" rel="alternate" type="text/html" title="AWS KMS and Envelope Encryption" />
-      
-      <published>2017-09-29T23:44:37-07:00</published>
-      <updated>2017-09-29T23:44:37-07:00</updated>
-      <id>https://lobster1234.github.io/2017/09/29/aws-kms-envelope-encryption</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2017/09/29/aws-kms-envelope-encryption/">&lt;p&gt;Every service needs encryption at one point or another - passwords to the database, credentials to an external service, or even entire filesystem or files. Sticking the secrets, or keys in configuration files seems a quick and easy option. However, it carries security risks, even if these configurations are managed outside of the source code. On top of it, the keys used to encrypt/decrypt the data bring additional security implications and requirements in terms of storage, audit, and lifecycle management.&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://aws.amazon.com/kms/&quot;&gt;AWS KMS&lt;/a&gt;, or AWS Key Management Service is a fully managed service to store and manage keys. Any AWS service which supports encryption - S3 buckets, EBS Volumes, SQS, etc. uses KMS under the hood. KMS is more than just a key manager, it can also be used to encrypt large volumes of data, using a technique called Envelope Encryption.&lt;/p&gt;
-
-&lt;p&gt;In this post I will cover KMS, and the &lt;em&gt;why&lt;/em&gt;, &lt;em&gt;what&lt;/em&gt;, and &lt;em&gt;how&lt;/em&gt; of Envelope Encryption.&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;p&gt;An ideal key management system should be highly available, control access to the master key(s), audit the key(s) usage, and manage key(s) lifecycle. This becomes all the more important with microservices, as the number of such secrets can grow to a large number, if the services being composed to offer a functionality all need their own secrets.&lt;/p&gt;
-
-&lt;h2 id=&quot;setup&quot;&gt;Setup&lt;/h2&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;Access to &lt;a href=&quot;https://console.aws.amazon.com/console/home&quot;&gt;AWS Console&lt;/a&gt; (optional, but preferred)&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://aws.amazon.com/cli/&quot;&gt;AWS CLI&lt;/a&gt; which is configured with credentials that allow for &lt;code class=&quot;highlighter-rouge&quot;&gt;AWSKeyManagementServicePowerUser&lt;/code&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://github.com/awslabs/aws-shell&quot;&gt;AWS Shell&lt;/a&gt;, which I prefer over using the CLI&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;openssl&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;base64&lt;/code&gt; commands (I am using a Mac OSX Sierra)&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2 id=&quot;aws-kms&quot;&gt;AWS KMS&lt;/h2&gt;
-
-&lt;p&gt;KMS keys are referred to as CMKs (Customer Master Keys). The CMKs are used to encrypt and decrypt data, &lt;em&gt;or other keys&lt;/em&gt; - as we will see below. Customers can also choose to upload their own keys to KMS. As mentioned earlier, AWS uses KMS to manage keys for it’s own services. These keys are called &lt;em&gt;AWS-Managed CMKs&lt;/em&gt;, as opposed to the ones created by the customer, called &lt;em&gt;Customer-Managed CMKs&lt;/em&gt;. Customer-Managed CMKs can be used for AWS services if customers want greater control over key-rotations, etc. KMS provides &lt;a href=&quot;https://en.wikipedia.org/wiki/Symmetric-key_algorithm&quot;&gt;symmetric encryption&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;If you have, in the past, used any AWS service with encryption, AWS has created CMKs for it on your behalf. These will be the AWS-Managed CMKs - one per service per region. To check it out, log in to the AWS Console, and click &lt;code class=&quot;highlighter-rouge&quot;&gt;Encryption keys&lt;/code&gt; under &lt;code class=&quot;highlighter-rouge&quot;&gt;IAM&lt;/code&gt; to see the AWS Managed Keys. The AWS-Managed CMKs show up with the orange AWS icon.&lt;/p&gt;
-
-&lt;p&gt;Here is what my keys look like -&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/kms-aws-managed.png&quot; alt=&quot;kms-2&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;The keys are region specific, so you may want to pick different regions to see the CMKs in those regions.&lt;/p&gt;
-
-&lt;p&gt;The CMKs can never be retrieved or seen in plaintext - AWS uses its underlying infrastructure to keep the CMKs secure, highly available, and durable.&lt;/p&gt;
-
-&lt;p&gt;Data should be only decrypted &lt;em&gt;where&lt;/em&gt; it is needed, not at some server and then transmitted over unencrypted. IAM policies control who can encrypt and/or decrypt using the CMKs, and these policies can a be part of IAM roles associated with AWS resources. IAM policies also control who can administer the CMKs.&lt;/p&gt;
-
-&lt;p&gt;KMS can be used to decrypt/encrypt up to 4KB of data. This begs the question - how does AWS manage to encrypt EBS volumes and large S3 files with KMS? The answer is - &lt;a href=&quot;http://docs.aws.amazon.com/kms/latest/developerguide/workflow.html&quot;&gt;Envelope Encryption&lt;/a&gt;. The CMKs can be used to generate a different type of keys called data keys, which can then be used to encrypt/decrypt data. However, the data keys, when generated, are returned in plain-text, and AWS does not store or manage them. It is up to the customer to store and use the data keys on their own.&lt;/p&gt;
-
-&lt;h2 id=&quot;envelope-encryption&quot;&gt;Envelope Encryption&lt;/h2&gt;
-
-&lt;p&gt;Here are the steps to implement Envelope Encryption  -&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;Create a new CMK, or re-use an existing CMK. This can be done the AWS Console, or with CLI using &lt;a href=&quot;http://docs.aws.amazon.com/cli/latest/reference/kms/create-key.html&quot;&gt;create-key&lt;/a&gt;.&lt;/li&gt;
-  &lt;li&gt;Use &lt;a href=&quot;http://docs.aws.amazon.com/cli/latest/reference/kms/generate-data-key.html&quot;&gt;generate-data-key&lt;/a&gt; to get a data key.&lt;/li&gt;
-  &lt;li&gt;This returns the plain text data key, and also an encrypted (with the specified CMK) version of the data key. The encrypted version is referred to as a &lt;em&gt;CipherTextBlob&lt;/em&gt;. Store the returned CipherTextBlob (we will need it later). The CipherTextBlob has metadata which tells KMS which CMK was used to generate it. Store this CipherTextBlob.&lt;/li&gt;
-  &lt;li&gt;Use the plain-text data key to encrypt any amount of data.&lt;/li&gt;
-  &lt;li&gt;Throw away the plain-text data key, but be sure to store the CipherTextBlob along side the encrypted data.&lt;/li&gt;
-  &lt;li&gt;To decrypt, use the &lt;a href=&quot;http://docs.aws.amazon.com/kms/latest/APIReference/API_Decrypt.html&quot;&gt;Decrypt API&lt;/a&gt;, sending it the CipherTextBlob from step (3).&lt;/li&gt;
-  &lt;li&gt;The above step will return the plain text data key (the same one we threw away). Use this key to decrypt the data.&lt;/li&gt;
-  &lt;li&gt;Throw away the plain-text data key.&lt;/li&gt;
-  &lt;li&gt;To encrypt more data, repeat steps 6, 7, 8 except use the plain text key to &lt;strong&gt;encrypt&lt;/strong&gt; instead of &lt;strong&gt;decrypt&lt;/strong&gt;.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;This ensures that the encrypted data will not be compromised as long as the plain-text data key is destroyed after each encryption/decryption process. At best, someone can get to the CipherTextBlob, but unless they can call KMS to decrypt it, the encrypted data cannot be decrypted with just the CipherTextBlob.&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;It is very important to note that KMS has no record of the data key. It is us who are managing the data key. If you were to throw away the CipherTextBlob after deleting the plain text key, the encrypted data can NEVER be decrypted.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p style=&quot;text-align: center&quot;&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/envelope_encryption.png&quot; alt=&quot;kms-1&quot; /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;!--more--&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;envelope-encryption-with-cli&quot;&gt;Envelope Encryption with CLI&lt;/h2&gt;
-
-&lt;p&gt;I am using AWS Shell here, but you may use AWS CLI just as easily. You’d need to prefix all commands with &lt;code class=&quot;highlighter-rouge&quot;&gt;aws&lt;/code&gt; if so.&lt;/p&gt;
-
-&lt;p&gt;In the steps below, AWS Shell has the prompt &lt;code class=&quot;highlighter-rouge&quot;&gt;aws&amp;gt;&lt;/code&gt;, while terminal shell has the prompt &lt;code class=&quot;highlighter-rouge&quot;&gt;$&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;Also, in real life situations, CMKs should not be created willy-nilly, and should have IAM policies associated with them to restrict who can manage, and use them.&lt;/p&gt;
-
-&lt;h4 id=&quot;1-create-a-new-cmk-proceed-to-step-3-if-you-already-have-a-cmk-that-youd-want-to-use&quot;&gt;1. Create a new CMK (proceed to step 3 if you already have a CMK that you’d want to use)&lt;/h4&gt;
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; kms create-key --description &quot;This is our master key&quot;
-{
-    &quot;KeyMetadata&quot;: {
-        &quot;Origin&quot;: &quot;AWS_KMS&quot;,
-        &quot;KeyId&quot;: &quot;30f0d765-d120-41ab-b078-************&quot;,
-        &quot;Description&quot;: &quot;This is our master key&quot;,
-        &quot;KeyManager&quot;: &quot;CUSTOMER&quot;,
-        &quot;Enabled&quot;: true,
-        &quot;KeyUsage&quot;: &quot;ENCRYPT_DECRYPT&quot;,
-        &quot;KeyState&quot;: &quot;Enabled&quot;,
-        &quot;CreationDate&quot;: 1506814355.941,
-        &quot;Arn&quot;: &quot;arn:aws:kms:us-east-1:************:key/30f0d765-d120-41ab-b078-************&quot;,
-        &quot;AWSAccountId&quot;: &quot;************&quot;
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h4 id=&quot;2-create-an-alias-for-this-key-optional---i-prefer-using-aliases-over-key-ids&quot;&gt;2. Create an alias for this key (optional) - I prefer using aliases over key IDs.&lt;/h4&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; kms create-alias --target-key-id 30f0d765-d120-41ab-b078-************ --alias-name &quot;alias/our-master-key&quot;
-
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h4 id=&quot;3-get-data-key&quot;&gt;3. Get Data Key&lt;/h4&gt;
-
-&lt;p&gt;Now that we have the CMK, let’s create a data key using this CMK. We will use AES_256, which will use AES to generate a 256-bit data key. You can see how aliasing the CMK is relatively handy than using the key-id.&lt;/p&gt;
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; kms generate-data-key --key-id alias/our-master-key --key-spec AES_256
-{
-    &quot;Plaintext&quot;: &quot;************2abcgdF4rWGaG54esFdaNnfTWBXezcU=&quot;,
-    &quot;KeyId&quot;: &quot;arn:aws:kms:us-east-1:************:key/30f0d765-d120-41ab-b078-************&quot;,
-    &quot;CipherTextBlob&quot;: &quot;******************************rP1R8rH5AgbwKqWvkXdAHHltn9RJtKSH/XCI5vPSjdOgGx2TYb7p2jjsTCgcOV65rODtZ7TDqpOL+bw==&quot;
-}
-aws&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;p&gt;The key-id returned here is &lt;strong&gt;not&lt;/strong&gt; of the data key, but of the CMK. Remember, KMS has no record of any data keys it generates.&lt;/p&gt;
-
-&lt;h4 id=&quot;4-encrypt-data&quot;&gt;4. Encrypt Data&lt;/h4&gt;
-
-&lt;p&gt;We store the &lt;code class=&quot;highlighter-rouge&quot;&gt;CipherTextBlob&lt;/code&gt;, and use the &lt;code class=&quot;highlighter-rouge&quot;&gt;Plaintext&lt;/code&gt; to encrypt some data. You can use any programming language of your choice to do so. This is where it gets interesting. The blob as well as the key and CipherTextBlob is all &lt;code class=&quot;highlighter-rouge&quot;&gt;base64&lt;/code&gt; encoded. They need to be decoded before they can be put to any use. I will use &lt;code class=&quot;highlighter-rouge&quot;&gt;base64&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;openssl&lt;/code&gt;.&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;This is not how real production usage will be. While I am using a simple string to demo encryption/decryption using data keys, in the real world this would be happening on entire databases and giant filesystems.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;First, we base64 &lt;em&gt;decode&lt;/em&gt; our plaintext key and store it in a file. In this example I am using a &lt;code class=&quot;highlighter-rouge&quot;&gt;tmp&lt;/code&gt; folder in my home directory.&lt;/p&gt;
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ echo '************2abcgdF4rWGaG54esFdaNnfTWBXezcU=' | base64 --decode &amp;gt; ~/tmp/plaintext_key_decoded.txt
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;p&gt;We have now decoded the base64 plain text key as &lt;code class=&quot;highlighter-rouge&quot;&gt;~/tmp/plaintext_key_decoded.txt&lt;/code&gt; file. Next, we encrypt a simple string, &lt;code class=&quot;highlighter-rouge&quot;&gt;Hello World&lt;/code&gt; using &lt;code class=&quot;highlighter-rouge&quot;&gt;openssl&lt;/code&gt;.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ echo &quot;Hello World!&quot;  | openssl enc -e -aes256 -k fileb://Users/mpandit/tmp/plaintext_key_decoded.txt &amp;gt; ~/tmp/encrypted.txt
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;p&gt;Here, we are encrypting &lt;code class=&quot;highlighter-rouge&quot;&gt;Hello World!&lt;/code&gt; using &lt;code class=&quot;highlighter-rouge&quot;&gt;openssl&lt;/code&gt; command line, using the decoded key that we had saved in a file. We are saving the result of this encryption in &lt;code class=&quot;highlighter-rouge&quot;&gt;~/tmp/encrypted.txt&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;Next, we delete the plain text key, while making sure we have the base64 decoded CipherTextBlob stored.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ rm ~/tmp/plaintext_key_decoded.txt
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h4 id=&quot;5-decrypt-data&quot;&gt;5. Decrypt Data&lt;/h4&gt;
-
-&lt;p&gt;Just like the plain text key, the CipherTextBlob is also base64 encoded. Let us decode that and store that as well. We will need this later on to decrypt the data we have encrypted.&lt;/p&gt;
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;echo '*****************************rP1R8rH5AgbwKqWvkXdAHHltn9RJtKSH/X3Q9VNjCgcOV65rODtZ7TDqMUmgPcZzwaiPSDXrv/ZBr4+safgompOL+bw==' | base64 --decode &amp;gt; ~/tmp/ciphertext_blob_decoded.txt
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;Now we are ready to decrypt the encrypted data. Since we have deleted the plain text data key just like we should, we will ask KMS to give us the plain text data key by decrypting the CipherTextBlob.&lt;/p&gt;
-
-&lt;p&gt;Since the CipherTextBlob contains metadata, we do not need to tell KMS any information about the CMK that was used to encrypt the data key.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;aws&amp;gt; kms decrypt --ciphertext-blob fileb:///Users/mpandit/tmp/ciphertext_blob_decoded.txt
-{
-    &quot;Plaintext&quot;: &quot;************2abcgdF4rWGaG54esFdaNnfTWBXezcU=&quot;,
-    &quot;KeyId&quot;: &quot;arn:aws:kms:us-east-1:************:key/30f0d765-d120-41ab-b078-************&quot;,
-}
-
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;p&gt;KMS has given our plain text key back. Let us use openssl to decrypt our encrypted data. We go through the same exercise of base64 decoding the plain text key before we can use it with &lt;code class=&quot;highlighter-rouge&quot;&gt;openssl&lt;/code&gt;. We use the same filename to keep things simple. Also I am too lazy, so copy-paste helps.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ echo '************2abcgdF4rWGaG54esFdaNnfTWBXezcU=' | base64 --decode &amp;gt; ~/tmp/plaintext_key_decoded.txt
-
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;p&gt;Next, we pass this to &lt;code class=&quot;highlighter-rouge&quot;&gt;openssl&lt;/code&gt;, this time to &lt;em&gt;decrypt&lt;/em&gt;.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ cat ~/tmp/encrypted.txt  | openssl enc -d -aes256 -k fileb://Users/mpandit/tmp/plaintext_key_decoded.txt
-Hello World!
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;And we get our encrypted data decrypted. In the real world, this same process happens at a much larger scale. Like encrypting EBS Volumes, S3 files, or even local storage outside of AWS. Also, these steps can be integrated in code using the crypto libraries available for the programming language being used.&lt;/p&gt;
-
-&lt;h4 id=&quot;6-audit-trail&quot;&gt;6. Audit Trail&lt;/h4&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://aws.amazon.com/cloudtrail/&quot;&gt;AWS CloudTrail&lt;/a&gt; will show the usage log of the CMKs. &lt;strong&gt;This will not show up on the event log on the console, but in the raw json files that CloudTrail is configured to write to.&lt;/strong&gt; This is used to audit the CMK usage.&lt;/p&gt;
-
-&lt;h3 style=&quot;text-align: center&quot; id=&quot;comments&quot;&gt;Comments&lt;/h3&gt;
-
-&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
-&lt;script&gt;
-
-/**
-*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
-/*
-var disqus_config = function () {
-this.page.url = &quot;https://lobster1234.github.io/2017/09/29/aws-kms-envelope-encryption/&quot;;  
-this.page.identifier = &quot;/2017/09/29/aws-kms-envelope-encryption&quot;;
-};
-*/
-(function() { // DON'T EDIT BELOW THIS LINE
-var d = document, s = d.createElement('script');
-s.src = 'https://lobster1234.disqus.com/embed.js';
-s.setAttribute('data-timestamp', +new Date());
-(d.head || d.body).appendChild(s);
-})();
-&lt;/script&gt;
-
-&lt;noscript&gt;Please enable JavaScript to view the &lt;a href=&quot;https://disqus.com/?ref_noscript&quot;&gt;comments powered by Disqus.&lt;/a&gt;&lt;/noscript&gt;
-
-&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;
-&lt;script&gt;
-
-
-      
-
-&lt;/script&gt;</content>
-
-      
-      
-      
-      
-      
-
-      
-        <author>
-            <name>Manish Pandit</name>
-          
-          
-        </author>
-      
-
-      
-        <category term="aws" />
-      
-
-      
-
-      
-        <summary type="html">Every service needs encryption at one point or another - passwords to the database, credentials to an external service, or even entire filesystem or files. Sticking the secrets, or keys in configuration files seems a quick and easy option. However, it carries security risks, even if these configurations are managed outside of the source code. On top of it, the keys used to encrypt/decrypt the data bring additional security implications and requirements in terms of storage, audit, and lifecycle management. AWS KMS, or AWS Key Management Service is a fully managed service to store and manage keys. Any AWS service which supports encryption - S3 buckets, EBS Volumes, SQS, etc. uses KMS under the hood. KMS is more than just a key manager, it can also be used to encrypt large volumes of data, using a technique called Envelope Encryption. In this post I will cover KMS, and the why, what, and how of Envelope Encryption.</summary>
       
 
       
