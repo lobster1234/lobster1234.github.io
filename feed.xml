@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2019-04-24T03:03:28-07:00</updated>
+  <updated>2019-04-24T03:05:30-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -282,7 +282,7 @@ Bye
 
 &lt;h2 id=&quot;pricing&quot;&gt;Pricing&lt;/h2&gt;
 
-&lt;p&gt;The pricing is a little tricky, we pay by the ACUs, the IO requests, and storage. For us-east-1, the cost basis is &lt;code class=&quot;highlighter-rouge&quot;&gt;$0.06 ACU per hour&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;$0.10 per GB per month&lt;/code&gt; for storage, and  &lt;code class=&quot;highlighter-rouge&quot;&gt;$0.20 per 1MM IO Requests&lt;/code&gt;. The ACUs are billed &lt;em&gt;per second&lt;/em&gt; with a minimum of &lt;code class=&quot;highlighter-rouge&quot;&gt;5 minutes&lt;/code&gt; every time the cluster is &lt;em&gt;running&lt;/em&gt; or &lt;em&gt;unpaused&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;The pricing is a little tricky, we pay by the ACUs, the IO requests, and storage. For us-east-1, the cost basis is &lt;code class=&quot;highlighter-rouge&quot;&gt;$0.06 per ACU per hour&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;$0.10 per GB per month&lt;/code&gt; for storage, and  &lt;code class=&quot;highlighter-rouge&quot;&gt;$0.20 per 1MM IO Requests&lt;/code&gt;. The ACUs are billed &lt;em&gt;per second&lt;/em&gt; with a minimum of &lt;code class=&quot;highlighter-rouge&quot;&gt;5 minutes&lt;/code&gt; every time the cluster is &lt;em&gt;running&lt;/em&gt; or &lt;em&gt;unpaused&lt;/em&gt;.&lt;/p&gt;
 
 &lt;p&gt;The exercise above did cost us a little, as mentioned earlier.&lt;/p&gt;
 
