@@ -354,6 +354,8 @@
   </li>
 </ol>
 
+<p>If we wait 5 minutes, we can see the cluster scale down to <code class="highlighter-rouge">0 ACUs</code> and the Event Log showing the cluster being <code class="highlighter-rouge">paused</code>, as there are no active connections to this newly created cluster.</p>
+
 <h2 id="connectivity">Connectivity</h2>
 
 <ol>
@@ -452,22 +454,21 @@
     </div>
   </li>
   <li>
-    <p>On the <strong>Logs &amp; events</strong> tab, we can notice the cluster activity. Note how it scaled down the cluster from <code class="highlighter-rouge">4 ACUs</code> to <code class="highlighter-rouge">2 ACUs</code> since we are not really doing much.</p>
+    <p>On the <strong>Logs &amp; events</strong> tab, we can notice the cluster activity. The cluster <code class="highlighter-rouge">resumed</code> as we connected to it, and scaled down from <code class="highlighter-rouge">4 ACUs</code> to <code class="highlighter-rouge">2 ACUs</code> since we are not really doing much.</p>
 
     <p><img src="https://lobster1234.github.io/assets/serverless-aurora/events_1.png" alt="sls-8" /></p>
   </li>
   <li>
-    <p>On the <strong>Monitoring</strong> tab, we can see the scaling activity, as well as the number of connections as <code class="highlighter-rouge">1</code> which is the MySQL client from the EC2 instance. If yours looks different, do not worry. I reconnected a few times after exiting out of the connection.</p>
+    <p>On the <strong>Monitoring</strong> tab, we can see the scaling activity, as well as the number of connections as <code class="highlighter-rouge">1</code> which is the MySQL client from the EC2 instance.</p>
 
     <p><img src="https://lobster1234.github.io/assets/serverless-aurora/monitoring.png" alt="sls-9" /></p>
   </li>
   <li>
     <p>Now let us close the MySQL client and wait for the Aurora Serverless to shut down the cluster entirely.</p>
 
-    <div class="highlighter-rouge"><pre class="highlight"><code>    
-MySQL [addressbook]&gt; exit;
+    <div class="highlighter-rouge"><pre class="highlight"><code>MySQL [addressbook]&gt; exit;
 Bye
-    
+
 </code></pre>
     </div>
   </li>

@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2019-04-24T03:05:30-07:00</updated>
+  <updated>2019-04-24T03:37:07-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -132,6 +132,8 @@
   &lt;/li&gt;
 &lt;/ol&gt;
 
+&lt;p&gt;If we wait 5 minutes, we can see the cluster scale down to &lt;code class=&quot;highlighter-rouge&quot;&gt;0 ACUs&lt;/code&gt; and the Event Log showing the cluster being &lt;code class=&quot;highlighter-rouge&quot;&gt;paused&lt;/code&gt;, as there are no active connections to this newly created cluster.&lt;/p&gt;
+
 &lt;h2 id=&quot;connectivity&quot;&gt;Connectivity&lt;/h2&gt;
 
 &lt;ol&gt;
@@ -230,22 +232,21 @@
     &lt;/div&gt;
   &lt;/li&gt;
   &lt;li&gt;
-    &lt;p&gt;On the &lt;strong&gt;Logs &amp;amp; events&lt;/strong&gt; tab, we can notice the cluster activity. Note how it scaled down the cluster from &lt;code class=&quot;highlighter-rouge&quot;&gt;4 ACUs&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;2 ACUs&lt;/code&gt; since we are not really doing much.&lt;/p&gt;
+    &lt;p&gt;On the &lt;strong&gt;Logs &amp;amp; events&lt;/strong&gt; tab, we can notice the cluster activity. The cluster &lt;code class=&quot;highlighter-rouge&quot;&gt;resumed&lt;/code&gt; as we connected to it, and scaled down from &lt;code class=&quot;highlighter-rouge&quot;&gt;4 ACUs&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;2 ACUs&lt;/code&gt; since we are not really doing much.&lt;/p&gt;
 
     &lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/serverless-aurora/events_1.png&quot; alt=&quot;sls-8&quot; /&gt;&lt;/p&gt;
   &lt;/li&gt;
   &lt;li&gt;
-    &lt;p&gt;On the &lt;strong&gt;Monitoring&lt;/strong&gt; tab, we can see the scaling activity, as well as the number of connections as &lt;code class=&quot;highlighter-rouge&quot;&gt;1&lt;/code&gt; which is the MySQL client from the EC2 instance. If yours looks different, do not worry. I reconnected a few times after exiting out of the connection.&lt;/p&gt;
+    &lt;p&gt;On the &lt;strong&gt;Monitoring&lt;/strong&gt; tab, we can see the scaling activity, as well as the number of connections as &lt;code class=&quot;highlighter-rouge&quot;&gt;1&lt;/code&gt; which is the MySQL client from the EC2 instance.&lt;/p&gt;
 
     &lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/serverless-aurora/monitoring.png&quot; alt=&quot;sls-9&quot; /&gt;&lt;/p&gt;
   &lt;/li&gt;
   &lt;li&gt;
     &lt;p&gt;Now let us close the MySQL client and wait for the Aurora Serverless to shut down the cluster entirely.&lt;/p&gt;
 
-    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    
-MySQL [addressbook]&amp;gt; exit;
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;MySQL [addressbook]&amp;gt; exit;
 Bye
-    
+
 &lt;/code&gt;&lt;/pre&gt;
     &lt;/div&gt;
   &lt;/li&gt;
