@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2019-04-24T09:26:24-07:00</updated>
+  <updated>2019-04-24T09:47:43-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -60,24 +60,24 @@
       &lt;li&gt;Replicas&lt;/li&gt;
       &lt;li&gt;IAM Database Authentication&lt;/li&gt;
       &lt;li&gt;Restoring from S3&lt;/li&gt;
-      &lt;li&gt;&lt;a href=&quot;https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless.html&quot;&gt;Few other limitations&lt;/a&gt; that can be a deal-breaker for some production workloads&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless.html&quot;&gt;Few other limitations&lt;/a&gt; that can be a deal-breaker for some production workloads.&lt;/li&gt;
     &lt;/ul&gt;
   &lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h2 id=&quot;serverless-autoscale&quot;&gt;Serverless Autoscale&lt;/h2&gt;
 
-&lt;p&gt;Lets get some clarity on Aurora Serverless Autoscale. Usually we see the term &lt;em&gt;autoscale&lt;/em&gt; used with EC2 instances, ECS Services, Lambdas, DynamoDB, etc. It is common knowledge that a relational database cannot &lt;em&gt;autoscale&lt;/em&gt;. It can, however, &lt;em&gt;manual-scale&lt;/em&gt; (or &lt;em&gt;script-scale&lt;/em&gt;) vertically (beefier instance type) or horizontally (read replicas for reads-heavy workloads).&lt;/p&gt;
+&lt;p&gt;Lets get some clarity on Aurora Serverless Autoscale. Usually we see the term &lt;em&gt;autoscale&lt;/em&gt; used with EC2 instances, ECS Services, Lambdas, DynamoDB, etc. It is common knowledge that a relational database cannot &lt;em&gt;autoscale&lt;/em&gt;. It can, however, &lt;em&gt;manual-scale&lt;/em&gt; (or &lt;em&gt;script-scale&lt;/em&gt;) vertically (beefier instance type) or horizontally (read replicas for read-heavy workloads).&lt;/p&gt;
 
 &lt;p&gt;Serverless Aurora does &lt;em&gt;autoscale&lt;/em&gt;.&lt;/p&gt;
 
 &lt;h3 id=&quot;compute--memory&quot;&gt;Compute &amp;amp; Memory&lt;/h3&gt;
 
-&lt;p&gt;Aurora Serverless uses &lt;code class=&quot;highlighter-rouge&quot;&gt;ACU&lt;/code&gt; (Aurora Capacity Unit) as its capacity unit. This is comparable to provisioning RDS Instance types (&lt;code class=&quot;highlighter-rouge&quot;&gt;db.t3.micro&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;db.r5.4xlarge&lt;/code&gt;, etc.) which have a fixed amount of compute, network IO, storage IO, and memory. We provide &lt;code class=&quot;highlighter-rouge&quot;&gt;ACU&lt;/code&gt; limits (min, max) instead of picking instance types. An &lt;code class=&quot;highlighter-rouge&quot;&gt;ACU&lt;/code&gt; represents a combination of compute and memory capacity. Note that we only pay for the &lt;code class=&quot;highlighter-rouge&quot;&gt;ACUs&lt;/code&gt; consumed during the durtion that the cluster is running, and not for the &lt;code class=&quot;highlighter-rouge&quot;&gt;ACUs&lt;/code&gt; we specify as min/max.&lt;/p&gt;
+&lt;p&gt;Aurora Serverless uses &lt;code class=&quot;highlighter-rouge&quot;&gt;ACU&lt;/code&gt; (Aurora Capacity Unit) as its capacity unit. This is comparable to provisioning RDS Instance types (&lt;code class=&quot;highlighter-rouge&quot;&gt;db.t3.micro&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;db.r5.4xlarge&lt;/code&gt;, etc.) which have a fixed amount of compute, network IO, storage IO, and memory. We provide &lt;code class=&quot;highlighter-rouge&quot;&gt;ACU&lt;/code&gt; limits (min, max) instead of picking instance types. An &lt;code class=&quot;highlighter-rouge&quot;&gt;ACU&lt;/code&gt; represents a combination of compute and memory capacity. Note that we only pay for the &lt;code class=&quot;highlighter-rouge&quot;&gt;ACUs&lt;/code&gt; consumed while the cluster is running, and not for the &lt;code class=&quot;highlighter-rouge&quot;&gt;ACUs&lt;/code&gt; we specify as min/max.&lt;/p&gt;
 
 &lt;p&gt;The units range from &lt;code class=&quot;highlighter-rouge&quot;&gt;2 ACUs (4GB RAM)&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;256 ACUs (488GB RAM)&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;minimum ACUs&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;maximum ACUs&lt;/code&gt; limit the cluster’s scale down and scale up respectively. Aurora Serverless scales up based on the number of connections, CPU usage, and memory usage. This scale up event is initiated at a &lt;em&gt;scaling point&lt;/em&gt;, where the need to scale up is determined and executed. Same is applicable for scaling down, which has a cooldown period of &lt;code class=&quot;highlighter-rouge&quot;&gt;15 minutes&lt;/code&gt; after a scale up event, and &lt;code class=&quot;highlighter-rouge&quot;&gt;310 seconds (~5 mins)&lt;/code&gt; after each cool down event.&lt;/p&gt;
+&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;minimum ACUs&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;maximum ACUs&lt;/code&gt; limit the cluster’s scale down and scale up respectively. Aurora Serverless scales based on the number of connections, CPU usage, and memory usage. This event is initiated at a &lt;em&gt;scaling point&lt;/em&gt;, where the need to scale is determined and executed. For scale down, there is a cooldown period of &lt;code class=&quot;highlighter-rouge&quot;&gt;15 minutes&lt;/code&gt; after a scale up event, and &lt;code class=&quot;highlighter-rouge&quot;&gt;310 seconds (~5 mins)&lt;/code&gt; cooldown after each cool down event.&lt;/p&gt;
 
 &lt;h3 id=&quot;storage&quot;&gt;Storage&lt;/h3&gt;
 
@@ -85,7 +85,7 @@
 
 &lt;h2 id=&quot;setup&quot;&gt;Setup&lt;/h2&gt;
 
-&lt;p&gt;Aurora Serverless set up is accessible on the AWS Console just like other RDS Engines. However, it does &lt;strong&gt;not&lt;/strong&gt; qualify for Free Tier. Also, it is only available for MySQL 5.6 compatible edition.&lt;/p&gt;
+&lt;p&gt;Aurora Serverless set up is accessible from the AWS Console just like other RDS Engines. However, it does &lt;strong&gt;not&lt;/strong&gt; qualify for Free Tier. Also, it is only available for MySQL 5.6 compatible edition.&lt;/p&gt;
 
 &lt;ol&gt;
   &lt;li&gt;

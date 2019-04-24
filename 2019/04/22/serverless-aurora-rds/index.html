@@ -283,24 +283,24 @@
       <li>Replicas</li>
       <li>IAM Database Authentication</li>
       <li>Restoring from S3</li>
-      <li><a href="https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless.html">Few other limitations</a> that can be a deal-breaker for some production workloads</li>
+      <li><a href="https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless.html">Few other limitations</a> that can be a deal-breaker for some production workloads.</li>
     </ul>
   </li>
 </ul>
 
 <h2 id="serverless-autoscale">Serverless Autoscale</h2>
 
-<p>Lets get some clarity on Aurora Serverless Autoscale. Usually we see the term <em>autoscale</em> used with EC2 instances, ECS Services, Lambdas, DynamoDB, etc. It is common knowledge that a relational database cannot <em>autoscale</em>. It can, however, <em>manual-scale</em> (or <em>script-scale</em>) vertically (beefier instance type) or horizontally (read replicas for reads-heavy workloads).</p>
+<p>Lets get some clarity on Aurora Serverless Autoscale. Usually we see the term <em>autoscale</em> used with EC2 instances, ECS Services, Lambdas, DynamoDB, etc. It is common knowledge that a relational database cannot <em>autoscale</em>. It can, however, <em>manual-scale</em> (or <em>script-scale</em>) vertically (beefier instance type) or horizontally (read replicas for read-heavy workloads).</p>
 
 <p>Serverless Aurora does <em>autoscale</em>.</p>
 
 <h3 id="compute--memory">Compute &amp; Memory</h3>
 
-<p>Aurora Serverless uses <code class="highlighter-rouge">ACU</code> (Aurora Capacity Unit) as its capacity unit. This is comparable to provisioning RDS Instance types (<code class="highlighter-rouge">db.t3.micro</code>, <code class="highlighter-rouge">db.r5.4xlarge</code>, etc.) which have a fixed amount of compute, network IO, storage IO, and memory. We provide <code class="highlighter-rouge">ACU</code> limits (min, max) instead of picking instance types. An <code class="highlighter-rouge">ACU</code> represents a combination of compute and memory capacity. Note that we only pay for the <code class="highlighter-rouge">ACUs</code> consumed during the durtion that the cluster is running, and not for the <code class="highlighter-rouge">ACUs</code> we specify as min/max.</p>
+<p>Aurora Serverless uses <code class="highlighter-rouge">ACU</code> (Aurora Capacity Unit) as its capacity unit. This is comparable to provisioning RDS Instance types (<code class="highlighter-rouge">db.t3.micro</code>, <code class="highlighter-rouge">db.r5.4xlarge</code>, etc.) which have a fixed amount of compute, network IO, storage IO, and memory. We provide <code class="highlighter-rouge">ACU</code> limits (min, max) instead of picking instance types. An <code class="highlighter-rouge">ACU</code> represents a combination of compute and memory capacity. Note that we only pay for the <code class="highlighter-rouge">ACUs</code> consumed while the cluster is running, and not for the <code class="highlighter-rouge">ACUs</code> we specify as min/max.</p>
 
 <p>The units range from <code class="highlighter-rouge">2 ACUs (4GB RAM)</code> to <code class="highlighter-rouge">256 ACUs (488GB RAM)</code>.</p>
 
-<p>The <code class="highlighter-rouge">minimum ACUs</code> and <code class="highlighter-rouge">maximum ACUs</code> limit the cluster’s scale down and scale up respectively. Aurora Serverless scales up based on the number of connections, CPU usage, and memory usage. This scale up event is initiated at a <em>scaling point</em>, where the need to scale up is determined and executed. Same is applicable for scaling down, which has a cooldown period of <code class="highlighter-rouge">15 minutes</code> after a scale up event, and <code class="highlighter-rouge">310 seconds (~5 mins)</code> after each cool down event.</p>
+<p>The <code class="highlighter-rouge">minimum ACUs</code> and <code class="highlighter-rouge">maximum ACUs</code> limit the cluster’s scale down and scale up respectively. Aurora Serverless scales based on the number of connections, CPU usage, and memory usage. This event is initiated at a <em>scaling point</em>, where the need to scale is determined and executed. For scale down, there is a cooldown period of <code class="highlighter-rouge">15 minutes</code> after a scale up event, and <code class="highlighter-rouge">310 seconds (~5 mins)</code> cooldown after each cool down event.</p>
 
 <h3 id="storage">Storage</h3>
 
@@ -308,7 +308,7 @@
 
 <h2 id="setup">Setup</h2>
 
-<p>Aurora Serverless set up is accessible on the AWS Console just like other RDS Engines. However, it does <strong>not</strong> qualify for Free Tier. Also, it is only available for MySQL 5.6 compatible edition.</p>
+<p>Aurora Serverless set up is accessible from the AWS Console just like other RDS Engines. However, it does <strong>not</strong> qualify for Free Tier. Also, it is only available for MySQL 5.6 compatible edition.</p>
 
 <ol>
   <li>
