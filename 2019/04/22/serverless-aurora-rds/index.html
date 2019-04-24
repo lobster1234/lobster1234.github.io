@@ -457,7 +457,7 @@
     <p><img src="https://lobster1234.github.io/assets/serverless-aurora/events_1.png" alt="sls-8" /></p>
   </li>
   <li>
-    <p>On the <strong>Monitoring</strong> tab, we can see the scaling activity, as well as the number of connections as <code class="highlighter-rouge">1</code> which is the MySQL client from the EC2 instance. If yours looks different, do not worry. I reconnected a few times after existing out of the connection.</p>
+    <p>On the <strong>Monitoring</strong> tab, we can see the scaling activity, as well as the number of connections as <code class="highlighter-rouge">1</code> which is the MySQL client from the EC2 instance. If yours looks different, do not worry. I reconnected a few times after exiting out of the connection.</p>
 
     <p><img src="https://lobster1234.github.io/assets/serverless-aurora/monitoring.png" alt="sls-9" /></p>
   </li>
@@ -494,12 +494,12 @@ Bye
 
 <ol>
   <li>Set the DB connection timeout to at least a minute, if not more. This is for the initial connection latency, while the cluster is <code class="highlighter-rouge">unpaused</code> and <code class="highlighter-rouge">scaled up</code> from Zero ACUs.</li>
-  <li>Make sure the connections are closed - as long as there is even one connection, the cluster will sit at minumum ACUs and not pause. For example, AWS Batch containers will exit upon completion, terminating any connections. In cases where the process does not exit, ensure to close the connection pool to avoid this situation.</li>
+  <li>Make sure the connections are closed - as long as there is even one connection, the cluster will sit at minumum ACUs and not pause. For example, AWS Batch containers will exit upon completion, terminating any connections. In cases where the process does not exit, ensure to shutdown the connection pool to avoid this situation.</li>
   <li>Configure the RDS Security group securely, make sure you only allow connections from known and needed hosts.</li>
   <li>The port number cannot be changed from 3306.</li>
   <li>There are no replicas, the instance is all we got.</li>
   <li>Do not use Aurora Serverless for <em>always on</em> type applications. This will not be cost effective.</li>
-  <li>Design the test harness where the initialization and destruction is guaranteed to run pre and post test runs, if using this set up for running tests. In other words, if the tests exist uncleanly, there is a chance that the connection(s) will continue to be established to the database, preventing a pause.</li>
+  <li>Design the test harness where the initialization and destruction is guaranteed to run pre and post test runs when using this set up for running tests. In other words, if the tests exit uncleanly, there is a chance that the connection(s) will continue to be established to the database, preventing a pause.</li>
 </ol>
 
 <h2 id="pricing">Pricing</h2>

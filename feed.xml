@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2019-04-24T02:58:34-07:00</updated>
+  <updated>2019-04-24T03:03:28-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -235,7 +235,7 @@
     &lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/serverless-aurora/events_1.png&quot; alt=&quot;sls-8&quot; /&gt;&lt;/p&gt;
   &lt;/li&gt;
   &lt;li&gt;
-    &lt;p&gt;On the &lt;strong&gt;Monitoring&lt;/strong&gt; tab, we can see the scaling activity, as well as the number of connections as &lt;code class=&quot;highlighter-rouge&quot;&gt;1&lt;/code&gt; which is the MySQL client from the EC2 instance. If yours looks different, do not worry. I reconnected a few times after existing out of the connection.&lt;/p&gt;
+    &lt;p&gt;On the &lt;strong&gt;Monitoring&lt;/strong&gt; tab, we can see the scaling activity, as well as the number of connections as &lt;code class=&quot;highlighter-rouge&quot;&gt;1&lt;/code&gt; which is the MySQL client from the EC2 instance. If yours looks different, do not worry. I reconnected a few times after exiting out of the connection.&lt;/p&gt;
 
     &lt;p&gt;&lt;img src=&quot;https://lobster1234.github.io/assets/serverless-aurora/monitoring.png&quot; alt=&quot;sls-9&quot; /&gt;&lt;/p&gt;
   &lt;/li&gt;
@@ -272,12 +272,12 @@ Bye
 
 &lt;ol&gt;
   &lt;li&gt;Set the DB connection timeout to at least a minute, if not more. This is for the initial connection latency, while the cluster is &lt;code class=&quot;highlighter-rouge&quot;&gt;unpaused&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;scaled up&lt;/code&gt; from Zero ACUs.&lt;/li&gt;
-  &lt;li&gt;Make sure the connections are closed - as long as there is even one connection, the cluster will sit at minumum ACUs and not pause. For example, AWS Batch containers will exit upon completion, terminating any connections. In cases where the process does not exit, ensure to close the connection pool to avoid this situation.&lt;/li&gt;
+  &lt;li&gt;Make sure the connections are closed - as long as there is even one connection, the cluster will sit at minumum ACUs and not pause. For example, AWS Batch containers will exit upon completion, terminating any connections. In cases where the process does not exit, ensure to shutdown the connection pool to avoid this situation.&lt;/li&gt;
   &lt;li&gt;Configure the RDS Security group securely, make sure you only allow connections from known and needed hosts.&lt;/li&gt;
   &lt;li&gt;The port number cannot be changed from 3306.&lt;/li&gt;
   &lt;li&gt;There are no replicas, the instance is all we got.&lt;/li&gt;
   &lt;li&gt;Do not use Aurora Serverless for &lt;em&gt;always on&lt;/em&gt; type applications. This will not be cost effective.&lt;/li&gt;
-  &lt;li&gt;Design the test harness where the initialization and destruction is guaranteed to run pre and post test runs, if using this set up for running tests. In other words, if the tests exist uncleanly, there is a chance that the connection(s) will continue to be established to the database, preventing a pause.&lt;/li&gt;
+  &lt;li&gt;Design the test harness where the initialization and destruction is guaranteed to run pre and post test runs when using this set up for running tests. In other words, if the tests exit uncleanly, there is a chance that the connection(s) will continue to be established to the database, preventing a pause.&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;h2 id=&quot;pricing&quot;&gt;Pricing&lt;/h2&gt;
