@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2019-04-24T09:47:43-07:00</updated>
+  <updated>2019-04-24T12:51:22-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -29,23 +29,43 @@
   
     <entry>
       
-      <title type="html">Serverless Aurora RDS</title>
+      <title type="html">Up and running with Aurora Serverless</title>
       
       
-      <link href="https://lobster1234.github.io/2019/04/22/serverless-aurora-rds/" rel="alternate" type="text/html" title="Serverless Aurora RDS" />
+      <link href="https://lobster1234.github.io/2019/04/22/serverless-aurora-rds/" rel="alternate" type="text/html" title="Up and running with Aurora Serverless" />
       
       <published>2019-04-22T13:44:37-07:00</published>
       <updated>2019-04-22T13:44:37-07:00</updated>
       <id>https://lobster1234.github.io/2019/04/22/serverless-aurora-rds</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2019/04/22/serverless-aurora-rds/">&lt;p&gt;&lt;a href=&quot;&quot;&gt;Amazon RDS&lt;/a&gt; is a fully managed Relational Database Service in the AWS Public Cloud. &lt;a href=&quot;https://aws.amazon.com/rds/aurora/&quot;&gt;Amazon Aurora&lt;/a&gt; is a MySQL and Postgres compatible database with much better performance at scale due to all the enhancements and rewriting AWS has put in. For more context on Aurora, here is &lt;a href=&quot;https://lobster1234.github.io/2017/11/03/amazon-aurora-rds-notes/&quot;&gt;my earlier post&lt;/a&gt;.&lt;/p&gt;
+      <content type="html" xml:base="https://lobster1234.github.io/2019/04/22/serverless-aurora-rds/">&lt;p&gt;Amazon RDS is a fully managed Relational Database Service on AWS. Amazon Aurora is a MySQL and Postgres compatible database with much better performance at scale due to the enhancements and rewriting AWS has put in. For more context on Aurora, here is &lt;a href=&quot;https://lobster1234.github.io/2017/11/03/amazon-aurora-rds-notes/&quot;&gt;my earlier post&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;Very recently, Amazon’s Fulfillment Unit &lt;a href=&quot;https://twitter.com/jdarrow/status/1111629087947132928&quot;&gt;moved off of Oracle&lt;/a&gt; on to Aurora Postgres + DynamoDB.&lt;/p&gt;
+&lt;p&gt;Aurora RDS has several practical configurations applicable to pretty much all production workloads (Multi region, Multi-flavored read replicas FTW!). The ones I like the most are Aurora Global Database, and Aurora Serverless.&lt;/p&gt;
 
-&lt;p&gt;Aurora RDS has several practical configurations applicable to pretty much all production workloads (Multi region, Multi-flavored read replicas FTW!). The ones I like the most are &lt;a href=&quot;https://aws.amazon.com/rds/aurora/global-database/&quot;&gt;Aurora Global Database&lt;/a&gt;, and &lt;a href=&quot;https://aws.amazon.com/rds/aurora/serverless/&quot;&gt;Aurora Serverless&lt;/a&gt;. In this post I will talk about Aurora Serverless, while saving Aurora Global Database for a later time.&lt;/p&gt;
+&lt;p&gt;Imagine a fully managed database in the cloud that needs minimal upfront setup, scales on demand, and saves $$ by pausing when not in use. In a nutshell, thats exactly what Aurora Serverless is.&lt;/p&gt;
+
+&lt;p&gt;In this post I will talk about the fundamental concepts, use cases, setting up a cluster, taking it for a spin, and tips/gotchas.&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h2 id=&quot;aurora-serverless-concepts&quot;&gt;Aurora Serverless Concepts&lt;/h2&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://aws.amazon.com/rds/aurora/serverless/&quot;&gt;Amazon Aurora Serverless&lt;/a&gt; is an on-demand, out of the box auto-scaled Aurora MySQL 5.6 Database, which is &lt;em&gt;Serverless&lt;/em&gt;, in that it will start, scale, and stop automatically. The &lt;code class=&quot;highlighter-rouge&quot;&gt;start/stop&lt;/code&gt; cycle is also referred to as &lt;code class=&quot;highlighter-rouge&quot;&gt;resume/pause&lt;/code&gt;. As with all RDS engines, Aurora Serverless is fully managed.&lt;/p&gt;
 
-&lt;!--more--&gt;
+&lt;p&gt;Usually we see the term &lt;em&gt;autoscale&lt;/em&gt; used with EC2 instances, ECS Services, Lambdas, DynamoDB, etc. It is common knowledge that a relational database cannot &lt;em&gt;autoscale&lt;/em&gt;. It can, however, &lt;em&gt;manual-scale&lt;/em&gt; (or &lt;em&gt;script-scale&lt;/em&gt;) vertically (beefier instance type) or horizontally (read replicas for read-heavy workloads).&lt;/p&gt;
+
+&lt;p&gt;Serverless Aurora does &lt;em&gt;autoscale&lt;/em&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;autoscale-compute--memory&quot;&gt;Autoscale Compute &amp;amp; Memory&lt;/h3&gt;
+
+&lt;p&gt;Aurora Serverless uses &lt;code class=&quot;highlighter-rouge&quot;&gt;ACU&lt;/code&gt; (Aurora Capacity Unit) as its capacity unit. This is comparable to provisioning RDS Instance types (&lt;code class=&quot;highlighter-rouge&quot;&gt;db.t3.micro&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;db.r5.4xlarge&lt;/code&gt;, etc.) which have a fixed amount of compute, network IO, storage IO, and memory. We provide &lt;code class=&quot;highlighter-rouge&quot;&gt;ACU&lt;/code&gt; limits (min, max) instead of picking instance types. An &lt;code class=&quot;highlighter-rouge&quot;&gt;ACU&lt;/code&gt; represents a combination of compute and memory capacity. Note that we only pay for the &lt;code class=&quot;highlighter-rouge&quot;&gt;ACUs&lt;/code&gt; consumed while the cluster is running, and not for the &lt;code class=&quot;highlighter-rouge&quot;&gt;ACUs&lt;/code&gt; we specify as min/max.&lt;/p&gt;
+
+&lt;p&gt;The units range from &lt;code class=&quot;highlighter-rouge&quot;&gt;2 ACUs (4GB RAM)&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;256 ACUs (488GB RAM)&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;minimum ACUs&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;maximum ACUs&lt;/code&gt; limit the cluster’s scale down and scale up respectively. Aurora Serverless scales based on the number of connections, CPU usage, and memory usage. This event is initiated at a &lt;em&gt;scaling point&lt;/em&gt;, where the need to scale is determined and executed. For scale down, there is a cooldown period of &lt;code class=&quot;highlighter-rouge&quot;&gt;15 minutes&lt;/code&gt; after a scale up event, and &lt;code class=&quot;highlighter-rouge&quot;&gt;310 seconds (~5 mins)&lt;/code&gt; cooldown after each cool down event.&lt;/p&gt;
+
+&lt;h3 id=&quot;autoscale-storage&quot;&gt;Autoscale Storage&lt;/h3&gt;
+
+&lt;p&gt;The storage &lt;em&gt;autoscales&lt;/em&gt; from &lt;code class=&quot;highlighter-rouge&quot;&gt;10 GB&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;64 TB&lt;/code&gt; (just like Aurora RDS).&lt;/p&gt;
 
 &lt;h2 id=&quot;use-cases&quot;&gt;Use Cases&lt;/h2&gt;
 
@@ -64,24 +84,6 @@
     &lt;/ul&gt;
   &lt;/li&gt;
 &lt;/ul&gt;
-
-&lt;h2 id=&quot;serverless-autoscale&quot;&gt;Serverless Autoscale&lt;/h2&gt;
-
-&lt;p&gt;Lets get some clarity on Aurora Serverless Autoscale. Usually we see the term &lt;em&gt;autoscale&lt;/em&gt; used with EC2 instances, ECS Services, Lambdas, DynamoDB, etc. It is common knowledge that a relational database cannot &lt;em&gt;autoscale&lt;/em&gt;. It can, however, &lt;em&gt;manual-scale&lt;/em&gt; (or &lt;em&gt;script-scale&lt;/em&gt;) vertically (beefier instance type) or horizontally (read replicas for read-heavy workloads).&lt;/p&gt;
-
-&lt;p&gt;Serverless Aurora does &lt;em&gt;autoscale&lt;/em&gt;.&lt;/p&gt;
-
-&lt;h3 id=&quot;compute--memory&quot;&gt;Compute &amp;amp; Memory&lt;/h3&gt;
-
-&lt;p&gt;Aurora Serverless uses &lt;code class=&quot;highlighter-rouge&quot;&gt;ACU&lt;/code&gt; (Aurora Capacity Unit) as its capacity unit. This is comparable to provisioning RDS Instance types (&lt;code class=&quot;highlighter-rouge&quot;&gt;db.t3.micro&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;db.r5.4xlarge&lt;/code&gt;, etc.) which have a fixed amount of compute, network IO, storage IO, and memory. We provide &lt;code class=&quot;highlighter-rouge&quot;&gt;ACU&lt;/code&gt; limits (min, max) instead of picking instance types. An &lt;code class=&quot;highlighter-rouge&quot;&gt;ACU&lt;/code&gt; represents a combination of compute and memory capacity. Note that we only pay for the &lt;code class=&quot;highlighter-rouge&quot;&gt;ACUs&lt;/code&gt; consumed while the cluster is running, and not for the &lt;code class=&quot;highlighter-rouge&quot;&gt;ACUs&lt;/code&gt; we specify as min/max.&lt;/p&gt;
-
-&lt;p&gt;The units range from &lt;code class=&quot;highlighter-rouge&quot;&gt;2 ACUs (4GB RAM)&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;256 ACUs (488GB RAM)&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;minimum ACUs&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;maximum ACUs&lt;/code&gt; limit the cluster’s scale down and scale up respectively. Aurora Serverless scales based on the number of connections, CPU usage, and memory usage. This event is initiated at a &lt;em&gt;scaling point&lt;/em&gt;, where the need to scale is determined and executed. For scale down, there is a cooldown period of &lt;code class=&quot;highlighter-rouge&quot;&gt;15 minutes&lt;/code&gt; after a scale up event, and &lt;code class=&quot;highlighter-rouge&quot;&gt;310 seconds (~5 mins)&lt;/code&gt; cooldown after each cool down event.&lt;/p&gt;
-
-&lt;h3 id=&quot;storage&quot;&gt;Storage&lt;/h3&gt;
-
-&lt;p&gt;The storage &lt;em&gt;autoscales&lt;/em&gt; from &lt;code class=&quot;highlighter-rouge&quot;&gt;10 GB&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;64 TB&lt;/code&gt; (just like Aurora RDS).&lt;/p&gt;
 
 &lt;h2 id=&quot;setup&quot;&gt;Setup&lt;/h2&gt;
 
@@ -267,7 +269,7 @@ Bye
 
 &lt;p&gt;Terminate the EC2 instance as well, if you created one while following this post and do not need it anymore.&lt;/p&gt;
 
-&lt;h2 id=&quot;gotchas&quot;&gt;Gotchas&lt;/h2&gt;
+&lt;h2 id=&quot;tips--gotchas&quot;&gt;Tips &amp;amp; Gotchas&lt;/h2&gt;
 
 &lt;p&gt;Now that we have seen Aurora Serverless in action, here are a few gotchas :&lt;/p&gt;
 
@@ -353,7 +355,7 @@ s.setAttribute('data-timestamp', +new Date());
       
 
       
-        <summary type="html">Amazon RDS is a fully managed Relational Database Service in the AWS Public Cloud. Amazon Aurora is a MySQL and Postgres compatible database with much better performance at scale due to all the enhancements and rewriting AWS has put in. For more context on Aurora, here is my earlier post. Very recently, Amazon’s Fulfillment Unit moved off of Oracle on to Aurora Postgres + DynamoDB. Aurora RDS has several practical configurations applicable to pretty much all production workloads (Multi region, Multi-flavored read replicas FTW!). The ones I like the most are Aurora Global Database, and Aurora Serverless. In this post I will talk about Aurora Serverless, while saving Aurora Global Database for a later time. Amazon Aurora Serverless is an on-demand, out of the box auto-scaled Aurora MySQL 5.6 Database, which is Serverless, in that it will start, scale, and stop automatically. The start/stop cycle is also referred to as resume/pause. As with all RDS engines, Aurora Serverless is fully managed.</summary>
+        <summary type="html">Amazon RDS is a fully managed Relational Database Service on AWS. Amazon Aurora is a MySQL and Postgres compatible database with much better performance at scale due to the enhancements and rewriting AWS has put in. For more context on Aurora, here is my earlier post. Aurora RDS has several practical configurations applicable to pretty much all production workloads (Multi region, Multi-flavored read replicas FTW!). The ones I like the most are Aurora Global Database, and Aurora Serverless. Imagine a fully managed database in the cloud that needs minimal upfront setup, scales on demand, and saves $$ by pausing when not in use. In a nutshell, thats exactly what Aurora Serverless is. In this post I will talk about the fundamental concepts, use cases, setting up a cluster, taking it for a spin, and tips/gotchas.</summary>
       
 
       

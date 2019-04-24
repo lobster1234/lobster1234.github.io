@@ -9,8 +9,8 @@
   
   
   
-  <title>Serverless Aurora RDS</title>
-  <meta name="description" content="Amazon RDS is a fully managed Relational Database Service in the AWS Public Cloud. Amazon Aurora is a MySQL and Postgres compatible database with much better performance at scale due to all the enhancements and rewriting AWS has put in. For more context on Aurora, here is my earlier post. Very recently, Amazon’s Fulfillment Unit moved off of Oracle on to Aurora Postgres + DynamoDB. Aurora RDS has several practical configurations applicable to pretty much all production workloads (Multi region, Multi-flavored read replicas FTW!). The ones I like the most are Aurora Global Database, and Aurora Serverless. In this post I will talk about Aurora Serverless, while saving Aurora Global Database for a later time. Amazon Aurora Serverless is an on-demand, out of the box auto-scaled Aurora MySQL 5.6 Database, which is Serverless, in that it will start, scale, and stop automatically. The start/stop cycle is also referred to as resume/pause. As with all RDS engines, Aurora Serverless is fully managed.">
+  <title>Up and running with Aurora Serverless</title>
+  <meta name="description" content="Amazon RDS is a fully managed Relational Database Service on AWS. Amazon Aurora is a MySQL and Postgres compatible database with much better performance at scale due to the enhancements and rewriting AWS has put in. For more context on Aurora, here is my earlier post. Aurora RDS has several practical configurations applicable to pretty much all production workloads (Multi region, Multi-flavored read replicas FTW!). The ones I like the most are Aurora Global Database, and Aurora Serverless. Imagine a fully managed database in the cloud that needs minimal upfront setup, scales on demand, and saves $$ by pausing when not in use. In a nutshell, thats exactly what Aurora Serverless is. In this post I will talk about the fundamental concepts, use cases, setting up a cluster, taking it for a spin, and tips/gotchas.">
   
 
   <link rel="stylesheet" href="/assets/main.css">
@@ -24,8 +24,8 @@
   
   <meta name="twitter:card" content="summary">
   <meta name="twitter:site" content="lobster1234">
-  <meta name="twitter:title" content="Serverless Aurora RDS">
-  <meta name="twitter:description" content="Amazon RDS is a fully managed Relational Database Service in the AWS Public Cloud. Amazon Aurora is a MySQL and Postgres compatible database with much better performance at scale due to all the enh...">
+  <meta name="twitter:title" content="Up and running with Aurora Serverless">
+  <meta name="twitter:description" content="Amazon RDS is a fully managed Relational Database Service on AWS. Amazon Aurora is a MySQL and Postgres compatible database with much better performance at scale due to the enhancements and rewriti...">
   
     <meta name="twitter:creator" content="lobster1234">
   
@@ -58,13 +58,13 @@
 
 
   <!-- Begin Jekyll SEO tag v2.4.0 -->
-<title>Serverless Aurora RDS | Manish Pandit’s Blog</title>
+<title>Up and running with Aurora Serverless | Manish Pandit’s Blog</title>
 <meta name="generator" content="Jekyll v3.4.3" />
-<meta property="og:title" content="Serverless Aurora RDS" />
+<meta property="og:title" content="Up and running with Aurora Serverless" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="Amazon RDS is a fully managed Relational Database Service in the AWS Public Cloud. Amazon Aurora is a MySQL and Postgres compatible database with much better performance at scale due to all the enhancements and rewriting AWS has put in. For more context on Aurora, here is my earlier post. Very recently, Amazon’s Fulfillment Unit moved off of Oracle on to Aurora Postgres + DynamoDB. Aurora RDS has several practical configurations applicable to pretty much all production workloads (Multi region, Multi-flavored read replicas FTW!). The ones I like the most are Aurora Global Database, and Aurora Serverless. In this post I will talk about Aurora Serverless, while saving Aurora Global Database for a later time. Amazon Aurora Serverless is an on-demand, out of the box auto-scaled Aurora MySQL 5.6 Database, which is Serverless, in that it will start, scale, and stop automatically. The start/stop cycle is also referred to as resume/pause. As with all RDS engines, Aurora Serverless is fully managed." />
-<meta property="og:description" content="Amazon RDS is a fully managed Relational Database Service in the AWS Public Cloud. Amazon Aurora is a MySQL and Postgres compatible database with much better performance at scale due to all the enhancements and rewriting AWS has put in. For more context on Aurora, here is my earlier post. Very recently, Amazon’s Fulfillment Unit moved off of Oracle on to Aurora Postgres + DynamoDB. Aurora RDS has several practical configurations applicable to pretty much all production workloads (Multi region, Multi-flavored read replicas FTW!). The ones I like the most are Aurora Global Database, and Aurora Serverless. In this post I will talk about Aurora Serverless, while saving Aurora Global Database for a later time. Amazon Aurora Serverless is an on-demand, out of the box auto-scaled Aurora MySQL 5.6 Database, which is Serverless, in that it will start, scale, and stop automatically. The start/stop cycle is also referred to as resume/pause. As with all RDS engines, Aurora Serverless is fully managed." />
+<meta name="description" content="Amazon RDS is a fully managed Relational Database Service on AWS. Amazon Aurora is a MySQL and Postgres compatible database with much better performance at scale due to the enhancements and rewriting AWS has put in. For more context on Aurora, here is my earlier post. Aurora RDS has several practical configurations applicable to pretty much all production workloads (Multi region, Multi-flavored read replicas FTW!). The ones I like the most are Aurora Global Database, and Aurora Serverless. Imagine a fully managed database in the cloud that needs minimal upfront setup, scales on demand, and saves $$ by pausing when not in use. In a nutshell, thats exactly what Aurora Serverless is. In this post I will talk about the fundamental concepts, use cases, setting up a cluster, taking it for a spin, and tips/gotchas." />
+<meta property="og:description" content="Amazon RDS is a fully managed Relational Database Service on AWS. Amazon Aurora is a MySQL and Postgres compatible database with much better performance at scale due to the enhancements and rewriting AWS has put in. For more context on Aurora, here is my earlier post. Aurora RDS has several practical configurations applicable to pretty much all production workloads (Multi region, Multi-flavored read replicas FTW!). The ones I like the most are Aurora Global Database, and Aurora Serverless. Imagine a fully managed database in the cloud that needs minimal upfront setup, scales on demand, and saves $$ by pausing when not in use. In a nutshell, thats exactly what Aurora Serverless is. In this post I will talk about the fundamental concepts, use cases, setting up a cluster, taking it for a spin, and tips/gotchas." />
 <link rel="canonical" href="https://lobster1234.github.io/2019/04/22/serverless-aurora-rds/" />
 <meta property="og:url" content="https://lobster1234.github.io/2019/04/22/serverless-aurora-rds/" />
 <meta property="og:site_name" content="Manish Pandit’s Blog" />
@@ -72,7 +72,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2019-04-22T13:44:37-07:00" />
 <script type="application/ld+json">
-{"description":"Amazon RDS is a fully managed Relational Database Service in the AWS Public Cloud. Amazon Aurora is a MySQL and Postgres compatible database with much better performance at scale due to all the enhancements and rewriting AWS has put in. For more context on Aurora, here is my earlier post. Very recently, Amazon’s Fulfillment Unit moved off of Oracle on to Aurora Postgres + DynamoDB. Aurora RDS has several practical configurations applicable to pretty much all production workloads (Multi region, Multi-flavored read replicas FTW!). The ones I like the most are Aurora Global Database, and Aurora Serverless. In this post I will talk about Aurora Serverless, while saving Aurora Global Database for a later time. Amazon Aurora Serverless is an on-demand, out of the box auto-scaled Aurora MySQL 5.6 Database, which is Serverless, in that it will start, scale, and stop automatically. The start/stop cycle is also referred to as resume/pause. As with all RDS engines, Aurora Serverless is fully managed.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"BlogPosting","url":"https://lobster1234.github.io/2019/04/22/serverless-aurora-rds/","image":"https://lobster1234.github.io/assets/serverless-aurora/title.png","headline":"Serverless Aurora RDS","dateModified":"2019-04-22T13:44:37-07:00","datePublished":"2019-04-22T13:44:37-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2019/04/22/serverless-aurora-rds/"},"@context":"http://schema.org"}</script>
+{"description":"Amazon RDS is a fully managed Relational Database Service on AWS. Amazon Aurora is a MySQL and Postgres compatible database with much better performance at scale due to the enhancements and rewriting AWS has put in. For more context on Aurora, here is my earlier post. Aurora RDS has several practical configurations applicable to pretty much all production workloads (Multi region, Multi-flavored read replicas FTW!). The ones I like the most are Aurora Global Database, and Aurora Serverless. Imagine a fully managed database in the cloud that needs minimal upfront setup, scales on demand, and saves $$ by pausing when not in use. In a nutshell, thats exactly what Aurora Serverless is. In this post I will talk about the fundamental concepts, use cases, setting up a cluster, taking it for a spin, and tips/gotchas.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"BlogPosting","url":"https://lobster1234.github.io/2019/04/22/serverless-aurora-rds/","image":"https://lobster1234.github.io/assets/serverless-aurora/title.png","headline":"Up and running with Aurora Serverless","dateModified":"2019-04-22T13:44:37-07:00","datePublished":"2019-04-22T13:44:37-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2019/04/22/serverless-aurora-rds/"},"@context":"http://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -111,7 +111,7 @@
 
   <header class="post-header">
     
-      <h1 class="post-title" itemprop="name headline">Serverless Aurora RDS</h1>
+      <h1 class="post-title" itemprop="name headline">Up and running with Aurora Serverless</h1>
     
     <p class="post-meta"><time datetime="2019-04-22T13:44:37-07:00" itemprop="datePublished">Apr 22, 2019</time> •
   
@@ -260,15 +260,35 @@
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <p><a href="">Amazon RDS</a> is a fully managed Relational Database Service in the AWS Public Cloud. <a href="https://aws.amazon.com/rds/aurora/">Amazon Aurora</a> is a MySQL and Postgres compatible database with much better performance at scale due to all the enhancements and rewriting AWS has put in. For more context on Aurora, here is <a href="https://lobster1234.github.io/2017/11/03/amazon-aurora-rds-notes/">my earlier post</a>.</p>
+    <p>Amazon RDS is a fully managed Relational Database Service on AWS. Amazon Aurora is a MySQL and Postgres compatible database with much better performance at scale due to the enhancements and rewriting AWS has put in. For more context on Aurora, here is <a href="https://lobster1234.github.io/2017/11/03/amazon-aurora-rds-notes/">my earlier post</a>.</p>
 
-<p>Very recently, Amazon’s Fulfillment Unit <a href="https://twitter.com/jdarrow/status/1111629087947132928">moved off of Oracle</a> on to Aurora Postgres + DynamoDB.</p>
+<p>Aurora RDS has several practical configurations applicable to pretty much all production workloads (Multi region, Multi-flavored read replicas FTW!). The ones I like the most are Aurora Global Database, and Aurora Serverless.</p>
 
-<p>Aurora RDS has several practical configurations applicable to pretty much all production workloads (Multi region, Multi-flavored read replicas FTW!). The ones I like the most are <a href="https://aws.amazon.com/rds/aurora/global-database/">Aurora Global Database</a>, and <a href="https://aws.amazon.com/rds/aurora/serverless/">Aurora Serverless</a>. In this post I will talk about Aurora Serverless, while saving Aurora Global Database for a later time.</p>
+<p>Imagine a fully managed database in the cloud that needs minimal upfront setup, scales on demand, and saves $$ by pausing when not in use. In a nutshell, thats exactly what Aurora Serverless is.</p>
+
+<p>In this post I will talk about the fundamental concepts, use cases, setting up a cluster, taking it for a spin, and tips/gotchas.</p>
+
+<!--more-->
+
+<h2 id="aurora-serverless-concepts">Aurora Serverless Concepts</h2>
 
 <p><a href="https://aws.amazon.com/rds/aurora/serverless/">Amazon Aurora Serverless</a> is an on-demand, out of the box auto-scaled Aurora MySQL 5.6 Database, which is <em>Serverless</em>, in that it will start, scale, and stop automatically. The <code class="highlighter-rouge">start/stop</code> cycle is also referred to as <code class="highlighter-rouge">resume/pause</code>. As with all RDS engines, Aurora Serverless is fully managed.</p>
 
-<!--more-->
+<p>Usually we see the term <em>autoscale</em> used with EC2 instances, ECS Services, Lambdas, DynamoDB, etc. It is common knowledge that a relational database cannot <em>autoscale</em>. It can, however, <em>manual-scale</em> (or <em>script-scale</em>) vertically (beefier instance type) or horizontally (read replicas for read-heavy workloads).</p>
+
+<p>Serverless Aurora does <em>autoscale</em>.</p>
+
+<h3 id="autoscale-compute--memory">Autoscale Compute &amp; Memory</h3>
+
+<p>Aurora Serverless uses <code class="highlighter-rouge">ACU</code> (Aurora Capacity Unit) as its capacity unit. This is comparable to provisioning RDS Instance types (<code class="highlighter-rouge">db.t3.micro</code>, <code class="highlighter-rouge">db.r5.4xlarge</code>, etc.) which have a fixed amount of compute, network IO, storage IO, and memory. We provide <code class="highlighter-rouge">ACU</code> limits (min, max) instead of picking instance types. An <code class="highlighter-rouge">ACU</code> represents a combination of compute and memory capacity. Note that we only pay for the <code class="highlighter-rouge">ACUs</code> consumed while the cluster is running, and not for the <code class="highlighter-rouge">ACUs</code> we specify as min/max.</p>
+
+<p>The units range from <code class="highlighter-rouge">2 ACUs (4GB RAM)</code> to <code class="highlighter-rouge">256 ACUs (488GB RAM)</code>.</p>
+
+<p>The <code class="highlighter-rouge">minimum ACUs</code> and <code class="highlighter-rouge">maximum ACUs</code> limit the cluster’s scale down and scale up respectively. Aurora Serverless scales based on the number of connections, CPU usage, and memory usage. This event is initiated at a <em>scaling point</em>, where the need to scale is determined and executed. For scale down, there is a cooldown period of <code class="highlighter-rouge">15 minutes</code> after a scale up event, and <code class="highlighter-rouge">310 seconds (~5 mins)</code> cooldown after each cool down event.</p>
+
+<h3 id="autoscale-storage">Autoscale Storage</h3>
+
+<p>The storage <em>autoscales</em> from <code class="highlighter-rouge">10 GB</code> to <code class="highlighter-rouge">64 TB</code> (just like Aurora RDS).</p>
 
 <h2 id="use-cases">Use Cases</h2>
 
@@ -287,24 +307,6 @@
     </ul>
   </li>
 </ul>
-
-<h2 id="serverless-autoscale">Serverless Autoscale</h2>
-
-<p>Lets get some clarity on Aurora Serverless Autoscale. Usually we see the term <em>autoscale</em> used with EC2 instances, ECS Services, Lambdas, DynamoDB, etc. It is common knowledge that a relational database cannot <em>autoscale</em>. It can, however, <em>manual-scale</em> (or <em>script-scale</em>) vertically (beefier instance type) or horizontally (read replicas for read-heavy workloads).</p>
-
-<p>Serverless Aurora does <em>autoscale</em>.</p>
-
-<h3 id="compute--memory">Compute &amp; Memory</h3>
-
-<p>Aurora Serverless uses <code class="highlighter-rouge">ACU</code> (Aurora Capacity Unit) as its capacity unit. This is comparable to provisioning RDS Instance types (<code class="highlighter-rouge">db.t3.micro</code>, <code class="highlighter-rouge">db.r5.4xlarge</code>, etc.) which have a fixed amount of compute, network IO, storage IO, and memory. We provide <code class="highlighter-rouge">ACU</code> limits (min, max) instead of picking instance types. An <code class="highlighter-rouge">ACU</code> represents a combination of compute and memory capacity. Note that we only pay for the <code class="highlighter-rouge">ACUs</code> consumed while the cluster is running, and not for the <code class="highlighter-rouge">ACUs</code> we specify as min/max.</p>
-
-<p>The units range from <code class="highlighter-rouge">2 ACUs (4GB RAM)</code> to <code class="highlighter-rouge">256 ACUs (488GB RAM)</code>.</p>
-
-<p>The <code class="highlighter-rouge">minimum ACUs</code> and <code class="highlighter-rouge">maximum ACUs</code> limit the cluster’s scale down and scale up respectively. Aurora Serverless scales based on the number of connections, CPU usage, and memory usage. This event is initiated at a <em>scaling point</em>, where the need to scale is determined and executed. For scale down, there is a cooldown period of <code class="highlighter-rouge">15 minutes</code> after a scale up event, and <code class="highlighter-rouge">310 seconds (~5 mins)</code> cooldown after each cool down event.</p>
-
-<h3 id="storage">Storage</h3>
-
-<p>The storage <em>autoscales</em> from <code class="highlighter-rouge">10 GB</code> to <code class="highlighter-rouge">64 TB</code> (just like Aurora RDS).</p>
 
 <h2 id="setup">Setup</h2>
 
@@ -490,7 +492,7 @@ Bye
 
 <p>Terminate the EC2 instance as well, if you created one while following this post and do not need it anymore.</p>
 
-<h2 id="gotchas">Gotchas</h2>
+<h2 id="tips--gotchas">Tips &amp; Gotchas</h2>
 
 <p>Now that we have seen Aurora Serverless in action, here are a few gotchas :</p>
 
