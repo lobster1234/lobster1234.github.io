@@ -5,7 +5,7 @@
   
   <link href="https://lobster1234.github.io/feed.xml" rel="self" type="application/atom+xml" />
   <link href="https://lobster1234.github.io/" rel="alternate" type="text/html" />
-  <updated>2019-04-24T04:09:55-07:00</updated>
+  <updated>2019-04-24T09:20:59-07:00</updated>
   <id>https://lobster1234.github.io//</id>
 
   
@@ -37,19 +37,19 @@
       <published>2019-04-22T13:44:37-07:00</published>
       <updated>2019-04-22T13:44:37-07:00</updated>
       <id>https://lobster1234.github.io/2019/04/22/serverless-aurora-rds</id>
-      <content type="html" xml:base="https://lobster1234.github.io/2019/04/22/serverless-aurora-rds/">&lt;p&gt;&lt;a href=&quot;&quot;&gt;Amazon RDS&lt;/a&gt; is a fully managed Relational Database Service in the AWS Public Cloud. &lt;a href=&quot;https://aws.amazon.com/rds/aurora/&quot;&gt;Amazon Aurora&lt;/a&gt; is a MySQL and Postgre compatible database with much better performance at scale with all the enhancements and rewriting AWS has put in. For more context on Aurora, here is &lt;a href=&quot;https://lobster1234.github.io/2017/11/03/amazon-aurora-rds-notes/&quot;&gt;my post on Aurora&lt;/a&gt;.&lt;/p&gt;
+      <content type="html" xml:base="https://lobster1234.github.io/2019/04/22/serverless-aurora-rds/">&lt;p&gt;&lt;a href=&quot;&quot;&gt;Amazon RDS&lt;/a&gt; is a fully managed Relational Database Service in the AWS Public Cloud. &lt;a href=&quot;https://aws.amazon.com/rds/aurora/&quot;&gt;Amazon Aurora&lt;/a&gt; is a MySQL and Postgres compatible database with much better performance at scale due to all the enhancements and rewriting AWS has put in. For more context on Aurora, here is &lt;a href=&quot;https://lobster1234.github.io/2017/11/03/amazon-aurora-rds-notes/&quot;&gt;my earlier post&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;Very recently, Amazon’s Fulfillment Unit &lt;a href=&quot;https://twitter.com/jdarrow/status/1111629087947132928&quot;&gt;moved off of Oracle&lt;/a&gt; on to Aurora Postgres + DynamoDB.&lt;/p&gt;
 
-&lt;p&gt;Aurora RDS has a lot of practical configurations applicable to pretty much all production workloads (multi region, multi-flavored read replicas FTW!). The ones I like the most are &lt;a href=&quot;https://aws.amazon.com/rds/aurora/global-database/&quot;&gt;Aurora Global Database&lt;/a&gt;, and &lt;a href=&quot;https://aws.amazon.com/rds/aurora/serverless/&quot;&gt;Aurora Serverless&lt;/a&gt;. In this post I will talk about Aurora Serverless, while saving Aurora Global Database for a later time.&lt;/p&gt;
+&lt;p&gt;Aurora RDS has several practical configurations applicable to pretty much all production workloads (Multi region, Multi-flavored read replicas FTW!). The ones I like the most are &lt;a href=&quot;https://aws.amazon.com/rds/aurora/global-database/&quot;&gt;Aurora Global Database&lt;/a&gt;, and &lt;a href=&quot;https://aws.amazon.com/rds/aurora/serverless/&quot;&gt;Aurora Serverless&lt;/a&gt;. In this post I will talk about Aurora Serverless, while saving Aurora Global Database for a later time.&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://aws.amazon.com/rds/aurora/serverless/&quot;&gt;Amazon Aurora Serverless&lt;/a&gt; is an on-demand, out of the box auto-scaled Aurora MySQL 5.6 Database which is &lt;em&gt;Serverless&lt;/em&gt;, in that it will start, scale, and stop automatically. As all RDS engines, it is fully managed.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://aws.amazon.com/rds/aurora/serverless/&quot;&gt;Amazon Aurora Serverless&lt;/a&gt; is an on-demand, out of the box auto-scaled Aurora MySQL 5.6 Database, which is &lt;em&gt;Serverless&lt;/em&gt;, in that it will start, scale, and stop automatically. The &lt;code class=&quot;highlighter-rouge&quot;&gt;start/stop&lt;/code&gt; cycle is also referred to as &lt;code class=&quot;highlighter-rouge&quot;&gt;resume/pause&lt;/code&gt;. As with all RDS engines, Aurora Serverless is fully managed.&lt;/p&gt;
 
 &lt;!--more--&gt;
 
 &lt;h2 id=&quot;use-cases&quot;&gt;Use Cases&lt;/h2&gt;
 
-&lt;p&gt;Combined with autoscaling, on-demand startup and shutdown, and per-second pricing, Aurora Serverless is a great fit for workloads that are infrequent and/or variable. Some of the examples can be -&lt;/p&gt;
+&lt;p&gt;Combined with autoscaling, on-demand startup and shutdown, and per-second billing, Aurora Serverless is a great fit for workloads that are infrequent and/or variable. Some of the examples can be -&lt;/p&gt;
 
 &lt;ul&gt;
   &lt;li&gt;Test workloads, where a database instance is only really need during the test runs, and can be “torn down” after the tests have finished running.&lt;/li&gt;
@@ -73,11 +73,11 @@
 
 &lt;h3 id=&quot;compute--memory&quot;&gt;Compute &amp;amp; Memory&lt;/h3&gt;
 
-&lt;p&gt;Aurora Serverless uses &lt;code class=&quot;highlighter-rouge&quot;&gt;ACU&lt;/code&gt; (Aurora Capacity Unit) as its capacity unit. This is comparable to provisioning an RDS Instance Types (&lt;code class=&quot;highlighter-rouge&quot;&gt;db.t3.micro&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;db.r5.4xlarge&lt;/code&gt;, etc.) which have a fixed amount of compute, network IO, storage IO, and memory. We &lt;em&gt;provision&lt;/em&gt; &lt;code class=&quot;highlighter-rouge&quot;&gt;ACUs&lt;/code&gt; instead of picking instance types. An &lt;code class=&quot;highlighter-rouge&quot;&gt;ACU&lt;/code&gt; represents a combination of compute and memory capacity.&lt;/p&gt;
+&lt;p&gt;Aurora Serverless uses &lt;code class=&quot;highlighter-rouge&quot;&gt;ACU&lt;/code&gt; (Aurora Capacity Unit) as its capacity unit. This is comparable to provisioning RDS Instance types (&lt;code class=&quot;highlighter-rouge&quot;&gt;db.t3.micro&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;db.r5.4xlarge&lt;/code&gt;, etc.) which have a fixed amount of compute, network IO, storage IO, and memory. We provide &lt;code class=&quot;highlighter-rouge&quot;&gt;ACU&lt;/code&gt; limits (min, max) instead of picking instance types. An &lt;code class=&quot;highlighter-rouge&quot;&gt;ACU&lt;/code&gt; represents a combination of compute and memory capacity. Note that we only pay for the &lt;code class=&quot;highlighter-rouge&quot;&gt;ACUs&lt;/code&gt; consumed during the durtion that the cluster is running, and not for the &lt;code class=&quot;highlighter-rouge&quot;&gt;ACUs&lt;/code&gt; we specify as min/max.&lt;/p&gt;
 
 &lt;p&gt;The units range from &lt;code class=&quot;highlighter-rouge&quot;&gt;2 ACUs (4GB RAM)&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;256 ACUs (488GB RAM)&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;We specify the &lt;code class=&quot;highlighter-rouge&quot;&gt;minimum ACUs&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;maximum ACUs&lt;/code&gt;, which limit the cluster’s scale down and scale up respectively. Aurora Serverless scales up based on the number of connections, CPU usage, and memory usage. This scale up event is initiated at a &lt;em&gt;scaling point&lt;/em&gt;. Same is applicable for scaling down, which has a cooldown period of &lt;code class=&quot;highlighter-rouge&quot;&gt;15 minutes&lt;/code&gt; after a scale up event, and &lt;code class=&quot;highlighter-rouge&quot;&gt;310 seconds (~5 mins)&lt;/code&gt; after each cool down event.&lt;/p&gt;
+&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;minimum ACUs&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;maximum ACUs&lt;/code&gt;, which limit the cluster’s scale down and scale up respectively. Aurora Serverless scales up based on the number of connections, CPU usage, and memory usage. This scale up event is initiated at a &lt;em&gt;scaling point&lt;/em&gt;. Same is applicable for scaling down, which has a cooldown period of &lt;code class=&quot;highlighter-rouge&quot;&gt;15 minutes&lt;/code&gt; after a scale up event, and &lt;code class=&quot;highlighter-rouge&quot;&gt;310 seconds (~5 mins)&lt;/code&gt; after each cool down event.&lt;/p&gt;
 
 &lt;h3 id=&quot;storage&quot;&gt;Storage&lt;/h3&gt;
 
@@ -178,7 +178,7 @@
  ^C
 &lt;/code&gt;&lt;/pre&gt;
     &lt;/div&gt;
-    &lt;p&gt;This step will time out, if we went with all the default settings during Setup. This is because the RDS Security Group that was automatically created only allows &lt;code class=&quot;highlighter-rouge&quot;&gt;3306&lt;/code&gt; inbound from our IP address. We will need to open up that security group to our VPC. To navigate to the security group, go to &lt;a href=&quot;https://console.aws.amazon.com/ec2/v2/home?region=us-east-1#SecurityGroups:sort=groupId&quot;&gt;Subnets&lt;/a&gt;, and look for a Security Group named &lt;code class=&quot;highlighter-rouge&quot;&gt;rds-launch-wizard&lt;/code&gt;. Verify the date/time in the description, as well as VPC ID to ensure you’re picking up the right one, in case you have multiple of them across many VPCs. If you click that Security Group and go to &lt;strong&gt;Inbound&lt;/strong&gt; tab, you can see that it only allows inbound from a &lt;code class=&quot;highlighter-rouge&quot;&gt;/32&lt;/code&gt; IP, which is your public IP. This IP is your internet gateway (Wifi Router, Internet Modem) IP. Let us open it up to our VPC. We can either enter our VPC CIDR, the VPC’s default security group, or just the one instance’s private IP. To keep things simple, I’ll use the instance’s private IP. This is different than the public IP used to ssh into the server. To get the server’s private IP, we can use the instance metadata endpoint.&lt;/p&gt;
+    &lt;p&gt;This step will time out, if we went with all the default settings during Setup. This is because the RDS Security Group that was automatically created only allows &lt;code class=&quot;highlighter-rouge&quot;&gt;3306&lt;/code&gt; inbound from our IP address. We will need to open up that security group to our VPC. To navigate to the security group, go to &lt;a href=&quot;https://console.aws.amazon.com/ec2/v2/home?region=us-east-1#SecurityGroups:sort=groupId&quot;&gt;Subnets&lt;/a&gt;, and look for a Security Group named &lt;code class=&quot;highlighter-rouge&quot;&gt;rds-launch-wizard&lt;/code&gt;. Verify the date/time in the description, as well as VPC ID to ensure you’re picking up the right one, in case you have multiple of them across many VPCs. If you click that Security Group and go to &lt;strong&gt;Inbound&lt;/strong&gt; tab, you can see that it only allows inbound from a &lt;code class=&quot;highlighter-rouge&quot;&gt;/32&lt;/code&gt; IP, which is your public IP. Let us open it up to our EC2 instance. We can either enter our VPC CIDR, the VPC’s default security group, or just the one instance’s private IP. To keep things simple, I’ll use the instance’s private IP. This is different than the public IP used to &lt;code class=&quot;highlighter-rouge&quot;&gt;ssh&lt;/code&gt; into the server. To get the server’s private IP, we can use the instance metadata endpoint.&lt;/p&gt;
 
     &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; [ec2-user@ip-172-31-61-122 ~]$ curl http://169.254.169.254/1.0/meta-data/local-ipv4
  172.31.61.122
@@ -283,7 +283,9 @@ Bye
 
 &lt;h2 id=&quot;pricing&quot;&gt;Pricing&lt;/h2&gt;
 
-&lt;p&gt;The pricing is a little tricky, we pay by the ACUs, the IO requests, and storage. For us-east-1, the cost basis is &lt;code class=&quot;highlighter-rouge&quot;&gt;$0.06 per ACU per hour&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;$0.10 per GB per month&lt;/code&gt; for storage, and  &lt;code class=&quot;highlighter-rouge&quot;&gt;$0.20 per 1MM IO Requests&lt;/code&gt;. The ACUs are billed &lt;em&gt;per second&lt;/em&gt; with a minimum of &lt;code class=&quot;highlighter-rouge&quot;&gt;5 minutes&lt;/code&gt; every time the cluster is &lt;em&gt;running&lt;/em&gt; or &lt;em&gt;unpaused&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;The pricing gets a little tricky, we pay by the &lt;code class=&quot;highlighter-rouge&quot;&gt;ACUs&lt;/code&gt;, the IO requests, and storage.&lt;/p&gt;
+
+&lt;p&gt;For us-east-1, the cost basis is &lt;code class=&quot;highlighter-rouge&quot;&gt;$0.06 per ACU per hour&lt;/code&gt; for compute+memory, &lt;code class=&quot;highlighter-rouge&quot;&gt;$0.10 per GB per month&lt;/code&gt; for storage, and  &lt;code class=&quot;highlighter-rouge&quot;&gt;$0.20 per 1MM IO Requests&lt;/code&gt; for the number of operations. The &lt;code class=&quot;highlighter-rouge&quot;&gt;ACUs&lt;/code&gt; are billed &lt;em&gt;per second&lt;/em&gt; with a minimum of &lt;code class=&quot;highlighter-rouge&quot;&gt;5 minutes&lt;/code&gt; every time the cluster is &lt;em&gt;running&lt;/em&gt; or &lt;em&gt;unpaused&lt;/em&gt;.&lt;/p&gt;
 
 &lt;p&gt;The exercise above did cost us a little, as mentioned earlier.&lt;/p&gt;
 
@@ -326,7 +328,6 @@ s.setAttribute('data-timestamp', +new Date());
 
 
       
-
 &lt;/script&gt;</content>
 
       
@@ -352,7 +353,7 @@ s.setAttribute('data-timestamp', +new Date());
       
 
       
-        <summary type="html">Amazon RDS is a fully managed Relational Database Service in the AWS Public Cloud. Amazon Aurora is a MySQL and Postgre compatible database with much better performance at scale with all the enhancements and rewriting AWS has put in. For more context on Aurora, here is my post on Aurora. Very recently, Amazon’s Fulfillment Unit moved off of Oracle on to Aurora Postgres + DynamoDB. Aurora RDS has a lot of practical configurations applicable to pretty much all production workloads (multi region, multi-flavored read replicas FTW!). The ones I like the most are Aurora Global Database, and Aurora Serverless. In this post I will talk about Aurora Serverless, while saving Aurora Global Database for a later time. Amazon Aurora Serverless is an on-demand, out of the box auto-scaled Aurora MySQL 5.6 Database which is Serverless, in that it will start, scale, and stop automatically. As all RDS engines, it is fully managed.</summary>
+        <summary type="html">Amazon RDS is a fully managed Relational Database Service in the AWS Public Cloud. Amazon Aurora is a MySQL and Postgres compatible database with much better performance at scale due to all the enhancements and rewriting AWS has put in. For more context on Aurora, here is my earlier post. Very recently, Amazon’s Fulfillment Unit moved off of Oracle on to Aurora Postgres + DynamoDB. Aurora RDS has several practical configurations applicable to pretty much all production workloads (Multi region, Multi-flavored read replicas FTW!). The ones I like the most are Aurora Global Database, and Aurora Serverless. In this post I will talk about Aurora Serverless, while saving Aurora Global Database for a later time. Amazon Aurora Serverless is an on-demand, out of the box auto-scaled Aurora MySQL 5.6 Database, which is Serverless, in that it will start, scale, and stop automatically. The start/stop cycle is also referred to as resume/pause. As with all RDS engines, Aurora Serverless is fully managed.</summary>
       
 
       

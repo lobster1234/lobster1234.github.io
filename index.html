@@ -202,13 +202,13 @@
         </header>
 
         <div class="post-content">
-          <p><a href="">Amazon RDS</a> is a fully managed Relational Database Service in the AWS Public Cloud. <a href="https://aws.amazon.com/rds/aurora/">Amazon Aurora</a> is a MySQL and Postgre compatible database with much better performance at scale with all the enhancements and rewriting AWS has put in. For more context on Aurora, here is <a href="https://lobster1234.github.io/2017/11/03/amazon-aurora-rds-notes/">my post on Aurora</a>.</p>
+          <p><a href="">Amazon RDS</a> is a fully managed Relational Database Service in the AWS Public Cloud. <a href="https://aws.amazon.com/rds/aurora/">Amazon Aurora</a> is a MySQL and Postgres compatible database with much better performance at scale due to all the enhancements and rewriting AWS has put in. For more context on Aurora, here is <a href="https://lobster1234.github.io/2017/11/03/amazon-aurora-rds-notes/">my earlier post</a>.</p>
 
 <p>Very recently, Amazon’s Fulfillment Unit <a href="https://twitter.com/jdarrow/status/1111629087947132928">moved off of Oracle</a> on to Aurora Postgres + DynamoDB.</p>
 
-<p>Aurora RDS has a lot of practical configurations applicable to pretty much all production workloads (multi region, multi-flavored read replicas FTW!). The ones I like the most are <a href="https://aws.amazon.com/rds/aurora/global-database/">Aurora Global Database</a>, and <a href="https://aws.amazon.com/rds/aurora/serverless/">Aurora Serverless</a>. In this post I will talk about Aurora Serverless, while saving Aurora Global Database for a later time.</p>
+<p>Aurora RDS has several practical configurations applicable to pretty much all production workloads (Multi region, Multi-flavored read replicas FTW!). The ones I like the most are <a href="https://aws.amazon.com/rds/aurora/global-database/">Aurora Global Database</a>, and <a href="https://aws.amazon.com/rds/aurora/serverless/">Aurora Serverless</a>. In this post I will talk about Aurora Serverless, while saving Aurora Global Database for a later time.</p>
 
-<p><a href="https://aws.amazon.com/rds/aurora/serverless/">Amazon Aurora Serverless</a> is an on-demand, out of the box auto-scaled Aurora MySQL 5.6 Database which is <em>Serverless</em>, in that it will start, scale, and stop automatically. As all RDS engines, it is fully managed.</p>
+<p><a href="https://aws.amazon.com/rds/aurora/serverless/">Amazon Aurora Serverless</a> is an on-demand, out of the box auto-scaled Aurora MySQL 5.6 Database, which is <em>Serverless</em>, in that it will start, scale, and stop automatically. The <code class="highlighter-rouge">start/stop</code> cycle is also referred to as <code class="highlighter-rouge">resume/pause</code>. As with all RDS engines, Aurora Serverless is fully managed.</p>
 
 
         </div>
