@@ -290,7 +290,7 @@
 
 <h2 id="serverless-autoscale">Serverless Autoscale</h2>
 
-<p>Lets get some clarity on Aurora Serverless Autoscale. Usually we see the term <em>autoscale</em> used with EC2 instances, ECS Services, Lambdas, DynamoDB, etc. It is common knowledge that a relational database cannot <em>autoscale</em>. It can, however, <em>manual-scale</em> (or <em>script-scale</em>) vertically (beefier instance type) or horizontally (read relicas for reads).</p>
+<p>Lets get some clarity on Aurora Serverless Autoscale. Usually we see the term <em>autoscale</em> used with EC2 instances, ECS Services, Lambdas, DynamoDB, etc. It is common knowledge that a relational database cannot <em>autoscale</em>. It can, however, <em>manual-scale</em> (or <em>script-scale</em>) vertically (beefier instance type) or horizontally (read replicas for reads-heavy workloads).</p>
 
 <p>Serverless Aurora does <em>autoscale</em>.</p>
 
@@ -300,7 +300,7 @@
 
 <p>The units range from <code class="highlighter-rouge">2 ACUs (4GB RAM)</code> to <code class="highlighter-rouge">256 ACUs (488GB RAM)</code>.</p>
 
-<p>The <code class="highlighter-rouge">minimum ACUs</code> and <code class="highlighter-rouge">maximum ACUs</code>, which limit the cluster’s scale down and scale up respectively. Aurora Serverless scales up based on the number of connections, CPU usage, and memory usage. This scale up event is initiated at a <em>scaling point</em>. Same is applicable for scaling down, which has a cooldown period of <code class="highlighter-rouge">15 minutes</code> after a scale up event, and <code class="highlighter-rouge">310 seconds (~5 mins)</code> after each cool down event.</p>
+<p>The <code class="highlighter-rouge">minimum ACUs</code> and <code class="highlighter-rouge">maximum ACUs</code> limit the cluster’s scale down and scale up respectively. Aurora Serverless scales up based on the number of connections, CPU usage, and memory usage. This scale up event is initiated at a <em>scaling point</em>, where the need to scale up is determined and executed. Same is applicable for scaling down, which has a cooldown period of <code class="highlighter-rouge">15 minutes</code> after a scale up event, and <code class="highlighter-rouge">310 seconds (~5 mins)</code> after each cool down event.</p>
 
 <h3 id="storage">Storage</h3>
 
