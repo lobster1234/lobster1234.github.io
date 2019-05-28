@@ -119,6 +119,181 @@
       <li>
         <header class="post-header">
           <h1 class="post-title">
+            <a class="post-link" href="/2019/05/20/bloom-filters/">Bloom Filters</a>
+          </h1>
+
+          <p class="post-meta">May 20, 2019 •  •
+  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/data-structures/">data-structures</a>,
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+    
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <a href="/categories/algorithms/">algorithms</a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+
+
+ •
+  
+
+</p>
+        </header>
+
+        <div class="post-content">
+          <p>A <a href="https://en.wikipedia.org/wiki/Bloom_filter">Bloom Filter</a> is a Probabilistic Data Structure. The Filter responds to <code class="highlighter-rouge">exits(str)</code> with 100% certainty if <code class="highlighter-rouge">str</code> is <strong>not</strong> present. A <code class="highlighter-rouge">true</code> response from <code class="highlighter-rouge">exists(str)</code> only indicates a <em>probability</em> of <code class="highlighter-rouge">str</code> being present, and could be a false positive.</p>
+
+<p>Bloom filters are used to efficiently and accurately check the absence of a value. Typical examples can be blacklist of domains, checks for a username availability for registration, or whether to look for data in cache depending on the key, etc.</p>
+
+<p>Since Bloom Filters use arrays of bits, they are space efficient, and the get/set operations do not require any scans or searches, making them compute efficient as well.</p>
+
+<p>Having used them at IGN to quickly respond to <em>is the username available</em> on the registration form, I recently ran into them again for a hobby project.</p>
+
+
+        </div>
+        
+          <p class="post-continue">
+            <a href="/2019/05/20/bloom-filters/">Read on &rarr;</a>
+          </p>
+        
+      </li>
+    
+      
+      
+
+      <li>
+        <header class="post-header">
+          <h1 class="post-title">
             <a class="post-link" href="/2019/04/22/serverless-aurora-rds/">Up and running with Aurora Serverless</a>
           </h1>
 
@@ -584,177 +759,6 @@
         
           <p class="post-continue">
             <a href="/2019/01/03/managing-multiple-aws-credentials/">Read on &rarr;</a>
-          </p>
-        
-      </li>
-    
-      
-      
-
-      <li>
-        <header class="post-header">
-          <h1 class="post-title">
-            <a class="post-link" href="/2018/12/20/lambda-layers/">Lambda Layers</a>
-          </h1>
-
-          <p class="post-meta">Dec 20, 2018 •  •
-  
-    
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-        <a href="/categories/aws/">aws</a>,
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-  
-    
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-        <a href="/categories/serverless/">serverless</a>
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-  
-
-
- •
-  
-
-</p>
-        </header>
-
-        <div class="post-content">
-          <p>At <a href="https://twitter.com/AWSreInvent/status/1068200715733020673">re:Invent 2018</a>, AWS announced <a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">Lambda Layers</a>, bringing Lambda construct closer to that of an AMI. Put simply, layers are dependencies that can be made available to the function at runtime. Currently there can be 5 <em>layers</em> associated with a function. Layers help with isolating common dependencies, as well as keeping the runtime consistent in terms of versions - just like the AMIs do. Layers are immutable, and are versioned. While this post is focused on Python, the concept of layers applies uniformly regardless of the language (although I feel this is more <em>useful</em> for dynamic languages compared to languages like Java, where the whole artifact is packaged as a part of the deployment artifact). The dependencies are zipped up, uploaded as new layer, or a new version of an existing layer. They can be tied to runtimes (via labels) for validation as well.</p>
-
-<p>In this post I’ll walk through creating a Python layer, and associating it with a function. I’ll use the CLI, <a href="https://github.com/awslabs/aws-shell">aws-shell</a> to accomplish this.</p>
-
-
-        </div>
-        
-          <p class="post-continue">
-            <a href="/2018/12/20/lambda-layers/">Read on &rarr;</a>
           </p>
         
       </li>
