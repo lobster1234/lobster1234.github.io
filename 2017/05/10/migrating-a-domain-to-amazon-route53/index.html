@@ -31,35 +31,29 @@
   
   
 
-  <script type="text/javascript">
-  WebFontConfig = {
-    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
-  };
-  (function(d) {
-    var wf = d.createElement('script'), s = d.scripts[0];
-    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
-    wf.async = true;
-    s.parentNode.insertBefore(wf, s);
-  })(document);
-</script>
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet">
 
   
-  <!-- Google Analytics -->
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    ga('create', 'UA-96931340-1', 'auto');
-    ga('send', 'pageview');
+      ga('create', 'UA-96931340-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  
 
-  </script>
 
-
-  <!-- Begin Jekyll SEO tag v2.4.0 -->
+  <!-- Begin Jekyll SEO tag v2.6.1 -->
 <title>Migrating a Domain to Amazon Route53 | Manish Pandit’s Blog</title>
-<meta name="generator" content="Jekyll v3.4.3" />
+<meta name="generator" content="Jekyll v4.3.4" />
 <meta property="og:title" content="Migrating a Domain to Amazon Route53" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
@@ -72,7 +66,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2017-05-10T23:44:37-07:00" />
 <script type="application/ld+json">
-{"description":"Amazon Route53 is a highly available and scalable DNS service. Route53 provides Domain Registrations and Transfers, DNS service to route traffic to the infrastructure (either within AWS or non-AWS), advanced routing policies like weighted and geo, and health check services that can be leveraged to perform traffic routing to different destination in the event of a failure. It provides more flexibility and seamless integration with AWS Services than any other DNS host can. One of the most common scenarios is the need to send traffic from a site registered at non-Route53 providers to an ELB, which Route53 supports via an Alias Record. In this post we will discuss moving the DNS - where requests to a domain hosted on a non-Route53 provider would resolve to Route53, and then point to an ELB which could be hosting a web property. However, the destination does not have to be an ELB, it can be any public IP. The other part is that of the Domain Registration itself, which can be transferred to Route53 if needed.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"BlogPosting","url":"https://lobster1234.github.io/2017/05/10/migrating-a-domain-to-amazon-route53/","image":"https://lobster1234.github.io/assets/route53_post_image.png","headline":"Migrating a Domain to Amazon Route53","dateModified":"2017-05-10T23:44:37-07:00","datePublished":"2017-05-10T23:44:37-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/05/10/migrating-a-domain-to-amazon-route53/"},"@context":"http://schema.org"}</script>
+{"url":"https://lobster1234.github.io/2017/05/10/migrating-a-domain-to-amazon-route53/","description":"Amazon Route53 is a highly available and scalable DNS service. Route53 provides Domain Registrations and Transfers, DNS service to route traffic to the infrastructure (either within AWS or non-AWS), advanced routing policies like weighted and geo, and health check services that can be leveraged to perform traffic routing to different destination in the event of a failure. It provides more flexibility and seamless integration with AWS Services than any other DNS host can. One of the most common scenarios is the need to send traffic from a site registered at non-Route53 providers to an ELB, which Route53 supports via an Alias Record. In this post we will discuss moving the DNS - where requests to a domain hosted on a non-Route53 provider would resolve to Route53, and then point to an ELB which could be hosting a web property. However, the destination does not have to be an ELB, it can be any public IP. The other part is that of the Domain Registration itself, which can be transferred to Route53 if needed.","author":{"@type":"Person","name":"Manish Pandit"},"image":"https://lobster1234.github.io/assets/route53_post_image.png","headline":"Migrating a Domain to Amazon Route53","dateModified":"2017-05-10T23:44:37-07:00","datePublished":"2017-05-10T23:44:37-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/05/10/migrating-a-domain-to-amazon-route53/"},"@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -290,11 +284,11 @@
 <img src="https://lobster1234.github.io/assets/dns-3.png" alt="dns-3" /></p>
   </li>
   <li>
-    <p>A form will show up in the right panel. Enter your domain name (skip the <code class="highlighter-rouge">www</code>), and an optional description. Keep the <code class="highlighter-rouge">Public Hosted Zone</code> selected. Click <strong>Create</strong>.
+    <p>A form will show up in the right panel. Enter your domain name (skip the <code class="language-plaintext highlighter-rouge">www</code>), and an optional description. Keep the <code class="language-plaintext highlighter-rouge">Public Hosted Zone</code> selected. Click <strong>Create</strong>.
 <img src="https://lobster1234.github.io/assets/dns-4.png" alt="dns-4" /></p>
   </li>
   <li>
-    <p>Once done, you will see the zone details, with only an <code class="highlighter-rouge">NS</code> record set and a <code class="highlighter-rouge">SOA</code> record set. <code class="highlighter-rouge">NS</code> has a list of name servers, and <code class="highlighter-rouge">SOA</code> is the <code class="highlighter-rouge">Start of Authority</code> record, which at a minimum contains the primary name server host name. You will notice this is usually the first name server address from the <code class="highlighter-rouge">NS</code> record record set. You can read more information on various DNS record set types <a href="https://en.wikipedia.org/wiki/List_of_DNS_record_types" target="_blank_">here</a>.
+    <p>Once done, you will see the zone details, with only an <code class="language-plaintext highlighter-rouge">NS</code> record set and a <code class="language-plaintext highlighter-rouge">SOA</code> record set. <code class="language-plaintext highlighter-rouge">NS</code> has a list of name servers, and <code class="language-plaintext highlighter-rouge">SOA</code> is the <code class="language-plaintext highlighter-rouge">Start of Authority</code> record, which at a minimum contains the primary name server host name. You will notice this is usually the first name server address from the <code class="language-plaintext highlighter-rouge">NS</code> record record set. You can read more information on various DNS record set types <a href="https://en.wikipedia.org/wiki/List_of_DNS_record_types" target="_blank_">here</a>.
 <img src="https://lobster1234.github.io/assets/dns-5.png" alt="dns-5" /></p>
   </li>
   <li>
@@ -306,10 +300,10 @@
 <img src="https://lobster1234.github.io/assets/dns-6.png" alt="dns-6" /></p>
   </li>
   <li>
-    <p>Notice a file <code class="highlighter-rouge">your_domain_name.txt</code> that has been downloaded. Open that file in any text editor of your choice.</p>
+    <p>Notice a file <code class="language-plaintext highlighter-rouge">your_domain_name.txt</code> that has been downloaded. Open that file in any text editor of your choice.</p>
   </li>
   <li>
-    <p>Now come back to the <strong>Route 53</strong> page with the <strong>Hosted Zone</strong>, and click <strong>Import Zone File</strong> at the top. A form will open up on the right. Copy and paste the contents of the <code class="highlighter-rouge">your_domain_name.txt</code> file in this section, and click <strong>Import</strong> button.</p>
+    <p>Now come back to the <strong>Route 53</strong> page with the <strong>Hosted Zone</strong>, and click <strong>Import Zone File</strong> at the top. A form will open up on the right. Copy and paste the contents of the <code class="language-plaintext highlighter-rouge">your_domain_name.txt</code> file in this section, and click <strong>Import</strong> button.</p>
   </li>
   <li>
     <p>Click refresh at the top right or just refresh your browser and you’ll notice a much bigger list of record sets in the hosted domain. These have been imported from the GoDaddy Zone File.
@@ -340,7 +334,7 @@ Click <strong>Save</strong>.</p>
 <img src="https://lobster1234.github.io/assets/dns-12.png" alt="dns-12" /></p>
   </li>
   <li>
-    <p>Give it a few minutes and keep verifying the name server change by using <a href="http://dnscheck.pingdom.com/" target="_blank_">this excellent service by Pingdom</a>. Enter your domain name, and if everything worked, you will notice the Amazon Nameservers show up under the <strong>Nameservers</strong> section on the test results page. If you still see Godaddy’s <code class="highlighter-rouge">*.domaincontrol.com</code> then give it a while and retry.</p>
+    <p>Give it a few minutes and keep verifying the name server change by using <a href="http://dnscheck.pingdom.com/" target="_blank_">this excellent service by Pingdom</a>. Enter your domain name, and if everything worked, you will notice the Amazon Nameservers show up under the <strong>Nameservers</strong> section on the test results page. If you still see Godaddy’s <code class="language-plaintext highlighter-rouge">*.domaincontrol.com</code> then give it a while and retry.</p>
   </li>
   <li>
     <p>Once you see the Amazon Nameservers in this test, You should be all set! You can now choose to transfer your domain ownership from GoDaddy to Route53, but that is entirely optional.</p>

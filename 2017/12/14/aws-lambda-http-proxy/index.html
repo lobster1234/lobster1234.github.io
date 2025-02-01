@@ -31,35 +31,29 @@
   
   
 
-  <script type="text/javascript">
-  WebFontConfig = {
-    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
-  };
-  (function(d) {
-    var wf = d.createElement('script'), s = d.scripts[0];
-    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
-    wf.async = true;
-    s.parentNode.insertBefore(wf, s);
-  })(document);
-</script>
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet">
 
   
-  <!-- Google Analytics -->
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    ga('create', 'UA-96931340-1', 'auto');
-    ga('send', 'pageview');
+      ga('create', 'UA-96931340-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  
 
-  </script>
 
-
-  <!-- Begin Jekyll SEO tag v2.4.0 -->
+  <!-- Begin Jekyll SEO tag v2.6.1 -->
 <title>HTTP/S Proxy Server for AWS Lambda Invocations | Manish Pandit’s Blog</title>
-<meta name="generator" content="Jekyll v3.4.3" />
+<meta name="generator" content="Jekyll v4.3.4" />
 <meta property="og:title" content="HTTP/S Proxy Server for AWS Lambda Invocations" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
@@ -72,7 +66,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2017-12-14T22:44:37-08:00" />
 <script type="application/ld+json">
-{"description":"Lambda Functions are a FaaS implementation on Amazon Web Services. Setting them as HTTP/S endpoints over API Gateway can be complicated, and more often than not is an overkill for simple, internal APIs. Besides, API Gateway endpoints for Lambda are public, no matter how we slice and dice it. The recently announced VPC Link for API Gateway only allows the endpoints to route to a NLB target, not a Lambda. This is a lightweight HTTP/S proxy written in Java, which wraps a lambda invocation, mimicking the API Gateway-Lambda Proxy Integration.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"BlogPosting","url":"https://lobster1234.github.io/2017/12/14/aws-lambda-http-proxy/","image":"https://lobster1234.github.io/assets/lambda_proxy.png","headline":"HTTP/S Proxy Server for AWS Lambda Invocations","dateModified":"2017-12-14T22:44:37-08:00","datePublished":"2017-12-14T22:44:37-08:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/12/14/aws-lambda-http-proxy/"},"@context":"http://schema.org"}</script>
+{"url":"https://lobster1234.github.io/2017/12/14/aws-lambda-http-proxy/","description":"Lambda Functions are a FaaS implementation on Amazon Web Services. Setting them as HTTP/S endpoints over API Gateway can be complicated, and more often than not is an overkill for simple, internal APIs. Besides, API Gateway endpoints for Lambda are public, no matter how we slice and dice it. The recently announced VPC Link for API Gateway only allows the endpoints to route to a NLB target, not a Lambda. This is a lightweight HTTP/S proxy written in Java, which wraps a lambda invocation, mimicking the API Gateway-Lambda Proxy Integration.","author":{"@type":"Person","name":"Manish Pandit"},"image":"https://lobster1234.github.io/assets/lambda_proxy.png","headline":"HTTP/S Proxy Server for AWS Lambda Invocations","dateModified":"2017-12-14T22:44:37-08:00","datePublished":"2017-12-14T22:44:37-08:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/12/14/aws-lambda-http-proxy/"},"@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -266,7 +260,7 @@ Besides, API Gateway endpoints for Lambda are public, no matter how we slice and
 <p><a href="https://github.com/lobster1234/lambda-proxy">This</a> is a lightweight HTTP/S proxy written in Java, which wraps a lambda invocation, mimicking the API Gateway-Lambda Proxy Integration.</p>
 
 <!--more-->
-<p>The <code class="highlighter-rouge">/function</code> endpoint supports <code class="highlighter-rouge">GET</code>, <code class="highlighter-rouge">PUT</code>, <code class="highlighter-rouge">POST</code>, and <code class="highlighter-rouge">DELETE</code>. Any request sent to this endpoint is wrapped as <a href="https://github.com/aws/aws-lambda-java-libs/blob/master/aws-lambda-java-events/src/main/java/com/amazonaws/services/lambda/runtime/events/APIGatewayProxyRequestEvent.java">APIGatewayProxyRequestEvent</a>.</p>
+<p>The <code class="language-plaintext highlighter-rouge">/function</code> endpoint supports <code class="language-plaintext highlighter-rouge">GET</code>, <code class="language-plaintext highlighter-rouge">PUT</code>, <code class="language-plaintext highlighter-rouge">POST</code>, and <code class="language-plaintext highlighter-rouge">DELETE</code>. Any request sent to this endpoint is wrapped as <a href="https://github.com/aws/aws-lambda-java-libs/blob/master/aws-lambda-java-events/src/main/java/com/amazonaws/services/lambda/runtime/events/APIGatewayProxyRequestEvent.java">APIGatewayProxyRequestEvent</a>.</p>
 
 <p>The Response from the Lambda is wrapped as <a href="https://github.com/aws/aws-lambda-java-libs/blob/master/aws-lambda-java-events/src/main/java/com/amazonaws/services/lambda/runtime/events/APIGatewayProxyResponseEvent.java">APIGatewayProxyResponseEvent</a>.</p>
 
@@ -280,50 +274,48 @@ Besides, API Gateway endpoints for Lambda are public, no matter how we slice and
 
 <ul>
   <li>
-    <p><code class="highlighter-rouge">GET /healthcheck</code> - Used by the load balancer</p>
+    <p><code class="language-plaintext highlighter-rouge">GET /healthcheck</code> - Used by the load balancer</p>
   </li>
   <li>
-    <p><code class="highlighter-rouge">GET /functions</code> - Get a list of lambda functions</p>
+    <p><code class="language-plaintext highlighter-rouge">GET /functions</code> - Get a list of lambda functions</p>
   </li>
   <li>
-    <p><code class="highlighter-rouge">GET | PUT | POST | DELETE  /function</code> - Invoke the Lambda Function named in the header <code class="highlighter-rouge">x-lambda-function-name</code>. This header can also contain the ARN of the function.</p>
+    <p><code class="language-plaintext highlighter-rouge">GET | PUT | POST | DELETE  /function</code> - Invoke the Lambda Function named in the header <code class="language-plaintext highlighter-rouge">x-lambda-function-name</code>. This header can also contain the ARN of the function.</p>
   </li>
 </ul>
 
 <h3 id="deployment">Deployment</h3>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>git clone git@github.com:lobster1234/lambda-proxy.git
-<span class="gp">$ </span><span class="nb">cd </span>lambda-proxy
-<span class="gp">$ </span>mvn clean install jetty:run
-</code></pre>
-</div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git clone git@github.com:lobster1234/lambda-proxy.git
+<span class="nv">$ </span><span class="nb">cd </span>lambda-proxy
+<span class="nv">$ </span>mvn clean <span class="nb">install </span>jetty:run
+</code></pre></div></div>
 
 <p>This will run the lambda proxy server on jetty, port 8080.</p>
 
-<p>To deploy in Tomcat, copy <code class="highlighter-rouge">target/lambda-proxy-1.0-SNAPSHOT.war</code> and copy it to <code class="highlighter-rouge">$TOMCAT_HOME/webapps</code> as <code class="highlighter-rouge">lambda-proxy.war</code> for the context <code class="highlighter-rouge">lambda-proxy</code> or as <code class="highlighter-rouge">ROOT.war</code> for <code class="highlighter-rouge">/</code>.</p>
+<p>To deploy in Tomcat, copy <code class="language-plaintext highlighter-rouge">target/lambda-proxy-1.0-SNAPSHOT.war</code> and copy it to <code class="language-plaintext highlighter-rouge">$TOMCAT_HOME/webapps</code> as <code class="language-plaintext highlighter-rouge">lambda-proxy.war</code> for the context <code class="language-plaintext highlighter-rouge">lambda-proxy</code> or as <code class="language-plaintext highlighter-rouge">ROOT.war</code> for <code class="language-plaintext highlighter-rouge">/</code>.</p>
 
 <h3 id="iam-policy">IAM Policy</h3>
 
 <p>If this proxy will run in an autoscaling group in AWS (recommended), create a role with the below inline policy for the instances -</p>
 
-<div class="language-json highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="w">
-    </span><span class="nt">"Version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2012-10-17"</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"Statement"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"Version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2012-10-17"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Statement"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
         </span><span class="p">{</span><span class="w">
-            </span><span class="nt">"Sid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"InvokePermission"</span><span class="p">,</span><span class="w">
-            </span><span class="nt">"Effect"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Allow"</span><span class="p">,</span><span class="w">
-            </span><span class="nt">"Action"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+            </span><span class="nl">"Sid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"InvokePermission"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"Effect"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Allow"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"Action"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
                 </span><span class="s2">"lambda:InvokeFunction"</span><span class="p">,</span><span class="w">
                 </span><span class="s2">"lambda:ListFunctions"</span><span class="w">
             </span><span class="p">],</span><span class="w">
-            </span><span class="nt">"Resource"</span><span class="p">:</span><span class="w"> </span><span class="s2">"*"</span><span class="w">
+            </span><span class="nl">"Resource"</span><span class="p">:</span><span class="w"> </span><span class="s2">"*"</span><span class="w">
         </span><span class="p">}</span><span class="w">
     </span><span class="p">]</span><span class="w">
 </span><span class="p">}</span><span class="w">  
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
-<p>If on-prem or on a laptop, attach the above policy to the IAM user whose credentials will sit in <code class="highlighter-rouge">~/.aws/credentials</code>.</p>
+<p>If on-prem or on a laptop, attach the above policy to the IAM user whose credentials will sit in <code class="language-plaintext highlighter-rouge">~/.aws/credentials</code>.</p>
 
 <h3 id="usage">Usage</h3>
 
@@ -331,23 +323,22 @@ Besides, API Gateway endpoints for Lambda are public, no matter how we slice and
   <li>Healtcheck for LBs</li>
 </ul>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code>
-<span class="gp">$ </span>curl -i http://localhost:8080/healthcheck
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nv">$ </span>curl <span class="nt">-i</span> http://localhost:8080/healthcheck
 HTTP/1.1 200 OK
 Date: Tue, 12 Dec 2017 02:17:31 GMT
-Content-Type: text/html; <span class="nv">charset</span><span class="o">=</span>UTF-8
+Content-Type: text/html<span class="p">;</span> <span class="nv">charset</span><span class="o">=</span>UTF-8
 Transfer-Encoding: chunked
 Server: Apache Tomcat/8.5.11
 
 OK
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <ul>
   <li>Get a list of lambda functions</li>
 </ul>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>curl -i http://localhost:8080/functions
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>curl <span class="nt">-i</span> http://localhost:8080/functions
 HTTP/1.1 200 OK
 Date: Tue, 12 Dec 2017 02:19:07 GMT
 Content-Type: application/json
@@ -373,13 +364,12 @@ Server: Apache Tomcat/8.5.11
 
 
  <span class="o">]</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 <ul>
   <li>Invoke a lambda function</li>
 </ul>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>curl -i -X POST http://localhost:8080/function -H <span class="s1">'x-lambda-function-name:internal-api-function'</span>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>curl <span class="nt">-i</span> <span class="nt">-X</span> POST http://localhost:8080/function <span class="nt">-H</span> <span class="s1">'x-lambda-function-name:internal-api-function'</span>
   HTTP/1.1 200
   Content-Type: application/json
   Transfer-Encoding: chunked
@@ -400,8 +390,7 @@ Server: Apache Tomcat/8.5.11
      <span class="o">}</span>,
      <span class="s2">"body"</span>:<span class="s2">"{</span><span class="se">\"</span><span class="s2">message</span><span class="se">\"</span><span class="s2">: </span><span class="se">\"</span><span class="s2">Hello from Lambda</span><span class="se">\"</span><span class="s2">}"</span>
   <span class="o">}</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h3 id="typical-deployment-in-aws">Typical Deployment in AWS</h3>
 
@@ -413,7 +402,7 @@ Server: Apache Tomcat/8.5.11
   <li>Missing function name</li>
 </ul>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>curl -i  http://localhost:8080/function                                          
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>curl <span class="nt">-i</span>  http://localhost:8080/function                                          
 HTTP/1.1 400
 Content-Type: application/json
 Transfer-Encoding: chunked
@@ -426,14 +415,13 @@ Server: Apache Tomcat/8.5.11
    <span class="s2">"body"</span>:<span class="s2">"{</span><span class="se">\"</span><span class="s2">Error</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">Must provide x-lambda-function-name header</span><span class="se">\"</span><span class="s2">}}"</span>
 <span class="o">}</span>
 
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <ul>
   <li>Function Not Found</li>
 </ul>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>curl -i -X POST http://localhost:8080/function -H <span class="s1">'x-lambda-function-name:internal-api-func'</span>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>curl <span class="nt">-i</span> <span class="nt">-X</span> POST http://localhost:8080/function <span class="nt">-H</span> <span class="s1">'x-lambda-function-name:internal-api-func'</span>
 HTTP/1.1 404
 Content-Type: application/json
 Transfer-Encoding: chunked
@@ -446,14 +434,13 @@ Server: Apache Tomcat/8.5.11
    (Service: AWSLambda; Status Code: 404; Error Code: ResourceNotFoundException;
    Request ID: 324e3566-dee6-11e7-a4b9-4b1d43c1a0fb)"</span>
 <span class="o">}</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <ul>
   <li>Runtime Failure</li>
 </ul>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>curl -i -X POST http://localhost:8080/function -H <span class="s1">'x-lambda-function-name:getBankTransactions-dev-get-accounts'</span>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>curl <span class="nt">-i</span> <span class="nt">-X</span> POST http://localhost:8080/function <span class="nt">-H</span> <span class="s1">'x-lambda-function-name:getBankTransactions-dev-get-accounts'</span>
 HTTP/1.1 500
 Content-Type: application/json
 Transfer-Encoding: chunked
@@ -480,8 +467,7 @@ Server: Apache Tomcat/8.5.11
    Bad Request</span><span class="se">\"</span><span class="s2">,</span><span class="se">\"</span><span class="s2">errorType</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">java.lang.RuntimeException</span><span class="se">\"</span><span class="s2">,</span><span class="se">\"</span><span class="s2">stackTrace</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">]}}}"</span>
 <span class="o">}</span>
 
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h3 style="text-align: center" id="comments">Comments</h3>
 

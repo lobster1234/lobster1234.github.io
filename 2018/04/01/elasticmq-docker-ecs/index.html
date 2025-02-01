@@ -31,35 +31,29 @@
   
   
 
-  <script type="text/javascript">
-  WebFontConfig = {
-    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
-  };
-  (function(d) {
-    var wf = d.createElement('script'), s = d.scripts[0];
-    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
-    wf.async = true;
-    s.parentNode.insertBefore(wf, s);
-  })(document);
-</script>
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet">
 
   
-  <!-- Google Analytics -->
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    ga('create', 'UA-96931340-1', 'auto');
-    ga('send', 'pageview');
+      ga('create', 'UA-96931340-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  
 
-  </script>
 
-
-  <!-- Begin Jekyll SEO tag v2.4.0 -->
+  <!-- Begin Jekyll SEO tag v2.6.1 -->
 <title>Running ElasticMQ in ECS | Manish Pandit’s Blog</title>
-<meta name="generator" content="Jekyll v3.4.3" />
+<meta name="generator" content="Jekyll v4.3.4" />
 <meta property="og:title" content="Running ElasticMQ in ECS" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
@@ -71,7 +65,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2018-04-01T00:44:37-07:00" />
 <script type="application/ld+json">
-{"description":"This post is an overview on running ElasticMQ in Amazon ECS. This can help simulate SQS for development purposes, and running it in ECS would help with resourcing, as well as having an ALB to act as an endpoint-url. I’ve used EC2 and not Fargate, but this can just as easily be launched as a Fargate task. While there is also localstack, for this particular case, I just wanted to run SQS Mock and not all other services localstack comes bundled with. Familiarity with ECS, specially around creating Task Definitions, Services, and associating them with Application Load Balancers will definitely help.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"BlogPosting","url":"https://lobster1234.github.io/2018/04/01/elasticmq-docker-ecs/","headline":"Running ElasticMQ in ECS","dateModified":"2018-04-01T00:44:37-07:00","datePublished":"2018-04-01T00:44:37-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2018/04/01/elasticmq-docker-ecs/"},"@context":"http://schema.org"}</script>
+{"url":"https://lobster1234.github.io/2018/04/01/elasticmq-docker-ecs/","description":"This post is an overview on running ElasticMQ in Amazon ECS. This can help simulate SQS for development purposes, and running it in ECS would help with resourcing, as well as having an ALB to act as an endpoint-url. I’ve used EC2 and not Fargate, but this can just as easily be launched as a Fargate task. While there is also localstack, for this particular case, I just wanted to run SQS Mock and not all other services localstack comes bundled with. Familiarity with ECS, specially around creating Task Definitions, Services, and associating them with Application Load Balancers will definitely help.","author":{"@type":"Person","name":"Manish Pandit"},"headline":"Running ElasticMQ in ECS","dateModified":"2018-04-01T00:44:37-07:00","datePublished":"2018-04-01T00:44:37-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2018/04/01/elasticmq-docker-ecs/"},"@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -190,7 +184,7 @@
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <p>This post is an overview on running <a href="https://github.com/adamw/elasticmq">ElasticMQ</a> in <a href="https://aws.amazon.com/ecs/">Amazon ECS</a>. This can help <em>simulate</em> <a href="https://aws.amazon.com/sqs/">SQS</a> for development purposes, and running it in ECS would help with resourcing, as well as having an ALB to act as an <code class="highlighter-rouge">endpoint-url</code>. I’ve used EC2 and not <a href="https://aws.amazon.com/fargate/">Fargate</a>, but this can just as easily be launched as a Fargate task. While there is also <a href="https://localstack.cloud/">localstack</a>, for this particular case, I just wanted to run SQS Mock and not all other services localstack comes bundled with.</p>
+    <p>This post is an overview on running <a href="https://github.com/adamw/elasticmq">ElasticMQ</a> in <a href="https://aws.amazon.com/ecs/">Amazon ECS</a>. This can help <em>simulate</em> <a href="https://aws.amazon.com/sqs/">SQS</a> for development purposes, and running it in ECS would help with resourcing, as well as having an ALB to act as an <code class="language-plaintext highlighter-rouge">endpoint-url</code>. I’ve used EC2 and not <a href="https://aws.amazon.com/fargate/">Fargate</a>, but this can just as easily be launched as a Fargate task. While there is also <a href="https://localstack.cloud/">localstack</a>, for this particular case, I just wanted to run SQS Mock and not all other services localstack comes bundled with.</p>
 
 <p>Familiarity with ECS, specially around creating Task Definitions, Services, and associating them with Application Load Balancers will definitely help.</p>
 
@@ -202,11 +196,11 @@
 
 <h2 id="setup">Setup</h2>
 
-<p>First off, we create a custom configuration for ElasticMQ, mostly to ensure that the endpoint URL is different than <code class="highlighter-rouge">localhost</code>, and maps to whatever ALB this service runs as.</p>
+<p>First off, we create a custom configuration for ElasticMQ, mostly to ensure that the endpoint URL is different than <code class="language-plaintext highlighter-rouge">localhost</code>, and maps to whatever ALB this service runs as.</p>
 
 <p>Here is the custom configuration:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>include classpath("application.conf")
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>include classpath("application.conf")
 
 node-address {
     protocol = http
@@ -228,130 +222,126 @@ queues {
 
 }
 
-</code></pre>
-</div>
-<p>Next we create the <code class="highlighter-rouge">Dockerfile</code>:</p>
+</code></pre></div></div>
+<p>Next we create the <code class="language-plaintext highlighter-rouge">Dockerfile</code>:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>FROM openjdk:8u151-alpine
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>FROM openjdk:8u151-alpine
 WORKDIR /tmp
 RUN wget  https://s3-eu-west-1.amazonaws.com/softwaremill-public/elasticmq-server-0.13.9.jar
 COPY custom.conf /tmp/
 EXPOSE 9324
 CMD  java -Dconfig.file=custom.conf -jar elasticmq-server-0.13.9.jar
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h2 id="build-and-deploy">Build and Deploy</h2>
 
 <p>To build the docker image :</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>$ git clone git@github.com:lobster1234/elasticmq-docker.git
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ git clone git@github.com:lobster1234/elasticmq-docker.git
 $ cd elasticmq-docker
 $ docker build .
 $ docker run -p9324:9324 &lt;image_id&gt;
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<p>I’ve pushed this image on dockerhub as <code class="highlighter-rouge">lobster1234/elasticmq-docker</code>. This can be used in ECS while creating the container definition.</p>
+<p>I’ve pushed this image on dockerhub as <code class="language-plaintext highlighter-rouge">lobster1234/elasticmq-docker</code>. This can be used in ECS while creating the container definition.</p>
 
-<p>As a reference, here is the task definition JSON for ECS.  As you can see, I’ve used <code class="highlighter-rouge">256MB</code> and <code class="highlighter-rouge">128vCPU</code> for this task. I’ve also used us-east-1, and called the task as <code class="highlighter-rouge">elasticmq</code>. Everything else is default ECS including log driver and IAM roles, etc.</p>
+<p>As a reference, here is the task definition JSON for ECS.  As you can see, I’ve used <code class="language-plaintext highlighter-rouge">256MB</code> and <code class="language-plaintext highlighter-rouge">128vCPU</code> for this task. I’ve also used us-east-1, and called the task as <code class="language-plaintext highlighter-rouge">elasticmq</code>. Everything else is default ECS including log driver and IAM roles, etc.</p>
 
-<div class="language-json highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="w">
-  </span><span class="nt">"executionRoleArn"</span><span class="p">:</span><span class="w"> </span><span class="s2">"arn:aws:iam::ACCOUNT_ID_HERE:role/ecsTaskExecutionRole"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"containerDefinitions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"executionRoleArn"</span><span class="p">:</span><span class="w"> </span><span class="s2">"arn:aws:iam::ACCOUNT_ID_HERE:role/ecsTaskExecutionRole"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"containerDefinitions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
     </span><span class="p">{</span><span class="w">
-      </span><span class="nt">"dnsSearchDomains"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"logConfiguration"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-        </span><span class="nt">"logDriver"</span><span class="p">:</span><span class="w"> </span><span class="s2">"awslogs"</span><span class="p">,</span><span class="w">
-        </span><span class="nt">"options"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-          </span><span class="nt">"awslogs-group"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/ecs/elasticmq"</span><span class="p">,</span><span class="w">
-          </span><span class="nt">"awslogs-region"</span><span class="p">:</span><span class="w"> </span><span class="s2">"us-east-1"</span><span class="p">,</span><span class="w">
-          </span><span class="nt">"awslogs-stream-prefix"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ecs"</span><span class="w">
+      </span><span class="nl">"dnsSearchDomains"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"logConfiguration"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"logDriver"</span><span class="p">:</span><span class="w"> </span><span class="s2">"awslogs"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"options"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"awslogs-group"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/ecs/elasticmq"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"awslogs-region"</span><span class="p">:</span><span class="w"> </span><span class="s2">"us-east-1"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"awslogs-stream-prefix"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ecs"</span><span class="w">
         </span><span class="p">}</span><span class="w">
       </span><span class="p">},</span><span class="w">
-      </span><span class="nt">"entryPoint"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"portMappings"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="nl">"entryPoint"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"portMappings"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
         </span><span class="p">{</span><span class="w">
-          </span><span class="nt">"hostPort"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
-          </span><span class="nt">"protocol"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tcp"</span><span class="p">,</span><span class="w">
-          </span><span class="nt">"containerPort"</span><span class="p">:</span><span class="w"> </span><span class="mi">9324</span><span class="w">
+          </span><span class="nl">"hostPort"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"protocol"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tcp"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"containerPort"</span><span class="p">:</span><span class="w"> </span><span class="mi">9324</span><span class="w">
         </span><span class="p">}</span><span class="w">
       </span><span class="p">],</span><span class="w">
-      </span><span class="nt">"command"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"linuxParameters"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"cpu"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"environment"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
-      </span><span class="nt">"ulimits"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"dnsServers"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"mountPoints"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
-      </span><span class="nt">"workingDirectory"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"dockerSecurityOptions"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"memory"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"memoryReservation"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"volumesFrom"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
-      </span><span class="nt">"image"</span><span class="p">:</span><span class="w"> </span><span class="s2">"lobster1234/elasticmq-docker"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"disableNetworking"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"healthCheck"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"essential"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"links"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"hostname"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"extraHosts"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"user"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"readonlyRootFilesystem"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"dockerLabels"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"privileged"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"elasticmq-container"</span><span class="w">
+      </span><span class="nl">"command"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"linuxParameters"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"cpu"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"environment"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+      </span><span class="nl">"ulimits"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"dnsServers"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"mountPoints"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+      </span><span class="nl">"workingDirectory"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"dockerSecurityOptions"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"memory"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"memoryReservation"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"volumesFrom"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+      </span><span class="nl">"image"</span><span class="p">:</span><span class="w"> </span><span class="s2">"lobster1234/elasticmq-docker"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"disableNetworking"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"healthCheck"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"essential"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"links"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"hostname"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"extraHosts"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"user"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"readonlyRootFilesystem"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"dockerLabels"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"privileged"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"elasticmq-container"</span><span class="w">
     </span><span class="p">}</span><span class="w">
   </span><span class="p">],</span><span class="w">
-  </span><span class="nt">"placementConstraints"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
-  </span><span class="nt">"memory"</span><span class="p">:</span><span class="w"> </span><span class="s2">"256"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"taskRoleArn"</span><span class="p">:</span><span class="w"> </span><span class="s2">"arn:aws:iam::ACCOUNT_ID_HERE:role/ecsTaskExecutionRole"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"compatibilities"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+  </span><span class="nl">"placementConstraints"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+  </span><span class="nl">"memory"</span><span class="p">:</span><span class="w"> </span><span class="s2">"256"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"taskRoleArn"</span><span class="p">:</span><span class="w"> </span><span class="s2">"arn:aws:iam::ACCOUNT_ID_HERE:role/ecsTaskExecutionRole"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"compatibilities"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
     </span><span class="s2">"EC2"</span><span class="w">
   </span><span class="p">],</span><span class="w">
-  </span><span class="nt">"taskDefinitionArn"</span><span class="p">:</span><span class="w"> </span><span class="s2">"arn:aws:ecs:us-east-1:ACCOUNT_ID_HERE:task-definition/elasticmq:1"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"family"</span><span class="p">:</span><span class="w"> </span><span class="s2">"elasticmq"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"requiresAttributes"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+  </span><span class="nl">"taskDefinitionArn"</span><span class="p">:</span><span class="w"> </span><span class="s2">"arn:aws:ecs:us-east-1:ACCOUNT_ID_HERE:task-definition/elasticmq:1"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"family"</span><span class="p">:</span><span class="w"> </span><span class="s2">"elasticmq"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"requiresAttributes"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
     </span><span class="p">{</span><span class="w">
-      </span><span class="nt">"targetId"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"targetType"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"com.amazonaws.ecs.capability.task-iam-role"</span><span class="w">
+      </span><span class="nl">"targetId"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"targetType"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"com.amazonaws.ecs.capability.task-iam-role"</span><span class="w">
     </span><span class="p">},</span><span class="w">
     </span><span class="p">{</span><span class="w">
-      </span><span class="nt">"targetId"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"targetType"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ecs.capability.execution-role-awslogs"</span><span class="w">
+      </span><span class="nl">"targetId"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"targetType"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ecs.capability.execution-role-awslogs"</span><span class="w">
     </span><span class="p">},</span><span class="w">
     </span><span class="p">{</span><span class="w">
-      </span><span class="nt">"targetId"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"targetType"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"com.amazonaws.ecs.capability.logging-driver.awslogs"</span><span class="w">
+      </span><span class="nl">"targetId"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"targetType"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"com.amazonaws.ecs.capability.logging-driver.awslogs"</span><span class="w">
     </span><span class="p">},</span><span class="w">
     </span><span class="p">{</span><span class="w">
-      </span><span class="nt">"targetId"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"targetType"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"com.amazonaws.ecs.capability.docker-remote-api.1.19"</span><span class="w">
+      </span><span class="nl">"targetId"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"targetType"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"value"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"com.amazonaws.ecs.capability.docker-remote-api.1.19"</span><span class="w">
     </span><span class="p">}</span><span class="w">
   </span><span class="p">],</span><span class="w">
-  </span><span class="nt">"requiresCompatibilities"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+  </span><span class="nl">"requiresCompatibilities"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
     </span><span class="s2">"EC2"</span><span class="w">
   </span><span class="p">],</span><span class="w">
-  </span><span class="nt">"networkMode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"bridge"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"cpu"</span><span class="p">:</span><span class="w"> </span><span class="s2">"128"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"revision"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ACTIVE"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"volumes"</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="w">
+  </span><span class="nl">"networkMode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"bridge"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"cpu"</span><span class="p">:</span><span class="w"> </span><span class="s2">"128"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"revision"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ACTIVE"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"volumes"</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <p>Next, you’d create an ECS Service using this task definition.</p>
 
-<p><strong>When you’d create a service using this task, create only 1 instance. You’d create a new listener on the ALB (preferably <code class="highlighter-rouge">port 9324</code>) with path as <code class="highlighter-rouge">/</code>. Please edit the health check for the target group to check for a <code class="highlighter-rouge">HTTP 404</code> and NOT <code class="highlighter-rouge">HTTP 200</code> under <code class="highlighter-rouge">Success Codes</code>.</strong></p>
+<p><strong>When you’d create a service using this task, create only 1 instance. You’d create a new listener on the ALB (preferably <code class="language-plaintext highlighter-rouge">port 9324</code>) with path as <code class="language-plaintext highlighter-rouge">/</code>. Please edit the health check for the target group to check for a <code class="language-plaintext highlighter-rouge">HTTP 404</code> and NOT <code class="language-plaintext highlighter-rouge">HTTP 200</code> under <code class="language-plaintext highlighter-rouge">Success Codes</code>.</strong></p>
 
 <p><strong>If not, then you’d end up getting unhealthy hosts and infinite drain and initial cycles.</strong></p>
 
@@ -359,7 +349,7 @@ $ docker run -p9324:9324 &lt;image_id&gt;
 
 <p>I’ll use <a href="https://github.com/awslabs/aws-shell">aws-shell</a> to verify that our ElasticMQ service is working as we expect.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sqs create-queue --queue-name manish_test_queue --endpoint-url http://your_alb_dns_name:9324
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>aws&gt; sqs create-queue --queue-name manish_test_queue --endpoint-url http://your_alb_dns_name:9324
 {
     "QueueUrl": "http://your_alb_dns_name:9324/queue/manish_test_queue"
 }
@@ -389,8 +379,7 @@ aws&gt; sqs receive-message --queue-url http://your_alb_dns_name:9324/queue/mani
     ]
 }
 
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>Hope this helps with running ElasticMQ under ECS. Questions or comments? Please let me know!</p>
 

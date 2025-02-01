@@ -31,35 +31,29 @@
   
   
 
-  <script type="text/javascript">
-  WebFontConfig = {
-    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
-  };
-  (function(d) {
-    var wf = d.createElement('script'), s = d.scripts[0];
-    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
-    wf.async = true;
-    s.parentNode.insertBefore(wf, s);
-  })(document);
-</script>
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet">
 
   
-  <!-- Google Analytics -->
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    ga('create', 'UA-96931340-1', 'auto');
-    ga('send', 'pageview');
+      ga('create', 'UA-96931340-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  
 
-  </script>
 
-
-  <!-- Begin Jekyll SEO tag v2.4.0 -->
+  <!-- Begin Jekyll SEO tag v2.6.1 -->
 <title>AWS Lambda with Serverless Framework and Java/Maven - Part 3 | Manish Pandit’s Blog</title>
-<meta name="generator" content="Jekyll v3.4.3" />
+<meta name="generator" content="Jekyll v4.3.4" />
 <meta property="og:title" content="AWS Lambda with Serverless Framework and Java/Maven - Part 3" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
@@ -72,7 +66,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2017-04-15T23:44:37-07:00" />
 <script type="application/ld+json">
-{"description":"In this final post of the series on Java-based Serverless Lambda API, we will invoke the Transactions API using the Amazon API Gateway. As Lambda is evented, the HTTP endpoints exposed via the Amazon API Gateway will act as the event to trigger the function synchronously. If you have been following the earlier two posts, by the end of this post you will be comfortable building RESTful APIs using AWS Lambda, Java, DynamoDB (or any persistence layer), API Gateway - all put together using simple configuration in Serverless Framework.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"BlogPosting","url":"https://lobster1234.github.io/2017/04/15/serverless-framework-api-gateway-lambda-proxy/","image":"https://lobster1234.github.io/assets/serverless-blog.jpg","headline":"AWS Lambda with Serverless Framework and Java/Maven - Part 3","dateModified":"2017-04-15T23:44:37-07:00","datePublished":"2017-04-15T23:44:37-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/04/15/serverless-framework-api-gateway-lambda-proxy/"},"@context":"http://schema.org"}</script>
+{"url":"https://lobster1234.github.io/2017/04/15/serverless-framework-api-gateway-lambda-proxy/","description":"In this final post of the series on Java-based Serverless Lambda API, we will invoke the Transactions API using the Amazon API Gateway. As Lambda is evented, the HTTP endpoints exposed via the Amazon API Gateway will act as the event to trigger the function synchronously. If you have been following the earlier two posts, by the end of this post you will be comfortable building RESTful APIs using AWS Lambda, Java, DynamoDB (or any persistence layer), API Gateway - all put together using simple configuration in Serverless Framework.","author":{"@type":"Person","name":"Manish Pandit"},"image":"https://lobster1234.github.io/assets/serverless-blog.jpg","headline":"AWS Lambda with Serverless Framework and Java/Maven - Part 3","dateModified":"2017-04-15T23:44:37-07:00","datePublished":"2017-04-15T23:44:37-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/04/15/serverless-framework-api-gateway-lambda-proxy/"},"@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -489,53 +483,51 @@
 
 <h3 id="lambda-proxy-integration">Lambda Proxy Integration</h3>
 
-<p>We will be integrating the Lambdas in an integration pattern commonly referred to as <a href="http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html#api-gateway-proxy-integration-types" target="_blank_">Lambda Proxy Integration</a>, which means that the function(s) will get entire HTTP request <em>as-is</em> in the form of the input payload. This payload contains the entire request including the headers, query parameters, path parameters, and the body, as documented <a href="http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html#api-gateway-simple-proxy-for-Lambda-input-format" target="_blank_">here</a>. While the function has full control on rendering the response body, code, and headers, the response is expected to be in a particular format, as documented <a href="http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html#api-gateway-simple-proxy-for-Lambda-output-format" target="_blank_">here</a>. Serverless Framework creates an <code class="highlighter-rouge">ApiGatewayResponse</code> class as a part of the scaffolding which does exactly that. If you notice, the Transactions API code uses that class to marshal the response.</p>
+<p>We will be integrating the Lambdas in an integration pattern commonly referred to as <a href="http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html#api-gateway-proxy-integration-types" target="_blank_">Lambda Proxy Integration</a>, which means that the function(s) will get entire HTTP request <em>as-is</em> in the form of the input payload. This payload contains the entire request including the headers, query parameters, path parameters, and the body, as documented <a href="http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html#api-gateway-simple-proxy-for-Lambda-input-format" target="_blank_">here</a>. While the function has full control on rendering the response body, code, and headers, the response is expected to be in a particular format, as documented <a href="http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html#api-gateway-simple-proxy-for-Lambda-output-format" target="_blank_">here</a>. Serverless Framework creates an <code class="language-plaintext highlighter-rouge">ApiGatewayResponse</code> class as a part of the scaffolding which does exactly that. If you notice, the Transactions API code uses that class to marshal the response.</p>
 
 <p>By default, Serverless Framework uses the Lambda Proxy Integration for API Gateway.</p>
 
 <h3 id="configuring-serverless-to-define-endpoints">Configuring Serverless To Define Endpoints</h3>
 
-<p>The API endpoints will need to be defined in <code class="highlighter-rouge">serverless.yml</code>, where we have defined the function resources, IAM permissions, and handlers among other things. The API Gateway configuration is a part of the function definition. Add the following under the <code class="highlighter-rouge">handler</code> section for the two functions.</p>
+<p>The API endpoints will need to be defined in <code class="language-plaintext highlighter-rouge">serverless.yml</code>, where we have defined the function resources, IAM permissions, and handlers among other things. The API Gateway configuration is a part of the function definition. Add the following under the <code class="language-plaintext highlighter-rouge">handler</code> section for the two functions.</p>
 
-<p>For the <code class="highlighter-rouge">GET /accounts/:account_id/transactions</code> endpoint -</p>
+<p>For the <code class="language-plaintext highlighter-rouge">GET /accounts/:account_id/transactions</code> endpoint -</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>get-transactions:
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>get-transactions:
     handler: com.serverless.GetTransactionsHandler
     events:
       - http:
           path: /accounts/{account_id}/transactions
           method: get
 
-</code></pre>
-</div>
-<p>For the <code class="highlighter-rouge">POST /accounts/account_id/transactions</code> endpoint -</p>
+</code></pre></div></div>
+<p>For the <code class="language-plaintext highlighter-rouge">POST /accounts/account_id/transactions</code> endpoint -</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>post-transaction:
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>post-transaction:
   handler: com.serverless.PostTransactionsHandler
   events:
     - http:
         path: /accounts/{account_id}/transactions
         method: post
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<p>Lambda functions need an event to be triggered. The API Gateway invocation is one of the many events supported by AWS Lambda. Hence, we define <code class="highlighter-rouge">http</code> as the event under the function definition. Note that we can add more such events in the configuration, but for now we focus on HTTP invocation via the API Gateway. The endpoints will be <code class="highlighter-rouge">https</code>, so do not worry about calling the event as <code class="highlighter-rouge">http</code> here. Next, we provide more information about the <code class="highlighter-rouge">http</code> integration, namely the <code class="highlighter-rouge">path</code> and <code class="highlighter-rouge">method</code>. Notice the path parameter, <code class="highlighter-rouge"><span class="p">{</span><span class="err">account_id</span><span class="p">}</span></code> in the <code class="highlighter-rouge">path</code>.</p>
+<p>Lambda functions need an event to be triggered. The API Gateway invocation is one of the many events supported by AWS Lambda. Hence, we define <code class="language-plaintext highlighter-rouge">http</code> as the event under the function definition. Note that we can add more such events in the configuration, but for now we focus on HTTP invocation via the API Gateway. The endpoints will be <code class="language-plaintext highlighter-rouge">https</code>, so do not worry about calling the event as <code class="language-plaintext highlighter-rouge">http</code> here. Next, we provide more information about the <code class="language-plaintext highlighter-rouge">http</code> integration, namely the <code class="language-plaintext highlighter-rouge">path</code> and <code class="language-plaintext highlighter-rouge">method</code>. Notice the path parameter, <code class="language-plaintext highlighter-rouge">{account_id}</code> in the <code class="language-plaintext highlighter-rouge">path</code>.</p>
 
-<p>For more details on the <code class="highlighter-rouge">serverless.yml</code> configuration for API Gateway, refer to Serverless Framework API Gateway documentation <a href="https://serverless.com/framework/docs/providers/aws/events/apigateway/" target="_blank_">here</a>.</p>
+<p>For more details on the <code class="language-plaintext highlighter-rouge">serverless.yml</code> configuration for API Gateway, refer to Serverless Framework API Gateway documentation <a href="https://serverless.com/framework/docs/providers/aws/events/apigateway/" target="_blank_">here</a>.</p>
 
 <h3 id="deploying-the-api">Deploying the API</h3>
 
-<p>Now that we have configured the event and the endpoint, we are all set to deploy the Serverless project. Before we do that, we need to attach the IAM policy to the <code class="highlighter-rouge">serverless</code> user in order to administer the API Gateway. Remember, we are using this user’s credentials for the Serverless Framework. This is different than the <a href="http://docs.aws.amazon.com/lambda/latest/dg/intro-permission-model.html" target="_blank_">Lambda Execution Role</a> that was configured in the last post.</p>
+<p>Now that we have configured the event and the endpoint, we are all set to deploy the Serverless project. Before we do that, we need to attach the IAM policy to the <code class="language-plaintext highlighter-rouge">serverless</code> user in order to administer the API Gateway. Remember, we are using this user’s credentials for the Serverless Framework. This is different than the <a href="http://docs.aws.amazon.com/lambda/latest/dg/intro-permission-model.html" target="_blank_">Lambda Execution Role</a> that was configured in the last post.</p>
 
-<p>Log in to the AWS console, and click the <code class="highlighter-rouge">Serverless</code> group we had created in Part-1. Click on <code class="highlighter-rouge">Attach Policy</code>, Search for <code class="highlighter-rouge">APIGateway</code>, and add the <code class="highlighter-rouge">AmazonAPIGatewayAdministrator</code> policy to the group.</p>
+<p>Log in to the AWS console, and click the <code class="language-plaintext highlighter-rouge">Serverless</code> group we had created in Part-1. Click on <code class="language-plaintext highlighter-rouge">Attach Policy</code>, Search for <code class="language-plaintext highlighter-rouge">APIGateway</code>, and add the <code class="language-plaintext highlighter-rouge">AmazonAPIGatewayAdministrator</code> policy to the group.</p>
 
 <p>The final set of policies should look like this -</p>
 
 <p><img src="https://lobster1234.github.io/assets/serverless-group.png" alt="IAM Group" /></p>
 
-<p>Once done, we run the now familiar <code class="highlighter-rouge">serverless deploy</code> command.</p>
+<p>Once done, we run the now familiar <code class="language-plaintext highlighter-rouge">serverless deploy</code> command.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ serverless deploy
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ serverless deploy
 Serverless: Uploading CloudFormation file to S3...
 Serverless: Uploading service .zip file to S3 (7.57 MB)...
 Serverless: Updating Stack...
@@ -555,98 +547,94 @@ functions:
   get-transactions: transactions-api-dev-get-transactions
   post-transaction: transactions-api-dev-post-transaction
 
-</code></pre>
-</div>
-<p>If we compare the output of this command to the one we got during deploying just the functions, we see that we get additional information in terms of the endpoints. I’ve masked the endpoint with <code class="highlighter-rouge">aaaaaa</code>. This is referred to as an <code class="highlighter-rouge">appID</code>.</p>
+</code></pre></div></div>
+<p>If we compare the output of this command to the one we got during deploying just the functions, we see that we get additional information in terms of the endpoints. I’ve masked the endpoint with <code class="language-plaintext highlighter-rouge">aaaaaa</code>. This is referred to as an <code class="language-plaintext highlighter-rouge">appID</code>.</p>
 
 <h3 id="testing-the-endpoints">Testing the Endpoints</h3>
 
-<p>We can use <code class="highlighter-rouge">curl</code> or any handy HTTP client to hit the two endpoints.</p>
+<p>We can use <code class="language-plaintext highlighter-rouge">curl</code> or any handy HTTP client to hit the two endpoints.</p>
 
-<p>First we <code class="highlighter-rouge">POST</code> a transaction.</p>
+<p>First we <code class="language-plaintext highlighter-rouge">POST</code> a transaction.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ curl -X POST https://aaaaaa.execute-api.us-east-1.amazonaws.com/dev/accounts/1234/transactions -d '{"transaction_id":"foo", "amount": 20.50}'
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ curl -X POST https://aaaaaa.execute-api.us-east-1.amazonaws.com/dev/accounts/1234/transactions -d '{"transaction_id":"foo", "amount": 20.50}'
 
 {"message":"Transaction added successfully!","input":{"resource":"/accounts/{account_id}/transactions","path":"/accounts/1234/transactions","httpMethod":"POST","headers":{"Accept":"*/*","CloudFront-Forwarded-Proto":"https","CloudFront-Is-Desktop-Viewer":"true","CloudFront-Is-Mobile-Viewer":"false","CloudFront-Is-SmartTV-Viewer":"false","CloudFront-Is-Tablet-Viewer":"false","CloudFront-Viewer-Country":"US","Content-Type":"application/x-www-form-urlencoded","Host":"aaaaaa.execute-api.us-east-1.amazonaws.com","User-Agent":"curl/7.51.0","Via":"1.1 939ea9d62ec616846d41b16cea0dc65b.cloudfront.net (CloudFront)","X-Amz-Cf-Id":"YFSlfpQhMoyUk7xw1MwaHrC55oS-kL68gc9Of-hIa68bSr_61eK2Jw==","X-Amzn-Trace-Id":"Root=1-58f327f0-5c9c884966463c313adaf2b5","X-Forwarded-For":"73.111.62.170, 54.239.203.116","X-Forwarded-Port":"443","X-Forwarded-Proto":"https"},"queryStringParameters":null,"pathParameters":{"account_id":"1234"},"stageVariables":null,"requestContext":{"accountId":"123456789012","resourceId":"6otyx5","stage":"dev","requestId":"bd4b3165-227c-11e7-baa4-61d7c2f92db9","identity":{"cognitoIdentityPoolId":null,"accountId":null,"cognitoIdentityId":null,"caller":null,"apiKey":null,"sourceIp":"73.111.62.170","accessKey":null,"cognitoAuthenticationType":null,"cognitoAuthenticationProvider":null,"userArn":null,"userAgent":"curl/7.51.0","user":null},"resourcePath":"/accounts/{account_id}/transactions","httpMethod":"POST","apiId":"aaaaaa"},"body":"{\"transaction_id\":\"foo\", \"amount\": 20.50}","isBase64Encoded":false}}
 
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<p>Notice the long response - this is because in the code for <code class="highlighter-rouge">PutTransactionsHandler.java</code>, we’re adding the input as a part of the response (for troubleshooting). This input should also confirm our understanding of Lambda Proxy Integration. Formatted correctly, this is what the function got as a input from the AWS API Gateway -</p>
+<p>Notice the long response - this is because in the code for <code class="language-plaintext highlighter-rouge">PutTransactionsHandler.java</code>, we’re adding the input as a part of the response (for troubleshooting). This input should also confirm our understanding of Lambda Proxy Integration. Formatted correctly, this is what the function got as a input from the AWS API Gateway -</p>
 
-<div class="language-json highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="w">
-   </span><span class="nt">"resource"</span><span class="p">:</span><span class="s2">"/accounts/{account_id}/transactions"</span><span class="p">,</span><span class="w">
-   </span><span class="nt">"path"</span><span class="p">:</span><span class="s2">"/accounts/1234/transactions"</span><span class="p">,</span><span class="w">
-   </span><span class="nt">"httpMethod"</span><span class="p">:</span><span class="s2">"POST"</span><span class="p">,</span><span class="w">
-   </span><span class="nt">"headers"</span><span class="p">:{</span><span class="w">
-      </span><span class="nt">"Accept"</span><span class="p">:</span><span class="s2">"*/*"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"CloudFront-Forwarded-Proto"</span><span class="p">:</span><span class="s2">"https"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"CloudFront-Is-Desktop-Viewer"</span><span class="p">:</span><span class="s2">"true"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"CloudFront-Is-Mobile-Viewer"</span><span class="p">:</span><span class="s2">"false"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"CloudFront-Is-SmartTV-Viewer"</span><span class="p">:</span><span class="s2">"false"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"CloudFront-Is-Tablet-Viewer"</span><span class="p">:</span><span class="s2">"false"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"CloudFront-Viewer-Country"</span><span class="p">:</span><span class="s2">"US"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"Content-Type"</span><span class="p">:</span><span class="s2">"application/x-www-form-urlencoded"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"Host"</span><span class="p">:</span><span class="s2">"aaaaaa.execute-api.us-east-1.amazonaws.com"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"User-Agent"</span><span class="p">:</span><span class="s2">"curl/7.51.0"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"Via"</span><span class="p">:</span><span class="s2">"1.1 939ea9d62ec616846d41b16cea0dc65b.cloudfront.net (CloudFront)"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"X-Amz-Cf-Id"</span><span class="p">:</span><span class="s2">"YFSlfpQhMoyUk7xw1MwaHrC55oS-kL68gc9Of-hIa68bSr_61eK2Jw=="</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"X-Amzn-Trace-Id"</span><span class="p">:</span><span class="s2">"Root=1-58f327f0-5c9c884966463c313adaf2b5"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"X-Forwarded-For"</span><span class="p">:</span><span class="s2">"73.111.62.170, 54.239.203.116"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"X-Forwarded-Port"</span><span class="p">:</span><span class="s2">"443"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"X-Forwarded-Proto"</span><span class="p">:</span><span class="s2">"https"</span><span class="w">
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+   </span><span class="nl">"resource"</span><span class="p">:</span><span class="s2">"/accounts/{account_id}/transactions"</span><span class="p">,</span><span class="w">
+   </span><span class="nl">"path"</span><span class="p">:</span><span class="s2">"/accounts/1234/transactions"</span><span class="p">,</span><span class="w">
+   </span><span class="nl">"httpMethod"</span><span class="p">:</span><span class="s2">"POST"</span><span class="p">,</span><span class="w">
+   </span><span class="nl">"headers"</span><span class="p">:{</span><span class="w">
+      </span><span class="nl">"Accept"</span><span class="p">:</span><span class="s2">"*/*"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"CloudFront-Forwarded-Proto"</span><span class="p">:</span><span class="s2">"https"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"CloudFront-Is-Desktop-Viewer"</span><span class="p">:</span><span class="s2">"true"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"CloudFront-Is-Mobile-Viewer"</span><span class="p">:</span><span class="s2">"false"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"CloudFront-Is-SmartTV-Viewer"</span><span class="p">:</span><span class="s2">"false"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"CloudFront-Is-Tablet-Viewer"</span><span class="p">:</span><span class="s2">"false"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"CloudFront-Viewer-Country"</span><span class="p">:</span><span class="s2">"US"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"Content-Type"</span><span class="p">:</span><span class="s2">"application/x-www-form-urlencoded"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"Host"</span><span class="p">:</span><span class="s2">"aaaaaa.execute-api.us-east-1.amazonaws.com"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"User-Agent"</span><span class="p">:</span><span class="s2">"curl/7.51.0"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"Via"</span><span class="p">:</span><span class="s2">"1.1 939ea9d62ec616846d41b16cea0dc65b.cloudfront.net (CloudFront)"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"X-Amz-Cf-Id"</span><span class="p">:</span><span class="s2">"YFSlfpQhMoyUk7xw1MwaHrC55oS-kL68gc9Of-hIa68bSr_61eK2Jw=="</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"X-Amzn-Trace-Id"</span><span class="p">:</span><span class="s2">"Root=1-58f327f0-5c9c884966463c313adaf2b5"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"X-Forwarded-For"</span><span class="p">:</span><span class="s2">"73.111.62.170, 54.239.203.116"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"X-Forwarded-Port"</span><span class="p">:</span><span class="s2">"443"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"X-Forwarded-Proto"</span><span class="p">:</span><span class="s2">"https"</span><span class="w">
    </span><span class="p">},</span><span class="w">
-   </span><span class="nt">"queryStringParameters"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="w">
-   </span><span class="nt">"pathParameters"</span><span class="p">:{</span><span class="w">
-      </span><span class="nt">"account_id"</span><span class="p">:</span><span class="s2">"1234"</span><span class="w">
+   </span><span class="nl">"queryStringParameters"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="w">
+   </span><span class="nl">"pathParameters"</span><span class="p">:{</span><span class="w">
+      </span><span class="nl">"account_id"</span><span class="p">:</span><span class="s2">"1234"</span><span class="w">
    </span><span class="p">},</span><span class="w">
-   </span><span class="nt">"stageVariables"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="w">
-   </span><span class="nt">"requestContext"</span><span class="p">:{</span><span class="w">
-      </span><span class="nt">"accountId"</span><span class="p">:</span><span class="s2">"123456789012"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"resourceId"</span><span class="p">:</span><span class="s2">"6otyx5"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"stage"</span><span class="p">:</span><span class="s2">"dev"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"requestId"</span><span class="p">:</span><span class="s2">"bd4b3165-227c-11e7-baa4-61d7c2f92db9"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"identity"</span><span class="p">:{</span><span class="w">
-         </span><span class="nt">"cognitoIdentityPoolId"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="w">
-         </span><span class="nt">"accountId"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="w">
-         </span><span class="nt">"cognitoIdentityId"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="w">
-         </span><span class="nt">"caller"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="w">
-         </span><span class="nt">"apiKey"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="w">
-         </span><span class="nt">"sourceIp"</span><span class="p">:</span><span class="s2">"73.111.62.170"</span><span class="p">,</span><span class="w">
-         </span><span class="nt">"accessKey"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="w">
-         </span><span class="nt">"cognitoAuthenticationType"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="w">
-         </span><span class="nt">"cognitoAuthenticationProvider"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="w">
-         </span><span class="nt">"userArn"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="w">
-         </span><span class="nt">"userAgent"</span><span class="p">:</span><span class="s2">"curl/7.51.0"</span><span class="p">,</span><span class="w">
-         </span><span class="nt">"user"</span><span class="p">:</span><span class="kc">null</span><span class="w">
+   </span><span class="nl">"stageVariables"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="w">
+   </span><span class="nl">"requestContext"</span><span class="p">:{</span><span class="w">
+      </span><span class="nl">"accountId"</span><span class="p">:</span><span class="s2">"123456789012"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"resourceId"</span><span class="p">:</span><span class="s2">"6otyx5"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"stage"</span><span class="p">:</span><span class="s2">"dev"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"requestId"</span><span class="p">:</span><span class="s2">"bd4b3165-227c-11e7-baa4-61d7c2f92db9"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"identity"</span><span class="p">:{</span><span class="w">
+         </span><span class="nl">"cognitoIdentityPoolId"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="w">
+         </span><span class="nl">"accountId"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="w">
+         </span><span class="nl">"cognitoIdentityId"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="w">
+         </span><span class="nl">"caller"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="w">
+         </span><span class="nl">"apiKey"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="w">
+         </span><span class="nl">"sourceIp"</span><span class="p">:</span><span class="s2">"73.111.62.170"</span><span class="p">,</span><span class="w">
+         </span><span class="nl">"accessKey"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="w">
+         </span><span class="nl">"cognitoAuthenticationType"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="w">
+         </span><span class="nl">"cognitoAuthenticationProvider"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="w">
+         </span><span class="nl">"userArn"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="w">
+         </span><span class="nl">"userAgent"</span><span class="p">:</span><span class="s2">"curl/7.51.0"</span><span class="p">,</span><span class="w">
+         </span><span class="nl">"user"</span><span class="p">:</span><span class="kc">null</span><span class="w">
       </span><span class="p">},</span><span class="w">
-      </span><span class="nt">"resourcePath"</span><span class="p">:</span><span class="s2">"/accounts/{account_id}/transactions"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"httpMethod"</span><span class="p">:</span><span class="s2">"POST"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"apiId"</span><span class="p">:</span><span class="s2">"aaaaaa"</span><span class="w">
+      </span><span class="nl">"resourcePath"</span><span class="p">:</span><span class="s2">"/accounts/{account_id}/transactions"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"httpMethod"</span><span class="p">:</span><span class="s2">"POST"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"apiId"</span><span class="p">:</span><span class="s2">"aaaaaa"</span><span class="w">
    </span><span class="p">},</span><span class="w">
-   </span><span class="nt">"body"</span><span class="p">:</span><span class="s2">"{\"transaction_id\":\"foo\", \"amount\": 20.50}"</span><span class="p">,</span><span class="w">
-   </span><span class="nt">"isBase64Encoded"</span><span class="p">:</span><span class="kc">false</span><span class="w">
+   </span><span class="nl">"body"</span><span class="p">:</span><span class="s2">"{</span><span class="se">\"</span><span class="s2">transaction_id</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">foo</span><span class="se">\"</span><span class="s2">, </span><span class="se">\"</span><span class="s2">amount</span><span class="se">\"</span><span class="s2">: 20.50}"</span><span class="p">,</span><span class="w">
+   </span><span class="nl">"isBase64Encoded"</span><span class="p">:</span><span class="kc">false</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
-<p>Lets <code class="highlighter-rouge">GET</code> the transaction that has just posted, via <code class="highlighter-rouge">curl</code> again.</p>
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ curl  https://aaaaaa.execute-api.us-east-1.amazonaws.com/dev/accounts/1234/transactions
+<p>Lets <code class="language-plaintext highlighter-rouge">GET</code> the transaction that has just posted, via <code class="language-plaintext highlighter-rouge">curl</code> again.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ curl  https://aaaaaa.execute-api.us-east-1.amazonaws.com/dev/accounts/1234/transactions
 [{"account_id":"1234","transaction_date":1492330481722,"transaction_id":"foo","amount":20.5}]
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<p>Since we are not passing the <code class="highlighter-rouge">input</code> as a part of the output in <code class="highlighter-rouge">GetTransactionsHandler</code>, we do not see the extra information. However, we do return the input in case of an exception, again, for troubleshooting purposes.</p>
+<p>Since we are not passing the <code class="language-plaintext highlighter-rouge">input</code> as a part of the output in <code class="language-plaintext highlighter-rouge">GetTransactionsHandler</code>, we do not see the extra information. However, we do return the input in case of an exception, again, for troubleshooting purposes.</p>
 
-<p>You will also notice a delay (as much as 5-10 seconds) for the first invocation. This is called the <code class="highlighter-rouge">cold start</code> time, and as developers we’ve to be aware of this. Specially with compiled languages like Java and C#, the start/boot time for a Lambda may exceed the SLA you may have - something to be mindful about.</p>
+<p>You will also notice a delay (as much as 5-10 seconds) for the first invocation. This is called the <code class="language-plaintext highlighter-rouge">cold start</code> time, and as developers we’ve to be aware of this. Specially with compiled languages like Java and C#, the start/boot time for a Lambda may exceed the SLA you may have - something to be mindful about.</p>
 
 <p>The more <em>infrequently</em> the Lambda is invoked, <em>greater</em> the cold start cost. There are plenty of <em>workarounds</em> to address the cold start problem, I will cover some in a separate post as well.</p>
 
 <h3 id="cleanup">Cleanup</h3>
 
-<p>If you wish to remove the AWS infrastructure created as a part of this project, use the following command to do so. This will remove the IAM roles, any resources defined in <code class="highlighter-rouge">serverless.yml</code>, and destroy the CloudFormation stack.</p>
+<p>If you wish to remove the AWS infrastructure created as a part of this project, use the following command to do so. This will remove the IAM roles, any resources defined in <code class="language-plaintext highlighter-rouge">serverless.yml</code>, and destroy the CloudFormation stack.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ serverless remove
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ serverless remove
 Serverless: Getting all objects in S3 bucket...
 Serverless: Removing objects in S3 bucket...
 Serverless: Removing Stack...
@@ -654,8 +642,7 @@ Serverless: Checking Stack removal progress...
 ..................................
 Serverless: Stack removal finished...
 
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h2 id="summary">Summary</h2>
 

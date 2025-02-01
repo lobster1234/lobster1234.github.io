@@ -31,35 +31,29 @@
   
   
 
-  <script type="text/javascript">
-  WebFontConfig = {
-    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
-  };
-  (function(d) {
-    var wf = d.createElement('script'), s = d.scripts[0];
-    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
-    wf.async = true;
-    s.parentNode.insertBefore(wf, s);
-  })(document);
-</script>
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet">
 
   
-  <!-- Google Analytics -->
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    ga('create', 'UA-96931340-1', 'auto');
-    ga('send', 'pageview');
+      ga('create', 'UA-96931340-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  
 
-  </script>
 
-
-  <!-- Begin Jekyll SEO tag v2.4.0 -->
+  <!-- Begin Jekyll SEO tag v2.6.1 -->
 <title>Caching - Gotchas &amp; Lessons Learned | Manish Pandit’s Blog</title>
-<meta name="generator" content="Jekyll v3.4.3" />
+<meta name="generator" content="Jekyll v4.3.4" />
 <meta property="og:title" content="Caching - Gotchas &amp; Lessons Learned" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
@@ -72,7 +66,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2017-07-05T23:44:37-07:00" />
 <script type="application/ld+json">
-{"description":"It has been said time and again - “There are only two hard things in Computer Science: cache invalidation and naming things”. Having run into both of these problems in my professional career, I figured I could write a post, summarizing the lessons I have learned along the way by seeing and building various caching architectures across many companies, big and small. Just like threading, caching is easy to code, but often creates more problems than it intends to solve. These problems can arise from - you guessed it - invalidation, sub-par efficiency, inconsistency, and many more. It is also one of my favorite topics for technical interviews :)","author":{"@type":"Person","name":"Manish Pandit"},"@type":"BlogPosting","url":"https://lobster1234.github.io/2017/07/05/caching-gotchas-and-lessons-learned/","image":"https://lobster1234.github.io/assets/caching.png","headline":"Caching - Gotchas &amp; Lessons Learned","dateModified":"2017-07-05T23:44:37-07:00","datePublished":"2017-07-05T23:44:37-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/07/05/caching-gotchas-and-lessons-learned/"},"@context":"http://schema.org"}</script>
+{"url":"https://lobster1234.github.io/2017/07/05/caching-gotchas-and-lessons-learned/","description":"It has been said time and again - “There are only two hard things in Computer Science: cache invalidation and naming things”. Having run into both of these problems in my professional career, I figured I could write a post, summarizing the lessons I have learned along the way by seeing and building various caching architectures across many companies, big and small. Just like threading, caching is easy to code, but often creates more problems than it intends to solve. These problems can arise from - you guessed it - invalidation, sub-par efficiency, inconsistency, and many more. It is also one of my favorite topics for technical interviews :)","author":{"@type":"Person","name":"Manish Pandit"},"image":"https://lobster1234.github.io/assets/caching.png","headline":"Caching - Gotchas &amp; Lessons Learned","dateModified":"2017-07-05T23:44:37-07:00","datePublished":"2017-07-05T23:44:37-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/07/05/caching-gotchas-and-lessons-learned/"},"@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -268,7 +262,7 @@
 
 <p>By definition, a <em>cache</em> is a storage which stores the result from a previous data access, in order to make it available more efficiently for future accesses. Cached data usually has a defined <em>time to live</em>, or <em>TTL</em> so it can be evicted, and replaced with more recent state. When data is found in the cache, it is called a <em>hit</em>, and a failure results in a <em>miss</em>. When a <em>miss</em> happens, the underlying data store is accessed, and the result is placed in the cache with a <em>TTL</em>, and the cycle goes on.</p>
 
-<p><em>Hit ratio</em> (<code class="highlighter-rouge">nHits:nMisses</code>) is a metric used to measure caching efficiency - a higher <em>hit ratio</em> would mean efficient caching, while a lower <em>hit ratio</em> would mean the cache is not really helping as much as it should. This is the case when the cached data is highly mutable, and gets <em>invalidated</em> way too often to be of any value for future requests.</p>
+<p><em>Hit ratio</em> (<code class="language-plaintext highlighter-rouge">nHits:nMisses</code>) is a metric used to measure caching efficiency - a higher <em>hit ratio</em> would mean efficient caching, while a lower <em>hit ratio</em> would mean the cache is not really helping as much as it should. This is the case when the cached data is highly mutable, and gets <em>invalidated</em> way too often to be of any value for future requests.</p>
 
 <p>With this introduction, here are the lessons learned, and best practices:</p>
 
@@ -279,7 +273,7 @@
 <p>A cache can be <em>in-process</em> (taking the memory space of the application server), or <em>global</em> (out-of-process). For example, <a href="http://www.ehcache.org/" target="_blank_">EHCache</a> is an in-process cache, while <a href="https://memcached.org/" target="_blank_">Memcached</a> or <a href="https://redis.io" target="_blank_">Redis</a> are global cache servers. There are pros and cons to these. Some architectures also do a mix-and-match, which is why knowing your data usage patterns is the first step in designing a good caching strategy. The in-process cache will add state to the server, and, if in a cluster, there is a good chance each instance will end up with a different state of the data, causing inconsistency. However, for immutable data, in-process caches work great. As does a simple Map. Global caches hold a <em>shared state</em> of the application, but need extra infrastructure. Global caches can be clustered, and provide a single, consistent view of cached data.</p>
 
 <h1 id="3-design-for-high-availability">3. Design for High Availability</h1>
-<p>In-process caches are more available than global caches if we mitigate the consistency issues. Global caches are a different story. In the event of global caches failures, based on the client, the connections will time out, thereby taking up network time and locking threads. A failure will also cause a huge load on the back end, snowballing into increased database contention, possibly rippling across multiple applications which are relying on your application’s API. Highly available caching is implemented via cache replication and/or persistent caches. This replication can happen via shards, and/or in a master/slave type configuration. <a href="https://www.couchbase.com" target="_blank_">Couchbase</a> provides replication via Couchbase cluster. Redis provides a highly available <a href="https://redis.io/topics/sentinel" target="_blank_">Redis Sentinel</a>. Consider these servers instead of inventing one of your own, unless absolutely necessary. <a href="https://varnish-cache.org/" target="_blank_">Varnish HTTP Cache</a> is an HTTP cache, useful for caching HTTP responses with a built in <code class="highlighter-rouge">grace period</code>, where the cache serves stale data for an amount of time even if the back-end is unavailable.</p>
+<p>In-process caches are more available than global caches if we mitigate the consistency issues. Global caches are a different story. In the event of global caches failures, based on the client, the connections will time out, thereby taking up network time and locking threads. A failure will also cause a huge load on the back end, snowballing into increased database contention, possibly rippling across multiple applications which are relying on your application’s API. Highly available caching is implemented via cache replication and/or persistent caches. This replication can happen via shards, and/or in a master/slave type configuration. <a href="https://www.couchbase.com" target="_blank_">Couchbase</a> provides replication via Couchbase cluster. Redis provides a highly available <a href="https://redis.io/topics/sentinel" target="_blank_">Redis Sentinel</a>. Consider these servers instead of inventing one of your own, unless absolutely necessary. <a href="https://varnish-cache.org/" target="_blank_">Varnish HTTP Cache</a> is an HTTP cache, useful for caching HTTP responses with a built in <code class="language-plaintext highlighter-rouge">grace period</code>, where the cache serves stale data for an amount of time even if the back-end is unavailable.</p>
 
 <h1 id="4-beware-of-cache-hotspots">4. Beware of Cache Hotspots</h1>
 <p>Hotspots are created when a value tied to key becomes all too popular. An example can be a breaking news story cached in one of the servers. In this event, the global server containing the key being accessed heavily ends up degrading performance for other keys on the same server. This can be avoided via a <em>near/far cache architecture</em>, where a cache server with <em>very low TTL</em> runs on the local instance (localhost), and the application looks up the key in the <em>near server</em> first, and in the event of a miss, reaches out to the <em>far server</em>. The low TTL (few seconds) ensures that the data is not too stale, while the far cache server does not have to get hit that hard in a hotspot situation.</p>
@@ -291,28 +285,27 @@
 <p>Do not bother updating the cache on state changes. Just delete the key from the cache, and let the next read take care of caching the value. It may seem like a good idea to update the cache with the fresh data in the event of a state change, but it is not worth the effort. Not only this tends to have race conditions in a clustered environment, in write-heavy scenarios, data consistency becomes an issue as well. Just have your state change methods invalidate the key.</p>
 
 <h1 id="7-build-a-secure-auditable-invalidation-mechanism">7. Build a secure, auditable, invalidation mechanism</h1>
-<p>Realistically, no one should update the database directly while bypassing the API or the server code. However, this is an all too common scenario in the real world. This creates a situation where the cache does not hold the right state that the database has. The options are limited - delete the key, or wait for the key to expire. These options may not work if the keys are hashed (vs. human readable like <code class="highlighter-rouge">myapp.myperson.1234</code>), or the TTL is too high. I have seen cache servers having to be bounced after this, causing a snowball effect as the database gets overloaded, akin to a complete failure of a cache server. To avoid this, create an API endpoint that would take basic parameters to form a key, create and hash the key, and delete that key from the cache. Best way is to have a <em>parameterized jenkins job</em> for this operation - which provides security and auditing out of the box.</p>
+<p>Realistically, no one should update the database directly while bypassing the API or the server code. However, this is an all too common scenario in the real world. This creates a situation where the cache does not hold the right state that the database has. The options are limited - delete the key, or wait for the key to expire. These options may not work if the keys are hashed (vs. human readable like <code class="language-plaintext highlighter-rouge">myapp.myperson.1234</code>), or the TTL is too high. I have seen cache servers having to be bounced after this, causing a snowball effect as the database gets overloaded, akin to a complete failure of a cache server. To avoid this, create an API endpoint that would take basic parameters to form a key, create and hash the key, and delete that key from the cache. Best way is to have a <em>parameterized jenkins job</em> for this operation - which provides security and auditing out of the box.</p>
 
 <h1 id="8-be-aware-of-the-key-and-value-size-limits">8. Be aware of the key and value size limits</h1>
 <p>Different cache servers have different limits. Memcached key names cannot be greater than 250 bytes, and values cannot be larger than 1 MB. Redis has much larger limits, 512 MB for key and value. For memcached, keep this in mind when namespacing. A good idea is to MD5 or hash the key name to ensure consistent and unique key of acceptable length. Similarly, based on the efficiency trade-offs, you may want to compress or change the serialization format of the values as appropriate.</p>
 
 <h1 id="9-http-cache-is-not-the-same-as-application-cache">9. HTTP Cache is not the same as Application Cache</h1>
-<p>While so far we have discussed objets from the database being cached, there are cases where it makes a lot of sense to cache at the HTTP level, i.e. the HTTP response from an API, or an entire HTML response from a webserver. CDNs (Content Delivery Networks) are giant HTTP Caches. This is a also common scenario in <em>edge caching</em>, where the cache sits at the HTTP layer to cache static content with much larger TTLs. In case of APIs, the HTTP GET API URL is used as the key name. If going this route, be aware of the query strings that may have been used to modify the response. If the API supports features like field filtering, projections, sort, etc - the URL based caching may have a lower hit ratio, or inconsistent results. It is a good idea to account for these features while constructing the key. Caching the response for <code class="highlighter-rouge">?expand=address,business</code> should also result in a <em>hit</em> for <code class="highlighter-rouge">?expand=business,address</code>.</p>
+<p>While so far we have discussed objets from the database being cached, there are cases where it makes a lot of sense to cache at the HTTP level, i.e. the HTTP response from an API, or an entire HTML response from a webserver. CDNs (Content Delivery Networks) are giant HTTP Caches. This is a also common scenario in <em>edge caching</em>, where the cache sits at the HTTP layer to cache static content with much larger TTLs. In case of APIs, the HTTP GET API URL is used as the key name. If going this route, be aware of the query strings that may have been used to modify the response. If the API supports features like field filtering, projections, sort, etc - the URL based caching may have a lower hit ratio, or inconsistent results. It is a good idea to account for these features while constructing the key. Caching the response for <code class="language-plaintext highlighter-rouge">?expand=address,business</code> should also result in a <em>hit</em> for <code class="language-plaintext highlighter-rouge">?expand=business,address</code>.</p>
 
 <h1 id="10-use-http-cache-headers-for-http-responses">10. Use HTTP Cache Headers for HTTP Responses</h1>
-<p>This is where we move caching from the server, to the client. In other words, we can instruct the requester of our APIs or HTTP Content to cache the response at their end. Instead of building our own vernacular for these instructions, use the standard HTTP Spec. The <a href="https://tools.ietf.org/html/rfc7234" target="_blank_">HTTP RFC 7234</a> describes how HTTP content caching should behave, particularly when the client is a browser. The same directives and headers should also be used for all HTTP responses. For example, the directive <code class="highlighter-rouge">no-cache</code> would instruct the client to never cache the response, while <code class="highlighter-rouge">max-age</code> would instruct the client to safely re-use the response till it expires (as defined by the <code class="highlighter-rouge">max-age</code> value, or the TTL in seconds). Regardless of a webpage or a JSON response from an API, it is a good idea to adhere to HTTP Spec.</p>
+<p>This is where we move caching from the server, to the client. In other words, we can instruct the requester of our APIs or HTTP Content to cache the response at their end. Instead of building our own vernacular for these instructions, use the standard HTTP Spec. The <a href="https://tools.ietf.org/html/rfc7234" target="_blank_">HTTP RFC 7234</a> describes how HTTP content caching should behave, particularly when the client is a browser. The same directives and headers should also be used for all HTTP responses. For example, the directive <code class="language-plaintext highlighter-rouge">no-cache</code> would instruct the client to never cache the response, while <code class="language-plaintext highlighter-rouge">max-age</code> would instruct the client to safely re-use the response till it expires (as defined by the <code class="language-plaintext highlighter-rouge">max-age</code> value, or the TTL in seconds). Regardless of a webpage or a JSON response from an API, it is a good idea to adhere to HTTP Spec.</p>
 
 <p>Here is an example of cache headers returned by Google -</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>  bash-3.2$ curl --head https://www.google.com
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  bash-3.2$ curl --head https://www.google.com
   HTTP/1.1 200 OK
   Expires: -1
   Cache-Control: private, max-age=0
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h1 id="11-centralize-the-cache-interface-and-keep-it-simple">11. Centralize the Cache Interface, and keep it simple</h1>
-<p>Last but not the least, design all the cache operations to go through a single class instead of spreading it everywhere. This has many benefits, like centralizing the the logic for key name creation, providing vendor independent method for the rest of the application to interact with the cache, and also, optimize the serialization of the objects (like replacing Java Object Serialization with Kyro or protobuf). This also provides a way for cache key lookups and invalidations with human-friendly key names, despite the cache having hashed key names. For instance, in Java, this can be a <code class="highlighter-rouge">Singleton</code> sitting in a commons-jar used across all the applications sharing a cache cluster.</p>
+<p>Last but not the least, design all the cache operations to go through a single class instead of spreading it everywhere. This has many benefits, like centralizing the the logic for key name creation, providing vendor independent method for the rest of the application to interact with the cache, and also, optimize the serialization of the objects (like replacing Java Object Serialization with Kyro or protobuf). This also provides a way for cache key lookups and invalidations with human-friendly key names, despite the cache having hashed key names. For instance, in Java, this can be a <code class="language-plaintext highlighter-rouge">Singleton</code> sitting in a commons-jar used across all the applications sharing a cache cluster.</p>
 
 <p>In conclusion, while no solution is wrong, it is best to apply caching to get the biggest bang for the buck, reduce infrastructure overhead, and satisfy the consistency and availability requirements. Caching strategy for a Financial Application will be entirely different than that of a Social Networking App, which will be entirely different than a Content/Media Application. Caching is not a one size fits all proposition. However, I hope that by using the notes above, you can design an efficient, data-driven caching strategy across all tiers of your application.</p>
 

@@ -31,35 +31,29 @@
   
   
 
-  <script type="text/javascript">
-  WebFontConfig = {
-    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
-  };
-  (function(d) {
-    var wf = d.createElement('script'), s = d.scripts[0];
-    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
-    wf.async = true;
-    s.parentNode.insertBefore(wf, s);
-  })(document);
-</script>
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet">
 
   
-  <!-- Google Analytics -->
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    ga('create', 'UA-96931340-1', 'auto');
-    ga('send', 'pageview');
+      ga('create', 'UA-96931340-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  
 
-  </script>
 
-
-  <!-- Begin Jekyll SEO tag v2.4.0 -->
+  <!-- Begin Jekyll SEO tag v2.6.1 -->
 <title>Notes from AWS Lambda Deep Dive Webinar | Manish Pandit’s Blog</title>
-<meta name="generator" content="Jekyll v3.4.3" />
+<meta name="generator" content="Jekyll v4.3.4" />
 <meta property="og:title" content="Notes from AWS Lambda Deep Dive Webinar" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
@@ -71,7 +65,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2017-02-27T07:20:44-08:00" />
 <script type="application/ld+json">
-{"description":"I’ve put together my notes from the AWS webinar, which can be seen here. Lambda is the key enabler and a core AWS component for serverless computing. Lets you run the code you want, without worrying about the underlying infrastructure and provisioning. It is also cost efficient, as there are no instances that are in running state but idle. Lambda handles scaling up and scaling down as needed, transparently to the customer.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"BlogPosting","url":"https://lobster1234.github.io/2017/02/27/notes-from-aws-lambda-deep-dive-webinar/","headline":"Notes from AWS Lambda Deep Dive Webinar","dateModified":"2017-02-27T07:20:44-08:00","datePublished":"2017-02-27T07:20:44-08:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/02/27/notes-from-aws-lambda-deep-dive-webinar/"},"@context":"http://schema.org"}</script>
+{"url":"https://lobster1234.github.io/2017/02/27/notes-from-aws-lambda-deep-dive-webinar/","description":"I’ve put together my notes from the AWS webinar, which can be seen here. Lambda is the key enabler and a core AWS component for serverless computing. Lets you run the code you want, without worrying about the underlying infrastructure and provisioning. It is also cost efficient, as there are no instances that are in running state but idle. Lambda handles scaling up and scaling down as needed, transparently to the customer.","author":{"@type":"Person","name":"Manish Pandit"},"headline":"Notes from AWS Lambda Deep Dive Webinar","dateModified":"2017-02-27T07:20:44-08:00","datePublished":"2017-02-27T07:20:44-08:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/02/27/notes-from-aws-lambda-deep-dive-webinar/"},"@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -361,14 +355,14 @@
 
 <h2 id="what-is-in-it">What is in it</h2>
 <ul>
-  <li><code class="highlighter-rouge">Handler()</code> function - Entry point for Lambda.</li>
-  <li><code class="highlighter-rouge">Event</code> Object - The request (representation of the event). Can be a stream or an simple data type.</li>
-  <li><code class="highlighter-rouge">Context</code> Object - Provides a handle to the environment and basic utilities like time, logging and client/event info.</li>
-  <li><code class="highlighter-rouge">FunctionConfiguration</code> Metadata
+  <li><code class="language-plaintext highlighter-rouge">Handler()</code> function - Entry point for Lambda.</li>
+  <li><code class="language-plaintext highlighter-rouge">Event</code> Object - The request (representation of the event). Can be a stream or an simple data type.</li>
+  <li><code class="language-plaintext highlighter-rouge">Context</code> Object - Provides a handle to the environment and basic utilities like time, logging and client/event info.</li>
+  <li><code class="language-plaintext highlighter-rouge">FunctionConfiguration</code> Metadata
     <ol>
-      <li><code class="highlighter-rouge">VpcConfig</code> - Useful if you want to access your private resources within your VPC. Enables the lambda environment to be able to talk to your VPC.</li>
-      <li><code class="highlighter-rouge">DeadLetterConfig</code> - Failed events are sent to SQS or SNS. A dead letter queue or an SNS topic can be configured where the event is sent back in case the lambda function fails to process it. It is only available for async requests.</li>
-      <li><code class="highlighter-rouge">Environment</code> - Key value pairs as a part of the configuration, which are then available as environment variables to the function. They’re encrypted at rest via KMS, and are decrypted during lambda initialization.</li>
+      <li><code class="language-plaintext highlighter-rouge">VpcConfig</code> - Useful if you want to access your private resources within your VPC. Enables the lambda environment to be able to talk to your VPC.</li>
+      <li><code class="language-plaintext highlighter-rouge">DeadLetterConfig</code> - Failed events are sent to SQS or SNS. A dead letter queue or an SNS topic can be configured where the event is sent back in case the lambda function fails to process it. It is only available for async requests.</li>
+      <li><code class="language-plaintext highlighter-rouge">Environment</code> - Key value pairs as a part of the configuration, which are then available as environment variables to the function. They’re encrypted at rest via KMS, and are decrypted during lambda initialization.</li>
     </ol>
   </li>
 </ul>
@@ -390,7 +384,7 @@
 
 <h2 id="container-model">Container Model</h2>
 <ul>
-  <li>Each execution happens in a container that is created and managed by AWS. Containers are  re-used. This re-use can let us share cached static data, or DB connections between invocations. The folder <code class="highlighter-rouge">/tmp</code> is available across invocations. However, do not rely on this, use it opportunistically.</li>
+  <li>Each execution happens in a container that is created and managed by AWS. Containers are  re-used. This re-use can let us share cached static data, or DB connections between invocations. The folder <code class="language-plaintext highlighter-rouge">/tmp</code> is available across invocations. However, do not rely on this, use it opportunistically.</li>
   <li>Bootstrapping happens when a function is invoked for the first time after creation or update. The start time can be reduced by allowing more memory, having a smaller deployment package. Clearly Python and Node.js will be much quicker to bootstrap than Java and C#. Strip down the deployment of all the libraries that are not needed, as lambda will load everything that is present in the package. Mode to an interpreted language if cold starts are not within acceptable limits.</li>
   <li>Containers run Amazon Linux AMI. If there are any native binaries, compile against this environment.</li>
   <li>OpenJDK 1.8 is already provided by the container, so does not need to be packaged. Similarly AWS SDK for other languages, etc.</li>
@@ -406,8 +400,8 @@
   <li>Use AWS CodeCommit, CodeBuild, CodePipeline</li>
   <li>Use Github, Jenkins, CodeShip</li>
   <li>Put the package on an S3 location</li>
-  <li>AWS <code class="highlighter-rouge">SAM</code> - Serverless Application Model</li>
-  <li>CloudFormation supports <code class="highlighter-rouge">SAM</code> extensions</li>
+  <li>AWS <code class="language-plaintext highlighter-rouge">SAM</code> - Serverless Application Model</li>
+  <li>CloudFormation supports <code class="language-plaintext highlighter-rouge">SAM</code> extensions</li>
 </ul>
 
 <h2 id="versioning">Versioning</h2>
@@ -448,7 +442,7 @@
   <li>AWS X-Ray (Preview) for detailed breakdown of lambda performance and behavior metrics.</li>
   <li>All calls made to lambda are logged to CloudTrail. They can be delivered to S3 and analyzed.</li>
   <li>Every start, end, and report goes to CloudWatch</li>
-  <li>Java User logs can be created via <code class="highlighter-rouge">System.out.println()</code>, <code class="highlighter-rouge">System.err.println()</code>, <code class="highlighter-rouge">LambdaLogger.log()</code>, and <code class="highlighter-rouge">Log4j.*</code></li>
+  <li>Java User logs can be created via <code class="language-plaintext highlighter-rouge">System.out.println()</code>, <code class="language-plaintext highlighter-rouge">System.err.println()</code>, <code class="language-plaintext highlighter-rouge">LambdaLogger.log()</code>, and <code class="language-plaintext highlighter-rouge">Log4j.*</code></li>
   <li>Default metrics are free - which include duration, throttles, errors, etc. Custom metrics can also be added by the function itself via the CloudWatch API.</li>
 </ul>
 

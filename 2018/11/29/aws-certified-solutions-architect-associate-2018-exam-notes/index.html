@@ -31,35 +31,29 @@
   
   
 
-  <script type="text/javascript">
-  WebFontConfig = {
-    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
-  };
-  (function(d) {
-    var wf = d.createElement('script'), s = d.scripts[0];
-    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
-    wf.async = true;
-    s.parentNode.insertBefore(wf, s);
-  })(document);
-</script>
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet">
 
   
-  <!-- Google Analytics -->
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    ga('create', 'UA-96931340-1', 'auto');
-    ga('send', 'pageview');
+      ga('create', 'UA-96931340-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  
 
-  </script>
 
-
-  <!-- Begin Jekyll SEO tag v2.4.0 -->
+  <!-- Begin Jekyll SEO tag v2.6.1 -->
 <title>AWS Certified Solutions Architect Associate 2018 Notes | Manish Pandit’s Blog</title>
-<meta name="generator" content="Jekyll v3.4.3" />
+<meta name="generator" content="Jekyll v4.3.4" />
 <meta property="og:title" content="AWS Certified Solutions Architect Associate 2018 Notes" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
@@ -72,7 +66,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2018-11-29T01:05:22-08:00" />
 <script type="application/ld+json">
-{"description":"My CSAA from 2016 had expired, and I was in Vegas to attend re:Invent 2018. I took this opportunity to recertify the credential. This is a newer version of the exam, which made it exciting, but at the same time there were a lot of services that I had not really used, so had to go through the FAQs and documentation for those, along with the excellent acloud.guru course. It took me about 4 days of serious prep, and I scored 927/1000. Working with AWS professionally for 6 years helped me in a lot of areas - particularly the well architected framework. Also, I loved my exam experience at re:Invent, compared to the typical exam centers we go to. It was far more relaxing, and I scored quite a bit of swag. Here are the notes that I took while preparing for the exam.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"BlogPosting","url":"https://lobster1234.github.io/2018/11/29/aws-certified-solutions-architect-associate-2018-exam-notes/","image":"https://lobster1234.github.io/assets/IMG_1109.jpg","headline":"AWS Certified Solutions Architect Associate 2018 Notes","dateModified":"2018-11-29T01:05:22-08:00","datePublished":"2018-11-29T01:05:22-08:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2018/11/29/aws-certified-solutions-architect-associate-2018-exam-notes/"},"@context":"http://schema.org"}</script>
+{"url":"https://lobster1234.github.io/2018/11/29/aws-certified-solutions-architect-associate-2018-exam-notes/","description":"My CSAA from 2016 had expired, and I was in Vegas to attend re:Invent 2018. I took this opportunity to recertify the credential. This is a newer version of the exam, which made it exciting, but at the same time there were a lot of services that I had not really used, so had to go through the FAQs and documentation for those, along with the excellent acloud.guru course. It took me about 4 days of serious prep, and I scored 927/1000. Working with AWS professionally for 6 years helped me in a lot of areas - particularly the well architected framework. Also, I loved my exam experience at re:Invent, compared to the typical exam centers we go to. It was far more relaxing, and I scored quite a bit of swag. Here are the notes that I took while preparing for the exam.","author":{"@type":"Person","name":"Manish Pandit"},"image":"https://lobster1234.github.io/assets/IMG_1109.jpg","headline":"AWS Certified Solutions Architect Associate 2018 Notes","dateModified":"2018-11-29T01:05:22-08:00","datePublished":"2018-11-29T01:05:22-08:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2018/11/29/aws-certified-solutions-architect-associate-2018-exam-notes/"},"@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -652,30 +646,29 @@
   <li>Groups - collection of users who share permissions</li>
   <li>Role - permissions assigned to AWS resources like EC2, ECS, Lambdas etc. Roles are a secure way to grant permissions to entities that you trust. Roles are preferred over credentials (access key and secret key). A change in the role’s policy takes effect immediately. The roles can be attached to or detached from a running EC2 instance.</li>
   <li>Policies - permissions defined in a policy document in JSON</li>
-  <li>A policy document contains a statement, which has a collection of <code class="highlighter-rouge">Effect</code>, <code class="highlighter-rouge">Action</code> and <code class="highlighter-rouge">Resource</code> attributes. The <code class="highlighter-rouge">Action</code> and <code class="highlighter-rouge">Resource</code> can themselves be collections. These can be associated with users, groups and roles.
-    <div class="language-json highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="w">
-  </span><span class="nt">"Version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2012-10-17"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"Statement"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+  <li>A policy document contains a statement, which has a collection of <code class="language-plaintext highlighter-rouge">Effect</code>, <code class="language-plaintext highlighter-rouge">Action</code> and <code class="language-plaintext highlighter-rouge">Resource</code> attributes. The <code class="language-plaintext highlighter-rouge">Action</code> and <code class="language-plaintext highlighter-rouge">Resource</code> can themselves be collections. These can be associated with users, groups and roles.
+    <div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"Version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2012-10-17"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"Statement"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
       </span><span class="p">{</span><span class="w">
-          </span><span class="nt">"Effect"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Allow"</span><span class="p">,</span><span class="w">
-          </span><span class="nt">"Action"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+          </span><span class="nl">"Effect"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Allow"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"Action"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
               </span><span class="s2">"s3:*"</span><span class="p">,</span><span class="w">
               </span><span class="s2">"cloudwatch:*"</span><span class="p">,</span><span class="w">
               </span><span class="s2">"ec2:*"</span><span class="w">
           </span><span class="p">],</span><span class="w">
-          </span><span class="nt">"Resource"</span><span class="p">:</span><span class="w"> </span><span class="s2">"*"</span><span class="w">
+          </span><span class="nl">"Resource"</span><span class="p">:</span><span class="w"> </span><span class="s2">"*"</span><span class="w">
       </span><span class="p">}</span><span class="w">
   </span><span class="p">]</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></code></pre>
-    </div>
+</span></code></pre></div>    </div>
   </li>
   <li>IAM is global, not tied to a region</li>
   <li>We can create alias for the account, which shows up in the default signin link (https://account_number.signin.aws.amazon.com/console) to (https://somealias.signin.aws.amazon.com/console)</li>
   <li>Always activate MFA on the root account</li>
   <li>A root account is the email that is used to setup the account, and it has complete admin access by default</li>
   <li>Create users in the account and assign them permissions instead of sharing root user credentials. New users have no permissions when created.</li>
-  <li><code class="highlighter-rouge">PowerUserAccess</code> is <code class="highlighter-rouge">AdministratorAccess - IAM</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">PowerUserAccess</code> is <code class="language-plaintext highlighter-rouge">AdministratorAccess - IAM</code>.</li>
   <li>Create groups to hold permissions and put users in those groups instead of attaching permissions to users individually</li>
   <li>For programatic access (via CLI, SDK and APIs), users get an access key ID and secret access key. For logging into the console, users get a userId and a password</li>
   <li>A user can belong to multiple groups</li>
@@ -710,13 +703,13 @@
   <li>We can upload up to 5GB in single operation, for larger objects, use multipart upload API</li>
   <li>Unlimited Storage</li>
   <li>Successful uploads return a HTTP 200 response code via API or CLI</li>
-  <li>Files are stored in <code class="highlighter-rouge">buckets</code> whose names are globally unique (they have a DNS tied to them). Buckets can have folders in them. These folders do not need to be unique names except within the bucket.</li>
+  <li>Files are stored in <code class="language-plaintext highlighter-rouge">buckets</code> whose names are globally unique (they have a DNS tied to them). Buckets can have folders in them. These folders do not need to be unique names except within the bucket.</li>
   <li>By default all buckets are private.</li>
   <li>The URL looks like https://s3.{region}.amazonaws.com/{bucketname} OR https://s3-{region}.amazonaws.com. For example, https://s3.us-east-1.amazonaws.com/lobster1234-94568</li>
   <li>Read after Write consistency for <strong>new</strong> Object PUTs. You can write and immediately read the content.</li>
   <li>Eventual Consistency for <strong>overwrite</strong> PUTs and DELETEs. You can overwrite or delete, but if you read immediately, you may not get the current state. This can take minutes to hours.</li>
-  <li>S3 Object consists of a <code class="highlighter-rouge">Key</code> which is the name of the object (file name like foo.txt), value which is the data (byte[]), Version ID, metadata (tags), Sub-resources like ACL, Torrents</li>
-  <li>S3 has <code class="highlighter-rouge">99.99%</code> Availability, and <code class="highlighter-rouge">99.999999999%</code> (11 9s) durability.</li>
+  <li>S3 Object consists of a <code class="language-plaintext highlighter-rouge">Key</code> which is the name of the object (file name like foo.txt), value which is the data (byte[]), Version ID, metadata (tags), Sub-resources like ACL, Torrents</li>
+  <li>S3 has <code class="language-plaintext highlighter-rouge">99.99%</code> Availability, and <code class="language-plaintext highlighter-rouge">99.999999999%</code> (11 9s) durability.</li>
   <li>There are different storage classes or tiers -
     <ul>
       <li>STANDARD - 99.99% availability, 11 9s durability, designed to sustain the loss of 2 facilities (AZs) concurrently. Stored in &gt;= 3 AZs. No retrieval fee.</li>
@@ -744,9 +737,9 @@
   <li>S3 buckets can be encrypted Server Side via AES-256 (SSE-S3 using S3 Managed Keys) or AWS-KMS (SSE-KMS with KMS managed keys) or SSE-C with customer provided keys. This can be set at bucket, folder, and object level.</li>
   <li>Encryption at transit uses SSL/TLS</li>
   <li>Encryption at rest can be server side - S3 Managed (SSE-S3), SSE-KMS, or SSE-C, or client side</li>
-  <li>The header to specify encryption during PUT is <code class="highlighter-rouge">x-amz-server-side-encryption</code> with possible values as <code class="highlighter-rouge">AES256</code> for SSE-S3 or <code class="highlighter-rouge">aws:kms</code> for SSE-KMS.</li>
-  <li>A bucket policy can be created to reject any request that does not have the <code class="highlighter-rouge">x-amz-server-side-encryption</code> thereby enforcing encryption always. This is done by adding a <code class="highlighter-rouge">Condition</code> in the bucket policy with <code class="highlighter-rouge">StringNotEquals</code> for <code class="highlighter-rouge">Key</code> <code class="highlighter-rouge">x-amz-server-side-encryption</code> and <code class="highlighter-rouge">Value</code> as <code class="highlighter-rouge">aws:kms</code> or <code class="highlighter-rouge">AES256</code> for <code class="highlighter-rouge">Action</code> as <code class="highlighter-rouge">s3:PutObject</code>.</li>
-  <li>Each object gets a link which looks like this <code class="highlighter-rouge">https://s3.amazonaws.com/mpandit-452001/IMG_1070.png</code>. Note that there is no region in there.</li>
+  <li>The header to specify encryption during PUT is <code class="language-plaintext highlighter-rouge">x-amz-server-side-encryption</code> with possible values as <code class="language-plaintext highlighter-rouge">AES256</code> for SSE-S3 or <code class="language-plaintext highlighter-rouge">aws:kms</code> for SSE-KMS.</li>
+  <li>A bucket policy can be created to reject any request that does not have the <code class="language-plaintext highlighter-rouge">x-amz-server-side-encryption</code> thereby enforcing encryption always. This is done by adding a <code class="language-plaintext highlighter-rouge">Condition</code> in the bucket policy with <code class="language-plaintext highlighter-rouge">StringNotEquals</code> for <code class="language-plaintext highlighter-rouge">Key</code> <code class="language-plaintext highlighter-rouge">x-amz-server-side-encryption</code> and <code class="language-plaintext highlighter-rouge">Value</code> as <code class="language-plaintext highlighter-rouge">aws:kms</code> or <code class="language-plaintext highlighter-rouge">AES256</code> for <code class="language-plaintext highlighter-rouge">Action</code> as <code class="language-plaintext highlighter-rouge">s3:PutObject</code>.</li>
+  <li>Each object gets a link which looks like this <code class="language-plaintext highlighter-rouge">https://s3.amazonaws.com/mpandit-452001/IMG_1070.png</code>. Note that there is no region in there.</li>
 </ul>
 
 <h2 id="s3-versioning">S3 Versioning</h2>
@@ -754,7 +747,7 @@
   <li>Once enabled, versioning cannot be disabled and only be suspended.</li>
   <li>Buckets can be versioned, however, each version is stored a 100% (no incremental or deltas). Hence, each version of the object adds to the storage cost.</li>
   <li>Deleted objects are also stored as versions.</li>
-  <li>Delete Markers - A deleted object has an associated <code class="highlighter-rouge">delete marker</code>. If the delete marker is deleted, the deleted version is restored.</li>
+  <li>Delete Markers - A deleted object has an associated <code class="language-plaintext highlighter-rouge">delete marker</code>. If the delete marker is deleted, the deleted version is restored.</li>
   <li>Read more <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/Versioning.html">here</a></li>
   <li>MFA Delete is an added layer of security in S3 buckets, where a second factor auth is required to delete an object version, or to change versioning state.</li>
 </ul>
@@ -801,10 +794,10 @@
   <li>Cross Origin Resource Sharing</li>
   <li>CORS is a way for pages from one S3 bucket to access contents from another S3 bucket.</li>
   <li>CORS needs to be enabled from the bucket that is being accessed, to allow the URL of the bucket that is accessing it.</li>
-  <li>To do so, click on CORS tab in the bucket being accessed, enter the HTTPS URL of the bucket that is trying to access under <code class="highlighter-rouge">Access-Control-Allow-Origin</code> which will say <code class="highlighter-rouge">*</code> in the template.</li>
-  <li>Use the published URL of the bucket as origin, not the S3 URL (use the one with <code class="highlighter-rouge">website</code> in the name).</li>
-  <li>Example CORS configuration would look like this, where <code class="highlighter-rouge"><span class="p">{</span><span class="err">originbucketname</span><span class="p">}</span></code> is trying to access contents of this bucket.
-    <div class="language-xml highlighter-rouge"><pre class="highlight"><code><span class="nt">&lt;CORSConfiguration&gt;</span>
+  <li>To do so, click on CORS tab in the bucket being accessed, enter the HTTPS URL of the bucket that is trying to access under <code class="language-plaintext highlighter-rouge">Access-Control-Allow-Origin</code> which will say <code class="language-plaintext highlighter-rouge">*</code> in the template.</li>
+  <li>Use the published URL of the bucket as origin, not the S3 URL (use the one with <code class="language-plaintext highlighter-rouge">website</code> in the name).</li>
+  <li>Example CORS configuration would look like this, where <code class="language-plaintext highlighter-rouge">{originbucketname}</code> is trying to access contents of this bucket.
+    <div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;CORSConfiguration&gt;</span>
   <span class="nt">&lt;CORSRule&gt;</span>
     <span class="nt">&lt;AllowedOrigin&gt;</span>http://{originbucketname}.s3-website.us-east-1.amazonaws.com<span class="nt">&lt;/AllowedOrigin&gt;</span>
     <span class="nt">&lt;AllowedMethod&gt;</span>GET<span class="nt">&lt;/AllowedMethod&gt;</span>
@@ -812,8 +805,7 @@
     <span class="nt">&lt;AllowedHeader&gt;</span>*<span class="nt">&lt;/AllowedHeader&gt;</span>
   <span class="nt">&lt;/CORSRule&gt;</span>
 <span class="nt">&lt;/CORSConfiguration&gt;</span>
-</code></pre>
-    </div>
+</code></pre></div>    </div>
   </li>
 </ul>
 
@@ -881,15 +873,15 @@
     </ul>
   </li>
   <li>A distribution is identified by a domain</li>
-  <li>Edge Locations can be written to (<code class="highlighter-rouge">PUT</code>), this is used in S3 accelerated transfers.</li>
+  <li>Edge Locations can be written to (<code class="language-plaintext highlighter-rouge">PUT</code>), this is used in S3 accelerated transfers.</li>
   <li>Objects are cached at the edge location for a TTL (Max: 365 days, Default: 24 hours)</li>
   <li>It costs to invalidate the cache on an object basis (if we want to do it before the TTL expires)</li>
   <li>For performance of GET intensive workloads, use cloudfront</li>
   <li>For performance of mixed workloads, hash the S3 key by adding a random prefix to the key name. By doing so, there is no IO Contention on the same partition.</li>
-  <li>S3 origins look like <code class="highlighter-rouge">bucketname.s3.amazonaws.com</code>. (notice no region in the URL).</li>
+  <li>S3 origins look like <code class="language-plaintext highlighter-rouge">bucketname.s3.amazonaws.com</code>. (notice no region in the URL).</li>
   <li>An Origin Access Identity is set up in the distribution which gives access to Cloudfront to read from the origin S3 bucket. The bucket policy is updated on the origin bucket to allow access to this identity.</li>
   <li>Cloudfront uses pre-signed URLs and signed cookies to restrict access of content (just like S3)</li>
-  <li>The clouddront distribution URL gets a domain name <code class="highlighter-rouge">foobar.cloudfront.net</code>. Please note that <code class="highlighter-rouge">foobar</code> is <em>not</em> the distribution ID.</li>
+  <li>The clouddront distribution URL gets a domain name <code class="language-plaintext highlighter-rouge">foobar.cloudfront.net</code>. Please note that <code class="language-plaintext highlighter-rouge">foobar</code> is <em>not</em> the distribution ID.</li>
   <li>Cloudfront allows geo whitelisting OR blacklisting of countries. Cannot do both, has to be either.</li>
 </ul>
 
@@ -920,20 +912,19 @@
 To Remember: F (FPGA) I (IOPS) G (Graphics) H (High Disk Throughput) T (cheap GP) D (Density) R (RAM Memory) M (GP) C (Compute) P (Graphics) X (Extreme Memory) = <strong>FIGHTDRMCPX</strong></li>
     </ul>
   </li>
-  <li>EC2 User Data is used to add bootstrap scripts to the instance. It always starts with shbang (<code class="highlighter-rouge"><span class="c">#!/bin/bash</span></code>).</li>
-  <li>To log in to the instance, use <code class="highlighter-rouge">ssh -i &lt;path_to_pem&gt; ec2-user@&lt;IP address&gt;</code>. The PEM has <code class="highlighter-rouge">400</code> permissions to ensure it is hidden from everyone except the owner.</li>
+  <li>EC2 User Data is used to add bootstrap scripts to the instance. It always starts with shbang (<code class="language-plaintext highlighter-rouge">#!/bin/bash</code>).</li>
+  <li>To log in to the instance, use <code class="language-plaintext highlighter-rouge">ssh -i &lt;path_to_pem&gt; ec2-user@&lt;IP address&gt;</code>. The PEM has <code class="language-plaintext highlighter-rouge">400</code> permissions to ensure it is hidden from everyone except the owner.</li>
   <li>We can encrypt the root volume (where the OS is installed) using OS level encryption like Windows BitLocker.</li>
   <li>Another way to encrypt the root volume is to snap it, encrypt the snap, create an AMI from this snap and use this to launch the EC2.</li>
   <li>To retrieve instance metadata or userdata, the endpoint used is http://169.254.169.254/latest/user-data</li>
   <li>Instance User-Data :
-    <div class="highlighter-rouge"><pre class="highlight"><code>[root@ip-172-31-56-227 log]# curl http://169.254.169.254/latest/user-data
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@ip-172-31-56-227 log]# curl http://169.254.169.254/latest/user-data
 #!/bin/bash
 sudo yum update -y
-</code></pre>
-    </div>
+</code></pre></div>    </div>
   </li>
   <li>Instance Meta-Data :
-    <div class="highlighter-rouge"><pre class="highlight"><code>[ec2-user@ip-172-31-51-163 ~]$ curl http://169.254.169.254/latest/meta-data/
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[ec2-user@ip-172-31-51-163 ~]$ curl http://169.254.169.254/latest/meta-data/
 ami-id
 ami-launch-index
 ami-manifest-path
@@ -959,8 +950,7 @@ services/
 
 [ec2-user@ip-172-31-51-163 ~]$ curl http://169.254.169.254/latest/meta-data/instance-id
 i-00dfc2841e9b83d1e
-</code></pre>
-    </div>
+</code></pre></div>    </div>
   </li>
   <li>EC2 instance roles are created in IAM which eliminate the need for using security credentials (aws access key and secret) to access AWS services.</li>
   <li>The roles can be changed on a running instance, and is effective immediately. (just like security groups)</li>
@@ -1028,7 +1018,7 @@ i-00dfc2841e9b83d1e
   </li>
   <li>ELB responds with HTTP 504 Gateway Timeout when the application does not respond.</li>
   <li>The DNS names for the load balancers are {LB-name}.{region}-elb.amazonaws.com</li>
-  <li>The healthcheck statuses for instances behind LB can be <code class="highlighter-rouge">InService</code> or <code class="highlighter-rouge">OutOfService</code>.</li>
+  <li>The healthcheck statuses for instances behind LB can be <code class="language-plaintext highlighter-rouge">InService</code> or <code class="language-plaintext highlighter-rouge">OutOfService</code>.</li>
   <li>When a healtcheck for an instance fails, the load balancer stops sending traffic to that instance.</li>
 </ul>
 
@@ -1046,7 +1036,7 @@ i-00dfc2841e9b83d1e
 <h2 id="auto-scaling-groups">Auto Scaling Groups</h2>
 
 <ul>
-  <li>An autoscaling group = <code class="highlighter-rouge">Launch Configuration</code>  + <code class="highlighter-rouge">Scaling Policies</code>.</li>
+  <li>An autoscaling group = <code class="language-plaintext highlighter-rouge">Launch Configuration</code>  + <code class="language-plaintext highlighter-rouge">Scaling Policies</code>.</li>
   <li>Launch Templates are newly announced, but Launch Configurations have been around the longest</li>
   <li>A Launch Configuration has the AMI, Instance Type, Instance details like IAM role, user data, IP allocation details, as well as storage and security groups.</li>
   <li>Once a Launch Configuration is created, you can create an AutoScalingGroup. This is where details like VPC, subnets, number of instances, load balancer are entered.</li>
@@ -1208,7 +1198,7 @@ i-00dfc2841e9b83d1e
   <li>There is a 10GB limit of item collection (sum of size of all items in the table plus the local secondary indexes)</li>
   <li>LSI share the provisioned read write capacity of the main table.</li>
   <li>GSI need their own read write capacity, so think of GSI as another table of its own.</li>
-  <li>Changes to DynamoDB tables can be <code class="highlighter-rouge">streamed</code> using DynamoDB streams. These streams live in shards for 24 hours (like Kinesis).</li>
+  <li>Changes to DynamoDB tables can be <code class="language-plaintext highlighter-rouge">streamed</code> using DynamoDB streams. These streams live in shards for 24 hours (like Kinesis).</li>
 </ul>
 
 <h1 id="redshift">Redshift</h1>
@@ -1232,19 +1222,19 @@ i-00dfc2841e9b83d1e
 
 <ul>
   <li>A virtual datacenter in the cloud (Virtual Private Cloud).</li>
-  <li>Number of IPs in a CIDR notation is <code class="highlighter-rouge">2^(32-N)</code>. So, a <code class="highlighter-rouge">/32</code> is <code class="highlighter-rouge">2^(0)</code> which is 1.</li>
-  <li><code class="highlighter-rouge">/16</code> is the largest VPC, and smallest is <code class="highlighter-rouge">/28</code>.</li>
+  <li>Number of IPs in a CIDR notation is <code class="language-plaintext highlighter-rouge">2^(32-N)</code>. So, a <code class="language-plaintext highlighter-rouge">/32</code> is <code class="language-plaintext highlighter-rouge">2^(0)</code> which is 1.</li>
+  <li><code class="language-plaintext highlighter-rouge">/16</code> is the largest VPC, and smallest is <code class="language-plaintext highlighter-rouge">/28</code>.</li>
   <li>A region has a soft limit of 5 VPCs.</li>
   <li>A VPC is divided into subnets, where 1 subnet can only be in 1 AZ (a subnet cannot spread across AZs).</li>
   <li>Route Tables control traffic between subnets.</li>
   <li>Internet Gateways (1 per VPC) are used to provide internet (in+out) to a subnet by adding a route to IGW in that subnet’s route table.</li>
-  <li>We get a <code class="highlighter-rouge">/16</code> default VPC in each region, where all <code class="highlighter-rouge">/20</code> subnets are public.</li>
+  <li>We get a <code class="language-plaintext highlighter-rouge">/16</code> default VPC in each region, where all <code class="language-plaintext highlighter-rouge">/20</code> subnets are public.</li>
   <li>VPCs can be peered (even between different accounts and regions). The peering is in a star configuration where there is no transitive connectivity.</li>
   <li>NACLs (Network Access Control Lists) sit at the subnet level, and are stateful.</li>
   <li>A VPC can be on a dedicated tenancy, where all the instances that are launched in this VPC will use dedicated hardware.</li>
   <li>When we create a new VPC, it will create a default NACL, default route table (called main), but no subnets or gateways.</li>
   <li>The default NACLs allows all inbound and outbound traffic, default SG allows all inbound within the same security group and allows all outbound to anywhere, default route table (main) allows all traffic within the VPC.</li>
-  <li>We lose 5 IP addresses per subnet. These are first 4 and last 1 (<code class="highlighter-rouge">.0</code> network address, <code class="highlighter-rouge">.1</code>, <code class="highlighter-rouge">.2</code> and <code class="highlighter-rouge">.3</code> are reserved and <code class="highlighter-rouge">.255</code> is the broadcast).</li>
+  <li>We lose 5 IP addresses per subnet. These are first 4 and last 1 (<code class="language-plaintext highlighter-rouge">.0</code> network address, <code class="language-plaintext highlighter-rouge">.1</code>, <code class="language-plaintext highlighter-rouge">.2</code> and <code class="language-plaintext highlighter-rouge">.3</code> are reserved and <code class="language-plaintext highlighter-rouge">.255</code> is the broadcast).</li>
   <li>For outbound internet access for private subnets, we need to route the traffic to either NAT gateway or NAT instance.</li>
   <li>NAT instances are legacy, and are created from a community AMI. They’re placed in a public subnet with a security group that allows HTTP traffic inbound and all traffic outbound. Remember to turn off the source/dest check on the instance. By default all the EC2s only allow traffic that either originates or terminates at them.</li>
   <li>NAT instances are difficult to scale up and out using the traditional ASG setup.</li>
@@ -1255,7 +1245,7 @@ i-00dfc2841e9b83d1e
   <li>NACLs are stateless, so you’d need to explicitly allow outbound traffic when you enable inbound traffic on a port.</li>
   <li>A new NACL has deny all for inbound and outbound (unlike default which is allow all).</li>
   <li>The rules are evaluated in the increasing order (AWS recommends increments of 100) and are first match exit.</li>
-  <li>A <code class="highlighter-rouge">*</code> in a NACL rule set is the default, when there is no earlier match.</li>
+  <li>A <code class="language-plaintext highlighter-rouge">*</code> in a NACL rule set is the default, when there is no earlier match.</li>
   <li>Ephemeral ports are super important - they’re ports from 1024-65535, which are used as short lived ports for the client. The client picks these ports to expect the response on. They need to be opened up for outbound traffic.</li>
   <li>The changes to NACLs take effect immediately.</li>
   <li>The internet facing ALBs need to be in at least 2 AZs, and both of the subnets have to be public.</li>
@@ -1414,10 +1404,10 @@ i-00dfc2841e9b83d1e
 
 <h1 id="cloudformation-structure">Cloudformation Structure</h1>
 <ul>
-  <li><code class="highlighter-rouge">Resources</code>  - Define the resources to be created</li>
-  <li><code class="highlighter-rouge">Parameters</code> - Parameters taken in to create the resources</li>
-  <li><code class="highlighter-rouge">Mappings</code> - Used to map key values in the template</li>
-  <li><code class="highlighter-rouge">Outputs</code> - Return the resources created after running the template</li>
+  <li><code class="language-plaintext highlighter-rouge">Resources</code>  - Define the resources to be created</li>
+  <li><code class="language-plaintext highlighter-rouge">Parameters</code> - Parameters taken in to create the resources</li>
+  <li><code class="language-plaintext highlighter-rouge">Mappings</code> - Used to map key values in the template</li>
+  <li><code class="language-plaintext highlighter-rouge">Outputs</code> - Return the resources created after running the template</li>
 </ul>
 
 <h1 id="whitepapers">Whitepapers</h1>

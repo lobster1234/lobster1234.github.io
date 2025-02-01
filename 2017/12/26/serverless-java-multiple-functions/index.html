@@ -31,35 +31,29 @@
   
   
 
-  <script type="text/javascript">
-  WebFontConfig = {
-    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
-  };
-  (function(d) {
-    var wf = d.createElement('script'), s = d.scripts[0];
-    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
-    wf.async = true;
-    s.parentNode.insertBefore(wf, s);
-  })(document);
-</script>
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet">
 
   
-  <!-- Google Analytics -->
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    ga('create', 'UA-96931340-1', 'auto');
-    ga('send', 'pageview');
+      ga('create', 'UA-96931340-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  
 
-  </script>
 
-
-  <!-- Begin Jekyll SEO tag v2.4.0 -->
+  <!-- Begin Jekyll SEO tag v2.6.1 -->
 <title>Multiple Functions in Serverless Framework with Java | Manish Pandit’s Blog</title>
-<meta name="generator" content="Jekyll v3.4.3" />
+<meta name="generator" content="Jekyll v4.3.4" />
 <meta property="og:title" content="Multiple Functions in Serverless Framework with Java" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
@@ -71,7 +65,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2017-12-26T22:44:37-08:00" />
 <script type="application/ld+json">
-{"description":"Serverless Framework is an excellent choice for writing and deploying Lambda Functions in AWS. Having written a blog series on using it with Java8+Maven, I’ve been asked if there is a way to not have too many handlers (One per API), and somehow provide multiple handler functions in the same java class. In this post I provide the structure that’d allow for multiple handlers using a single Java class. This is particularly useful when the code is tightly coupled around a resource (CRUD) and writing a handler class for each of C, R, U, D seems un-necessary, like it should.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"BlogPosting","url":"https://lobster1234.github.io/2017/12/26/serverless-java-multiple-functions/","headline":"Multiple Functions in Serverless Framework with Java","dateModified":"2017-12-26T22:44:37-08:00","datePublished":"2017-12-26T22:44:37-08:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/12/26/serverless-java-multiple-functions/"},"@context":"http://schema.org"}</script>
+{"url":"https://lobster1234.github.io/2017/12/26/serverless-java-multiple-functions/","description":"Serverless Framework is an excellent choice for writing and deploying Lambda Functions in AWS. Having written a blog series on using it with Java8+Maven, I’ve been asked if there is a way to not have too many handlers (One per API), and somehow provide multiple handler functions in the same java class. In this post I provide the structure that’d allow for multiple handlers using a single Java class. This is particularly useful when the code is tightly coupled around a resource (CRUD) and writing a handler class for each of C, R, U, D seems un-necessary, like it should.","author":{"@type":"Person","name":"Manish Pandit"},"headline":"Multiple Functions in Serverless Framework with Java","dateModified":"2017-12-26T22:44:37-08:00","datePublished":"2017-12-26T22:44:37-08:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/12/26/serverless-java-multiple-functions/"},"@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -268,10 +262,9 @@
   <li>Make sure you’ve Serverless installed, and the AWS CLI is configured with the necessary policies.</li>
 </ul>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ serverless -v
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ serverless -v
 1.26.0
-</code></pre>
-</div>
+</code></pre></div></div>
 <blockquote>
   <p>Please ensure your serverless is at least 1.26.0 - There was a fairly hacky way to do this before <a href="https://github.com/serverless/serverless/pull/4596">this pull request</a>.</p>
 </blockquote>
@@ -280,7 +273,7 @@
   <li>Create a boilerplate serverless AWS Java8 Maven project.</li>
 </ul>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ mkdir multiple-handlers
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ mkdir multiple-handlers
 bash-3.2$ cd multiple-handlers/
 bash-3.2$ serverless create --template aws-java-maven
 Serverless: Generating boilerplate...
@@ -302,41 +295,38 @@ bash-3.2$ tree
             └── log4j.properties
 
 6 directories, 6 files
-</code></pre>
-</div>
+</code></pre></div></div>
 <ul>
-  <li>Check the <code class="highlighter-rouge">serverless.yml</code>, if you ignore all the comments, this is what it looks like -</li>
+  <li>Check the <code class="language-plaintext highlighter-rouge">serverless.yml</code>, if you ignore all the comments, this is what it looks like -</li>
 </ul>
 
-<div class="language-yml highlighter-rouge"><pre class="highlight"><code><span class="s">service</span><span class="pi">:</span> <span class="s">aws-java-maven</span> <span class="c1"># NOTE: update this with your service name</span>
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">service</span><span class="pi">:</span> <span class="s">aws-java-maven</span> <span class="c1"># NOTE: update this with your service name</span>
 
-<span class="s">provider</span><span class="pi">:</span>
-  <span class="s">name</span><span class="pi">:</span> <span class="s">aws</span>
-  <span class="s">runtime</span><span class="pi">:</span> <span class="s">java8</span>
+<span class="na">provider</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">aws</span>
+  <span class="na">runtime</span><span class="pi">:</span> <span class="s">java8</span>
 
 <span class="c1"># you can add packaging information here</span>
-<span class="s">package</span><span class="pi">:</span>
-  <span class="s">artifact</span><span class="pi">:</span> <span class="s">target/hello-dev.jar</span>
+<span class="na">package</span><span class="pi">:</span>
+  <span class="na">artifact</span><span class="pi">:</span> <span class="s">target/hello-dev.jar</span>
 
-<span class="s">functions</span><span class="pi">:</span>
-  <span class="s">hello</span><span class="pi">:</span>
-    <span class="s">handler</span><span class="pi">:</span> <span class="s">com.serverless.Handler</span>
-</code></pre>
-</div>
+<span class="na">functions</span><span class="pi">:</span>
+  <span class="na">hello</span><span class="pi">:</span>
+    <span class="na">handler</span><span class="pi">:</span> <span class="s">com.serverless.Handler</span>
+</code></pre></div></div>
 
-<p>The <code class="highlighter-rouge">package</code> section is what tells serverless to locate the artifacts.</p>
+<p>The <code class="language-plaintext highlighter-rouge">package</code> section is what tells serverless to locate the artifacts.</p>
 
 <ul>
-  <li>Let’s add another function to the auto-generated <code class="highlighter-rouge">Handler</code> class, which already has one function defined called <code class="highlighter-rouge">handleRequest</code> which maps to the lambda function <code class="highlighter-rouge">hello</code>, as noticed in the <code class="highlighter-rouge">serverless.yml</code> above.</li>
+  <li>Let’s add another function to the auto-generated <code class="language-plaintext highlighter-rouge">Handler</code> class, which already has one function defined called <code class="language-plaintext highlighter-rouge">handleRequest</code> which maps to the lambda function <code class="language-plaintext highlighter-rouge">hello</code>, as noticed in the <code class="language-plaintext highlighter-rouge">serverless.yml</code> above.</li>
 </ul>
 
-<p>We will add a new method called <code class="highlighter-rouge">handleAnotherRequest</code> in the same class. To differentiate the output, we’ll change the <code class="highlighter-rouge">Response</code> to output a different string than the auto-generated method. I replaced <code class="highlighter-rouge">Your</code> with <code class="highlighter-rouge">Another</code> in the new method.</p>
+<p>We will add a new method called <code class="language-plaintext highlighter-rouge">handleAnotherRequest</code> in the same class. To differentiate the output, we’ll change the <code class="language-plaintext highlighter-rouge">Response</code> to output a different string than the auto-generated method. I replaced <code class="language-plaintext highlighter-rouge">Your</code> with <code class="language-plaintext highlighter-rouge">Another</code> in the new method.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ vi src/main/java/com/serverless/Handler.java
-</code></pre>
-</div>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ vi src/main/java/com/serverless/Handler.java
+</code></pre></div></div>
 
-<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kn">package</span> <span class="n">com</span><span class="o">.</span><span class="na">serverless</span><span class="o">;</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="nn">com.serverless</span><span class="o">;</span>
 
 <span class="kn">import</span> <span class="nn">java.util.Collections</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">java.util.Map</span><span class="o">;</span>
@@ -347,61 +337,59 @@ bash-3.2$ tree
 <span class="kn">import</span> <span class="nn">com.amazonaws.services.lambda.runtime.Context</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">com.amazonaws.services.lambda.runtime.RequestHandler</span><span class="o">;</span>
 
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Handler</span> <span class="kd">implements</span> <span class="n">RequestHandler</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;,</span> <span class="n">ApiGatewayResponse</span><span class="o">&gt;</span> <span class="o">{</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Handler</span> <span class="kd">implements</span> <span class="nc">RequestHandler</span><span class="o">&lt;</span><span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">Object</span><span class="o">&gt;,</span> <span class="nc">ApiGatewayResponse</span><span class="o">&gt;</span> <span class="o">{</span>
 
-	<span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Logger</span> <span class="n">LOG</span> <span class="o">=</span> <span class="n">Logger</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="n">Handler</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+	<span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">Logger</span> <span class="no">LOG</span> <span class="o">=</span> <span class="nc">Logger</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="nc">Handler</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
 
 	<span class="nd">@Override</span>
-	<span class="kd">public</span> <span class="n">ApiGatewayResponse</span> <span class="nf">handleRequest</span><span class="o">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">input</span><span class="o">,</span> <span class="n">Context</span> <span class="n">context</span><span class="o">)</span> <span class="o">{</span>
-		<span class="n">BasicConfigurator</span><span class="o">.</span><span class="na">configure</span><span class="o">();</span>
+	<span class="kd">public</span> <span class="nc">ApiGatewayResponse</span> <span class="nf">handleRequest</span><span class="o">(</span><span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">Object</span><span class="o">&gt;</span> <span class="n">input</span><span class="o">,</span> <span class="nc">Context</span> <span class="n">context</span><span class="o">)</span> <span class="o">{</span>
+		<span class="nc">BasicConfigurator</span><span class="o">.</span><span class="na">configure</span><span class="o">();</span>
 
-		<span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"received: "</span> <span class="o">+</span> <span class="n">input</span><span class="o">);</span>
-		<span class="n">Response</span> <span class="n">responseBody</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Response</span><span class="o">(</span><span class="s">"Go Serverless v1.x! Your function executed successfully!"</span><span class="o">,</span> <span class="n">input</span><span class="o">);</span>
-		<span class="k">return</span> <span class="n">ApiGatewayResponse</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
+		<span class="no">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"received: "</span> <span class="o">+</span> <span class="n">input</span><span class="o">);</span>
+		<span class="nc">Response</span> <span class="n">responseBody</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Response</span><span class="o">(</span><span class="s">"Go Serverless v1.x! Your function executed successfully!"</span><span class="o">,</span> <span class="n">input</span><span class="o">);</span>
+		<span class="k">return</span> <span class="nc">ApiGatewayResponse</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
 				<span class="o">.</span><span class="na">setStatusCode</span><span class="o">(</span><span class="mi">200</span><span class="o">)</span>
 				<span class="o">.</span><span class="na">setObjectBody</span><span class="o">(</span><span class="n">responseBody</span><span class="o">)</span>
-				<span class="o">.</span><span class="na">setHeaders</span><span class="o">(</span><span class="n">Collections</span><span class="o">.</span><span class="na">singletonMap</span><span class="o">(</span><span class="s">"X-Powered-By"</span><span class="o">,</span> <span class="s">"AWS Lambda &amp; serverless"</span><span class="o">))</span>
+				<span class="o">.</span><span class="na">setHeaders</span><span class="o">(</span><span class="nc">Collections</span><span class="o">.</span><span class="na">singletonMap</span><span class="o">(</span><span class="s">"X-Powered-By"</span><span class="o">,</span> <span class="s">"AWS Lambda &amp; serverless"</span><span class="o">))</span>
 				<span class="o">.</span><span class="na">build</span><span class="o">();</span>
 	<span class="o">}</span>
 
-	<span class="kd">public</span> <span class="n">ApiGatewayResponse</span> <span class="nf">handleAnotherRequest</span><span class="o">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">input</span><span class="o">,</span> <span class="n">Context</span> <span class="n">context</span><span class="o">)</span> <span class="o">{</span>
-		<span class="n">Response</span> <span class="n">responseBody</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Response</span><span class="o">(</span><span class="s">"Go Serverless v1.x! Another function executed successfully!"</span><span class="o">,</span> <span class="n">input</span><span class="o">);</span>
-		<span class="k">return</span> <span class="n">ApiGatewayResponse</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
+	<span class="kd">public</span> <span class="nc">ApiGatewayResponse</span> <span class="nf">handleAnotherRequest</span><span class="o">(</span><span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">Object</span><span class="o">&gt;</span> <span class="n">input</span><span class="o">,</span> <span class="nc">Context</span> <span class="n">context</span><span class="o">)</span> <span class="o">{</span>
+		<span class="nc">Response</span> <span class="n">responseBody</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Response</span><span class="o">(</span><span class="s">"Go Serverless v1.x! Another function executed successfully!"</span><span class="o">,</span> <span class="n">input</span><span class="o">);</span>
+		<span class="k">return</span> <span class="nc">ApiGatewayResponse</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
 				<span class="o">.</span><span class="na">setStatusCode</span><span class="o">(</span><span class="mi">200</span><span class="o">)</span>
 				<span class="o">.</span><span class="na">setObjectBody</span><span class="o">(</span><span class="n">responseBody</span><span class="o">)</span>
-				<span class="o">.</span><span class="na">setHeaders</span><span class="o">(</span><span class="n">Collections</span><span class="o">.</span><span class="na">singletonMap</span><span class="o">(</span><span class="s">"X-Powered-By"</span><span class="o">,</span> <span class="s">"AWS Lambda &amp; serverless"</span><span class="o">))</span>
+				<span class="o">.</span><span class="na">setHeaders</span><span class="o">(</span><span class="nc">Collections</span><span class="o">.</span><span class="na">singletonMap</span><span class="o">(</span><span class="s">"X-Powered-By"</span><span class="o">,</span> <span class="s">"AWS Lambda &amp; serverless"</span><span class="o">))</span>
 				<span class="o">.</span><span class="na">build</span><span class="o">();</span>
 	<span class="o">}</span>
 <span class="o">}</span>
 
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <ul>
   <li>We then define the individual functions, like so -
-    <div class="language-yaml highlighter-rouge"><pre class="highlight"><code><span class="s">functions</span><span class="pi">:</span>
-<span class="s">hello</span><span class="pi">:</span>
-  <span class="s">handler</span><span class="pi">:</span> <span class="s">com.serverless.Handler::handleRequest</span>
-<span class="s">hello2</span><span class="pi">:</span>
-  <span class="s">handler</span><span class="pi">:</span> <span class="s">com.serverless.Handler::handleAnotherRequest</span>
-</code></pre>
-    </div>
+    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">functions</span><span class="pi">:</span>
+<span class="na">hello</span><span class="pi">:</span>
+  <span class="na">handler</span><span class="pi">:</span> <span class="s">com.serverless.Handler::handleRequest</span>
+<span class="na">hello2</span><span class="pi">:</span>
+  <span class="na">handler</span><span class="pi">:</span> <span class="s">com.serverless.Handler::handleAnotherRequest</span>
+</code></pre></div>    </div>
   </li>
 </ul>
 
-<p>Notice that we’ve added another function, <code class="highlighter-rouge">hello2</code> which has the same class, but maps to a different handler method.</p>
+<p>Notice that we’ve added another function, <code class="language-plaintext highlighter-rouge">hello2</code> which has the same class, but maps to a different handler method.</p>
 
 <ul>
   <li>Now we’re ready to deploy and invoke the functions.</li>
 </ul>
 
 <blockquote>
-  <p>This does not work with <code class="highlighter-rouge">invoke local</code> as of this writing (1.26.0).</p>
+  <p>This does not work with <code class="language-plaintext highlighter-rouge">invoke local</code> as of this writing (1.26.0).</p>
 </blockquote>
 
-<p>We need to build the project using <code class="highlighter-rouge">mvn</code></p>
+<p>We need to build the project using <code class="language-plaintext highlighter-rouge">mvn</code></p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ mvn clean install
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ mvn clean install
 [INFO] Scanning for projects...
 [INFO]
 [INFO] ------------------------------------------------------------------------
@@ -417,10 +405,9 @@ bash-3.2$ tree
 [INFO] Final Memory: 25M/310M
 [INFO] ------------------------------------------------------------------------
 bash-3.2$
-</code></pre>
-</div>
+</code></pre></div></div>
 <p>Now we deploy -</p>
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ serverless deploy
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ serverless deploy
 Serverless: Packaging service...
 Serverless: Uploading CloudFormation file to S3...
 Serverless: Uploading artifacts...
@@ -441,10 +428,9 @@ endpoints:
 functions:
   hello: aws-java-maven-dev-hello
   hello2: aws-java-maven-dev-hello2
-</code></pre>
-</div>
+</code></pre></div></div>
 <p>Finally, we can test -</p>
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ serverless invoke -f hello
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ serverless invoke -f hello
 {
     "statusCode": 200,
     "body": "{\"message\":\"Go Serverless v1.x! Your function executed successfully!\",\"input\":{}}",
@@ -463,9 +449,8 @@ bash-3.2$ serverless invoke -f hello2
     "isBase64Encoded": false
 }
 bash-3.2$
-</code></pre>
-</div>
-<p>As you can notice, the two functions can be invoked using their function names, while residing in the same <code class="highlighter-rouge">Handler</code> class. This is pretty useful when creating <code class="highlighter-rouge">CRUD</code> operations on resources without having to create a <code class="highlighter-rouge">Handler</code> class for each method.</p>
+</code></pre></div></div>
+<p>As you can notice, the two functions can be invoked using their function names, while residing in the same <code class="language-plaintext highlighter-rouge">Handler</code> class. This is pretty useful when creating <code class="language-plaintext highlighter-rouge">CRUD</code> operations on resources without having to create a <code class="language-plaintext highlighter-rouge">Handler</code> class for each method.</p>
 
 <p>Found this useful? Let me know in the comments below!</p>
 

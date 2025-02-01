@@ -31,35 +31,29 @@
   
   
 
-  <script type="text/javascript">
-  WebFontConfig = {
-    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
-  };
-  (function(d) {
-    var wf = d.createElement('script'), s = d.scripts[0];
-    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
-    wf.async = true;
-    s.parentNode.insertBefore(wf, s);
-  })(document);
-</script>
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet">
 
   
-  <!-- Google Analytics -->
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    ga('create', 'UA-96931340-1', 'auto');
-    ga('send', 'pageview');
+      ga('create', 'UA-96931340-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  
 
-  </script>
 
-
-  <!-- Begin Jekyll SEO tag v2.4.0 -->
+  <!-- Begin Jekyll SEO tag v2.6.1 -->
 <title>AWS Lambda with Serverless Framework and Java/Maven - Part 2 | Manish Pandit’s Blog</title>
-<meta name="generator" content="Jekyll v3.4.3" />
+<meta name="generator" content="Jekyll v4.3.4" />
 <meta property="og:title" content="AWS Lambda with Serverless Framework and Java/Maven - Part 2" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
@@ -71,7 +65,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2017-04-12T23:44:37-07:00" />
 <script type="application/ld+json">
-{"description":"We continue to build our Lambda functions beyond the Hello World that we saw in the previous post. Our end goal is to build an API, and make it available via Amazon API Gateway. We will build the foundation of our Lambda-API-Gateway set up in this tutorial. We will also set up DynamoDB. Feel free to replace DynamoDB with any persistance layer, or even a mock.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"BlogPosting","url":"https://lobster1234.github.io/2017/04/12/serverless-framework-aws-apigateway/","headline":"AWS Lambda with Serverless Framework and Java/Maven - Part 2","dateModified":"2017-04-12T23:44:37-07:00","datePublished":"2017-04-12T23:44:37-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/04/12/serverless-framework-aws-apigateway/"},"@context":"http://schema.org"}</script>
+{"url":"https://lobster1234.github.io/2017/04/12/serverless-framework-aws-apigateway/","description":"We continue to build our Lambda functions beyond the Hello World that we saw in the previous post. Our end goal is to build an API, and make it available via Amazon API Gateway. We will build the foundation of our Lambda-API-Gateway set up in this tutorial. We will also set up DynamoDB. Feel free to replace DynamoDB with any persistance layer, or even a mock.","author":{"@type":"Person","name":"Manish Pandit"},"headline":"AWS Lambda with Serverless Framework and Java/Maven - Part 2","dateModified":"2017-04-12T23:44:37-07:00","datePublished":"2017-04-12T23:44:37-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/04/12/serverless-framework-aws-apigateway/"},"@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -490,41 +484,39 @@
 
 <p>Here is the API Schema -</p>
 
-<p>POST <code class="highlighter-rouge">/accounts/:account_id/transactions</code></p>
+<p>POST <code class="language-plaintext highlighter-rouge">/accounts/:account_id/transactions</code></p>
 
-<div class="language-json highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="w">
-  </span><span class="nt">"transaction_id"</span><span class="p">:</span><span class="s2">"4f9a6c39-f3ba-4b62-9e30-ab408dd43933"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">22.44</span><span class="w">
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"transaction_id"</span><span class="p">:</span><span class="s2">"4f9a6c39-f3ba-4b62-9e30-ab408dd43933"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"amount"</span><span class="p">:</span><span class="w"> </span><span class="mf">22.44</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
-<p>GET <code class="highlighter-rouge">/accounts/:account_id/transactions</code></p>
+<p>GET <code class="language-plaintext highlighter-rouge">/accounts/:account_id/transactions</code></p>
 
 <p>The date is UTC milliseconds, as we are not bothering with dateformats and conversions here.</p>
 
-<div class="language-json highlighter-rouge"><pre class="highlight"><code><span class="p">[</span><span class="w">
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="w">
    </span><span class="p">{</span><span class="w">
-      </span><span class="nt">"account_id"</span><span class="p">:</span><span class="s2">"1234"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"transaction_date"</span><span class="p">:</span><span class="mi">1492160332168</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"transaction_id"</span><span class="p">:</span><span class="s2">"4f9a6c39-f3ba-4b62-9e30-ab408dd43933"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"amount"</span><span class="p">:</span><span class="mf">3.5</span><span class="w">
+      </span><span class="nl">"account_id"</span><span class="p">:</span><span class="s2">"1234"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"transaction_date"</span><span class="p">:</span><span class="mi">1492160332168</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"transaction_id"</span><span class="p">:</span><span class="s2">"4f9a6c39-f3ba-4b62-9e30-ab408dd43933"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"amount"</span><span class="p">:</span><span class="mf">3.5</span><span class="w">
    </span><span class="p">},</span><span class="w">
    </span><span class="p">{</span><span class="w">
-      </span><span class="nt">"account_id"</span><span class="p">:</span><span class="s2">"1234"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"transaction_date"</span><span class="p">:</span><span class="mi">1492160332122</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"transaction_id"</span><span class="p">:</span><span class="s2">"a411e6bd-941a-4ec9-9ff6-5fe816759256"</span><span class="p">,</span><span class="w">
-      </span><span class="nt">"amount"</span><span class="p">:</span><span class="mf">100.20</span><span class="w">
+      </span><span class="nl">"account_id"</span><span class="p">:</span><span class="s2">"1234"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"transaction_date"</span><span class="p">:</span><span class="mi">1492160332122</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"transaction_id"</span><span class="p">:</span><span class="s2">"a411e6bd-941a-4ec9-9ff6-5fe816759256"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"amount"</span><span class="p">:</span><span class="mf">100.20</span><span class="w">
    </span><span class="p">}</span><span class="w">
 </span><span class="p">]</span><span class="w">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <h2 id="create-a-serverless-project">Create a serverless project</h2>
 
 <p>Start by creating a new Serverless project, or you may re-use the one created during the Part-1 of this series.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ mkdir transactions-api
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ mkdir transactions-api
 bash-3.2$ serverless create -t aws-java-maven -n transactions-api
 Serverless: Generating boilerplate...
  _______                             __
@@ -536,59 +528,54 @@ Serverless: Generating boilerplate...
  -------'
 
 Serverless: Successfully generated boilerplate for template: "aws-java-maven"
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h2 id="update-the-pom-and-yaml">Update the POM and YAML</h2>
 
 <p>Since serverless creates a project called “hello”, lets go modify it to sound a bit more…functional.</p>
 
-<p>First, change the <code class="highlighter-rouge">pom.xml</code></p>
+<p>First, change the <code class="language-plaintext highlighter-rouge">pom.xml</code></p>
 
-<div class="language-xml highlighter-rouge"><pre class="highlight"><code> <span class="nt">&lt;groupId&gt;</span>com.serverless<span class="nt">&lt;/groupId&gt;</span>
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nt">&lt;groupId&gt;</span>com.serverless<span class="nt">&lt;/groupId&gt;</span>
   <span class="nt">&lt;artifactId&gt;</span>hello<span class="nt">&lt;/artifactId&gt;</span>
   <span class="nt">&lt;packaging&gt;</span>jar<span class="nt">&lt;/packaging&gt;</span>
   <span class="nt">&lt;version&gt;</span>dev<span class="nt">&lt;/version&gt;</span>
   <span class="nt">&lt;name&gt;</span>hello<span class="nt">&lt;/name&gt;</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 <p>to</p>
 
-<div class="language-xml highlighter-rouge"><pre class="highlight"><code> <span class="nt">&lt;groupId&gt;</span>com.serverless<span class="nt">&lt;/groupId&gt;</span>
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nt">&lt;groupId&gt;</span>com.serverless<span class="nt">&lt;/groupId&gt;</span>
   <span class="nt">&lt;artifactId&gt;</span>transactions-api<span class="nt">&lt;/artifactId&gt;</span>
   <span class="nt">&lt;packaging&gt;</span>jar<span class="nt">&lt;/packaging&gt;</span>
   <span class="nt">&lt;version&gt;</span>dev<span class="nt">&lt;/version&gt;</span>
   <span class="nt">&lt;name&gt;</span>transactions-api<span class="nt">&lt;/name&gt;</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<p>Also, since the project will use DynamoDB, add the AWS Java DynamoDB SDK dependency in <code class="highlighter-rouge">pom.xml</code>.</p>
+<p>Also, since the project will use DynamoDB, add the AWS Java DynamoDB SDK dependency in <code class="language-plaintext highlighter-rouge">pom.xml</code>.</p>
 
-<p>Add the below just before <code class="highlighter-rouge">&lt;/dependencies&gt;</code>.</p>
+<p>Add the below just before <code class="language-plaintext highlighter-rouge">&lt;/dependencies&gt;</code>.</p>
 
-<div class="language-xml highlighter-rouge"><pre class="highlight"><code> <span class="nt">&lt;dependency&gt;</span>
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nt">&lt;dependency&gt;</span>
   <span class="nt">&lt;groupId&gt;</span>com.amazonaws<span class="nt">&lt;/groupId&gt;</span>
   <span class="nt">&lt;artifactId&gt;</span>aws-java-sdk-dynamodb<span class="nt">&lt;/artifactId&gt;</span>
   <span class="nt">&lt;version&gt;</span>1.11.119<span class="nt">&lt;/version&gt;</span>
 <span class="nt">&lt;/dependency&gt;</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<p>Next, in <code class="highlighter-rouge">serverless.yml</code>, we describe the lambda handlers, and the deployment artifact name. Change the following</p>
+<p>Next, in <code class="language-plaintext highlighter-rouge">serverless.yml</code>, we describe the lambda handlers, and the deployment artifact name. Change the following</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code># you can add packaging information here
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># you can add packaging information here
 package:
   artifact: target/hello-dev.jar
 
 functions:
   hello:
     handler: com.serverless.Handler
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>to</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code># you can add packaging information here
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># you can add packaging information here
 package:
   artifact: target/transactions-api-dev.jar
 
@@ -597,8 +584,7 @@ functions:
     handler: com.serverless.GetTransactionsHandler
   post-transaction:
     handler: com.serverless.PostTransactionsHandler
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h2 id="configure-dynamodb-resource-and-lambda-role">Configure DynamoDB Resource and Lambda Role</h2>
 
@@ -610,21 +596,20 @@ functions:
 
 <p>Serverless takes care of creating a basic lambda execution role, however, it only has CloudWatch Log permissions. So let us add permissions for DynamoDB as well.</p>
 
-<p>To do so, add the following to <code class="highlighter-rouge">serverless.yml</code> above the commented out section that says <code class="highlighter-rouge"># you can add statements to the Lambda function's IAM Role here</code>.</p>
+<p>To do so, add the following to <code class="language-plaintext highlighter-rouge">serverless.yml</code> above the commented out section that says <code class="language-plaintext highlighter-rouge"># you can add statements to the Lambda function's IAM Role here</code>.</p>
 
-<p><strong>Make sure this is under the <code class="highlighter-rouge">provider</code> section, so indent accordingly.</strong>. Refer to the code in the github repo to verify.</p>
+<p><strong>Make sure this is under the <code class="language-plaintext highlighter-rouge">provider</code> section, so indent accordingly.</strong>. Refer to the code in the github repo to verify.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>iamRoleStatements:
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>iamRoleStatements:
    - Effect: "Allow"
      Action:
        - "dynamodb:*"
      Resource: "*"
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<p>To create the table, at the bottom of the <code class="highlighter-rouge">serverless.yml</code>, add this CloudFormation section. This represents the schema. Since the serverless user (created in Part-1) in IAM has CloudFormation permissions across all resources, the framework will be able to create this resource via CloudFormation. As you can see, we are using <code class="highlighter-rouge">account_id</code> as the <code class="highlighter-rouge">HASH</code> key, and <code class="highlighter-rouge">transaction_date</code> as our <code class="highlighter-rouge">RANGE</code> key. Other attributes like <code class="highlighter-rouge">transaction_id</code> and <code class="highlighter-rouge">amount</code> do not need to be declared.</p>
+<p>To create the table, at the bottom of the <code class="language-plaintext highlighter-rouge">serverless.yml</code>, add this CloudFormation section. This represents the schema. Since the serverless user (created in Part-1) in IAM has CloudFormation permissions across all resources, the framework will be able to create this resource via CloudFormation. As you can see, we are using <code class="language-plaintext highlighter-rouge">account_id</code> as the <code class="language-plaintext highlighter-rouge">HASH</code> key, and <code class="language-plaintext highlighter-rouge">transaction_date</code> as our <code class="language-plaintext highlighter-rouge">RANGE</code> key. Other attributes like <code class="language-plaintext highlighter-rouge">transaction_id</code> and <code class="language-plaintext highlighter-rouge">amount</code> do not need to be declared.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>resources:
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>resources:
   Resources:
     transactionsTable:
       Type: AWS::DynamoDB::Table
@@ -643,22 +628,21 @@ functions:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h2 id="now-we-code">Now we code!</h2>
 
-<p>I use <a href="https://www.jetbrains.com/idea/" target="_blank">IntelliJ</a>, but any IDE that works with a Maven project will do. In IntelliJ, click <code class="highlighter-rouge">Open</code>, then select the <code class="highlighter-rouge">pom.xml</code> and pick <code class="highlighter-rouge">Open as Project</code>.</p>
+<p>I use <a href="https://www.jetbrains.com/idea/" target="_blank">IntelliJ</a>, but any IDE that works with a Maven project will do. In IntelliJ, click <code class="language-plaintext highlighter-rouge">Open</code>, then select the <code class="language-plaintext highlighter-rouge">pom.xml</code> and pick <code class="language-plaintext highlighter-rouge">Open as Project</code>.</p>
 
-<p>Since there are declared 2 handlers <code class="highlighter-rouge">GetTransactionsHandler.java</code> and <code class="highlighter-rouge">PostTransactionsHandler.java</code>, copy the auto-generated <code class="highlighter-rouge">Hander.java</code> as those two new files. There are now 3 Java files under <code class="highlighter-rouge">src/main/java/com/serverless</code>. We will modify the copied files to build our API.</p>
+<p>Since there are declared 2 handlers <code class="language-plaintext highlighter-rouge">GetTransactionsHandler.java</code> and <code class="language-plaintext highlighter-rouge">PostTransactionsHandler.java</code>, copy the auto-generated <code class="language-plaintext highlighter-rouge">Hander.java</code> as those two new files. There are now 3 Java files under <code class="language-plaintext highlighter-rouge">src/main/java/com/serverless</code>. We will modify the copied files to build our API.</p>
 
 <h3 id="dynamodb-pojo">DynamoDB POJO</h3>
 
-<p>Lets create the POJO we will need for our API. We use <code class="highlighter-rouge">com.serverless.data</code> package to hold it. Please note that we use <a href="http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBMapper.Annotations.html" target="_blank">DynamoDB annotations</a> in this POJO to make our life easier.</p>
+<p>Lets create the POJO we will need for our API. We use <code class="language-plaintext highlighter-rouge">com.serverless.data</code> package to hold it. Please note that we use <a href="http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBMapper.Annotations.html" target="_blank">DynamoDB annotations</a> in this POJO to make our life easier.</p>
 
-<p><code class="highlighter-rouge">Transaction.java</code> - This POJO represents the DynamoDB Item.</p>
+<p><code class="language-plaintext highlighter-rouge">Transaction.java</code> - This POJO represents the DynamoDB Item.</p>
 
-<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kn">package</span> <span class="n">com</span><span class="o">.</span><span class="na">serverless</span><span class="o">.</span><span class="na">data</span><span class="o">;</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="nn">com.serverless.data</span><span class="o">;</span>
 
 <span class="kn">import</span> <span class="nn">com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey</span><span class="o">;</span>
@@ -671,58 +655,57 @@ functions:
 <span class="kd">public</span> <span class="kd">class</span> <span class="nc">Transaction</span> <span class="o">{</span>
 
     <span class="nd">@DynamoDBHashKey</span><span class="o">(</span><span class="n">attributeName</span> <span class="o">=</span> <span class="s">"account_id"</span><span class="o">)</span>
-    <span class="n">String</span> <span class="n">account_id</span><span class="o">;</span> <span class="c1">//Hash Key</span>
+    <span class="nc">String</span> <span class="n">account_id</span><span class="o">;</span> <span class="c1">//Hash Key</span>
 
     <span class="nd">@DynamoDBRangeKey</span><span class="o">(</span><span class="n">attributeName</span> <span class="o">=</span> <span class="s">"transaction_date"</span><span class="o">)</span>
-    <span class="n">Date</span> <span class="n">transaction_date</span><span class="o">;</span> <span class="c1">//Range Key</span>
+    <span class="nc">Date</span> <span class="n">transaction_date</span><span class="o">;</span> <span class="c1">//Range Key</span>
 
     <span class="nd">@DynamoDBAttribute</span><span class="o">(</span><span class="n">attributeName</span> <span class="o">=</span> <span class="s">"transaction_id"</span><span class="o">)</span>
-    <span class="n">String</span> <span class="n">transaction_id</span><span class="o">;</span>
+    <span class="nc">String</span> <span class="n">transaction_id</span><span class="o">;</span>
 
     <span class="nd">@DynamoDBAttribute</span><span class="o">(</span><span class="n">attributeName</span> <span class="o">=</span> <span class="s">"amount"</span><span class="o">)</span>
-    <span class="n">Float</span> <span class="n">amount</span><span class="o">;</span>
+    <span class="nc">Float</span> <span class="n">amount</span><span class="o">;</span>
 
-    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getAccount_id</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getAccount_id</span><span class="o">()</span> <span class="o">{</span>
         <span class="k">return</span> <span class="n">account_id</span><span class="o">;</span>
     <span class="o">}</span>
 
-    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setAccount_id</span><span class="o">(</span><span class="n">String</span> <span class="n">account_id</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setAccount_id</span><span class="o">(</span><span class="nc">String</span> <span class="n">account_id</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">this</span><span class="o">.</span><span class="na">account_id</span> <span class="o">=</span> <span class="n">account_id</span><span class="o">;</span>
     <span class="o">}</span>
 
-    <span class="kd">public</span> <span class="n">Date</span> <span class="nf">getTransaction_date</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="nc">Date</span> <span class="nf">getTransaction_date</span><span class="o">()</span> <span class="o">{</span>
         <span class="k">return</span> <span class="n">transaction_date</span><span class="o">;</span>
     <span class="o">}</span>
 
-    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setTransaction_date</span><span class="o">(</span><span class="n">Date</span> <span class="n">transaction_date</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setTransaction_date</span><span class="o">(</span><span class="nc">Date</span> <span class="n">transaction_date</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">this</span><span class="o">.</span><span class="na">transaction_date</span> <span class="o">=</span> <span class="n">transaction_date</span><span class="o">;</span>
     <span class="o">}</span>
 
-    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getTransaction_id</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getTransaction_id</span><span class="o">()</span> <span class="o">{</span>
         <span class="k">return</span> <span class="n">transaction_id</span><span class="o">;</span>
     <span class="o">}</span>
 
-    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setTransaction_id</span><span class="o">(</span><span class="n">String</span> <span class="n">transaction_id</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setTransaction_id</span><span class="o">(</span><span class="nc">String</span> <span class="n">transaction_id</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">this</span><span class="o">.</span><span class="na">transaction_id</span> <span class="o">=</span> <span class="n">transaction_id</span><span class="o">;</span>
     <span class="o">}</span>
 
-    <span class="kd">public</span> <span class="n">Float</span> <span class="nf">getAmount</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="nc">Float</span> <span class="nf">getAmount</span><span class="o">()</span> <span class="o">{</span>
         <span class="k">return</span> <span class="n">amount</span><span class="o">;</span>
     <span class="o">}</span>
 
-    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setAmount</span><span class="o">(</span><span class="n">Float</span> <span class="n">amount</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setAmount</span><span class="o">(</span><span class="nc">Float</span> <span class="n">amount</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">this</span><span class="o">.</span><span class="na">amount</span> <span class="o">=</span> <span class="n">amount</span><span class="o">;</span>
     <span class="o">}</span>
 <span class="o">}</span>
 
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h3 id="dynamodb-adapter">DynamoDB Adapter</h3>
 
-<p>Since our API uses DynamoDB, let us create a class to handle all DynamoDB work. Lets call it <code class="highlighter-rouge">DynamoDBAdapter</code> and put it under <code class="highlighter-rouge">com.serverless.db</code> package. We will make it a quick and dirty singleton. This provides 2 simple methods - to get transactions, and to store transactions. It uses <a href="http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBMapper.Methods.html" target="_blank">DynamoDBMapper</a> Class from AWS Java SDK.</p>
+<p>Since our API uses DynamoDB, let us create a class to handle all DynamoDB work. Lets call it <code class="language-plaintext highlighter-rouge">DynamoDBAdapter</code> and put it under <code class="language-plaintext highlighter-rouge">com.serverless.db</code> package. We will make it a quick and dirty singleton. This provides 2 simple methods - to get transactions, and to store transactions. It uses <a href="http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBMapper.Methods.html" target="_blank">DynamoDBMapper</a> Class from AWS Java SDK.</p>
 
-<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kn">package</span> <span class="n">com</span><span class="o">.</span><span class="na">serverless</span><span class="o">.</span><span class="na">db</span><span class="o">;</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="nn">com.serverless.db</span><span class="o">;</span>
 
 <span class="kn">import</span> <span class="nn">com.amazonaws.client.builder.AwsClientBuilder</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">com.amazonaws.services.dynamodbv2.AmazonDynamoDB</span><span class="o">;</span>
@@ -743,43 +726,42 @@ functions:
 
 <span class="kd">public</span> <span class="kd">class</span> <span class="nc">DynamoDBAdapter</span> <span class="o">{</span>
 
-    <span class="kd">private</span> <span class="n">Logger</span> <span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">getClass</span><span class="o">());</span>
+    <span class="kd">private</span> <span class="nc">Logger</span> <span class="n">logger</span> <span class="o">=</span> <span class="nc">Logger</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">getClass</span><span class="o">());</span>
 
-    <span class="kd">private</span> <span class="kd">final</span> <span class="kd">static</span> <span class="n">DynamoDBAdapter</span> <span class="n">adapter</span> <span class="o">=</span> <span class="k">new</span> <span class="n">DynamoDBAdapter</span><span class="o">();</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="kd">static</span> <span class="nc">DynamoDBAdapter</span> <span class="n">adapter</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">DynamoDBAdapter</span><span class="o">();</span>
 
-    <span class="kd">private</span> <span class="kd">final</span> <span class="n">AmazonDynamoDB</span> <span class="n">client</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">AmazonDynamoDB</span> <span class="n">client</span><span class="o">;</span>
 
     <span class="kd">private</span> <span class="nf">DynamoDBAdapter</span><span class="o">()</span> <span class="o">{</span>
-        <span class="n">client</span> <span class="o">=</span> <span class="n">AmazonDynamoDBClientBuilder</span><span class="o">.</span><span class="na">standard</span><span class="o">().</span><span class="na">withEndpointConfiguration</span><span class="o">(</span>
-                <span class="k">new</span> <span class="n">AwsClientBuilder</span><span class="o">.</span><span class="na">EndpointConfiguration</span><span class="o">(</span><span class="s">"https://dynamodb.us-east-1.amazonaws.com"</span><span class="o">,</span> <span class="s">"us-east-1"</span><span class="o">))</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="nc">AmazonDynamoDBClientBuilder</span><span class="o">.</span><span class="na">standard</span><span class="o">().</span><span class="na">withEndpointConfiguration</span><span class="o">(</span>
+                <span class="k">new</span> <span class="nc">AwsClientBuilder</span><span class="o">.</span><span class="na">EndpointConfiguration</span><span class="o">(</span><span class="s">"https://dynamodb.us-east-1.amazonaws.com"</span><span class="o">,</span> <span class="s">"us-east-1"</span><span class="o">))</span>
                 <span class="o">.</span><span class="na">build</span><span class="o">();</span>
         <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"Created DynamoDB client"</span><span class="o">);</span>
     <span class="o">}</span>
 
-    <span class="kd">public</span> <span class="kd">static</span> <span class="n">DynamoDBAdapter</span> <span class="nf">getInstance</span><span class="o">(){</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="nc">DynamoDBAdapter</span> <span class="nf">getInstance</span><span class="o">(){</span>
         <span class="k">return</span> <span class="n">adapter</span><span class="o">;</span>
     <span class="o">}</span>
 
-    <span class="kd">public</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Transaction</span><span class="o">&gt;</span> <span class="nf">getTransactions</span><span class="o">(</span><span class="n">String</span> <span class="n">accountId</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-        <span class="n">DynamoDBMapper</span> <span class="n">mapper</span> <span class="o">=</span> <span class="k">new</span> <span class="n">DynamoDBMapper</span><span class="o">(</span><span class="n">client</span><span class="o">);</span>
-        <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">AttributeValue</span><span class="o">&gt;</span> <span class="n">vals</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;&gt;();</span>
-        <span class="n">vals</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">":val1"</span><span class="o">,</span><span class="k">new</span> <span class="n">AttributeValue</span><span class="o">().</span><span class="na">withS</span><span class="o">(</span><span class="n">accountId</span><span class="o">));</span>
-        <span class="n">DynamoDBQueryExpression</span><span class="o">&lt;</span><span class="n">Transaction</span><span class="o">&gt;</span> <span class="n">queryExpression</span> <span class="o">=</span> <span class="k">new</span> <span class="n">DynamoDBQueryExpression</span><span class="o">&lt;</span><span class="n">Transaction</span><span class="o">&gt;()</span>
+    <span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Transaction</span><span class="o">&gt;</span> <span class="nf">getTransactions</span><span class="o">(</span><span class="nc">String</span> <span class="n">accountId</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">IOException</span> <span class="o">{</span>
+        <span class="nc">DynamoDBMapper</span> <span class="n">mapper</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">DynamoDBMapper</span><span class="o">(</span><span class="n">client</span><span class="o">);</span>
+        <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">AttributeValue</span><span class="o">&gt;</span> <span class="n">vals</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HashMap</span><span class="o">&lt;&gt;();</span>
+        <span class="n">vals</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">":val1"</span><span class="o">,</span><span class="k">new</span> <span class="nc">AttributeValue</span><span class="o">().</span><span class="na">withS</span><span class="o">(</span><span class="n">accountId</span><span class="o">));</span>
+        <span class="nc">DynamoDBQueryExpression</span><span class="o">&lt;</span><span class="nc">Transaction</span><span class="o">&gt;</span> <span class="n">queryExpression</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">DynamoDBQueryExpression</span><span class="o">&lt;</span><span class="nc">Transaction</span><span class="o">&gt;()</span>
                 <span class="o">.</span><span class="na">withKeyConditionExpression</span><span class="o">(</span><span class="s">"account_id = :val1 "</span><span class="o">)</span>
                 <span class="o">.</span><span class="na">withExpressionAttributeValues</span><span class="o">(</span><span class="n">vals</span><span class="o">);</span>
-        <span class="k">return</span> <span class="n">mapper</span><span class="o">.</span><span class="na">query</span><span class="o">(</span><span class="n">Transaction</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">queryExpression</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">mapper</span><span class="o">.</span><span class="na">query</span><span class="o">(</span><span class="nc">Transaction</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">queryExpression</span><span class="o">);</span>
     <span class="o">}</span>
 
 
-    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">putTransaction</span><span class="o">(</span><span class="n">Transaction</span> <span class="n">transaction</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">{</span>
-        <span class="n">DynamoDBMapper</span> <span class="n">mapper</span> <span class="o">=</span> <span class="k">new</span> <span class="n">DynamoDBMapper</span><span class="o">(</span><span class="n">client</span><span class="o">);</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">putTransaction</span><span class="o">(</span><span class="nc">Transaction</span> <span class="n">transaction</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">IOException</span><span class="o">{</span>
+        <span class="nc">DynamoDBMapper</span> <span class="n">mapper</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">DynamoDBMapper</span><span class="o">(</span><span class="n">client</span><span class="o">);</span>
         <span class="n">mapper</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="n">transaction</span><span class="o">);</span>
     <span class="o">}</span>
 
 <span class="o">}</span>
 
-</code></pre>
-</div>
+</code></pre></div></div>
 <h3 id="lambda-function-handlers">Lambda Function Handlers</h3>
 
 <p>Now we get to the fun part - writing our lambda handler. We had copied the Handler that Serverless created for us. Let us start there.</p>
@@ -788,80 +770,78 @@ functions:
 
 <p><a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html#api-gateway-simple-proxy-for-lambda-output-format" target="_blank">API Gateway Proxy For Lambda I/O format</a>.</p>
 
-<p>We need to extract our path parameter, <code class="highlighter-rouge">account_id</code> for the POST (and GET) request from <code class="highlighter-rouge">pathParameters</code> element in this JSON.</p>
+<p>We need to extract our path parameter, <code class="language-plaintext highlighter-rouge">account_id</code> for the POST (and GET) request from <code class="language-plaintext highlighter-rouge">pathParameters</code> element in this JSON.</p>
 
 <p>This part is a little tricky, as some elements are strings to be parsed as JSONs, others are serialized HashMaps. Please be sure to read the documentation linked above.</p>
 
-<p>Here is the code for <code class="highlighter-rouge">PostTransactionsHandler</code>’s <code class="highlighter-rouge">handleRequest</code> function.</p>
+<p>Here is the code for <code class="language-plaintext highlighter-rouge">PostTransactionsHandler</code>’s <code class="language-plaintext highlighter-rouge">handleRequest</code> function.</p>
 
-<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="nd">@Override</span>
-<span class="kd">public</span> <span class="n">ApiGatewayResponse</span> <span class="nf">handleRequest</span><span class="o">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">input</span><span class="o">,</span> <span class="n">Context</span> <span class="n">context</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"received: "</span> <span class="o">+</span> <span class="n">input</span><span class="o">);</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Override</span>
+<span class="kd">public</span> <span class="nc">ApiGatewayResponse</span> <span class="nf">handleRequest</span><span class="o">(</span><span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">Object</span><span class="o">&gt;</span> <span class="n">input</span><span class="o">,</span> <span class="nc">Context</span> <span class="n">context</span><span class="o">)</span> <span class="o">{</span>
+    <span class="no">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"received: "</span> <span class="o">+</span> <span class="n">input</span><span class="o">);</span>
     <span class="c1">//lets get our path parameter for account_id</span>
     <span class="k">try</span><span class="o">{</span>
-      <span class="n">ObjectMapper</span> <span class="n">mapper</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ObjectMapper</span><span class="o">();</span>
-      <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">pathParameters</span> <span class="o">=</span>  <span class="o">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span><span class="n">String</span><span class="o">&gt;)</span><span class="n">input</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">"pathParameters"</span><span class="o">);</span>
-      <span class="n">String</span> <span class="n">accountId</span> <span class="o">=</span> <span class="n">pathParameters</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">"account_id"</span><span class="o">);</span>
-      <span class="n">Transaction</span> <span class="n">tx</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Transaction</span><span class="o">();</span>
+      <span class="nc">ObjectMapper</span> <span class="n">mapper</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ObjectMapper</span><span class="o">();</span>
+      <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">pathParameters</span> <span class="o">=</span>  <span class="o">(</span><span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span><span class="nc">String</span><span class="o">&gt;)</span><span class="n">input</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">"pathParameters"</span><span class="o">);</span>
+      <span class="nc">String</span> <span class="n">accountId</span> <span class="o">=</span> <span class="n">pathParameters</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">"account_id"</span><span class="o">);</span>
+      <span class="nc">Transaction</span> <span class="n">tx</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Transaction</span><span class="o">();</span>
       <span class="n">tx</span><span class="o">.</span><span class="na">setAccount_id</span><span class="o">(</span><span class="n">accountId</span><span class="o">);</span>
-      <span class="n">JsonNode</span> <span class="n">body</span> <span class="o">=</span> <span class="n">mapper</span><span class="o">.</span><span class="na">readTree</span><span class="o">((</span><span class="n">String</span><span class="o">)</span> <span class="n">input</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">"body"</span><span class="o">));</span>
+      <span class="nc">JsonNode</span> <span class="n">body</span> <span class="o">=</span> <span class="n">mapper</span><span class="o">.</span><span class="na">readTree</span><span class="o">((</span><span class="nc">String</span><span class="o">)</span> <span class="n">input</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">"body"</span><span class="o">));</span>
       <span class="kt">float</span> <span class="n">amount</span> <span class="o">=</span> <span class="o">(</span><span class="kt">float</span><span class="o">)</span> <span class="n">body</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">"amount"</span><span class="o">).</span><span class="na">asDouble</span><span class="o">();</span>
-      <span class="n">String</span> <span class="n">txId</span> <span class="o">=</span> <span class="n">body</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">"transaction_id"</span><span class="o">).</span><span class="na">asText</span><span class="o">();</span>
+      <span class="nc">String</span> <span class="n">txId</span> <span class="o">=</span> <span class="n">body</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">"transaction_id"</span><span class="o">).</span><span class="na">asText</span><span class="o">();</span>
       <span class="n">tx</span><span class="o">.</span><span class="na">setAmount</span><span class="o">(</span><span class="n">amount</span><span class="o">);</span>
-      <span class="n">tx</span><span class="o">.</span><span class="na">setTransaction_date</span><span class="o">(</span><span class="k">new</span> <span class="n">Date</span><span class="o">(</span><span class="n">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">()));</span>
+      <span class="n">tx</span><span class="o">.</span><span class="na">setTransaction_date</span><span class="o">(</span><span class="k">new</span> <span class="nc">Date</span><span class="o">(</span><span class="nc">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">()));</span>
       <span class="n">tx</span><span class="o">.</span><span class="na">setTransaction_id</span><span class="o">(</span><span class="n">txId</span><span class="o">);</span>
-      <span class="n">DynamoDBAdapter</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">putTransaction</span><span class="o">(</span><span class="n">tx</span><span class="o">);</span>
-    <span class="o">}</span> <span class="k">catch</span><span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">){</span>
-      <span class="n">LOG</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="n">e</span><span class="o">,</span><span class="n">e</span><span class="o">);</span>
-      <span class="n">Response</span> <span class="n">responseBody</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Response</span><span class="o">(</span><span class="s">"Failure putting transaction"</span><span class="o">,</span> <span class="n">input</span><span class="o">);</span>
-      <span class="k">return</span> <span class="n">ApiGatewayResponse</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
+      <span class="nc">DynamoDBAdapter</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">putTransaction</span><span class="o">(</span><span class="n">tx</span><span class="o">);</span>
+    <span class="o">}</span> <span class="k">catch</span><span class="o">(</span><span class="nc">Exception</span> <span class="n">e</span><span class="o">){</span>
+      <span class="no">LOG</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="n">e</span><span class="o">,</span><span class="n">e</span><span class="o">);</span>
+      <span class="nc">Response</span> <span class="n">responseBody</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Response</span><span class="o">(</span><span class="s">"Failure putting transaction"</span><span class="o">,</span> <span class="n">input</span><span class="o">);</span>
+      <span class="k">return</span> <span class="nc">ApiGatewayResponse</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
       <span class="o">.</span><span class="na">setStatusCode</span><span class="o">(</span><span class="mi">500</span><span class="o">)</span>
       <span class="o">.</span><span class="na">setObjectBody</span><span class="o">(</span><span class="n">responseBody</span><span class="o">)</span>
-      <span class="o">.</span><span class="na">setHeaders</span><span class="o">(</span><span class="n">Collections</span><span class="o">.</span><span class="na">singletonMap</span><span class="o">(</span><span class="s">"X-Powered-By"</span><span class="o">,</span> <span class="s">"AWS Lambda &amp; serverless"</span><span class="o">))</span>
+      <span class="o">.</span><span class="na">setHeaders</span><span class="o">(</span><span class="nc">Collections</span><span class="o">.</span><span class="na">singletonMap</span><span class="o">(</span><span class="s">"X-Powered-By"</span><span class="o">,</span> <span class="s">"AWS Lambda &amp; serverless"</span><span class="o">))</span>
       <span class="o">.</span><span class="na">build</span><span class="o">();</span>
     <span class="o">}</span>
-    <span class="n">Response</span> <span class="n">responseBody</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Response</span><span class="o">(</span><span class="s">"Transaction added successfully!"</span><span class="o">,</span> <span class="n">input</span><span class="o">);</span>
-    <span class="k">return</span> <span class="n">ApiGatewayResponse</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
+    <span class="nc">Response</span> <span class="n">responseBody</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Response</span><span class="o">(</span><span class="s">"Transaction added successfully!"</span><span class="o">,</span> <span class="n">input</span><span class="o">);</span>
+    <span class="k">return</span> <span class="nc">ApiGatewayResponse</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
     <span class="o">.</span><span class="na">setStatusCode</span><span class="o">(</span><span class="mi">200</span><span class="o">)</span>
     <span class="o">.</span><span class="na">setObjectBody</span><span class="o">(</span><span class="n">responseBody</span><span class="o">)</span>
-    <span class="o">.</span><span class="na">setHeaders</span><span class="o">(</span><span class="n">Collections</span><span class="o">.</span><span class="na">singletonMap</span><span class="o">(</span><span class="s">"X-Powered-By"</span><span class="o">,</span> <span class="s">"AWS Lambda &amp; serverless"</span><span class="o">))</span>
+    <span class="o">.</span><span class="na">setHeaders</span><span class="o">(</span><span class="nc">Collections</span><span class="o">.</span><span class="na">singletonMap</span><span class="o">(</span><span class="s">"X-Powered-By"</span><span class="o">,</span> <span class="s">"AWS Lambda &amp; serverless"</span><span class="o">))</span>
     <span class="o">.</span><span class="na">build</span><span class="o">();</span>
 <span class="o">}</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<p>In the code above, we’re getting the <code class="highlighter-rouge">pathParameters</code> as a <code class="highlighter-rouge">Map</code> and extracting <code class="highlighter-rouge">account_id</code> from it. Then we create a <code class="highlighter-rouge">Transaction</code> object and populate it, and call the <code class="highlighter-rouge">DynamoDBAdapter</code> to persist the object. We parse the body using Jackson, which is already available to us via AWS Java SDK.</p>
+<p>In the code above, we’re getting the <code class="language-plaintext highlighter-rouge">pathParameters</code> as a <code class="language-plaintext highlighter-rouge">Map</code> and extracting <code class="language-plaintext highlighter-rouge">account_id</code> from it. Then we create a <code class="language-plaintext highlighter-rouge">Transaction</code> object and populate it, and call the <code class="language-plaintext highlighter-rouge">DynamoDBAdapter</code> to persist the object. We parse the body using Jackson, which is already available to us via AWS Java SDK.</p>
 
-<p>Similarly, we code our <code class="highlighter-rouge">GetTransactionsHandler</code>’s <code class="highlighter-rouge">handleRequest</code> function.</p>
+<p>Similarly, we code our <code class="language-plaintext highlighter-rouge">GetTransactionsHandler</code>’s <code class="language-plaintext highlighter-rouge">handleRequest</code> function.</p>
 
-<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="nd">@Override</span>
-<span class="kd">public</span> <span class="n">ApiGatewayResponse</span> <span class="nf">handleRequest</span><span class="o">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">input</span><span class="o">,</span> <span class="n">Context</span> <span class="n">context</span><span class="o">)</span> <span class="o">{</span>
-  <span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"received: "</span> <span class="o">+</span> <span class="n">input</span><span class="o">);</span>
-  <span class="n">List</span><span class="o">&lt;</span><span class="n">Transaction</span><span class="o">&gt;</span> <span class="n">tx</span><span class="o">;</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Override</span>
+<span class="kd">public</span> <span class="nc">ApiGatewayResponse</span> <span class="nf">handleRequest</span><span class="o">(</span><span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">Object</span><span class="o">&gt;</span> <span class="n">input</span><span class="o">,</span> <span class="nc">Context</span> <span class="n">context</span><span class="o">)</span> <span class="o">{</span>
+  <span class="no">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"received: "</span> <span class="o">+</span> <span class="n">input</span><span class="o">);</span>
+  <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Transaction</span><span class="o">&gt;</span> <span class="n">tx</span><span class="o">;</span>
   <span class="k">try</span> <span class="o">{</span>
-      <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">pathParameters</span> <span class="o">=</span> <span class="o">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;)</span> <span class="n">input</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">"pathParameters"</span><span class="o">);</span>
-      <span class="n">String</span> <span class="n">accountId</span> <span class="o">=</span> <span class="n">pathParameters</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">"account_id"</span><span class="o">);</span>
-      <span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"Getting transactions for "</span> <span class="o">+</span> <span class="n">accountId</span><span class="o">);</span>
-      <span class="n">tx</span> <span class="o">=</span> <span class="n">DynamoDBAdapter</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">getTransactions</span><span class="o">(</span><span class="n">accountId</span><span class="o">);</span>
-    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
-      <span class="n">LOG</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="n">e</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
-      <span class="n">Response</span> <span class="n">responseBody</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Response</span><span class="o">(</span><span class="s">"Failure getting transactions"</span><span class="o">,</span> <span class="n">input</span><span class="o">);</span>
-      <span class="k">return</span> <span class="n">ApiGatewayResponse</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
+      <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">String</span><span class="o">&gt;</span> <span class="n">pathParameters</span> <span class="o">=</span> <span class="o">(</span><span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">String</span><span class="o">&gt;)</span> <span class="n">input</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">"pathParameters"</span><span class="o">);</span>
+      <span class="nc">String</span> <span class="n">accountId</span> <span class="o">=</span> <span class="n">pathParameters</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">"account_id"</span><span class="o">);</span>
+      <span class="no">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"Getting transactions for "</span> <span class="o">+</span> <span class="n">accountId</span><span class="o">);</span>
+      <span class="n">tx</span> <span class="o">=</span> <span class="nc">DynamoDBAdapter</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">getTransactions</span><span class="o">(</span><span class="n">accountId</span><span class="o">);</span>
+    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+      <span class="no">LOG</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="n">e</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
+      <span class="nc">Response</span> <span class="n">responseBody</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Response</span><span class="o">(</span><span class="s">"Failure getting transactions"</span><span class="o">,</span> <span class="n">input</span><span class="o">);</span>
+      <span class="k">return</span> <span class="nc">ApiGatewayResponse</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
       <span class="o">.</span><span class="na">setStatusCode</span><span class="o">(</span><span class="mi">500</span><span class="o">)</span>
       <span class="o">.</span><span class="na">setObjectBody</span><span class="o">(</span><span class="n">responseBody</span><span class="o">)</span>
-      <span class="o">.</span><span class="na">setHeaders</span><span class="o">(</span><span class="n">Collections</span><span class="o">.</span><span class="na">singletonMap</span><span class="o">(</span><span class="s">"X-Powered-By"</span><span class="o">,</span> <span class="s">"AWS Lambda &amp; serverless"</span><span class="o">))</span>
+      <span class="o">.</span><span class="na">setHeaders</span><span class="o">(</span><span class="nc">Collections</span><span class="o">.</span><span class="na">singletonMap</span><span class="o">(</span><span class="s">"X-Powered-By"</span><span class="o">,</span> <span class="s">"AWS Lambda &amp; serverless"</span><span class="o">))</span>
       <span class="o">.</span><span class="na">build</span><span class="o">();</span>
    <span class="o">}</span>
-    <span class="k">return</span> <span class="n">ApiGatewayResponse</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
+    <span class="k">return</span> <span class="nc">ApiGatewayResponse</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
     <span class="o">.</span><span class="na">setStatusCode</span><span class="o">(</span><span class="mi">200</span><span class="o">)</span>
     <span class="o">.</span><span class="na">setObjectBody</span><span class="o">(</span><span class="n">tx</span><span class="o">)</span>
-    <span class="o">.</span><span class="na">setHeaders</span><span class="o">(</span><span class="n">Collections</span><span class="o">.</span><span class="na">singletonMap</span><span class="o">(</span><span class="s">"X-Powered-By"</span><span class="o">,</span> <span class="s">"AWS Lambda &amp; serverless"</span><span class="o">))</span>
+    <span class="o">.</span><span class="na">setHeaders</span><span class="o">(</span><span class="nc">Collections</span><span class="o">.</span><span class="na">singletonMap</span><span class="o">(</span><span class="s">"X-Powered-By"</span><span class="o">,</span> <span class="s">"AWS Lambda &amp; serverless"</span><span class="o">))</span>
     <span class="o">.</span><span class="na">build</span><span class="o">();</span>
 <span class="o">}</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<p>In this case, we’re calling <code class="highlighter-rouge">DynamoDBAdapter</code> to get the transactions for an account, and passing it as response body. We are not converting it to JSON or anything, hence you notice the <code class="highlighter-rouge">transaction_date</code> as a <code class="highlighter-rouge">long</code>.</p>
+<p>In this case, we’re calling <code class="language-plaintext highlighter-rouge">DynamoDBAdapter</code> to get the transactions for an account, and passing it as response body. We are not converting it to JSON or anything, hence you notice the <code class="language-plaintext highlighter-rouge">transaction_date</code> as a <code class="language-plaintext highlighter-rouge">long</code>.</p>
 
 <p>We are done with coding now. Lets deploy this!</p>
 
@@ -871,7 +851,7 @@ functions:
 
 <p>Build the jar, which will be the deployable artifact.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ mvn clean install
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ mvn clean install
 [INFO] Scanning for projects...
 [INFO]
 [INFO] ------------------------------------------------------------------------
@@ -884,10 +864,9 @@ functions:
 [INFO] Finished at: 2017-04-14T02:44:01-07:00
 [INFO] Final Memory: 39M/224M
 [INFO] ------------------------------------------------------------------------
-</code></pre>
-</div>
+</code></pre></div></div>
 <p>Next, we go ahead deploy.</p>
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ serverless deploy
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ serverless deploy
 Serverless: Creating Stack...
 Serverless: Checking Stack create progress...
 .....
@@ -910,23 +889,21 @@ functions:
   get-transactions: transactions-api-dev-get-transactions
   post-transaction: transactions-api-dev-post-transaction
 bash-3.2$
-</code></pre>
-</div>
-<p>If you want to dive deeper, check out the contents of <code class="highlighter-rouge">.serverless</code> folder. This has 2 CloudFormation templates that did the heavy lifting via Serverless Framework.</p>
+</code></pre></div></div>
+<p>If you want to dive deeper, check out the contents of <code class="language-plaintext highlighter-rouge">.serverless</code> folder. This has 2 CloudFormation templates that did the heavy lifting via Serverless Framework.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ tree .serverless/
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ tree .serverless/
 .serverless/
 ├── cloudformation-template-create-stack.json
 └── cloudformation-template-update-stack.json
 
 0 directories, 2 files
-</code></pre>
-</div>
-<p>The <code class="highlighter-rouge">create</code> templte creates the S3 bucket to upload the artifact, and <code class="highlighter-rouge">update</code> template takes care of everything else. More details on CloudFormation <a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/GettingStarted.html" target="_blank">here</a> .</p>
+</code></pre></div></div>
+<p>The <code class="language-plaintext highlighter-rouge">create</code> templte creates the S3 bucket to upload the artifact, and <code class="language-plaintext highlighter-rouge">update</code> template takes care of everything else. More details on CloudFormation <a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/GettingStarted.html" target="_blank">here</a> .</p>
 
-<p>Unfortunately invoking these 2 functions will not be straightforward via CLI, as they expects the input request as a <code class="highlighter-rouge">Map&lt;String, Object&gt;</code>.</p>
+<p>Unfortunately invoking these 2 functions will not be straightforward via CLI, as they expects the input request as a <code class="language-plaintext highlighter-rouge">Map&lt;String, Object&gt;</code>.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ serverless invoke -f get-transactions
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ serverless invoke -f get-transactions
 {
     "statusCode": 500,
     "body": "{\"message\":\"Failure getting transactions\",\"input\":{}}",
@@ -935,8 +912,7 @@ bash-3.2$
     },
     "isBase64Encoded": false
 }
-</code></pre>
-</div>
+</code></pre></div></div>
 <p>Feel free to log into the AWS console, and look at the lambda just set up under Lambda section. Also, take a look at CloudFormation stacks. We can test it by creating a body similar to the AWS Lambda Proxy request from the documentation link above in the Console.</p>
 
 <p>In the <a href="/2017/04/15/serverless-framework-api-gateway-lambda-proxy/" target="_blank_">next and final part</a>, we will wire up these 2 lambda functions to act as API endpoints.</p>

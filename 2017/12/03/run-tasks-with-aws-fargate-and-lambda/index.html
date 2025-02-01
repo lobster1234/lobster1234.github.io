@@ -31,35 +31,29 @@
   
   
 
-  <script type="text/javascript">
-  WebFontConfig = {
-    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
-  };
-  (function(d) {
-    var wf = d.createElement('script'), s = d.scripts[0];
-    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
-    wf.async = true;
-    s.parentNode.insertBefore(wf, s);
-  })(document);
-</script>
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet">
 
   
-  <!-- Google Analytics -->
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    ga('create', 'UA-96931340-1', 'auto');
-    ga('send', 'pageview');
+      ga('create', 'UA-96931340-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  
 
-  </script>
 
-
-  <!-- Begin Jekyll SEO tag v2.4.0 -->
+  <!-- Begin Jekyll SEO tag v2.6.1 -->
 <title>Run tasks with AWS Fargate and Lambda | Manish Pandit’s Blog</title>
-<meta name="generator" content="Jekyll v3.4.3" />
+<meta name="generator" content="Jekyll v4.3.4" />
 <meta property="og:title" content="Run tasks with AWS Fargate and Lambda" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
@@ -72,7 +66,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2017-12-03T22:44:37-08:00" />
 <script type="application/ld+json">
-{"description":"As with any other financial company, at Marqeta, we have a good number of batch jobs, which we are migrating over to AWS Batch. However, even in managed mode, AWS Batch needs us to define Compute Environments, which are clusters of EC2 instances running ECS (and Docker) agents. AWS Fargate was announced very recently at re:Invent 2017. Fargate adds a layer of abstraction on top of the Compute Environment, or the ECS Cluster. We no longer have to worry about the AMI, EC2 types, task placement, etc. In this post I cover the POC done to use Fargate over AWS Batch for batch processing, but this can also be used as a tutorial for running any type of tasks using Fargate. We create an ECS Task definition, a Fargate Cluster, and a Lambda to run the task using CloudWatch Event trigger.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"BlogPosting","url":"https://lobster1234.github.io/2017/12/03/run-tasks-with-aws-fargate-and-lambda/","image":"https://lobster1234.github.io/assets/fargate.png","headline":"Run tasks with AWS Fargate and Lambda","dateModified":"2017-12-03T22:44:37-08:00","datePublished":"2017-12-03T22:44:37-08:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/12/03/run-tasks-with-aws-fargate-and-lambda/"},"@context":"http://schema.org"}</script>
+{"url":"https://lobster1234.github.io/2017/12/03/run-tasks-with-aws-fargate-and-lambda/","description":"As with any other financial company, at Marqeta, we have a good number of batch jobs, which we are migrating over to AWS Batch. However, even in managed mode, AWS Batch needs us to define Compute Environments, which are clusters of EC2 instances running ECS (and Docker) agents. AWS Fargate was announced very recently at re:Invent 2017. Fargate adds a layer of abstraction on top of the Compute Environment, or the ECS Cluster. We no longer have to worry about the AMI, EC2 types, task placement, etc. In this post I cover the POC done to use Fargate over AWS Batch for batch processing, but this can also be used as a tutorial for running any type of tasks using Fargate. We create an ECS Task definition, a Fargate Cluster, and a Lambda to run the task using CloudWatch Event trigger.","author":{"@type":"Person","name":"Manish Pandit"},"image":"https://lobster1234.github.io/assets/fargate.png","headline":"Run tasks with AWS Fargate and Lambda","dateModified":"2017-12-03T22:44:37-08:00","datePublished":"2017-12-03T22:44:37-08:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/12/03/run-tasks-with-aws-fargate-and-lambda/"},"@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -365,25 +359,23 @@
 
 <h3 id="creating-the-docker-image">Creating the Docker image</h3>
 
-<p>This is the task that will simulate the batch job, <code class="highlighter-rouge">task.py</code> -</p>
+<p>This is the task that will simulate the batch job, <code class="language-plaintext highlighter-rouge">task.py</code> -</p>
 
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">time</span>
-<span class="k">print</span><span class="p">(</span><span class="s">'Task starting..'</span><span class="p">)</span>
-<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="s">'Task ended, took 5 seconds'</span><span class="p">)</span>
-</code></pre>
-</div>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">time</span>
+<span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">Task starting..</span><span class="sh">'</span><span class="p">)</span>
+<span class="n">time</span><span class="p">.</span><span class="nf">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="sh">'</span><span class="s">Task ended, took 5 seconds</span><span class="sh">'</span><span class="p">)</span>
+</code></pre></div></div>
 
 <p>And this is the Dockerfile -</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>FROM python:3.7.0a2-alpine3.6
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>FROM python:3.7.0a2-alpine3.6
 COPY task.py /tmp
 CMD python /tmp/task.py
-</code></pre>
-</div>
+</code></pre></div></div>
 <p>Next, we go ahead and build, and test the image.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>$ docker build .                              
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ docker build .                              
 Sending build context to Docker daemon  4.096kB
 Step 1/3 : FROM python:3.7.0a2-alpine3.6
  ---&gt; e0e4e8202722
@@ -398,16 +390,14 @@ Successfully built 65852146fb13
 $ docker run 65852146fb13
 Task starting..
 Task ended, took 5 seconds
-</code></pre>
-</div>
-<p>Now we can tag and push this image to ECR repo. Create a repo called <code class="highlighter-rouge">python-batch-job</code> in <a href="https://console.aws.amazon.com/ecs/home?region=us-east-1#/repositories">ECR</a>.</p>
-<div class="highlighter-rouge"><pre class="highlight"><code>$ docker tag 65852146fb13 python-batch-job:latest
+</code></pre></div></div>
+<p>Now we can tag and push this image to ECR repo. Create a repo called <code class="language-plaintext highlighter-rouge">python-batch-job</code> in <a href="https://console.aws.amazon.com/ecs/home?region=us-east-1#/repositories">ECR</a>.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ docker tag 65852146fb13 python-batch-job:latest
 $ aws ecr get-login --no-include-email --region us-east-1
 $ docker login -u AWS -p **** https://************.dkr.ecr.us-east-1.amazonaws.com
 $ docker tag python-batch-job:latest ************.dkr.ecr.us-east-1.amazonaws.com/python-batch-job:latest
 $ docker push ************.dkr.ecr.us-east-1.amazonaws.com/python-batch-job:latest
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h3 id="task-definition">Task Definition</h3>
 
@@ -415,17 +405,17 @@ $ docker push ************.dkr.ecr.us-east-1.amazonaws.com/python-batch-job:late
 
 <p><img src="https://lobster1234.github.io/assets/task_definition_launch_type.png" alt="Fargate-1" /></p>
 
-<p>Regarding the next steps, assuming you’re familiar with ECS Task Definitions, create a Task Definition using the container image from ECR. You can leave everything as default, and pick <code class="highlighter-rouge">Task Memory</code> as <code class="highlighter-rouge">0.5 GB</code>, and <code class="highlighter-rouge">Task CPU</code> as <code class="highlighter-rouge">0.25 vCPU</code>. When adding the container, you can specify the Hard Limit to <code class="highlighter-rouge">128 MB</code>, and <code class="highlighter-rouge">1</code> CPU Unit (under Environment).</p>
+<p>Regarding the next steps, assuming you’re familiar with ECS Task Definitions, create a Task Definition using the container image from ECR. You can leave everything as default, and pick <code class="language-plaintext highlighter-rouge">Task Memory</code> as <code class="language-plaintext highlighter-rouge">0.5 GB</code>, and <code class="language-plaintext highlighter-rouge">Task CPU</code> as <code class="language-plaintext highlighter-rouge">0.25 vCPU</code>. When adding the container, you can specify the Hard Limit to <code class="language-plaintext highlighter-rouge">128 MB</code>, and <code class="language-plaintext highlighter-rouge">1</code> CPU Unit (under Environment).</p>
 
 <p><img src="https://lobster1234.github.io/assets/task_definition_detail.png" alt="Fargate-2" /></p>
 
-<p>Since we are not using any AWS services in the task, we do not need a Task Role. The Task Execution IAM Role is automatically assigned to this task, called <code class="highlighter-rouge">ecsTaskExecutionRole</code> which lets the task pull the image from ECR and write to CloudWatch logs.</p>
+<p>Since we are not using any AWS services in the task, we do not need a Task Role. The Task Execution IAM Role is automatically assigned to this task, called <code class="language-plaintext highlighter-rouge">ecsTaskExecutionRole</code> which lets the task pull the image from ECR and write to CloudWatch logs.</p>
 
 <h3 id="fargate-cluster">Fargate Cluster</h3>
 
-<p>Even though we are not really provisioning any EC2 Clusters like ECS or Batch, we still need to create a cluster. This will not have any EC2 instances. The <code class="highlighter-rouge">Cluster</code> is still an important construct that adds a level of control for IAM policies, etc.</p>
+<p>Even though we are not really provisioning any EC2 Clusters like ECS or Batch, we still need to create a cluster. This will not have any EC2 instances. The <code class="language-plaintext highlighter-rouge">Cluster</code> is still an important construct that adds a level of control for IAM policies, etc.</p>
 
-<p>Head over to <a href="https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/create/new">ECS</a>, and create a Fargate Cluster. Do not ask to create a new VPC. Call it <code class="highlighter-rouge">fargatecluster</code>.</p>
+<p>Head over to <a href="https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/create/new">ECS</a>, and create a Fargate Cluster. Do not ask to create a new VPC. Call it <code class="language-plaintext highlighter-rouge">fargatecluster</code>.</p>
 
 <p><img src="https://lobster1234.github.io/assets/create_fargate_cluster.png" alt="Fargate-3" /></p>
 
@@ -433,79 +423,76 @@ $ docker push ************.dkr.ecr.us-east-1.amazonaws.com/python-batch-job:late
 
 <p>We will now create a lambda function that can be called via a trigger. In case of batch, we can use CloudWatch to trigger the Lambda at the interval or cron schedule of our choice.</p>
 
-<p>Here is the Lambda Code to run the task, as <code class="highlighter-rouge">run_task.py</code>. Create a folder to stick this file in.</p>
+<p>Here is the Lambda Code to run the task, as <code class="language-plaintext highlighter-rouge">run_task.py</code>. Create a folder to stick this file in.</p>
 
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">boto3</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">boto3</span>
 <span class="k">def</span> <span class="nf">handler</span><span class="p">(</span><span class="n">event</span><span class="p">,</span><span class="n">context</span><span class="p">):</span>
-  <span class="n">client</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s">'ecs'</span><span class="p">)</span>
-  <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">run_task</span><span class="p">(</span>
-  <span class="n">cluster</span><span class="o">=</span><span class="s">'fargatecluster'</span><span class="p">,</span> <span class="c"># name of the cluster</span>
-  <span class="n">launchType</span> <span class="o">=</span> <span class="s">'FARGATE'</span><span class="p">,</span>
-  <span class="n">taskDefinition</span><span class="o">=</span><span class="s">'my-batch-job:1'</span><span class="p">,</span> <span class="c"># replace with your task definition name and revision</span>
-  <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-  <span class="n">platformVersion</span><span class="o">=</span><span class="s">'LATEST'</span><span class="p">,</span>
+  <span class="n">client</span> <span class="o">=</span> <span class="n">boto3</span><span class="p">.</span><span class="nf">client</span><span class="p">(</span><span class="sh">'</span><span class="s">ecs</span><span class="sh">'</span><span class="p">)</span>
+  <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="p">.</span><span class="nf">run_task</span><span class="p">(</span>
+  <span class="n">cluster</span><span class="o">=</span><span class="sh">'</span><span class="s">fargatecluster</span><span class="sh">'</span><span class="p">,</span> <span class="c1"># name of the cluster
+</span>  <span class="n">launchType</span> <span class="o">=</span> <span class="sh">'</span><span class="s">FARGATE</span><span class="sh">'</span><span class="p">,</span>
+  <span class="n">taskDefinition</span><span class="o">=</span><span class="sh">'</span><span class="s">my-batch-job:1</span><span class="sh">'</span><span class="p">,</span> <span class="c1"># replace with your task definition name and revision
+</span>  <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="n">platformVersion</span><span class="o">=</span><span class="sh">'</span><span class="s">LATEST</span><span class="sh">'</span><span class="p">,</span>
   <span class="n">networkConfiguration</span><span class="o">=</span><span class="p">{</span>
-        <span class="s">'awsvpcConfiguration'</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s">'subnets'</span><span class="p">:</span> <span class="p">[</span>
-                <span class="s">'subnet-2ec3a94a'</span><span class="p">,</span> <span class="c"># replace with your public subnet or a private with NAT</span>
-                <span class="s">'subnet-413a9c6e'</span> <span class="c"># Second is optional, but good idea to have two</span>
-            <span class="p">],</span>
-            <span class="s">'assignPublicIp'</span><span class="p">:</span> <span class="s">'DISABLED'</span>
+        <span class="sh">'</span><span class="s">awsvpcConfiguration</span><span class="sh">'</span><span class="p">:</span> <span class="p">{</span>
+            <span class="sh">'</span><span class="s">subnets</span><span class="sh">'</span><span class="p">:</span> <span class="p">[</span>
+                <span class="sh">'</span><span class="s">subnet-2ec3a94a</span><span class="sh">'</span><span class="p">,</span> <span class="c1"># replace with your public subnet or a private with NAT
+</span>                <span class="sh">'</span><span class="s">subnet-413a9c6e</span><span class="sh">'</span> <span class="c1"># Second is optional, but good idea to have two
+</span>            <span class="p">],</span>
+            <span class="sh">'</span><span class="s">assignPublicIp</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">DISABLED</span><span class="sh">'</span>
         <span class="p">}</span>
     <span class="p">})</span>
-  <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
-</code></pre>
-</div>
-<p>Next, we will use <code class="highlighter-rouge">pip</code> to install <code class="highlighter-rouge">boto3 1.4.8</code> in this folder, so we can package our deployment artifact.</p>
+  <span class="k">return</span> <span class="nf">str</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+</code></pre></div></div>
+<p>Next, we will use <code class="language-plaintext highlighter-rouge">pip</code> to install <code class="language-plaintext highlighter-rouge">boto3 1.4.8</code> in this folder, so we can package our deployment artifact.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>$ pip3 install boto3==1.4.8 -t .
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ pip3 install boto3==1.4.8 -t .
 $ zip -r /tmp/run_task_lambda.zip *
-</code></pre>
-</div>
-<p>This will create <code class="highlighter-rouge">/tmp/run_task_lambda.zip</code> which is our deployment package.</p>
+</code></pre></div></div>
+<p>This will create <code class="language-plaintext highlighter-rouge">/tmp/run_task_lambda.zip</code> which is our deployment package.</p>
 
 <h3 id="create-the-lambda-function">Create the Lambda Function</h3>
 
-<p>The Lambda would need IAM role with 2 policies - one to run the task, and second to pass the <code class="highlighter-rouge">ecsTaskExecutionRole</code> to the task.</p>
+<p>The Lambda would need IAM role with 2 policies - one to run the task, and second to pass the <code class="language-plaintext highlighter-rouge">ecsTaskExecutionRole</code> to the task.</p>
 
-<p>Create a role in IAM, called <code class="highlighter-rouge">run_task_lambda_role</code> with the following in-line policy, replacing the <code class="highlighter-rouge">*****</code> with your AWS Account ID.</p>
+<p>Create a role in IAM, called <code class="language-plaintext highlighter-rouge">run_task_lambda_role</code> with the following in-line policy, replacing the <code class="language-plaintext highlighter-rouge">*****</code> with your AWS Account ID.</p>
 
-<div class="language-json highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="w">
-    </span><span class="nt">"Version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2012-10-17"</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"Statement"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"Version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2012-10-17"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Statement"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
         </span><span class="p">{</span><span class="w">
-            </span><span class="nt">"Sid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Stmt1512361420000"</span><span class="p">,</span><span class="w">
-            </span><span class="nt">"Effect"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Allow"</span><span class="p">,</span><span class="w">
-            </span><span class="nt">"Action"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+            </span><span class="nl">"Sid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Stmt1512361420000"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"Effect"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Allow"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"Action"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
                 </span><span class="s2">"ecs:RunTask"</span><span class="w">
             </span><span class="p">],</span><span class="w">
-            </span><span class="nt">"Resource"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+            </span><span class="nl">"Resource"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
                 </span><span class="s2">"*"</span><span class="w">
             </span><span class="p">]</span><span class="w">
         </span><span class="p">},</span><span class="w">
         </span><span class="p">{</span><span class="w">
-            </span><span class="nt">"Sid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Stmt1512361593000"</span><span class="p">,</span><span class="w">
-            </span><span class="nt">"Effect"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Allow"</span><span class="p">,</span><span class="w">
-            </span><span class="nt">"Action"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+            </span><span class="nl">"Sid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Stmt1512361593000"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"Effect"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Allow"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"Action"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
                 </span><span class="s2">"iam:PassRole"</span><span class="w">
             </span><span class="p">],</span><span class="w">
-            </span><span class="nt">"Resource"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+            </span><span class="nl">"Resource"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
                 </span><span class="s2">"arn:aws:iam::************:role/ecsTaskExecutionRole"</span><span class="w">
             </span><span class="p">]</span><span class="w">
         </span><span class="p">}</span><span class="w">
     </span><span class="p">]</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <p>Now, we create the Lambda using the <a href="https://console.aws.amazon.com/lambda/home?region=us-east-1#/create">Lambda Console</a>.</p>
 
 <p><img src="https://lobster1234.github.io/assets/create_lambda_function.png" alt="Fargate-4" /></p>
 
-<p>On the next page, under <code class="highlighter-rouge">Function code</code>, upload the <code class="highlighter-rouge">run_task_lambda.zip</code>, and put <code class="highlighter-rouge">run_task.handler</code> under <code class="highlighter-rouge">Handler</code>. Click <code class="highlighter-rouge">Save</code> so the package can be uploaded.</p>
+<p>On the next page, under <code class="language-plaintext highlighter-rouge">Function code</code>, upload the <code class="language-plaintext highlighter-rouge">run_task_lambda.zip</code>, and put <code class="language-plaintext highlighter-rouge">run_task.handler</code> under <code class="language-plaintext highlighter-rouge">Handler</code>. Click <code class="language-plaintext highlighter-rouge">Save</code> so the package can be uploaded.</p>
 
-<p>Once the function is saved, click <code class="highlighter-rouge">Test</code> to give it a shot. If all goes well, it should print something like this -</p>
-<div class="highlighter-rouge"><pre class="highlight"><code>"{'tasks': [{'taskArn': 'arn:aws:ecs:us-east-1:************:task/3f9ae8bf-207e-4956-b625-52a5a269c9a2', 'clusterArn':
+<p>Once the function is saved, click <code class="language-plaintext highlighter-rouge">Test</code> to give it a shot. If all goes well, it should print something like this -</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>"{'tasks': [{'taskArn': 'arn:aws:ecs:us-east-1:************:task/3f9ae8bf-207e-4956-b625-52a5a269c9a2', 'clusterArn':
 'arn:aws:ecs:us-east-1:************:cluster/fargatecluster', 'taskDefinitionArn':
 'arn:aws:ecs:us-east-1:************:task-definition/my-batch-job:1', 'overrides': {'containerOverrides': [{'name':
 'python-batch-container'}]}, 'lastStatus': 'PROVISIONING', 'desiredStatus': 'RUNNING', 'cpu': '256', 'memory': '512',
@@ -518,17 +505,15 @@ $ zip -r /tmp/run_task_lambda.zip *
   'b21a8d3d-d8c9-11e7-9000-014e69a44058', 'HTTPStatusCode': 200, 'HTTPHeaders': {'server': 'Server', 'date': 'Mon, 04 Dec 2017
   08:04:05 GMT', 'content-type': 'application/x-amz-json-1.1', 'content-length': '1007', 'connection': 'keep-alive',
   'x-amzn-requestid': 'b21a8d3d-d8c9-11e7-9000-014e69a44058'}, 'RetryAttempts': 0}}"
-</code></pre>
-</div>
-<p>Notice the response containing details of the task, and the task state as <code class="highlighter-rouge">PROVISIONING</code>.</p>
-<div class="highlighter-rouge"><pre class="highlight"><code>START RequestId: b1667f61-d8c9-11e7-9ddf-f1af7a353833 Version: $LATEST
+</code></pre></div></div>
+<p>Notice the response containing details of the task, and the task state as <code class="language-plaintext highlighter-rouge">PROVISIONING</code>.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>START RequestId: b1667f61-d8c9-11e7-9ddf-f1af7a353833 Version: $LATEST
 END RequestId: b1667f61-d8c9-11e7-9ddf-f1af7a353833
 REPORT RequestId: b1667f61-d8c9-11e7-9ddf-f1af7a353833	Duration: 1891.77 ms
 Billed Duration: 1900 ms 	Memory Size: 128 MB	Max Memory Used: 38 MB
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<p>You can head over to ECS Console, and check the task running under the <code class="highlighter-rouge">fargatecluster</code> details.</p>
+<p>You can head over to ECS Console, and check the task running under the <code class="language-plaintext highlighter-rouge">fargatecluster</code> details.</p>
 
 <blockquote>
   <p>If the task fails to run, it is very likely because it was launched in a subnet with no outbound internet access. Fix the subnets, redeploy the lambda after changing the subnet IDs in the code, and retry.</p>
@@ -538,7 +523,7 @@ Billed Duration: 1900 ms 	Memory Size: 128 MB	Max Memory Used: 38 MB
 
 <p>Now we can put this execution on a schedule using CloudWatch Events. We will create a scheduling rule, and configure it to trigger this lambda function.</p>
 
-<p>Click <code class="highlighter-rouge">Create Rule</code> on the <a href="https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#events:">CloudWatch Events</a> menu to create a rule.</p>
+<p>Click <code class="language-plaintext highlighter-rouge">Create Rule</code> on the <a href="https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#events:">CloudWatch Events</a> menu to create a rule.</p>
 
 <p><img src="https://lobster1234.github.io/assets/cloudwatch_rule.png" alt="Fargate-5" /></p>
 

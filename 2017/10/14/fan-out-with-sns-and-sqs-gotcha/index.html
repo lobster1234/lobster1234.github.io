@@ -31,35 +31,29 @@
   
   
 
-  <script type="text/javascript">
-  WebFontConfig = {
-    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
-  };
-  (function(d) {
-    var wf = d.createElement('script'), s = d.scripts[0];
-    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
-    wf.async = true;
-    s.parentNode.insertBefore(wf, s);
-  })(document);
-</script>
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet">
 
   
-  <!-- Google Analytics -->
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    ga('create', 'UA-96931340-1', 'auto');
-    ga('send', 'pageview');
+      ga('create', 'UA-96931340-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  
 
-  </script>
 
-
-  <!-- Begin Jekyll SEO tag v2.4.0 -->
+  <!-- Begin Jekyll SEO tag v2.6.1 -->
 <title>Fanout SNS-SQS Gotcha | Manish Pandit’s Blog</title>
-<meta name="generator" content="Jekyll v3.4.3" />
+<meta name="generator" content="Jekyll v4.3.4" />
 <meta property="og:title" content="Fanout SNS-SQS Gotcha" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
@@ -71,7 +65,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2017-10-14T13:44:37-07:00" />
 <script type="application/ld+json">
-{"description":"One of the very common architectural patterns is fan-out where an event is sent to multiple subscribers by a broker. An event can be like placing an order, which can then be handled by inventory service, record-keeping, as well as shipping service concurrently. These events can also be very frequent - like clickstreams, or search strings on a website. AWS allows for fan-out architecture with SNS topics, and SQS queues. SQS queue(s) can subscribe to SNS topics and receive any message sent to the SNS topic(s). It is documented that FIFO queues cannot be SNS subscribers here. However, as I recently found out, SSE-enabled SQS queues cannot subscribe to SNS either. While AWS stops us from subscribing a FIFO queue to SNS, SSE-enabled queues are allowed to subscribe, but they never get any events. The purpose of this post is to document this previously undocumented behavior.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"BlogPosting","url":"https://lobster1234.github.io/2017/10/14/fan-out-with-sns-and-sqs-gotcha/","headline":"Fanout SNS-SQS Gotcha","dateModified":"2017-10-14T13:44:37-07:00","datePublished":"2017-10-14T13:44:37-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/10/14/fan-out-with-sns-and-sqs-gotcha/"},"@context":"http://schema.org"}</script>
+{"url":"https://lobster1234.github.io/2017/10/14/fan-out-with-sns-and-sqs-gotcha/","description":"One of the very common architectural patterns is fan-out where an event is sent to multiple subscribers by a broker. An event can be like placing an order, which can then be handled by inventory service, record-keeping, as well as shipping service concurrently. These events can also be very frequent - like clickstreams, or search strings on a website. AWS allows for fan-out architecture with SNS topics, and SQS queues. SQS queue(s) can subscribe to SNS topics and receive any message sent to the SNS topic(s). It is documented that FIFO queues cannot be SNS subscribers here. However, as I recently found out, SSE-enabled SQS queues cannot subscribe to SNS either. While AWS stops us from subscribing a FIFO queue to SNS, SSE-enabled queues are allowed to subscribe, but they never get any events. The purpose of this post is to document this previously undocumented behavior.","author":{"@type":"Person","name":"Manish Pandit"},"headline":"Fanout SNS-SQS Gotcha","dateModified":"2017-10-14T13:44:37-07:00","datePublished":"2017-10-14T13:44:37-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/10/14/fan-out-with-sns-and-sqs-gotcha/"},"@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -466,53 +460,47 @@
 <!--more--></p>
 
 <h3 id="setup">Setup</h3>
-<p>We will create an SNS topic called <code class="highlighter-rouge">fan-out-topic</code>, and then create a SQS Standard Queue called <code class="highlighter-rouge">fan-out-sink</code>. We will create an IAM policy so the queue can receive messages from the topic, and finally we will subscribe the queue to the topic. Next, we will verify that the fan-out works. Finally we will enable SSE on the queue, and verify that the fan out no longer works.</p>
+<p>We will create an SNS topic called <code class="language-plaintext highlighter-rouge">fan-out-topic</code>, and then create a SQS Standard Queue called <code class="language-plaintext highlighter-rouge">fan-out-sink</code>. We will create an IAM policy so the queue can receive messages from the topic, and finally we will subscribe the queue to the topic. Next, we will verify that the fan-out works. Finally we will enable SSE on the queue, and verify that the fan out no longer works.</p>
 
 <p>I will use <a href="https://github.com/awslabs/aws-shell">aws-shell</a> CLI for all the operations.</p>
 
 <h3 id="create-an-sns-topic">Create an SNS topic</h3>
-<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sns create-topic --name fan-out-topic
-</code></pre>
-</div>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>aws&gt; sns create-topic --name fan-out-topic
+</code></pre></div></div>
 
 <h3 id="create-the-sqs-queue">Create the SQS queue</h3>
-<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sqs create-queue --queue-name fan-out-sink
-</code></pre>
-</div>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>aws&gt; sqs create-queue --queue-name fan-out-sink
+</code></pre></div></div>
 
 <h3 id="create-an-iam-policy">Create an IAM policy</h3>
-<p>The SQS queue will need to have an associated IAM policy to allow the SNS topic to send message to it via <code class="highlighter-rouge">SendMessage</code> action.</p>
+<p>The SQS queue will need to have an associated IAM policy to allow the SNS topic to send message to it via <code class="language-plaintext highlighter-rouge">SendMessage</code> action.</p>
 
-<p>This is where it gets interesting. AWS’s handling of assigning policies to SQS via CLI is really uncomfortable. Basically we’d need to flatten out the entire IAM policy JSON as a string, and put everything in a single line. We will create one file, call it <code class="highlighter-rouge">/tmp/policy.json</code>, with these contents. Your account IDs/ARNs will be different.</p>
+<p>This is where it gets interesting. AWS’s handling of assigning policies to SQS via CLI is really uncomfortable. Basically we’d need to flatten out the entire IAM policy JSON as a string, and put everything in a single line. We will create one file, call it <code class="language-plaintext highlighter-rouge">/tmp/policy.json</code>, with these contents. Your account IDs/ARNs will be different.</p>
 
-<div class="language-json highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="w"> </span><span class="nt">"Policy"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"{ \"Version\": \"2012-10-17\", \"Id\": \"arn:aws:sqs:us-east-1:***********:fan-out-sink/SQSDefaultPolicy\", \"Statement\": [{ \"Sid\": \"Sid1508039487834\",\"Effect\": \"Allow\", \"Principal\": {\"AWS\": \"*\"},\"Action\": \"SQS:SendMessage\",\"Resource\": \"arn:aws:sqs:us-east-1:***********:fan-out-sink\",\"Condition\": {\"ArnEquals\": {\"aws:SourceArn\": \"arn:aws:sns:us-east-1:***********:fan-out-topic\"}}}]}"</span><span class="p">}</span><span class="w">
-</span></code></pre>
-</div>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w"> </span><span class="nl">"Policy"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"{ </span><span class="se">\"</span><span class="s2">Version</span><span class="se">\"</span><span class="s2">: </span><span class="se">\"</span><span class="s2">2012-10-17</span><span class="se">\"</span><span class="s2">, </span><span class="se">\"</span><span class="s2">Id</span><span class="se">\"</span><span class="s2">: </span><span class="se">\"</span><span class="s2">arn:aws:sqs:us-east-1:***********:fan-out-sink/SQSDefaultPolicy</span><span class="se">\"</span><span class="s2">, </span><span class="se">\"</span><span class="s2">Statement</span><span class="se">\"</span><span class="s2">: [{ </span><span class="se">\"</span><span class="s2">Sid</span><span class="se">\"</span><span class="s2">: </span><span class="se">\"</span><span class="s2">Sid1508039487834</span><span class="se">\"</span><span class="s2">,</span><span class="se">\"</span><span class="s2">Effect</span><span class="se">\"</span><span class="s2">: </span><span class="se">\"</span><span class="s2">Allow</span><span class="se">\"</span><span class="s2">, </span><span class="se">\"</span><span class="s2">Principal</span><span class="se">\"</span><span class="s2">: {</span><span class="se">\"</span><span class="s2">AWS</span><span class="se">\"</span><span class="s2">: </span><span class="se">\"</span><span class="s2">*</span><span class="se">\"</span><span class="s2">},</span><span class="se">\"</span><span class="s2">Action</span><span class="se">\"</span><span class="s2">: </span><span class="se">\"</span><span class="s2">SQS:SendMessage</span><span class="se">\"</span><span class="s2">,</span><span class="se">\"</span><span class="s2">Resource</span><span class="se">\"</span><span class="s2">: </span><span class="se">\"</span><span class="s2">arn:aws:sqs:us-east-1:***********:fan-out-sink</span><span class="se">\"</span><span class="s2">,</span><span class="se">\"</span><span class="s2">Condition</span><span class="se">\"</span><span class="s2">: {</span><span class="se">\"</span><span class="s2">ArnEquals</span><span class="se">\"</span><span class="s2">: {</span><span class="se">\"</span><span class="s2">aws:SourceArn</span><span class="se">\"</span><span class="s2">: </span><span class="se">\"</span><span class="s2">arn:aws:sns:us-east-1:***********:fan-out-topic</span><span class="se">\"</span><span class="s2">}}}]}"</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
 
 <h3 id="associate-this-policy-with-sqs">Associate this policy with SQS</h3>
-<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sqs set-queue-attributes --queue-url https://queue.amazonaws.com/***********/fan-out-sink --attributes file:///tmp/policy.json
-</code></pre>
-</div>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>aws&gt; sqs set-queue-attributes --queue-url https://queue.amazonaws.com/***********/fan-out-sink --attributes file:///tmp/policy.json
+</code></pre></div></div>
 
 <h3 id="subscribe-sqs-to-sns">Subscribe SQS to SNS</h3>
-<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sns subscribe --topic-arn arn:aws:sns:us-east-1:***********:fan-out-topic --protocol sqs --notification-endpoint arn:aws:sqs:us-east-1:***********:fan-out-sink
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>aws&gt; sns subscribe --topic-arn arn:aws:sns:us-east-1:***********:fan-out-topic --protocol sqs --notification-endpoint arn:aws:sqs:us-east-1:***********:fan-out-sink
 {
     "SubscriptionArn": "arn:aws:sns:us-east-1:***********:fan-out-topic:c0ddf05a-a62e-44dc-ac64-99da02a00fba"
 }
-</code></pre>
-</div>
-<p>The <code class="highlighter-rouge">SubscriptionArn</code> would mean that we do not need to confirm this subscription.</p>
+</code></pre></div></div>
+<p>The <code class="language-plaintext highlighter-rouge">SubscriptionArn</code> would mean that we do not need to confirm this subscription.</p>
 
 <h3 id="try-the-fan-out--works">Try the fan-out : works!</h3>
 <p>Let’s publish a message on the topic</p>
-<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sns publish --message "Hello!" --topic-arn arn:aws:sns:us-east-1:***********:fan-out-topic
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>aws&gt; sns publish --message "Hello!" --topic-arn arn:aws:sns:us-east-1:***********:fan-out-topic
 {
     "MessageId": "92ce4aac-c8b9-59b3-b4c3-18f02e3a1306"
 }
-</code></pre>
-</div>
+</code></pre></div></div>
 <p>..and receive it</p>
-<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sqs receive-message --queue-url https://queue.amazonaws.com/***********/fan-out-sink
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>aws&gt; sqs receive-message --queue-url https://queue.amazonaws.com/***********/fan-out-sink
 {
     "Messages": [
         {
@@ -521,45 +509,40 @@
     ]
 }
 aws&gt;
-</code></pre>
-</div>
+</code></pre></div></div>
 <p>I’ve removed other response attributes for brevity.</p>
 
 <p>We will then purge this queue before enabling SSE on it. Alternatively, we may choose to just delete the messages.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sqs purge-queue --queue-url https://queue.amazonaws.com/***********/fan-out-sink
-</code></pre>
-</div>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>aws&gt; sqs purge-queue --queue-url https://queue.amazonaws.com/***********/fan-out-sink
+</code></pre></div></div>
 
 <h3 id="enable-sse-on-sqs">Enable SSE on SQS</h3>
-<p>Since I have a CMK I had created earlier, I will use it’s alias. You may choose to use <code class="highlighter-rouge">alias/aws/sqs</code> if one does not exist, as this is a Managed CMK AWS uses to encrypt any SQS.</p>
-<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sqs set-queue-attributes --queue-url https://queue.amazonaws.com/***********/fan-out-sink --attributes KmsMasterKeyId=alias/my-master-key
-</code></pre>
-</div>
+<p>Since I have a CMK I had created earlier, I will use it’s alias. You may choose to use <code class="language-plaintext highlighter-rouge">alias/aws/sqs</code> if one does not exist, as this is a Managed CMK AWS uses to encrypt any SQS.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>aws&gt; sqs set-queue-attributes --queue-url https://queue.amazonaws.com/***********/fan-out-sink --attributes KmsMasterKeyId=alias/my-master-key
+</code></pre></div></div>
 <p>We can verify that the queue has SSE enabled by doing so -</p>
-<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sqs get-queue-attributes --attribute-names KmsMasterKeyId --queue-url https://queue.amazonaws.om/***********/fan-out-sink
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>aws&gt; sqs get-queue-attributes --attribute-names KmsMasterKeyId --queue-url https://queue.amazonaws.om/***********/fan-out-sink
 {
     "Attributes": {
         "KmsMasterKeyId": "alias/my-master-key"
     }
 }
 aws&gt;
-</code></pre>
-</div>
+</code></pre></div></div>
 <h3 id="try-the-fan-out--fails">Try the fan-out : fails!</h3>
-<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sns publish --message "Hello!" --topic-arn arn:aws:sns:us-east-1:***********:fan-out-topic
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>aws&gt; sns publish --message "Hello!" --topic-arn arn:aws:sns:us-east-1:***********:fan-out-topic
 {
     "MessageId": "d28301cf-994c-5e50-a365-53937013a49c"
 }
 aws&gt; sqs receive-message --queue-url https://queue.amazonaws.com/***********/fan-out-sink
 aws&gt;
-</code></pre>
-</div>
+</code></pre></div></div>
 <p>As we can see, we did not get the message in the queue. This can also be verified on the AWS Console, where the queue will show zero available messages.</p>
 
 <h3 id="re-validate-by-disabling-sse">Re-validate by disabling SSE</h3>
-<p>We will remove SSE and run one final test. This is done by setting <code class="highlighter-rouge">KmsMasterKeyId</code> to empty.</p>
-<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; sqs set-queue-attributes --queue-url https://queue.amazonaws.com/***********/fan-out-sink --attributes KmsMasterKeyId=
+<p>We will remove SSE and run one final test. This is done by setting <code class="language-plaintext highlighter-rouge">KmsMasterKeyId</code> to empty.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>aws&gt; sqs set-queue-attributes --queue-url https://queue.amazonaws.com/***********/fan-out-sink --attributes KmsMasterKeyId=
 aws&gt; sqs get-queue-attributes --attribute-names KmsMasterKeyId --queue-url https://queue.amazonaws.om/***********/fan-out-sink
 aws&gt;
 aws&gt; sns publish --message "Reverification!" --topic-arn arn:aws:sns:us-east-1:***********:fan-out-topic
@@ -576,8 +559,7 @@ aws&gt; sqs receive-message --queue-url https://queue.amazonaws.com/***********/
     ]
 }
 aws&gt;
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>This shows that an SSE-enabled SQS queue cannot get messages from a subscribed SNS topic.</p>
 

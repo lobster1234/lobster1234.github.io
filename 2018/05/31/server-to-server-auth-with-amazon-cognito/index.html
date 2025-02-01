@@ -31,35 +31,29 @@
   
   
 
-  <script type="text/javascript">
-  WebFontConfig = {
-    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
-  };
-  (function(d) {
-    var wf = d.createElement('script'), s = d.scripts[0];
-    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
-    wf.async = true;
-    s.parentNode.insertBefore(wf, s);
-  })(document);
-</script>
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet">
 
   
-  <!-- Google Analytics -->
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    ga('create', 'UA-96931340-1', 'auto');
-    ga('send', 'pageview');
+      ga('create', 'UA-96931340-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  
 
-  </script>
 
-
-  <!-- Begin Jekyll SEO tag v2.4.0 -->
+  <!-- Begin Jekyll SEO tag v2.6.1 -->
 <title>Server to Server Auth with Amazon Cognito | Manish Pandit’s Blog</title>
-<meta name="generator" content="Jekyll v3.4.3" />
+<meta name="generator" content="Jekyll v4.3.4" />
 <meta property="og:title" content="Server to Server Auth with Amazon Cognito" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
@@ -72,7 +66,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2018-05-31T00:44:37-07:00" />
 <script type="application/ld+json">
-{"description":"Amazon Cognito is a managed service that provides federated identity, access controls, and user management with multi-factor authentication for web and mobile applications. The service is very rich - any application developer can set up the signup and login process with a few clicks in Amazon Cognito Console by federating with identity providers such as Google, Facebook, Twitter, etc. One of the best features of Cognito is Lambda integration (Triggers), which allows Lambda invocation on events like pre-signup, pre and post authentication, etc. In this post I will walk through a not so fancy, yet very useful Cognito feature - which is server to server authentication. This is one of the most common scenarios in a microservices world, where services need to talk to other services securely, and using an established standard such as OAuth2. This is also known as client_credentials Grant, or 2-legged OAuth. Amazon Cognito provides a simple and cost effective option to implement it.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"BlogPosting","url":"https://lobster1234.github.io/2018/05/31/server-to-server-auth-with-amazon-cognito/","image":"https://lobster1234.github.io/assets/cognito.png","headline":"Server to Server Auth with Amazon Cognito","dateModified":"2018-05-31T00:44:37-07:00","datePublished":"2018-05-31T00:44:37-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2018/05/31/server-to-server-auth-with-amazon-cognito/"},"@context":"http://schema.org"}</script>
+{"url":"https://lobster1234.github.io/2018/05/31/server-to-server-auth-with-amazon-cognito/","description":"Amazon Cognito is a managed service that provides federated identity, access controls, and user management with multi-factor authentication for web and mobile applications. The service is very rich - any application developer can set up the signup and login process with a few clicks in Amazon Cognito Console by federating with identity providers such as Google, Facebook, Twitter, etc. One of the best features of Cognito is Lambda integration (Triggers), which allows Lambda invocation on events like pre-signup, pre and post authentication, etc. In this post I will walk through a not so fancy, yet very useful Cognito feature - which is server to server authentication. This is one of the most common scenarios in a microservices world, where services need to talk to other services securely, and using an established standard such as OAuth2. This is also known as client_credentials Grant, or 2-legged OAuth. Amazon Cognito provides a simple and cost effective option to implement it.","author":{"@type":"Person","name":"Manish Pandit"},"image":"https://lobster1234.github.io/assets/cognito.png","headline":"Server to Server Auth with Amazon Cognito","dateModified":"2018-05-31T00:44:37-07:00","datePublished":"2018-05-31T00:44:37-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2018/05/31/server-to-server-auth-with-amazon-cognito/"},"@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -195,7 +189,7 @@
 
 <p><img src="https://lobster1234.github.io/assets/cognito.png" alt="cognito" /></p>
 
-<p>In this post I will walk through a not so fancy, yet very useful Cognito feature - which is server to server authentication. This is one of the most common scenarios in a microservices world, where services need to talk to other services securely, and using an established standard such as <a href="https://oauth.net/2/">OAuth2</a>. This is also known as <a href="https://www.oauth.com/oauth2-servers/access-tokens/client-credentials/"><code class="highlighter-rouge">client_credentials</code> Grant</a>, or <code class="highlighter-rouge">2-legged OAuth</code>. Amazon Cognito provides a simple and cost effective option to implement it.</p>
+<p>In this post I will walk through a not so fancy, yet very useful Cognito feature - which is server to server authentication. This is one of the most common scenarios in a microservices world, where services need to talk to other services securely, and using an established standard such as <a href="https://oauth.net/2/">OAuth2</a>. This is also known as <a href="https://www.oauth.com/oauth2-servers/access-tokens/client-credentials/"><code class="language-plaintext highlighter-rouge">client_credentials</code> Grant</a>, or <code class="language-plaintext highlighter-rouge">2-legged OAuth</code>. Amazon Cognito provides a simple and cost effective option to implement it.</p>
 
 <!--more-->
 
@@ -230,22 +224,21 @@
 
 <p>While mentioning the terminology, I did not talk about server to server, or service to service identity much. This is where OAuth2 Client Credentials Flow comes in, and there is no user, or identity associated with the access request. The calling service obtains an access token, and the target service asserts that token to be valid before granting access to the protected data.</p>
 
-<p>In this scenario, Cognito’s User Pool is merely a placeholder, as we will have no users. The only <em>user</em> will be the app client. Before you think that we do not need a Domain as we will not be hosting any login pages, but we do. Instead of login pages, this domain will host the OAuth2 endpoint, <code class="highlighter-rouge">/oauth2/token</code>.</p>
+<p>In this scenario, Cognito’s User Pool is merely a placeholder, as we will have no users. The only <em>user</em> will be the app client. Before you think that we do not need a Domain as we will not be hosting any login pages, but we do. Instead of login pages, this domain will host the OAuth2 endpoint, <code class="language-plaintext highlighter-rouge">/oauth2/token</code>.</p>
 
 <p>We will use the AWS CLI and not use the Console, but feel free to perform the same actions via the Console. Alternatively, you may want to just check the console after each step to learn more about the constructs.</p>
 
 <h2 id="aws-cli">AWS CLI</h2>
 
-<p>If you have seen my previous posts, I prefer <a href="https://github.com/awslabs/aws-shell">aws-shell</a> over the plain CLI. But you can use the CLI by prefixing every command with <code class="highlighter-rouge">aws</code>. Please ensure the credentials being used have policies allowing Cognito operations.</p>
+<p>If you have seen my previous posts, I prefer <a href="https://github.com/awslabs/aws-shell">aws-shell</a> over the plain CLI. But you can use the CLI by prefixing every command with <code class="language-plaintext highlighter-rouge">aws</code>. Please ensure the credentials being used have policies allowing Cognito operations.</p>
 
 <h3 id="create-a-cognito-user-pool">Create a Cognito User Pool</h3>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; cognito-idp create-user-pool --pool-name myblog
-</code></pre>
-</div>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>aws&gt; cognito-idp create-user-pool --pool-name myblog
+</code></pre></div></div>
 
 <p>This will produce a large JSON output. We can verify by listing the user pools, like so.</p>
-<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; cognito-idp list-user-pools --max-results 10
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>aws&gt; cognito-idp list-user-pools --max-results 10
 
   {
       "UserPools": [
@@ -258,14 +251,13 @@
           }
       ]
   }
-</code></pre>
-</div>
-<p>The <code class="highlighter-rouge">Id</code> of the user pool is very important, as everything we create from now on will need it.</p>
+</code></pre></div></div>
+<p>The <code class="language-plaintext highlighter-rouge">Id</code> of the user pool is very important, as everything we create from now on will need it.</p>
 
 <h3 id="create-a-resource-server">Create a Resource Server</h3>
 
 <p>The resource server acts as a placeholder for scopes. Imagine a service to manage transactions, which will have scopes like post and get transactions.</p>
-<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; cognito-idp create-resource-server --name transactions --identifier transactions --user-pool-id us-east-1_0Pe***** --scopes ScopeName=get,ScopeDescription=get_tx ScopeName=post,ScopeDescription=post_tx
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>aws&gt; cognito-idp create-resource-server --name transactions --identifier transactions --user-pool-id us-east-1_0Pe***** --scopes ScopeName=get,ScopeDescription=get_tx ScopeName=post,ScopeDescription=post_tx
 
 {
     "ResourceServer": {
@@ -284,12 +276,11 @@
         ]
     }
 }
-</code></pre>
-</div>
+</code></pre></div></div>
 <h3 id="create-a-client-app">Create a Client App</h3>
 
-<p>Let us create a client who can only <code class="highlighter-rouge">post</code> transactions by calling the transactions service. As you can see below, we configure this client to use <code class="highlighter-rouge">client_credentials</code> grant, and restrict it to using only <code class="highlighter-rouge">transactions/post</code> scope. The scopes are defined in <code class="highlighter-rouge">$resource_server_identifier/$scope_name</code> format. Also notice the <code class="highlighter-rouge">--generate-secret</code> argument, which will create a secret that we can use for our client credentials access token request.</p>
-<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; cognito-idp create-user-pool-client --user-pool-id us-east-1_0Pe***** --allowed-o-auth-flows client_credentials --client-name test --generate-secret --allowed-o-auth-scopes transactions/post --allowed-o-auth-flows-user-pool-client
+<p>Let us create a client who can only <code class="language-plaintext highlighter-rouge">post</code> transactions by calling the transactions service. As you can see below, we configure this client to use <code class="language-plaintext highlighter-rouge">client_credentials</code> grant, and restrict it to using only <code class="language-plaintext highlighter-rouge">transactions/post</code> scope. The scopes are defined in <code class="language-plaintext highlighter-rouge">$resource_server_identifier/$scope_name</code> format. Also notice the <code class="language-plaintext highlighter-rouge">--generate-secret</code> argument, which will create a secret that we can use for our client credentials access token request.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>aws&gt; cognito-idp create-user-pool-client --user-pool-id us-east-1_0Pe***** --allowed-o-auth-flows client_credentials --client-name test --generate-secret --allowed-o-auth-scopes transactions/post --allowed-o-auth-flows-user-pool-client
 {
     "UserPoolClient": {
         "UserPoolId": "us-east-1_0Pe*****",
@@ -309,14 +300,13 @@
     }
 }
 
-</code></pre>
-</div>
-<p>Note the <code class="highlighter-rouge">ClientId</code> and <code class="highlighter-rouge">ClientSecret</code> in the response, as we’d need this to request an access token.</p>
+</code></pre></div></div>
+<p>Note the <code class="language-plaintext highlighter-rouge">ClientId</code> and <code class="language-plaintext highlighter-rouge">ClientSecret</code> in the response, as we’d need this to request an access token.</p>
 
 <h3 id="add-a-domain">Add a Domain</h3>
 
-<p>We will need to add a domain to this pool, so we can get a URL for <code class="highlighter-rouge">/oauth2/token</code> endpoint. Notice that I used a fairly odd name, because these domain names are global (yes, as they generate a public URL), so a generic name like <code class="highlighter-rouge">test</code> is probably already taken. Please use a name that is probably unique.</p>
-<div class="highlighter-rouge"><pre class="highlight"><code>aws&gt; cognito-idp create-user-pool-domain  --domain lobster1234 --user-pool-id us-east-1_0Pe*****
+<p>We will need to add a domain to this pool, so we can get a URL for <code class="language-plaintext highlighter-rouge">/oauth2/token</code> endpoint. Notice that I used a fairly odd name, because these domain names are global (yes, as they generate a public URL), so a generic name like <code class="language-plaintext highlighter-rouge">test</code> is probably already taken. Please use a name that is probably unique.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>aws&gt; cognito-idp create-user-pool-domain  --domain lobster1234 --user-pool-id us-east-1_0Pe*****
 {
     "DomainDescription": {
         "UserPoolId": "us-east-1_0Pe*****",
@@ -329,40 +319,36 @@
     }
 }
 
-</code></pre>
-</div>
+</code></pre></div></div>
 <blockquote>
   <p><strong>The DNS may take some time to propagate, so the URL may not work for a while (Took me 20 mins).</strong></p>
 </blockquote>
 
-<p>This would translate into the OAuth2 URL as <code class="highlighter-rouge">https://lobster1234.auth.us-east-1.amazoncognito.com/oauth2/token</code></p>
+<p>This would translate into the OAuth2 URL as <code class="language-plaintext highlighter-rouge">https://lobster1234.auth.us-east-1.amazoncognito.com/oauth2/token</code></p>
 
 <h3 id="get-an-access-token">Get an Access Token</h3>
 
-<p>Notice that I am using HTTP Basic to send the <code class="highlighter-rouge">client_id</code> and <code class="highlighter-rouge">client_secret</code>. This is <code class="highlighter-rouge">base64(ClientId:ClientSecret)</code>.</p>
+<p>Notice that I am using HTTP Basic to send the <code class="language-plaintext highlighter-rouge">client_id</code> and <code class="language-plaintext highlighter-rouge">client_secret</code>. This is <code class="language-plaintext highlighter-rouge">base64(ClientId:ClientSecret)</code>.</p>
 
-<p>If you have <code class="highlighter-rouge">openssl</code> installed, you can use it, like so, replacing <code class="highlighter-rouge">x</code> with <code class="highlighter-rouge">ClientId</code> and <code class="highlighter-rouge">y</code> with <code class="highlighter-rouge">ClientSecret</code>.</p>
+<p>If you have <code class="language-plaintext highlighter-rouge">openssl</code> installed, you can use it, like so, replacing <code class="language-plaintext highlighter-rouge">x</code> with <code class="language-plaintext highlighter-rouge">ClientId</code> and <code class="language-plaintext highlighter-rouge">y</code> with <code class="language-plaintext highlighter-rouge">ClientSecret</code>.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>$ echo -n 'x:y' | openssl base64
-</code></pre>
-</div>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ echo -n 'x:y' | openssl base64
+</code></pre></div></div>
 <p>Once you have the base64 encoded HTTP Basic Authorization header, you can request the access token.</p>
-<div class="highlighter-rouge"><pre class="highlight"><code>$ curl -X POST \
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ curl -X POST \
   https://lobster1234.auth.us-east-1.amazoncognito.com/oauth2/token \
   -H 'authorization: Basic ***********iMWl0NmY2MnVlZmVtNmFxaG46ajIyYTJ******HRjYm9yZGtucHR0Z2U0azI5cmE3czgwMjZhZ3J***************' \
   -H 'content-type: application/x-www-form-urlencoded' \
   -d 'grant_type=client_credentials&amp;scope=transactions%2Fpost'
-</code></pre>
-</div>
-<p>This should return an <code class="highlighter-rouge">access_token</code>, which is a JWT.</p>
+</code></pre></div></div>
+<p>This should return an <code class="language-plaintext highlighter-rouge">access_token</code>, which is a JWT.</p>
 
-<div class="language-json highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="w">
-    </span><span class="nt">"access_token"</span><span class="p">:</span><span class="w"> </span><span class="s2">"******************.eyJzdWIiOiIxNGFxNWxsNWIxaXQ2ZjYydWVmZW02YXFobiIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoidGVzdFwvZm9vIiwiYXV0aF90aW1lIjoxNTI3ODE3MzY2LCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb21cL3VzLWVhc3QtMV83RThJc3hDR0MiLCJleHAiOjE1Mjc4MjA5NjYsImlhdCI6MTUyNzgxNzM2NiwidmVyc2lvbiI6MiwianRpIjoiYWVlZWY1MGEtYjNiNS00MjAxLTlhOGYtOGI1ZjYzYTBlYmNjIiwiY2xpZW50X2lkIjoiMTRhcTVsbDViMWl0NmY2MnVlZmVtNmFxaG4ifQ.LaWN4NEUrR_2gGANnDx8zINMZteR7-E_moskq__zai5BLNpiCBnVtoLHwVH3FvDFVVesMCBmD02dRhZqXkttxEMUmetFybDtEkH2KWbalOmKvibl5JuPyQEqZ5S4DN9ZUZAqv3X48F2e0Eshck-*******************-0aDBMaMtJU-QMfeFJkN2UgKQhtzi2dbLBB06dQEd6gcxh-*****************"</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"expires_in"</span><span class="p">:</span><span class="w"> </span><span class="mi">3600</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"token_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Bearer"</span><span class="w">
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"access_token"</span><span class="p">:</span><span class="w"> </span><span class="s2">"******************.eyJzdWIiOiIxNGFxNWxsNWIxaXQ2ZjYydWVmZW02YXFobiIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoidGVzdFwvZm9vIiwiYXV0aF90aW1lIjoxNTI3ODE3MzY2LCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb21cL3VzLWVhc3QtMV83RThJc3hDR0MiLCJleHAiOjE1Mjc4MjA5NjYsImlhdCI6MTUyNzgxNzM2NiwidmVyc2lvbiI6MiwianRpIjoiYWVlZWY1MGEtYjNiNS00MjAxLTlhOGYtOGI1ZjYzYTBlYmNjIiwiY2xpZW50X2lkIjoiMTRhcTVsbDViMWl0NmY2MnVlZmVtNmFxaG4ifQ.LaWN4NEUrR_2gGANnDx8zINMZteR7-E_moskq__zai5BLNpiCBnVtoLHwVH3FvDFVVesMCBmD02dRhZqXkttxEMUmetFybDtEkH2KWbalOmKvibl5JuPyQEqZ5S4DN9ZUZAqv3X48F2e0Eshck-*******************-0aDBMaMtJU-QMfeFJkN2UgKQhtzi2dbLBB06dQEd6gcxh-*****************"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"expires_in"</span><span class="p">:</span><span class="w"> </span><span class="mi">3600</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"token_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Bearer"</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <h3 id="validate-the-access-token">Validate the Access Token</h3>
 
@@ -370,32 +356,30 @@
   <p>This section would need familiarity with JWT, JWK, and a bit of encryption standards.</p>
 </blockquote>
 
-<p>When a service calls the transactions service with this Bearer token in the <code class="highlighter-rouge">Authorization</code> header, the token would need to be validated. There are several libraries available to do so. The JWT is base64 encoded, and signed. It may be encrypted as well, as is done in a lot of financial/sensitive use cases.</p>
+<p>When a service calls the transactions service with this Bearer token in the <code class="language-plaintext highlighter-rouge">Authorization</code> header, the token would need to be validated. There are several libraries available to do so. The JWT is base64 encoded, and signed. It may be encrypted as well, as is done in a lot of financial/sensitive use cases.</p>
 
 <p>To peek in the access token, you may paste it in <a href="https://jwt.io">jtw.io</a>. You’ll see the following as the token is decoded.</p>
 
 <p>Header</p>
-<div class="language-json highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="w">
-  </span><span class="nt">"kid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Lkek/Dt3d7ibTkq4Pz2LKpmIKTu5mR6A++DRfvmu5Vw="</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"alg"</span><span class="p">:</span><span class="w"> </span><span class="s2">"RS256"</span><span class="w">
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"kid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Lkek/Dt3d7ibTkq4Pz2LKpmIKTu5mR6A++DRfvmu5Vw="</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"alg"</span><span class="p">:</span><span class="w"> </span><span class="s2">"RS256"</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 <p>Payload</p>
-<div class="language-json highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="w">
-  </span><span class="nt">"sub"</span><span class="p">:</span><span class="w"> </span><span class="s2">"14aq5ll5b1it6f62uefe******"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"token_use"</span><span class="p">:</span><span class="w"> </span><span class="s2">"access"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"scope"</span><span class="p">:</span><span class="w"> </span><span class="s2">"transactions/post"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"auth_time"</span><span class="p">:</span><span class="w"> </span><span class="mi">1527809373</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"iss"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://cognito-idp.us-east-1.amazonaws.com/us-east-1_0Pe*****"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"exp"</span><span class="p">:</span><span class="w"> </span><span class="mi">1527812973</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"iat"</span><span class="p">:</span><span class="w"> </span><span class="mi">1527809373</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"jti"</span><span class="p">:</span><span class="w"> </span><span class="s2">"864ec9c6-f3c9-4e3c-b9e1-dfe21e167e1e"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"client_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"14aq5ll5b1it6f62uefe******"</span><span class="w">
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"sub"</span><span class="p">:</span><span class="w"> </span><span class="s2">"14aq5ll5b1it6f62uefe******"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"token_use"</span><span class="p">:</span><span class="w"> </span><span class="s2">"access"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"scope"</span><span class="p">:</span><span class="w"> </span><span class="s2">"transactions/post"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"auth_time"</span><span class="p">:</span><span class="w"> </span><span class="mi">1527809373</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"iss"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://cognito-idp.us-east-1.amazonaws.com/us-east-1_0Pe*****"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"exp"</span><span class="p">:</span><span class="w"> </span><span class="mi">1527812973</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"iat"</span><span class="p">:</span><span class="w"> </span><span class="mi">1527809373</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"version"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"jti"</span><span class="p">:</span><span class="w"> </span><span class="s2">"864ec9c6-f3c9-4e3c-b9e1-dfe21e167e1e"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"client_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"14aq5ll5b1it6f62uefe******"</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <p>If you need to perform signature validation, there is some extra effort.</p>
 
@@ -403,9 +387,9 @@
 
 <p>This has the list of keys that Cognito would use to sign the access tokens. It is also known as JWKS - <em>JSON Web Key Set</em>.</p>
 
-<p>To verify the signature, you’d need to convert the JWK to PEM. I used node to do so. From that URL, copy the key identified by the <code class="highlighter-rouge">kid</code> in the access token’s header.</p>
+<p>To verify the signature, you’d need to convert the JWK to PEM. I used node to do so. From that URL, copy the key identified by the <code class="language-plaintext highlighter-rouge">kid</code> in the access token’s header.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>$ npm install jsonwebtoken
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ npm install jsonwebtoken
 $ npm install jwk-to-pem
 $ node
 &gt; var jwkToPem = require('jwk-to-pem'), jwt = require('jsonwebtoken');
@@ -424,8 +408,7 @@ N4IPzXbaHzy9iJgTDbnd6f+htneHegoLHlSmEfYgnJ/jJBsXwXFAYVm9JLiDyhdZ
 Ol+aSpSPQjXprlHz3Ksln5D8/Ic7yiQLtPostlZEovc0dzqGND2Hr686B1CkbGqZ
 nwIDAQAB
 -----END PUBLIC KEY-----
-</code></pre>
-</div>
+</code></pre></div></div>
 <p>Now copy the PEM, and paste it on jwt.io under “Verify Signature” section.</p>
 
 <p>If everything goes well, you’ll notice a “Signature Verified” message show up instead of “Invalid Signature”.</p>

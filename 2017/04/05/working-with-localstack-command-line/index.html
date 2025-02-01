@@ -31,35 +31,29 @@
   
   
 
-  <script type="text/javascript">
-  WebFontConfig = {
-    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
-  };
-  (function(d) {
-    var wf = d.createElement('script'), s = d.scripts[0];
-    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
-    wf.async = true;
-    s.parentNode.insertBefore(wf, s);
-  })(document);
-</script>
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet">
 
   
-  <!-- Google Analytics -->
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    ga('create', 'UA-96931340-1', 'auto');
-    ga('send', 'pageview');
+      ga('create', 'UA-96931340-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  
 
-  </script>
 
-
-  <!-- Begin Jekyll SEO tag v2.4.0 -->
+  <!-- Begin Jekyll SEO tag v2.6.1 -->
 <title>Using localstack with AWS CLI | Manish Pandit’s Blog</title>
-<meta name="generator" content="Jekyll v3.4.3" />
+<meta name="generator" content="Jekyll v4.3.4" />
 <meta property="og:title" content="Using localstack with AWS CLI" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
@@ -71,7 +65,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2017-04-05T23:44:37-07:00" />
 <script type="application/ld+json">
-{"description":"Localstack is a really useful project by Atlassian, which allows for local development using the AWS cloud stack. In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against. This post is a quick and handy gist of using AWS command line to work with localstack for S3, SNS, SQS, and DynamoDB.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"BlogPosting","url":"https://lobster1234.github.io/2017/04/05/working-with-localstack-command-line/","headline":"Using localstack with AWS CLI","dateModified":"2017-04-05T23:44:37-07:00","datePublished":"2017-04-05T23:44:37-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/04/05/working-with-localstack-command-line/"},"@context":"http://schema.org"}</script>
+{"url":"https://lobster1234.github.io/2017/04/05/working-with-localstack-command-line/","description":"Localstack is a really useful project by Atlassian, which allows for local development using the AWS cloud stack. In other words, it is a Mock AWS Stack with support for many of the infrastructure commonly coded against. This post is a quick and handy gist of using AWS command line to work with localstack for S3, SNS, SQS, and DynamoDB.","author":{"@type":"Person","name":"Manish Pandit"},"headline":"Using localstack with AWS CLI","dateModified":"2017-04-05T23:44:37-07:00","datePublished":"2017-04-05T23:44:37-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/04/05/working-with-localstack-command-line/"},"@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -264,9 +258,9 @@
 
 <h1 id="setting-up-localstack">Setting up localstack</h1>
 
-<p>Assuming you’re using an OSX/Linux base, check if you have <code class="highlighter-rouge">make</code>, <code class="highlighter-rouge">python 2.x</code>, <code class="highlighter-rouge">pip</code>, <code class="highlighter-rouge">npm</code>, <code class="highlighter-rouge">java</code> and <code class="highlighter-rouge">maven</code> installed and in path.</p>
+<p>Assuming you’re using an OSX/Linux base, check if you have <code class="language-plaintext highlighter-rouge">make</code>, <code class="language-plaintext highlighter-rouge">python 2.x</code>, <code class="language-plaintext highlighter-rouge">pip</code>, <code class="language-plaintext highlighter-rouge">npm</code>, <code class="language-plaintext highlighter-rouge">java</code> and <code class="language-plaintext highlighter-rouge">maven</code> installed and in path.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
 bash-3.2$ git clone https://github.com/localstack/localstack.git
 bash-3.2$ cd localstack
 bash-3.2$ make clean install test
@@ -286,60 +280,55 @@ Starting mock Lambda (port 4574)...
 Starting mock Kinesis (port 4568)...
 Starting mock Redshift server (port 4577)...
 Ready.
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>Optionally, start the web interface as well. It is not really feature rich at the moment but something to check out.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ make install-web
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ make install-web
 bash-3.2$ make web
 (. .venv/bin/activate; bin/localstack web --port=8080)
  * Running on http://0.0.0.0:8080/ (Press CTRL+C to quit)
  * Restarting with stat
  * Debugger is active!
  * Debugger PIN: 272-228-949
-</code></pre>
-</div>
+</code></pre></div></div>
 <p>Hit up http://localhost:8080 to see the console.</p>
 
 <blockquote>
-  <p><a href="https://github.com/localstack/awscli-local">LocalStack AWS CLI</a> is a thin wrapper around the <code class="highlighter-rouge">aws</code> command line. This will save you remembering port numbers and typing the endpoint-url all the time. Do check it out!</p>
+  <p><a href="https://github.com/localstack/awscli-local">LocalStack AWS CLI</a> is a thin wrapper around the <code class="language-plaintext highlighter-rouge">aws</code> command line. This will save you remembering port numbers and typing the endpoint-url all the time. Do check it out!</p>
 </blockquote>
 
 <h2 id="s3">S3</h2>
 
 <h3 id="create-a-bucket">Create a bucket</h3>
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4572 s3 mb s3://mytestbucket
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4572 s3 mb s3://mytestbucket
 make_bucket: mytestbucket
 
 bash-3.2$ aws --endpoint-url=http://localhost:4572 s3 ls
 2006-02-03 08:45:09 mytestbucket
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h3 id="copy-a-file-over">Copy a file over</h3>
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4572 s3 cp /tmp/mongo.log s3://mytestbucket
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4572 s3 cp /tmp/mongo.log s3://mytestbucket
 upload: ../../../../tmp/mongo.log to s3://mytestbucket/mongo.log
 
 bash-3.2$ aws --endpoint-url=http://localhost:4572 s3 ls s3://mytestbucket
 2017-04-05 01:18:39       4789 mongo.log
-</code></pre>
-</div>
+</code></pre></div></div>
 <h3 id="delete-this-file">Delete this file</h3>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4572 s3 rm s3://mytestbucket/mongo.log
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4572 s3 rm s3://mytestbucket/mongo.log
 delete: s3://mytestbucket/mongo.log
 
 bash-3.2$ aws --endpoint-url=http://localhost:4572 s3 ls s3://mytestbucket
 
 bash-3.2$
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h2 id="sns">SNS</h2>
 
 <h3 id="create-a-topic">Create a topic</h3>
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4575 sns list-topics
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4575 sns list-topics
 {
     "Topics": []
 }
@@ -357,13 +346,12 @@ bash-3.2$ aws --endpoint-url=http://localhost:4575 sns list-topics
     ]
 }
 
-</code></pre>
-</div>
+</code></pre></div></div>
 <h3 id="subscribe-to-the-topic">Subscribe to the topic</h3>
 
 <p>(use any random email)</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4575 sns subscribe --topic-arn arn:aws:sns:us-east-1:123456789012:test-topic --protocol email --notification-endpoint pibehatin@1rentcar.top
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4575 sns subscribe --topic-arn arn:aws:sns:us-east-1:123456789012:test-topic --protocol email --notification-endpoint pibehatin@1rentcar.top
 {
     "SubscriptionArn": "arn:aws:sns:us-east-1:123456789012:test-topic:5aacffbe-ccf7-40d5-be97-c55af7392935"
 }
@@ -381,21 +369,19 @@ bash-3.2$ aws --endpoint-url=http://localhost:4575 sns list-subscriptions
     ]
 }
 
-</code></pre>
-</div>
+</code></pre></div></div>
 <h3 id="publish-to-this-topic">Publish to this topic</h3>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4575 sns publish  --topic-arn arn:aws:sns:us-east-1:123456789012:test-topic --message 'Test Message!'
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4575 sns publish  --topic-arn arn:aws:sns:us-east-1:123456789012:test-topic --message 'Test Message!'
 {
     "MessageId": "n/a"
 }
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h2 id="sqs">SQS</h2>
 
 <h3 id="create-a-queue">Create a Queue</h3>
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4576 sqs create-queue --queue-name test_queue
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4576 sqs create-queue --queue-name test_queue
 {
     "QueueUrl": "http://localhost:4576/123456789012/test_queue"
 }
@@ -406,19 +392,17 @@ bash-3.2$ aws --endpoint-url=http://localhost:4576 sqs list-queues
         "http://localhost:4576/123456789012/test_queue"
     ]
 }
-</code></pre>
-</div>
+</code></pre></div></div>
 <h3 id="send-a-message-to-this-queue">Send a message to this queue</h3>
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$  aws --endpoint-url=http://localhost:4576 sqs send-message --queue-url http://localhost:4576/123456789012/test_queue --message-body 'Test Message!'
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$  aws --endpoint-url=http://localhost:4576 sqs send-message --queue-url http://localhost:4576/123456789012/test_queue --message-body 'Test Message!'
 {
     "MD5OfMessageBody": "df69267381a60e476252c989db9ac8ad",
     "MessageId": "a6ed436b-076a-0d8d-73e1-cc3291a19c28"
 }
 
-</code></pre>
-</div>
+</code></pre></div></div>
 <h3 id="receive-the-message-from-this-queue">Receive the message from this queue</h3>
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$  aws --endpoint-url=http://localhost:4576 sqs receive-message --queue-url http://localhost:4576/123456789012/test_queue
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$  aws --endpoint-url=http://localhost:4576 sqs receive-message --queue-url http://localhost:4576/123456789012/test_queue
 {
     "Messages": [
         {
@@ -435,35 +419,31 @@ bash-3.2$ aws --endpoint-url=http://localhost:4576 sqs list-queues
         }
     ]
 }
-</code></pre>
-</div>
+</code></pre></div></div>
 <p>If you do this many times, the process seems to sleep. May be to simulate the message visibility? Here are 2 consecutive runs.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>real	0m15.185s
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>real	0m15.185s
 user	0m0.291s
 sys	0m0.158s
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>real	0m26.829s
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>real	0m26.829s
 user	0m0.291s
 sys	0m0.167s
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>I have reported this issue here - <a href="https://github.com/atlassian/localstack/issues/52" target="_blank">https://github.com/atlassian/localstack/issues/52</a></p>
 
 <h3 id="delete-this-message">Delete this message</h3>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4576 sqs delete-message --queue-url http://localhost:4576/123456789012/test_queue --receipt-handle 'yugzzebhnnksfuvbjlibfnlejyqbulxqfegsnrgafjeabxaatxbmeiyfkfliedslohseosgjwkxhdzllpudhccjhorpkwbgjgyzeyzjwkfvqflathnvsmugeyevbqmfyqanuxetvdhcetseuwzrqpexogzggznndxmbqowtlalvqtffntdahhihel'
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4576 sqs delete-message --queue-url http://localhost:4576/123456789012/test_queue --receipt-handle 'yugzzebhnnksfuvbjlibfnlejyqbulxqfegsnrgafjeabxaatxbmeiyfkfliedslohseosgjwkxhdzllpudhccjhorpkwbgjgyzeyzjwkfvqflathnvsmugeyevbqmfyqanuxetvdhcetseuwzrqpexogzggznndxmbqowtlalvqtffntdahhihel'
 
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h2 id="dynamodb">DynamoDB</h2>
 <h3 id="create-a-table">Create a table</h3>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb create-table --table-name test_table  --attribute-definitions AttributeName=first,AttributeType=S AttributeName=second,AttributeType=N --key-schema AttributeName=first,KeyType=HASH AttributeName=second,KeyType=RANGE --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb create-table --table-name test_table  --attribute-definitions AttributeName=first,AttributeType=S AttributeName=second,AttributeType=N --key-schema AttributeName=first,KeyType=HASH AttributeName=second,KeyType=RANGE --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5
 {
    "TableDescription": {
        "TableArn": "arn:aws:dynamodb:us-east-1:000000000000:table/test_table",
@@ -500,22 +480,20 @@ sys	0m0.167s
    }
 }
 
-</code></pre>
-</div>
+</code></pre></div></div>
 <p>We can verify our created table -</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb list-tables
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb list-tables
 {
     "TableNames": [
         "test_table"
     ]
 }
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>and describe it too</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb describe-table --table-name test_table
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb describe-table --table-name test_table
 {
    "Table": {
        "TableArn": "arn:aws:dynamodb:us-east-1:000000000000:table/test_table",
@@ -551,20 +529,18 @@ sys	0m0.167s
        "CreationDateTime": 1491818083.66
    }
 }
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h3 id="put-item">Put item</h3>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb put-item --table-name test_table  --item '{"first":{"S":"Jack"},"second":{"N":"42"}}'
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb put-item --table-name test_table  --item '{"first":{"S":"Jack"},"second":{"N":"42"}}'
 
 bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb put-item --table-name test_table  --item '{"first":{"S":"Manish"},"second":{"N":"40"}}'
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h3 id="scan-table">Scan Table</h3>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb scan --table-name test_table
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb scan --table-name test_table
 
  {
     "Count": 2,
@@ -590,11 +566,10 @@ bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb put-item --table-nam
     "ConsumedCapacity": null
 }
 
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h3 id="get-item">Get item</h3>
-<div class="highlighter-rouge"><pre class="highlight"><code>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
 bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb get-item --table-name test_table  --key '{"first":{"S":"Manish"},"second":{"N":"40"}}'
 
 {
@@ -607,13 +582,12 @@ bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb get-item --table-nam
         }
     }
 }
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h3 id="query">Query</h3>
 <p>I <strong>hate</strong> to query over CLI, and you can see why. Hope this can help you realize that the best way to deal with DynamoDB is via an SDK.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb query --table-name test_table --projection-expression "#first, #second" --key-condition-expression "#first = :value" --expression-attribute-values '{":value" : {"S":"Manish"}}' --expression-attribute-names '{"#first":"first", "#second":"second"}'
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb query --table-name test_table --projection-expression "#first, #second" --key-condition-expression "#first = :value" --expression-attribute-values '{":value" : {"S":"Manish"}}' --expression-attribute-names '{"#first":"first", "#second":"second"}'
 {
     "Count": 1,
     "Items": [
@@ -629,8 +603,7 @@ bash-3.2$ aws --endpoint-url=http://localhost:4569 dynamodb get-item --table-nam
     "ScannedCount": 1,
     "ConsumedCapacity": null
 }
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h3 style="text-align: center" id="comments">Comments</h3>
 

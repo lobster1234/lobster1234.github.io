@@ -31,35 +31,29 @@
   
   
 
-  <script type="text/javascript">
-  WebFontConfig = {
-    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
-  };
-  (function(d) {
-    var wf = d.createElement('script'), s = d.scripts[0];
-    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
-    wf.async = true;
-    s.parentNode.insertBefore(wf, s);
-  })(document);
-</script>
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet">
 
   
-  <!-- Google Analytics -->
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    ga('create', 'UA-96931340-1', 'auto');
-    ga('send', 'pageview');
+      ga('create', 'UA-96931340-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  
 
-  </script>
 
-
-  <!-- Begin Jekyll SEO tag v2.4.0 -->
+  <!-- Begin Jekyll SEO tag v2.6.1 -->
 <title>Python Primer for Java Developers | Manish Pandit’s Blog</title>
-<meta name="generator" content="Jekyll v3.4.3" />
+<meta name="generator" content="Jekyll v4.3.4" />
 <meta property="og:title" content="Python Primer for Java Developers" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
@@ -72,7 +66,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2017-05-25T23:44:37-07:00" />
 <script type="application/ld+json">
-{"description":"I took these notes while ramping up on Python, to be able to contribute to a few Github projects, deploy AWS Lambdas quicker, and use boto3 for quite a few projects. Plus I find it a very light, frictionless, quick and easy scripting language to have in the arsenal. This information can be particularly useful to anyone who is coming from a Java background, and wants to compare and contrast the two languages’ basic constructs and syntax.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"BlogPosting","url":"https://lobster1234.github.io/2017/05/25/python-java-primer/","image":"https://lobster1234.github.io/assets/python-logo.png","headline":"Python Primer for Java Developers","dateModified":"2017-05-25T23:44:37-07:00","datePublished":"2017-05-25T23:44:37-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/05/25/python-java-primer/"},"@context":"http://schema.org"}</script>
+{"url":"https://lobster1234.github.io/2017/05/25/python-java-primer/","description":"I took these notes while ramping up on Python, to be able to contribute to a few Github projects, deploy AWS Lambdas quicker, and use boto3 for quite a few projects. Plus I find it a very light, frictionless, quick and easy scripting language to have in the arsenal. This information can be particularly useful to anyone who is coming from a Java background, and wants to compare and contrast the two languages’ basic constructs and syntax.","author":{"@type":"Person","name":"Manish Pandit"},"image":"https://lobster1234.github.io/assets/python-logo.png","headline":"Python Primer for Java Developers","dateModified":"2017-05-25T23:44:37-07:00","datePublished":"2017-05-25T23:44:37-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/05/25/python-java-primer/"},"@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -265,11 +259,11 @@
 <!--more-->
 
 <h3 id="setup">Setup</h3>
-<p>I recommend using <a href="https://atom.io/" target="_blank_">Atom</a>, and installing the <a href="https://atom.io/packages/script" target="_blank_">Script</a> package. Once done, make sure you download and install <a href="https://www.python.org/downloads/" target="_blank_">Python 3.x</a>. For OSX, this will also install <code class="highlighter-rouge">pip3</code>, which is the Python Package Manager. I noticed that on Ubuntu Xenial I had to install pip3 via <code class="highlighter-rouge">sudo apt install python3-pip</code>.</p>
+<p>I recommend using <a href="https://atom.io/" target="_blank_">Atom</a>, and installing the <a href="https://atom.io/packages/script" target="_blank_">Script</a> package. Once done, make sure you download and install <a href="https://www.python.org/downloads/" target="_blank_">Python 3.x</a>. For OSX, this will also install <code class="language-plaintext highlighter-rouge">pip3</code>, which is the Python Package Manager. I noticed that on Ubuntu Xenial I had to install pip3 via <code class="language-plaintext highlighter-rouge">sudo apt install python3-pip</code>.</p>
 
-<p>There is a <a href="https://github.com/lsegal/atom-runner/issues/124" target="_blank_">(closed) issue</a> logged for Atom to work with Python 3 on OSX, but none of it worked for me except using shebang. Just put <code class="highlighter-rouge"><span class="c">#!/usr/local/bin/python3</span></code> as the first line in the file which you’ll write code in.</p>
+<p>There is a <a href="https://github.com/lsegal/atom-runner/issues/124" target="_blank_">(closed) issue</a> logged for Atom to work with Python 3 on OSX, but none of it worked for me except using shebang. Just put <code class="language-plaintext highlighter-rouge">#!/usr/local/bin/python3</code> as the first line in the file which you’ll write code in.</p>
 
-<p>To write code, create a new file in Atom, and you’re good to go. On OSX use <code class="highlighter-rouge">⌘+i</code> to execute.</p>
+<p>To write code, create a new file in Atom, and you’re good to go. On OSX use <code class="language-plaintext highlighter-rouge">⌘+i</code> to execute.</p>
 
 <p>I’d also recommend checking out the <a href="https://www.hackerrank.com/domains/python/py-introduction" target="_blank_">Python Domain</a> on HackerRank for hands-on practice.</p>
 
@@ -277,410 +271,379 @@
 
 <h3 id="comments">Comments</h3>
 <h4 id="java">Java</h4>
-<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="c1">//  This is a comment</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//  This is a comment</span>
 <span class="cm">/*  
     This is a
     multi line comment
 */</span>
 
-</code></pre>
-</div>
+</code></pre></div></div>
 <h4 id="python">Python</h4>
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="c"># This is a comment</span>
-</code></pre>
-</div>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># This is a comment
+</span></code></pre></div></div>
 
 <h3 id="variables">Variables</h3>
 <h4 id="java-1">Java</h4>
-<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="n">String</span> <span class="n">name</span> <span class="o">=</span> <span class="s">"Name"</span><span class="o">;</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">String</span> <span class="n">name</span> <span class="o">=</span> <span class="s">"Name"</span><span class="o">;</span>
 <span class="kt">int</span> <span class="n">age</span> <span class="o">=</span> <span class="mi">42</span><span class="o">;</span>
 <span class="kt">boolean</span> <span class="n">completed</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
 <span class="kt">char</span> <span class="n">c</span> <span class="o">=</span> <span class="sc">'A'</span><span class="o">;</span>
 <span class="kt">float</span> <span class="n">f</span> <span class="o">=</span> <span class="mf">0.0034</span><span class="o">;</span>
 
 <span class="c1">//conversions</span>
-<span class="n">Integer</span><span class="o">.</span><span class="na">parseInt</span><span class="o">(</span><span class="s">"1234"</span><span class="o">);</span>
-<span class="n">Object</span><span class="o">.</span><span class="na">toString</span><span class="o">();</span>
-<span class="n">Long</span><span class="o">.</span><span class="na">parseLong</span><span class="o">(</span><span class="s">"1024"</span><span class="o">);</span>
-<span class="n">Boolean</span><span class="o">.</span><span class="na">parseBoolean</span><span class="o">(</span><span class="s">"false"</span><span class="o">);</span>
+<span class="nc">Integer</span><span class="o">.</span><span class="na">parseInt</span><span class="o">(</span><span class="s">"1234"</span><span class="o">);</span>
+<span class="nc">Object</span><span class="o">.</span><span class="na">toString</span><span class="o">();</span>
+<span class="nc">Long</span><span class="o">.</span><span class="na">parseLong</span><span class="o">(</span><span class="s">"1024"</span><span class="o">);</span>
+<span class="nc">Boolean</span><span class="o">.</span><span class="na">parseBoolean</span><span class="o">(</span><span class="s">"false"</span><span class="o">);</span>
 <span class="c1">//casting</span>
 <span class="o">(</span><span class="kt">int</span><span class="o">)</span> <span class="n">n</span><span class="o">;</span>
 <span class="o">(</span><span class="kt">float</span><span class="o">)</span> <span class="n">f</span><span class="o">;</span>
 <span class="o">(</span><span class="kt">long</span><span class="o">)</span> <span class="n">l</span><span class="o">;</span>
-<span class="o">(</span><span class="n">Object</span><span class="o">)</span> <span class="n">o</span><span class="o">;</span>
+<span class="o">(</span><span class="nc">Object</span><span class="o">)</span> <span class="n">o</span><span class="o">;</span>
 
-</code></pre>
-</div>
+</code></pre></div></div>
 <h4 id="python-1">Python</h4>
 
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">name</span> <span class="o">=</span> <span class="s">"Name"</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">name</span> <span class="o">=</span> <span class="sh">"</span><span class="s">Name</span><span class="sh">"</span>
 <span class="n">age</span> <span class="o">=</span> <span class="mi">42</span>
 <span class="n">completed</span> <span class="o">=</span> <span class="bp">False</span>
-<span class="n">c</span> <span class="o">=</span> <span class="s">'A'</span>
+<span class="n">c</span> <span class="o">=</span> <span class="sh">'</span><span class="s">A</span><span class="sh">'</span>
 <span class="n">f</span> <span class="o">=</span> <span class="mf">0.0034</span>
 
-<span class="c"># casting</span>
-<span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-<span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-<span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-<span class="nb">bool</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="c"># Will only return false for an empty string or an int=0</span>
-<span class="n">list_of_ints</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">list_of_strings</span><span class="p">]</span>
-</code></pre>
-</div>
+<span class="c1"># casting
+</span><span class="nf">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+<span class="nf">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+<span class="nf">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+<span class="nf">bool</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="c1"># Will only return false for an empty string or an int=0
+</span><span class="n">list_of_ints</span> <span class="o">=</span> <span class="p">[</span><span class="nf">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">list_of_strings</span><span class="p">]</span>
+</code></pre></div></div>
 
 <h3 id="hello-world">Hello World</h3>
 <h4 id="java-2">Java</h4>
-<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="c1">//With newline</span>
-<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Hello World!"</span><span class="o">);</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//With newline</span>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Hello World!"</span><span class="o">);</span>
 <span class="c1">//Without newline</span>
-<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">print</span><span class="o">(</span><span class="s">"Hello World!"</span><span class="o">);</span>
-</code></pre>
-</div>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">print</span><span class="o">(</span><span class="s">"Hello World!"</span><span class="o">);</span>
+</code></pre></div></div>
 <h4 id="python-2">Python</h4>
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="c"># With newline</span>
-<span class="k">print</span><span class="p">(</span><span class="s">"Hello World"</span><span class="p">);</span>
-<span class="c"># Without newline</span>
-<span class="k">print</span><span class="p">(</span><span class="s">"Hello World"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s">''</span><span class="p">)</span>
-</code></pre>
-</div>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># With newline
+</span><span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Hello World</span><span class="sh">"</span><span class="p">);</span>
+<span class="c1"># Without newline
+</span><span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Hello World</span><span class="sh">"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="sh">''</span><span class="p">)</span>
+</code></pre></div></div>
 
 <h3 id="read-input">Read Input</h3>
 <h4 id="java-3">Java</h4>
-<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="n">Scanner</span> <span class="n">scanner</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Scanner</span><span class="o">(</span><span class="n">System</span><span class="o">.</span><span class="na">in</span><span class="o">);</span>
-<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Enter name"</span><span class="o">);</span>
-<span class="n">String</span> <span class="n">name</span> <span class="o">=</span> <span class="n">scanner</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
-<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Enter age"</span><span class="o">);</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">Scanner</span> <span class="n">scanner</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Scanner</span><span class="o">(</span><span class="nc">System</span><span class="o">.</span><span class="na">in</span><span class="o">);</span>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Enter name"</span><span class="o">);</span>
+<span class="nc">String</span> <span class="n">name</span> <span class="o">=</span> <span class="n">scanner</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Enter age"</span><span class="o">);</span>
 <span class="kt">int</span> <span class="n">age</span> <span class="o">=</span> <span class="n">scanner</span><span class="o">.</span><span class="na">nextInt</span><span class="o">();</span>
-<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Name is "</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">" and age is "</span> <span class="o">+</span> <span class="n">age</span><span class="o">);</span>
-</code></pre>
-</div>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Name is "</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">" and age is "</span> <span class="o">+</span> <span class="n">age</span><span class="o">);</span>
+</code></pre></div></div>
 <h4 id="python-3">Python</h4>
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">name</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s">"Enter name</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
-<span class="n">age</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s">"Enter age</span><span class="se">\n</span><span class="s">"</span><span class="p">))</span>
-<span class="k">print</span><span class="p">(</span><span class="s">"Name is "</span><span class="p">,</span> <span class="n">name</span> <span class="p">,</span><span class="s">" and age is "</span><span class="p">,</span> <span class="n">age</span><span class="p">)</span>
-</code></pre>
-</div>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">name</span> <span class="o">=</span> <span class="nf">input</span><span class="p">(</span><span class="sh">"</span><span class="s">Enter name</span><span class="se">\n</span><span class="sh">"</span><span class="p">)</span>
+<span class="n">age</span> <span class="o">=</span> <span class="nf">int</span><span class="p">(</span><span class="nf">input</span><span class="p">(</span><span class="sh">"</span><span class="s">Enter age</span><span class="se">\n</span><span class="sh">"</span><span class="p">))</span>
+<span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Name is </span><span class="sh">"</span><span class="p">,</span> <span class="n">name</span> <span class="p">,</span><span class="sh">"</span><span class="s"> and age is </span><span class="sh">"</span><span class="p">,</span> <span class="n">age</span><span class="p">)</span>
+</code></pre></div></div>
 
 <h3 id="operators">Operators</h3>
 <h4 id="java-4">Java</h4>
-<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">5</span><span class="o">;</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">5</span><span class="o">;</span>
 <span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">3</span><span class="o">;</span>
-<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Sum : "</span> <span class="o">+</span> <span class="n">i</span><span class="o">+</span><span class="n">j</span><span class="o">);</span>
-<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Diff : "</span> <span class="o">+</span> <span class="o">(</span><span class="n">i</span><span class="o">-</span><span class="n">j</span><span class="o">));</span>
-<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Product : "</span> <span class="o">+</span> <span class="n">i</span><span class="o">*</span><span class="n">j</span><span class="o">);</span>
-<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Modulo : "</span> <span class="o">+</span> <span class="n">i</span><span class="o">%</span><span class="n">j</span><span class="o">);</span>
-<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Power : "</span> <span class="o">+</span> <span class="n">Math</span><span class="o">.</span><span class="na">pow</span><span class="o">(</span><span class="n">i</span><span class="o">,</span><span class="n">j</span><span class="o">));</span>
-<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Floor Division : "</span> <span class="o">+</span> <span class="n">i</span><span class="o">/</span><span class="n">j</span><span class="o">);</span>
-<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Float Division : "</span> <span class="o">+</span> <span class="o">(</span><span class="kt">float</span><span class="o">)</span><span class="n">i</span><span class="o">/</span><span class="n">j</span><span class="o">);</span>
-</code></pre>
-</div>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Sum : "</span> <span class="o">+</span> <span class="n">i</span><span class="o">+</span><span class="n">j</span><span class="o">);</span>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Diff : "</span> <span class="o">+</span> <span class="o">(</span><span class="n">i</span><span class="o">-</span><span class="n">j</span><span class="o">));</span>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Product : "</span> <span class="o">+</span> <span class="n">i</span><span class="o">*</span><span class="n">j</span><span class="o">);</span>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Modulo : "</span> <span class="o">+</span> <span class="n">i</span><span class="o">%</span><span class="n">j</span><span class="o">);</span>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Power : "</span> <span class="o">+</span> <span class="nc">Math</span><span class="o">.</span><span class="na">pow</span><span class="o">(</span><span class="n">i</span><span class="o">,</span><span class="n">j</span><span class="o">));</span>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Floor Division : "</span> <span class="o">+</span> <span class="n">i</span><span class="o">/</span><span class="n">j</span><span class="o">);</span>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Float Division : "</span> <span class="o">+</span> <span class="o">(</span><span class="kt">float</span><span class="o">)</span><span class="n">i</span><span class="o">/</span><span class="n">j</span><span class="o">);</span>
+</code></pre></div></div>
 <h4 id="python-4">Python</h4>
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">i</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">i</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
 <span class="n">j</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
-<span class="k">print</span><span class="p">(</span><span class="s">"Sum : "</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="n">j</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="s">"Diff : "</span> <span class="p">,</span> <span class="n">i</span><span class="o">-</span><span class="n">j</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="s">"Product : "</span> <span class="p">,</span> <span class="n">i</span><span class="o">*</span><span class="n">j</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="s">"Modulo : "</span> <span class="p">,</span> <span class="n">i</span><span class="o">%</span><span class="n">j</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="s">"Floor Division : "</span> <span class="p">,</span> <span class="n">i</span><span class="o">//</span><span class="n">j</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="s">"Float Division : "</span> <span class="p">,</span> <span class="n">i</span><span class="o">/</span><span class="n">j</span><span class="p">)</span>
-</code></pre>
-</div>
+<span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Sum : </span><span class="sh">"</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="n">j</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Diff : </span><span class="sh">"</span> <span class="p">,</span> <span class="n">i</span><span class="o">-</span><span class="n">j</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Product : </span><span class="sh">"</span> <span class="p">,</span> <span class="n">i</span><span class="o">*</span><span class="n">j</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Modulo : </span><span class="sh">"</span> <span class="p">,</span> <span class="n">i</span><span class="o">%</span><span class="n">j</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Floor Division : </span><span class="sh">"</span> <span class="p">,</span> <span class="n">i</span><span class="o">//</span><span class="n">j</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Float Division : </span><span class="sh">"</span> <span class="p">,</span> <span class="n">i</span><span class="o">/</span><span class="n">j</span><span class="p">)</span>
+</code></pre></div></div>
 
 <h3 id="if-then-else">If-then-else</h3>
 <p>We use the if-then-else exercise from Hackerrank as an example.</p>
-<div class="highlighter-rouge"><pre class="highlight"><code>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
 If n  is odd, print Weird
 If n is even and in the inclusive range of 2 to 5 , print Not Weird
 If n is even and in the inclusive range of 6 to 20, print Weird
 If n is even and greater than 20 , print Not Weird
 
-</code></pre>
-</div>
+</code></pre></div></div>
 <h4 id="java-5">Java</h4>
-<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="k">if</span><span class="o">(</span><span class="n">n</span><span class="o">%</span><span class="mi">2</span><span class="o">==</span><span class="mi">1</span><span class="o">)</span> <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Weird"</span><span class="o">);</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span><span class="o">(</span><span class="n">n</span><span class="o">%</span><span class="mi">2</span><span class="o">==</span><span class="mi">1</span><span class="o">)</span> <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Weird"</span><span class="o">);</span>
 <span class="k">else</span> <span class="nf">if</span><span class="o">(</span><span class="n">n</span><span class="o">%</span><span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">n</span> <span class="o">&gt;=</span><span class="mi">2</span> <span class="o">&amp;&amp;</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">5</span><span class="o">)</span>
-  <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Not Weird"</span><span class="o">);</span>
+  <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Not Weird"</span><span class="o">);</span>
 <span class="k">else</span> <span class="nf">if</span><span class="o">(</span><span class="n">n</span><span class="o">%</span><span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">n</span> <span class="o">&gt;=</span> <span class="mi">6</span> <span class="o">&amp;&amp;</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">20</span><span class="o">)</span>
-  <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Weird"</span><span class="o">);</span>
+  <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Weird"</span><span class="o">);</span>
 <span class="k">else</span> <span class="nf">if</span><span class="o">(</span><span class="n">n</span><span class="o">%</span><span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">20</span><span class="o">)</span>
-  <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Not Weird"</span><span class="o">);</span>
+  <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Not Weird"</span><span class="o">);</span>
 
-</code></pre>
-</div>
+</code></pre></div></div>
 <h4 id="python-5">Python</h4>
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="k">if</span> <span class="n">n</span><span class="o">%</span><span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span>  <span class="p">:</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">"Weird"</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="n">n</span><span class="o">%</span><span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span>  <span class="p">:</span>
+    <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Weird</span><span class="sh">"</span><span class="p">)</span>
 <span class="k">elif</span> <span class="n">n</span><span class="o">%</span><span class="mi">2</span><span class="o">==</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">&gt;=</span><span class="mi">2</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">&lt;=</span><span class="mi">5</span> <span class="p">:</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">"Not Weird"</span><span class="p">)</span>
+    <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Not Weird</span><span class="sh">"</span><span class="p">)</span>
 <span class="k">elif</span> <span class="n">n</span><span class="o">%</span><span class="mi">2</span><span class="o">==</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">&gt;=</span><span class="mi">6</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">&lt;=</span><span class="mi">20</span> <span class="p">:</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">"Weird"</span><span class="p">)</span>
+    <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Weird</span><span class="sh">"</span><span class="p">)</span>
 <span class="k">elif</span> <span class="n">n</span><span class="o">%</span><span class="mi">2</span><span class="o">==</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">20</span> <span class="p">:</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">"Not Weird"</span><span class="p">)</span>
-</code></pre>
-</div>
+    <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Not Weird</span><span class="sh">"</span><span class="p">)</span>
+</code></pre></div></div>
 
 <h3 id="switch">Switch</h3>
 <h4 id="java-6">Java</h4>
-<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="k">switch</span><span class="o">(</span><span class="n">dayOfWeek</span><span class="o">){</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">switch</span><span class="o">(</span><span class="n">dayOfWeek</span><span class="o">){</span>
     <span class="k">case</span> <span class="mi">0</span> <span class="o">:</span>
     <span class="k">case</span> <span class="mi">6</span> <span class="o">:</span>
-        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Weekend"</span><span class="o">);</span>
+        <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Weekend"</span><span class="o">);</span>
         <span class="k">break</span><span class="o">;</span>
     <span class="k">case</span> <span class="mi">5</span> <span class="o">:</span>
-        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"TGIF"</span><span class="o">);</span>
+        <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"TGIF"</span><span class="o">);</span>
         <span class="k">break</span><span class="o">;</span>
     <span class="k">default</span><span class="o">:</span>
-       <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Weekday"</span><span class="o">);</span>
+       <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Weekday"</span><span class="o">);</span>
 <span class="o">}</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 <h4 id="python-6">Python</h4>
 <p>Python does not really have a switch/case. if/elif/else are used instead.</p>
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">6</span> <span class="p">:</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">"Weekend"</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">6</span> <span class="p">:</span>
+    <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Weekend</span><span class="sh">"</span><span class="p">)</span>
 <span class="k">elif</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">5</span> <span class="p">:</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">"TGIF"</span><span class="p">)</span>
+    <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">TGIF</span><span class="sh">"</span><span class="p">)</span>
 <span class="k">else</span> <span class="p">:</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">"Weekday"</span><span class="p">)</span>
-</code></pre>
-</div>
+    <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Weekday</span><span class="sh">"</span><span class="p">)</span>
+</code></pre></div></div>
 <h3 id="for-loop">For Loop</h3>
 <h4 id="java-7">Java</h4>
-<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="o">;</span><span class="n">i</span><span class="o">&lt;</span><span class="mi">5</span><span class="o">;</span><span class="n">i</span><span class="o">++){</span>
-  <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="o">;</span><span class="n">i</span><span class="o">&lt;</span><span class="mi">5</span><span class="o">;</span><span class="n">i</span><span class="o">++){</span>
+  <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
 <span class="o">}</span>
 
 <span class="k">for</span><span class="o">(</span><span class="kt">char</span> <span class="n">c</span> <span class="o">:</span> <span class="s">"Manish"</span><span class="o">.</span><span class="na">toCharArray</span><span class="o">()){</span>
-    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">c</span><span class="o">);</span>
+    <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">c</span><span class="o">);</span>
 <span class="o">}</span>
 
-</code></pre>
-</div>
+</code></pre></div></div>
 <h4 id="python-7">Python</h4>
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="p">:</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="p">:</span>
+    <span class="nf">print</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
 
-<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="s">"Manish"</span> <span class="p">:</span>
-  <span class="k">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="sh">"</span><span class="s">Manish</span><span class="sh">"</span> <span class="p">:</span>
+  <span class="nf">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
 
-</code></pre>
-</div>
-<p>Python also supports Scala style <code class="highlighter-rouge">For Comprehensions</code>, which are called <code class="highlighter-rouge">Generators</code>. There is a subtle difference though, as you can see below.</p>
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">square</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+</code></pre></div></div>
+<p>Python also supports Scala style <code class="language-plaintext highlighter-rouge">For Comprehensions</code>, which are called <code class="language-plaintext highlighter-rouge">Generators</code>. There is a subtle difference though, as you can see below.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">square</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
         <span class="k">yield</span> <span class="n">i</span><span class="o">**</span><span class="mi">2</span>
 
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">square</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-</code></pre>
-</div>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nf">square</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="nf">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+</code></pre></div></div>
 <h3 id="while-loop">While Loop</h3>
 <h4 id="java-8">Java</h4>
-<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
 <span class="k">while</span><span class="o">(</span><span class="kc">true</span><span class="o">){</span>
   <span class="o">++</span><span class="n">n</span><span class="o">;</span>
-  <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">n</span><span class="o">);</span>
+  <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">n</span><span class="o">);</span>
   <span class="k">if</span><span class="o">(</span><span class="n">n</span><span class="o">==</span><span class="mi">20</span><span class="o">)</span> <span class="o">{</span>
     <span class="k">break</span><span class="o">;</span>
   <span class="o">}</span>
 <span class="o">}</span>
-<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Loop Broke with n = "</span> <span class="o">+</span> <span class="n">n</span><span class="o">);</span>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Loop Broke with n = "</span> <span class="o">+</span> <span class="n">n</span><span class="o">);</span>
 
-</code></pre>
-</div>
+</code></pre></div></div>
 <h4 id="python-8">Python</h4>
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="k">while</span> <span class="bp">True</span> <span class="p">:</span>
     <span class="n">n</span> <span class="o">=</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="nf">print</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">n</span><span class="o">==</span><span class="mi">20</span> <span class="p">:</span>
         <span class="k">break</span>
-<span class="k">print</span><span class="p">(</span><span class="s">"Loop broke with n = "</span><span class="p">,</span><span class="n">n</span><span class="p">)</span>
-</code></pre>
-</div>
+<span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Loop broke with n = </span><span class="sh">"</span><span class="p">,</span><span class="n">n</span><span class="p">)</span>
+</code></pre></div></div>
 <h3 id="exceptions-and-errors">Exceptions and Errors</h3>
 <h4 id="java-9">Java</h4>
-<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="k">try</span><span class="o">{</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">try</span><span class="o">{</span>
   <span class="n">doSomething</span><span class="o">();</span>
-<span class="o">}</span><span class="k">catch</span><span class="o">(</span><span class="n">SomeException</span> <span class="n">e</span><span class="o">){</span>
+<span class="o">}</span><span class="k">catch</span><span class="o">(</span><span class="nc">SomeException</span> <span class="n">e</span><span class="o">){</span>
   <span class="c1">//do something</span>
-<span class="o">}</span><span class="k">catch</span><span class="o">(</span><span class="n">SomeOtherException</span> <span class="n">e</span><span class="o">){</span>
+<span class="o">}</span><span class="k">catch</span><span class="o">(</span><span class="nc">SomeOtherException</span> <span class="n">e</span><span class="o">){</span>
   <span class="c1">//do something else</span>
 <span class="o">}</span><span class="k">finally</span><span class="o">{</span>
   <span class="c1">//always executes</span>
 <span class="o">}</span>
 
-</code></pre>
-</div>
+</code></pre></div></div>
 <h4 id="python-9">Python</h4>
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="k">try</span><span class="p">:</span>
-    <span class="k">assert</span><span class="p">(</span><span class="mi">1</span><span class="o">==</span><span class="mi">2</span><span class="p">)</span> <span class="c"># This will cause an error</span>
-<span class="k">except</span> <span class="nb">AssertionError</span><span class="p">:</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">"Caught Assertion Exception"</span><span class="p">)</span>
-<span class="k">except</span> <span class="p">:</span> <span class="c"># catch all exceptions</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">"Caught unknown exception"</span><span class="p">)</span>
-<span class="k">else</span><span class="p">:</span> <span class="c"># happy path</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">"No exceptions raised"</span><span class="p">)</span>
-<span class="k">finally</span><span class="p">:</span> <span class="c"># will execute regardless of exceptions or happy path</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">"Done with the assertion"</span><span class="p">)</span>
-</code></pre>
-</div>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">try</span><span class="p">:</span>
+    <span class="nf">assert</span><span class="p">(</span><span class="mi">1</span><span class="o">==</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># This will cause an error
+</span><span class="k">except</span> <span class="nb">AssertionError</span><span class="p">:</span>
+    <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Caught Assertion Exception</span><span class="sh">"</span><span class="p">)</span>
+<span class="k">except</span> <span class="p">:</span> <span class="c1"># catch all exceptions
+</span>    <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Caught unknown exception</span><span class="sh">"</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span> <span class="c1"># happy path
+</span>    <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">No exceptions raised</span><span class="sh">"</span><span class="p">)</span>
+<span class="k">finally</span><span class="p">:</span> <span class="c1"># will execute regardless of exceptions or happy path
+</span>    <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Done with the assertion</span><span class="sh">"</span><span class="p">)</span>
+</code></pre></div></div>
 <h3 id="functions">Functions</h3>
 <h4 id="java-10">Java</h4>
-<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kd">public</span> <span class="kt">int</span> <span class="nf">add</span> <span class="o">(</span><span class="kt">int</span> <span class="n">x</span><span class="o">,</span> <span class="kt">int</span> <span class="n">y</span><span class="o">){</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kt">int</span> <span class="nf">add</span> <span class="o">(</span><span class="kt">int</span> <span class="n">x</span><span class="o">,</span> <span class="kt">int</span> <span class="n">y</span><span class="o">){</span>
   <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="o">;</span>
 <span class="o">}</span>
 
-<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">add</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span><span class="mi">2</span><span class="o">));</span>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">add</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span><span class="mi">2</span><span class="o">));</span>
 
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h4 id="python-10">Python</h4>
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">y</span> <span class="c"># If return is skipped, the method returns a None</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">y</span> <span class="c1"># If return is skipped, the method returns a None
+</span>
+<span class="nf">print</span><span class="p">(</span><span class="nf">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
 
-<span class="k">print</span><span class="p">(</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
-
-<span class="c"># Can be called with named arguments</span>
-
-<span class="k">print</span><span class="p">(</span><span class="n">add</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="mi">7</span><span class="p">))</span> <span class="c"># Will print 12</span>
-
-<span class="c"># Can take default arguments too</span>
-<span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<span class="c1"># Can be called with named arguments
+</span>
+<span class="nf">print</span><span class="p">(</span><span class="nf">add</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="mi">7</span><span class="p">))</span> <span class="c1"># Will print 12
+</span>
+<span class="c1"># Can take default arguments too
+</span><span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
   <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">y</span>
 
-<span class="k">print</span><span class="p">(</span><span class="n">add</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span> <span class="c"># Will return 7</span>
-
-</code></pre>
-</div>
+<span class="nf">print</span><span class="p">(</span><span class="nf">add</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span> <span class="c1"># Will return 7
+</span>
+</code></pre></div></div>
 <h3 id="collections---lists">Collections - Lists</h3>
-<p>There are technically no <code class="highlighter-rouge">Arrays</code> in Python, just <code class="highlighter-rouge">Lists</code>. Also, they may contain many <code class="highlighter-rouge">types</code> of elements, but in practice it is just one <code class="highlighter-rouge">type</code>. Python Lists are mutable.</p>
+<p>There are technically no <code class="language-plaintext highlighter-rouge">Arrays</code> in Python, just <code class="language-plaintext highlighter-rouge">Lists</code>. Also, they may contain many <code class="language-plaintext highlighter-rouge">types</code> of elements, but in practice it is just one <code class="language-plaintext highlighter-rouge">type</code>. Python Lists are mutable.</p>
 <h4 id="java-11">Java</h4>
-<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;();</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;&gt;();</span>
 <span class="n">list</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"A"</span><span class="o">);</span>
 <span class="n">list</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"B"</span><span class="o">);</span>
 <span class="n">list</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"C"</span><span class="o">);</span>
 <span class="n">list</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span><span class="s">"D"</span><span class="o">);</span>
-<span class="n">Collections</span><span class="o">.</span><span class="na">sort</span><span class="o">(</span><span class="n">list</span><span class="o">);</span> <span class="c1">//in place sort</span>
+<span class="nc">Collections</span><span class="o">.</span><span class="na">sort</span><span class="o">(</span><span class="n">list</span><span class="o">);</span> <span class="c1">//in place sort</span>
 <span class="n">list</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="s">"C"</span><span class="o">);</span> <span class="c1">//remove the first occurrence of "C"</span>
 <span class="n">list</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="mi">2</span><span class="o">);</span> <span class="c1">//remove object at the index 2</span>
-<span class="n">Collections</span><span class="o">.</span><span class="na">reverse</span><span class="o">(</span><span class="n">list</span><span class="o">);</span> <span class="c1">//reverse the list</span>
+<span class="nc">Collections</span><span class="o">.</span><span class="na">reverse</span><span class="o">(</span><span class="n">list</span><span class="o">);</span> <span class="c1">//reverse the list</span>
 <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">list</span><span class="o">.</span><span class="na">indexOf</span><span class="o">(</span><span class="s">"A"</span><span class="o">);</span> <span class="c1">//return the index of first occurrence of "A"</span>
-<span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">list1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;();</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">list1</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;&gt;();</span>
 <span class="n">list1</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"E"</span><span class="o">);</span>
 <span class="n">list1</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"F"</span><span class="o">);</span>
 <span class="n">list</span><span class="o">.</span><span class="na">addAll</span><span class="o">(</span><span class="n">list1</span><span class="o">);</span> <span class="c1">//add list1 elements to list at the end</span>
 <span class="kt">int</span> <span class="n">size</span> <span class="o">=</span> <span class="n">list</span><span class="o">.</span><span class="na">size</span><span class="o">();</span> <span class="c1">//size of the list</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h4 id="python-11">Python</h4>
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="nb">list</span> <span class="o">=</span> <span class="p">[]</span> <span class="c"># create a new list</span>
-<span class="nb">list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">"A"</span><span class="p">)</span> <span class="c"># add to the end</span>
-<span class="nb">list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">"B"</span><span class="p">)</span>
-<span class="nb">list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">"C"</span><span class="p">)</span>
-<span class="nb">list</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="s">"D"</span><span class="p">)</span> <span class="c"># insert at an index</span>
-<span class="n">sorted_list</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span> <span class="c"># returns a new, sorted list</span>
-<span class="nb">list</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span> <span class="c"># in place sort</span>
-<span class="nb">list</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s">"C"</span><span class="p">)</span> <span class="c"># remove first occurrence of "C"</span>
-<span class="n">popped</span> <span class="o">=</span> <span class="nb">list</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="c"># return and remove the item at index 2</span>
-<span class="nb">list</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span> <span class="c"># reverse the list</span>
-<span class="n">a</span> <span class="o">=</span> <span class="nb">list</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">"A"</span><span class="p">)</span> <span class="c"># return index of "A"</span>
-<span class="nb">list</span> <span class="o">+=</span> <span class="p">[</span><span class="s">"E"</span><span class="p">,</span><span class="s">"F"</span><span class="p">]</span> <span class="c"># add a list with E and F to the end of this list</span>
-<span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span> <span class="c"># size of the list</span>
-</code></pre>
-</div>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">list</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># create a new list
+</span><span class="nb">list</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="sh">"</span><span class="s">A</span><span class="sh">"</span><span class="p">)</span> <span class="c1"># add to the end
+</span><span class="nb">list</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="sh">"</span><span class="s">B</span><span class="sh">"</span><span class="p">)</span>
+<span class="nb">list</span><span class="p">.</span><span class="nf">append</span><span class="p">(</span><span class="sh">"</span><span class="s">C</span><span class="sh">"</span><span class="p">)</span>
+<span class="nb">list</span><span class="p">.</span><span class="nf">insert</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="sh">"</span><span class="s">D</span><span class="sh">"</span><span class="p">)</span> <span class="c1"># insert at an index
+</span><span class="n">sorted_list</span> <span class="o">=</span> <span class="nf">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span> <span class="c1"># returns a new, sorted list
+</span><span class="nb">list</span><span class="p">.</span><span class="nf">sort</span><span class="p">()</span> <span class="c1"># in place sort
+</span><span class="nb">list</span><span class="p">.</span><span class="nf">remove</span><span class="p">(</span><span class="sh">"</span><span class="s">C</span><span class="sh">"</span><span class="p">)</span> <span class="c1"># remove first occurrence of "C"
+</span><span class="n">popped</span> <span class="o">=</span> <span class="nb">list</span><span class="p">.</span><span class="nf">pop</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># return and remove the item at index 2
+</span><span class="nb">list</span><span class="p">.</span><span class="nf">reverse</span><span class="p">()</span> <span class="c1"># reverse the list
+</span><span class="n">a</span> <span class="o">=</span> <span class="nb">list</span><span class="p">.</span><span class="nf">index</span><span class="p">(</span><span class="sh">"</span><span class="s">A</span><span class="sh">"</span><span class="p">)</span> <span class="c1"># return index of "A"
+</span><span class="nb">list</span> <span class="o">+=</span> <span class="p">[</span><span class="sh">"</span><span class="s">E</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">F</span><span class="sh">"</span><span class="p">]</span> <span class="c1"># add a list with E and F to the end of this list
+</span><span class="n">size</span> <span class="o">=</span> <span class="nf">len</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span> <span class="c1"># size of the list
+</span></code></pre></div></div>
 <h3 id="collections---sets">Collections - Sets</h3>
 <h4 id="java-12">Java</h4>
-<div class="language-java highlighter-rouge"><pre class="highlight"><code> <span class="n">Set</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">set1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashSet</span><span class="o">&lt;&gt;();</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nc">Set</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">set1</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HashSet</span><span class="o">&lt;&gt;();</span>
  <span class="n">set1</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"A"</span><span class="o">);</span>
  <span class="n">set1</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"B"</span><span class="o">);</span>
  <span class="n">set1</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"C"</span><span class="o">);</span>
- <span class="n">Set</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">set2</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashSet</span><span class="o">&lt;&gt;();</span>
+ <span class="nc">Set</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">set2</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HashSet</span><span class="o">&lt;&gt;();</span>
  <span class="n">set2</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"C"</span><span class="o">);</span>
  <span class="n">set2</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"D"</span><span class="o">);</span>
  <span class="n">set2</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"E"</span><span class="o">);</span>
  <span class="c1">//intersection</span>
- <span class="n">Set</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">intersection</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashSet</span><span class="o">&lt;&gt;(</span><span class="n">set1</span><span class="o">);</span>
+ <span class="nc">Set</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">intersection</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HashSet</span><span class="o">&lt;&gt;(</span><span class="n">set1</span><span class="o">);</span>
  <span class="n">intersection</span><span class="o">.</span><span class="na">retainAll</span><span class="o">(</span><span class="n">set2</span><span class="o">);</span>
  <span class="c1">//union</span>
- <span class="n">Set</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">union</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashSet</span><span class="o">&lt;&gt;(</span><span class="n">set1</span><span class="o">);</span>
+ <span class="nc">Set</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">union</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HashSet</span><span class="o">&lt;&gt;(</span><span class="n">set1</span><span class="o">);</span>
  <span class="n">union</span><span class="o">.</span><span class="na">addAll</span><span class="o">(</span><span class="n">set2</span><span class="o">);</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 <h4 id="python-12">Python</h4>
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">set_of_words1</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span> <span class="c"># create a new set. Note that we do not use {}, as that is for the dict</span>
-<span class="n">set_of_words1</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">"The"</span><span class="p">)</span> <span class="c"># add values</span>
-<span class="n">set_of_words1</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">"A"</span><span class="p">)</span>
-<span class="n">set_of_words1</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">"Boat"</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="s">"Boat"</span> <span class="ow">in</span> <span class="n">set_of_words1</span><span class="p">)</span> <span class="c"># True</span>
-<span class="n">set_of_words2</span> <span class="o">=</span> <span class="p">{</span><span class="s">"Anchor"</span><span class="p">,</span><span class="s">"A"</span><span class="p">,</span><span class="s">"Coast"</span><span class="p">}</span> <span class="c"># create another set and populate it</span>
-<span class="k">print</span><span class="p">(</span><span class="n">set_of_words1</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">set_of_words2</span><span class="p">))</span> <span class="c"># intersection</span>
-<span class="k">print</span><span class="p">(</span><span class="n">set_of_words1</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">set_of_words2</span><span class="p">))</span> <span class="c"># union</span>
-<span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">set_of_words2</span> <span class="p">:</span> <span class="c"># all values</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">set_of_words1</span> <span class="o">=</span> <span class="nf">set</span><span class="p">()</span> <span class="c1"># create a new set. Note that we do not use {}, as that is for the dict
+</span><span class="n">set_of_words1</span><span class="p">.</span><span class="nf">add</span><span class="p">(</span><span class="sh">"</span><span class="s">The</span><span class="sh">"</span><span class="p">)</span> <span class="c1"># add values
+</span><span class="n">set_of_words1</span><span class="p">.</span><span class="nf">add</span><span class="p">(</span><span class="sh">"</span><span class="s">A</span><span class="sh">"</span><span class="p">)</span>
+<span class="n">set_of_words1</span><span class="p">.</span><span class="nf">add</span><span class="p">(</span><span class="sh">"</span><span class="s">Boat</span><span class="sh">"</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Boat</span><span class="sh">"</span> <span class="ow">in</span> <span class="n">set_of_words1</span><span class="p">)</span> <span class="c1"># True
+</span><span class="n">set_of_words2</span> <span class="o">=</span> <span class="p">{</span><span class="sh">"</span><span class="s">Anchor</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">A</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">Coast</span><span class="sh">"</span><span class="p">}</span> <span class="c1"># create another set and populate it
+</span><span class="nf">print</span><span class="p">(</span><span class="n">set_of_words1</span><span class="p">.</span><span class="nf">intersection</span><span class="p">(</span><span class="n">set_of_words2</span><span class="p">))</span> <span class="c1"># intersection
+</span><span class="nf">print</span><span class="p">(</span><span class="n">set_of_words1</span><span class="p">.</span><span class="nf">union</span><span class="p">(</span><span class="n">set_of_words2</span><span class="p">))</span> <span class="c1"># union
+</span><span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">set_of_words2</span> <span class="p">:</span> <span class="c1"># all values
+</span>    <span class="nf">print</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h3 id="collections---tuples">Collections - Tuples</h3>
-<p>There are no <code class="highlighter-rouge">Tuples</code> in Java. A tuple is an immutable collection of values.</p>
+<p>There are no <code class="language-plaintext highlighter-rouge">Tuples</code> in Java. A tuple is an immutable collection of values.</p>
 <h4 id="python-13">Python</h4>
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">words</span> <span class="o">=</span>  <span class="p">(</span><span class="s">"Good"</span><span class="p">,</span> <span class="s">"Morning"</span><span class="p">)</span> <span class="c"># or words = "Good", "Morning"</span>
-<span class="k">print</span><span class="p">(</span><span class="s">"Good"</span> <span class="ow">in</span> <span class="n">words</span><span class="p">)</span> <span class="c"># True</span>
-<span class="k">print</span><span class="p">(</span><span class="nb">hash</span><span class="p">(</span><span class="n">words</span><span class="p">))</span> <span class="c"># This is what makes the tuples so special - they are hashable</span>
-<span class="n">a</span><span class="p">,</span><span class="n">b</span> <span class="o">=</span> <span class="n">words</span> <span class="c"># or a,b = "Good", "Morning"</span>
-<span class="k">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="c"># Good</span>
-<span class="k">print</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="c"># Morning</span>
-<span class="k">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">))</span> <span class="c"># 2</span>
-</code></pre>
-</div>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">words</span> <span class="o">=</span>  <span class="p">(</span><span class="sh">"</span><span class="s">Good</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">Morning</span><span class="sh">"</span><span class="p">)</span> <span class="c1"># or words = "Good", "Morning"
+</span><span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Good</span><span class="sh">"</span> <span class="ow">in</span> <span class="n">words</span><span class="p">)</span> <span class="c1"># True
+</span><span class="nf">print</span><span class="p">(</span><span class="nf">hash</span><span class="p">(</span><span class="n">words</span><span class="p">))</span> <span class="c1"># This is what makes the tuples so special - they are hashable
+</span><span class="n">a</span><span class="p">,</span><span class="n">b</span> <span class="o">=</span> <span class="n">words</span> <span class="c1"># or a,b = "Good", "Morning"
+</span><span class="nf">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="c1"># Good
+</span><span class="nf">print</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="c1"># Morning
+</span><span class="nf">print</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">words</span><span class="p">))</span> <span class="c1"># 2
+</span></code></pre></div></div>
 <h3 id="collections---maps">Collections - Maps</h3>
-<p><code class="highlighter-rouge">Maps</code> are called <code class="highlighter-rouge">dicts</code> or Dictionaries in Python.</p>
+<p><code class="language-plaintext highlighter-rouge">Maps</code> are called <code class="language-plaintext highlighter-rouge">dicts</code> or Dictionaries in Python.</p>
 <h4 id="java-13">Java</h4>
-<div class="language-java highlighter-rouge"><pre class="highlight"><code> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">wordCount</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;&gt;();</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span><span class="nc">Integer</span><span class="o">&gt;</span> <span class="n">wordCount</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HashMap</span><span class="o">&lt;&gt;();</span>
  <span class="n">wordCount</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"anchor"</span><span class="o">,</span><span class="mi">2</span><span class="o">);</span>
  <span class="n">wordCount</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"dock"</span><span class="o">,</span><span class="mi">3</span><span class="o">);</span>
  <span class="n">wordCount</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"the"</span><span class="o">,</span><span class="mi">10</span><span class="o">);</span>
  <span class="n">wordCount</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"a"</span><span class="o">,</span><span class="mi">8</span><span class="o">);</span>
  <span class="n">wordCount</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"boat"</span><span class="o">,</span><span class="mi">1</span><span class="o">);</span>
  <span class="kt">int</span> <span class="n">the</span> <span class="o">=</span> <span class="n">wordCount</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">"the"</span><span class="o">);</span>
- <span class="n">Set</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">keys</span> <span class="o">=</span> <span class="n">wordCount</span><span class="o">.</span><span class="na">keySet</span><span class="o">();</span>
- <span class="n">Collection</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">values</span> <span class="o">=</span> <span class="n">wordCount</span><span class="o">.</span><span class="na">values</span><span class="o">();</span>
+ <span class="nc">Set</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">keys</span> <span class="o">=</span> <span class="n">wordCount</span><span class="o">.</span><span class="na">keySet</span><span class="o">();</span>
+ <span class="nc">Collection</span><span class="o">&lt;</span><span class="nc">Integer</span><span class="o">&gt;</span> <span class="n">values</span> <span class="o">=</span> <span class="n">wordCount</span><span class="o">.</span><span class="na">values</span><span class="o">();</span>
  <span class="kt">boolean</span> <span class="n">exists</span> <span class="o">=</span> <span class="n">wordCount</span><span class="o">.</span><span class="na">containsKey</span><span class="o">(</span><span class="s">"a"</span><span class="o">);</span>
- <span class="n">Set</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span><span class="n">Integer</span><span class="o">&gt;&gt;</span> <span class="n">entries</span> <span class="o">=</span> <span class="n">wordCount</span><span class="o">.</span><span class="na">entrySet</span><span class="o">();</span>
+ <span class="nc">Set</span><span class="o">&lt;</span><span class="nc">Map</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span><span class="nc">Integer</span><span class="o">&gt;&gt;</span> <span class="n">entries</span> <span class="o">=</span> <span class="n">wordCount</span><span class="o">.</span><span class="na">entrySet</span><span class="o">();</span>
  <span class="kt">int</span> <span class="n">foo</span> <span class="o">=</span> <span class="n">wordCount</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">"foo"</span><span class="o">);</span> <span class="c1">//throws NullPointerException</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h4 id="python-14">Python</h4>
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">wordcount_map</span> <span class="o">=</span> <span class="p">{}</span> <span class="c"># create a new, empty dict</span>
-<span class="n">wordcount_map</span> <span class="o">=</span> <span class="p">{</span><span class="s">"anchor"</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="s">"dock"</span><span class="p">:</span><span class="mi">3</span><span class="p">}</span> <span class="c"># create a new dict and add key-values</span>
-<span class="n">wordcount_map</span><span class="p">[</span><span class="s">"the"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span> <span class="c"># add keys and values</span>
-<span class="n">wordcount_map</span><span class="p">[</span><span class="s">"a"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">8</span>
-<span class="n">wordcount_map</span><span class="p">[</span><span class="s">"boat"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="k">print</span><span class="p">(</span><span class="n">wordcount_map</span><span class="p">[</span><span class="s">"the"</span><span class="p">])</span> <span class="c"># value of a key</span>
-<span class="k">print</span><span class="p">(</span><span class="n">wordcount_map</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="c"># List of keys</span>
-<span class="k">print</span><span class="p">(</span><span class="n">wordcount_map</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="c"># List of values</span>
-<span class="k">print</span><span class="p">(</span><span class="s">"a"</span> <span class="ow">in</span> <span class="n">wordcount_map</span><span class="p">)</span> <span class="c"># True</span>
-<span class="k">print</span><span class="p">(</span><span class="n">wordcount_map</span><span class="o">.</span><span class="n">items</span><span class="p">())</span> <span class="c">#prints tuples of key-value pairs</span>
-<span class="k">print</span><span class="p">(</span><span class="n">wordcount_map</span><span class="p">[</span><span class="s">"foo"</span><span class="p">])</span> <span class="c"># throws a KeyError</span>
-</code></pre>
-</div>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">wordcount_map</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1"># create a new, empty dict
+</span><span class="n">wordcount_map</span> <span class="o">=</span> <span class="p">{</span><span class="sh">"</span><span class="s">anchor</span><span class="sh">"</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="sh">"</span><span class="s">dock</span><span class="sh">"</span><span class="p">:</span><span class="mi">3</span><span class="p">}</span> <span class="c1"># create a new dict and add key-values
+</span><span class="n">wordcount_map</span><span class="p">[</span><span class="sh">"</span><span class="s">the</span><span class="sh">"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span> <span class="c1"># add keys and values
+</span><span class="n">wordcount_map</span><span class="p">[</span><span class="sh">"</span><span class="s">a</span><span class="sh">"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">wordcount_map</span><span class="p">[</span><span class="sh">"</span><span class="s">boat</span><span class="sh">"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">wordcount_map</span><span class="p">[</span><span class="sh">"</span><span class="s">the</span><span class="sh">"</span><span class="p">])</span> <span class="c1"># value of a key
+</span><span class="nf">print</span><span class="p">(</span><span class="n">wordcount_map</span><span class="p">.</span><span class="nf">keys</span><span class="p">())</span> <span class="c1"># List of keys
+</span><span class="nf">print</span><span class="p">(</span><span class="n">wordcount_map</span><span class="p">.</span><span class="nf">values</span><span class="p">())</span> <span class="c1"># List of values
+</span><span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">a</span><span class="sh">"</span> <span class="ow">in</span> <span class="n">wordcount_map</span><span class="p">)</span> <span class="c1"># True
+</span><span class="nf">print</span><span class="p">(</span><span class="n">wordcount_map</span><span class="p">.</span><span class="nf">items</span><span class="p">())</span> <span class="c1">#prints tuples of key-value pairs
+</span><span class="nf">print</span><span class="p">(</span><span class="n">wordcount_map</span><span class="p">[</span><span class="sh">"</span><span class="s">foo</span><span class="sh">"</span><span class="p">])</span> <span class="c1"># throws a KeyError
+</span></code></pre></div></div>
 
 <h3 id="classes-and-objects">Classes and Objects</h3>
 <h4 id="java-14">Java</h4>
-<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyClass</span><span class="o">{</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyClass</span><span class="o">{</span>
 
-    <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">words</span><span class="o">;</span>
+    <span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">words</span><span class="o">;</span>
 
     <span class="kd">public</span> <span class="nf">MyClass</span><span class="o">(){</span>
-        <span class="n">words</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;();</span>
+        <span class="n">words</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;&gt;();</span>
         <span class="n">words</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"baz"</span><span class="o">);</span>
     <span class="o">}</span>
 
-    <span class="kd">public</span> <span class="nf">MyClass</span><span class="o">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">data</span><span class="o">){</span>
+    <span class="kd">public</span> <span class="nf">MyClass</span><span class="o">(</span><span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">data</span><span class="o">){</span>
         <span class="n">words</span> <span class="o">=</span> <span class="n">data</span><span class="o">;</span>
     <span class="o">}</span>
 
@@ -690,111 +653,104 @@ If n is even and greater than 20 , print Not Weird
   <span class="o">}</span>
 
 <span class="c1">//Usage</span>
-<span class="n">MyClass</span> <span class="n">myClass</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MyClass</span><span class="o">();</span>
-<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">myClass</span><span class="o">.</span><span class="na">count</span><span class="o">());</span> <span class="c1">// will print 1</span>
-<span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">data</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;();</span>
+<span class="nc">MyClass</span> <span class="n">myClass</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">MyClass</span><span class="o">();</span>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">myClass</span><span class="o">.</span><span class="na">count</span><span class="o">());</span> <span class="c1">// will print 1</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">data</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;();</span>
 <span class="n">data</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"foo"</span><span class="o">);</span>
 <span class="n">data</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"bar"</span><span class="o">);</span>
-<span class="n">myClass</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MyClass</span><span class="o">(</span><span class="n">data</span><span class="o">);</span>
-<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">myClass</span><span class="o">.</span><span class="na">count</span><span class="o">());</span> <span class="c1">// will print 2</span>
+<span class="n">myClass</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">MyClass</span><span class="o">(</span><span class="n">data</span><span class="o">);</span>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">myClass</span><span class="o">.</span><span class="na">count</span><span class="o">());</span> <span class="c1">// will print 2</span>
 
-</code></pre>
-</div>
+</code></pre></div></div>
 <h4 id="python-15">Python</h4>
 <p>For more details like member visibility and multiple inheritance, etc., see <a href="https://docs.python.org/3/tutorial/classes.html" target="_blank_">here</a></p>
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">MyClass</span><span class="p">:</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">MyClass</span><span class="p">:</span>
     <span class="n">words</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="s">"baz"</span><span class="p">]):</span> <span class="c"># think of this as a Constructor in Java</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">words</span> <span class="o">=</span> <span class="n">data</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">baz</span><span class="sh">"</span><span class="p">]):</span> <span class="c1"># think of this as a Constructor in Java
+</span>        <span class="n">self</span><span class="p">.</span><span class="n">words</span> <span class="o">=</span> <span class="n">data</span>
 
-    <span class="k">def</span> <span class="nf">count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="c"># think of self as "this" in Java</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">words</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">count</span><span class="p">(</span><span class="n">self</span><span class="p">):</span> <span class="c1"># think of self as "this" in Java
+</span>        <span class="k">return</span> <span class="nf">len</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">words</span><span class="p">)</span>
 
-<span class="c"># Usage</span>
-<span class="n">clz</span> <span class="o">=</span> <span class="n">MyClass</span><span class="p">()</span>
-<span class="k">print</span><span class="p">(</span><span class="n">clz</span><span class="o">.</span><span class="n">count</span><span class="p">())</span> <span class="c"># will print 1</span>
-<span class="k">print</span><span class="p">(</span><span class="n">clz</span><span class="o">.</span><span class="n">words</span><span class="p">)</span> <span class="c"># will print ['baz']</span>
-<span class="n">clz</span> <span class="o">=</span> <span class="n">MyClass</span><span class="p">([</span><span class="s">"foo"</span><span class="p">,</span><span class="s">"bar"</span><span class="p">])</span>
-<span class="k">print</span><span class="p">(</span><span class="n">clz</span><span class="o">.</span><span class="n">count</span><span class="p">())</span> <span class="c"># will print 2</span>
-<span class="k">print</span><span class="p">(</span><span class="n">clz</span><span class="o">.</span><span class="n">words</span><span class="p">)</span>  <span class="c"># will print ['foo','bar']</span>
-
-</code></pre>
-</div>
+<span class="c1"># Usage
+</span><span class="n">clz</span> <span class="o">=</span> <span class="nc">MyClass</span><span class="p">()</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">clz</span><span class="p">.</span><span class="nf">count</span><span class="p">())</span> <span class="c1"># will print 1
+</span><span class="nf">print</span><span class="p">(</span><span class="n">clz</span><span class="p">.</span><span class="n">words</span><span class="p">)</span> <span class="c1"># will print ['baz']
+</span><span class="n">clz</span> <span class="o">=</span> <span class="nc">MyClass</span><span class="p">([</span><span class="sh">"</span><span class="s">foo</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">bar</span><span class="sh">"</span><span class="p">])</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">clz</span><span class="p">.</span><span class="nf">count</span><span class="p">())</span> <span class="c1"># will print 2
+</span><span class="nf">print</span><span class="p">(</span><span class="n">clz</span><span class="p">.</span><span class="n">words</span><span class="p">)</span>  <span class="c1"># will print ['foo','bar']
+</span>
+</code></pre></div></div>
 
 <h3 id="reading-and-writing-files">Reading and Writing Files</h3>
 <h4 id="java-15">Java</h4>
 <p>Here is an example with <a href="https://commons.apache.org/proper/commons-io/javadocs/api-2.5/org/apache/commons/io/FileUtils.html" target="_blank_">Apache Commons FileUtils</a></p>
-<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="n">File</span> <span class="n">file</span> <span class="o">=</span> <span class="n">FileUtils</span><span class="o">.</span><span class="na">getFile</span><span class="o">(</span><span class="s">"/tmp/foo.txt"</span><span class="o">);</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">File</span> <span class="n">file</span> <span class="o">=</span> <span class="nc">FileUtils</span><span class="o">.</span><span class="na">getFile</span><span class="o">(</span><span class="s">"/tmp/foo.txt"</span><span class="o">);</span>
 
 <span class="c1">//Read line by line</span>
-<span class="n">LineIterator</span> <span class="n">it</span> <span class="o">=</span> <span class="n">FileUtils</span><span class="o">.</span><span class="na">lineIterator</span><span class="o">(</span><span class="n">file</span><span class="o">);</span>
+<span class="nc">LineIterator</span> <span class="n">it</span> <span class="o">=</span> <span class="nc">FileUtils</span><span class="o">.</span><span class="na">lineIterator</span><span class="o">(</span><span class="n">file</span><span class="o">);</span>
 <span class="k">while</span> <span class="o">(</span><span class="n">it</span><span class="o">.</span><span class="na">hasNext</span><span class="o">())</span> <span class="o">{</span>
-    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">it</span><span class="o">.</span><span class="na">next</span><span class="o">());</span>
+    <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">it</span><span class="o">.</span><span class="na">next</span><span class="o">());</span>
 <span class="o">}</span>
 
 <span class="c1">//Read the entire file in memory</span>
-<span class="n">String</span> <span class="n">contents</span> <span class="o">=</span> <span class="n">FileUtils</span><span class="o">.</span><span class="na">readFileToString</span><span class="o">(</span><span class="n">file</span><span class="o">);</span>
+<span class="nc">String</span> <span class="n">contents</span> <span class="o">=</span> <span class="nc">FileUtils</span><span class="o">.</span><span class="na">readFileToString</span><span class="o">(</span><span class="n">file</span><span class="o">);</span>
 
 <span class="c1">//Write to a file</span>
-<span class="n">File</span> <span class="n">file</span> <span class="o">=</span> <span class="n">FileUtils</span><span class="o">.</span><span class="na">getFile</span><span class="o">(</span><span class="s">"/tmp/bar.txt"</span><span class="o">);</span>
-<span class="n">FileUtils</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">file</span><span class="o">,</span><span class="s">"This is a test"</span><span class="o">,</span> <span class="s">"UTF-8"</span><span class="o">);</span>
+<span class="nc">File</span> <span class="n">file</span> <span class="o">=</span> <span class="nc">FileUtils</span><span class="o">.</span><span class="na">getFile</span><span class="o">(</span><span class="s">"/tmp/bar.txt"</span><span class="o">);</span>
+<span class="nc">FileUtils</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">file</span><span class="o">,</span><span class="s">"This is a test"</span><span class="o">,</span> <span class="s">"UTF-8"</span><span class="o">);</span>
 
 
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h4 id="python-16">Python</h4>
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="c"># read line by line</span>
-<span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">"/tmp/foo.txt"</span><span class="p">,</span><span class="s">"r"</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># read line by line
+</span><span class="n">f</span> <span class="o">=</span> <span class="nf">open</span><span class="p">(</span><span class="sh">"</span><span class="s">/tmp/foo.txt</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">r</span><span class="sh">"</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
   <span class="k">print</span> <span class="n">line</span>
-<span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="n">f</span><span class="p">.</span><span class="nf">close</span><span class="p">()</span>
 
-<span class="c"># read the entire file in memory</span>
-<span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">"/tmp/foo.txt"</span><span class="p">,</span><span class="s">"r"</span><span class="p">)</span>
-<span class="n">contents</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-<span class="k">print</span><span class="p">(</span><span class="n">contents</span><span class="p">)</span>
-<span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="c1"># read the entire file in memory
+</span><span class="n">f</span> <span class="o">=</span> <span class="nf">open</span><span class="p">(</span><span class="sh">"</span><span class="s">/tmp/foo.txt</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">r</span><span class="sh">"</span><span class="p">)</span>
+<span class="n">contents</span> <span class="o">=</span> <span class="n">f</span><span class="p">.</span><span class="nf">read</span><span class="p">()</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">contents</span><span class="p">)</span>
+<span class="n">f</span><span class="p">.</span><span class="nf">close</span><span class="p">()</span>
 
-<span class="c"># write to a file</span>
-<span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">"/tmp/bar.txt"</span><span class="p">,</span><span class="s">"r+"</span><span class="p">)</span> <span class="c"># open for both read and write</span>
-<span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">"This is a test"</span><span class="p">)</span>
-<span class="n">contents</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-<span class="k">print</span><span class="p">(</span><span class="n">contents</span><span class="p">)</span> <span class="c"># will print "This is a test"</span>
-
-</code></pre>
-</div>
+<span class="c1"># write to a file
+</span><span class="n">f</span> <span class="o">=</span> <span class="nf">open</span><span class="p">(</span><span class="sh">"</span><span class="s">/tmp/bar.txt</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">r+</span><span class="sh">"</span><span class="p">)</span> <span class="c1"># open for both read and write
+</span><span class="n">f</span><span class="p">.</span><span class="nf">write</span><span class="p">(</span><span class="sh">"</span><span class="s">This is a test</span><span class="sh">"</span><span class="p">)</span>
+<span class="n">contents</span> <span class="o">=</span> <span class="n">f</span><span class="p">.</span><span class="nf">read</span><span class="p">()</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">contents</span><span class="p">)</span> <span class="c1"># will print "This is a test"
+</span>
+</code></pre></div></div>
 
 <h3 id="handling-http-communication">Handling HTTP Communication</h3>
 <h4 id="java-16">Java</h4>
 <p>Here is an example with <a href="http://square.github.io/okhttp/" target="_blank_">okhttp</a></p>
 
-<div class="language-java highlighter-rouge"><pre class="highlight"><code>  <span class="n">OkHttpClient</span> <span class="n">client</span> <span class="o">=</span> <span class="k">new</span> <span class="n">OkHttpClient</span><span class="o">();</span>
-  <span class="n">Request</span> <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Request</span><span class="o">.</span><span class="na">Builder</span><span class="o">()</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="nc">OkHttpClient</span> <span class="n">client</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">OkHttpClient</span><span class="o">();</span>
+  <span class="nc">Request</span> <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Request</span><span class="o">.</span><span class="na">Builder</span><span class="o">()</span>
         <span class="o">.</span><span class="na">url</span><span class="o">(</span><span class="s">"https://lobster1234.github.io"</span><span class="o">)</span>
         <span class="o">.</span><span class="na">build</span><span class="o">();</span>
-  <span class="n">Response</span> <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">newCall</span><span class="o">(</span><span class="n">request</span><span class="o">).</span><span class="na">execute</span><span class="o">();</span>
-  <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">body</span><span class="o">().</span><span class="na">string</span><span class="o">());</span>
+  <span class="nc">Response</span> <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">newCall</span><span class="o">(</span><span class="n">request</span><span class="o">).</span><span class="na">execute</span><span class="o">();</span>
+  <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">body</span><span class="o">().</span><span class="na">string</span><span class="o">());</span>
   <span class="c1">//similarly, use response's methods to get other values like status code, etc.</span>
 
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h4 id="python-17">Python</h4>
-<p>First, install <code class="highlighter-rouge">requests</code> using <code class="highlighter-rouge">pip3</code>.</p>
-<div class="highlighter-rouge"><pre class="highlight"><code>pip3 install requests
-</code></pre>
-</div>
+<p>First, install <code class="language-plaintext highlighter-rouge">requests</code> using <code class="language-plaintext highlighter-rouge">pip3</code>.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pip3 install requests
+</code></pre></div></div>
 <p>Then, you’re ready to make HTTP requests</p>
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">requests</span>
-<span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">"https://lobster1234.github.io"</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span> <span class="c"># headers as a dict</span>
-<span class="k">print</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span> <span class="c"># 200</span>
-<span class="k">print</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span> <span class="c"># body</span>
-<span class="n">r</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</code></pre>
-</div>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">requests</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="sh">"</span><span class="s">https://lobster1234.github.io</span><span class="sh">"</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">headers</span><span class="p">)</span> <span class="c1"># headers as a dict
+</span><span class="nf">print</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">status_code</span><span class="p">)</span> <span class="c1"># 200
+</span><span class="nf">print</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">content</span><span class="p">)</span> <span class="c1"># body
+</span><span class="n">r</span><span class="p">.</span><span class="nf">close</span><span class="p">()</span>
+</code></pre></div></div>
 <h3 id="summary">Summary</h3>
 
 <p>While these notes provide a quick kick-start and a glimpse in Python Programming, I encourage you to visit python.org and check out the <a href="https://docs.python.org/3/" target="_blank_">documentation</a>. There is a <strong>lot</strong> more to Python than what is covered here. Please let me know your feedback with a <a href="https://twitter.com/lobster1234" target="_blank_">tweet/DM</a>, and thank you for stopping by!</p>

@@ -31,35 +31,29 @@
   
   
 
-  <script type="text/javascript">
-  WebFontConfig = {
-    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
-  };
-  (function(d) {
-    var wf = d.createElement('script'), s = d.scripts[0];
-    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
-    wf.async = true;
-    s.parentNode.insertBefore(wf, s);
-  })(document);
-</script>
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet">
 
   
-  <!-- Google Analytics -->
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    ga('create', 'UA-96931340-1', 'auto');
-    ga('send', 'pageview');
+      ga('create', 'UA-96931340-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  
 
-  </script>
 
-
-  <!-- Begin Jekyll SEO tag v2.4.0 -->
+  <!-- Begin Jekyll SEO tag v2.6.1 -->
 <title>Manish Pandit’s Blog | A tech blog with gists, code, presentations, tutorials, and many goodies around programming, devops, cloud architectures, aws, google cloud platform, and infrastructure.</title>
-<meta name="generator" content="Jekyll v3.4.3" />
+<meta name="generator" content="Jekyll v4.3.4" />
 <meta property="og:title" content="Manish Pandit’s Blog" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
@@ -70,7 +64,7 @@
 <meta property="og:site_name" content="Manish Pandit’s Blog" />
 <link rel="next" href="https://lobster1234.github.io/posts/2/" />
 <script type="application/ld+json">
-{"name":"Manish Pandit’s Blog","description":"A tech blog with gists, code, presentations, tutorials, and many goodies around programming, devops, cloud architectures, aws, google cloud platform, and infrastructure.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"WebSite","url":"https://lobster1234.github.io/","headline":"Manish Pandit’s Blog","@context":"http://schema.org"}</script>
+{"url":"https://lobster1234.github.io/","name":"Manish Pandit’s Blog","description":"A tech blog with gists, code, presentations, tutorials, and many goodies around programming, devops, cloud architectures, aws, google cloud platform, and infrastructure.","author":{"@type":"Person","name":"Manish Pandit"},"headline":"Manish Pandit’s Blog","@type":"WebSite","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -271,7 +265,7 @@
         </header>
 
         <div class="post-content">
-          <p>A <a href="https://en.wikipedia.org/wiki/Bloom_filter">Bloom Filter</a> is a Probabilistic Data Structure. The Filter responds to <code class="highlighter-rouge">exits(str)</code> with 100% certainty if <code class="highlighter-rouge">str</code> is <strong>not</strong> present. A <code class="highlighter-rouge">true</code> response from <code class="highlighter-rouge">exists(str)</code> only indicates a <em>probability</em> of <code class="highlighter-rouge">str</code> being present, and could be a false positive.</p>
+          <p>A <a href="https://en.wikipedia.org/wiki/Bloom_filter">Bloom Filter</a> is a Probabilistic Data Structure. The Filter responds to <code class="language-plaintext highlighter-rouge">exits(str)</code> with 100% certainty if <code class="language-plaintext highlighter-rouge">str</code> is <strong>not</strong> present. A <code class="language-plaintext highlighter-rouge">true</code> response from <code class="language-plaintext highlighter-rouge">exists(str)</code> only indicates a <em>probability</em> of <code class="language-plaintext highlighter-rouge">str</code> being present, and could be a false positive.</p>
 
 <p>Bloom filters are used to efficiently and accurately check the absence of a value. Typical examples can be blacklist of domains, checks for a username availability for registration, or whether to look for data in cache depending on the key, etc.</p>
 
@@ -483,7 +477,7 @@
         </header>
 
         <div class="post-content">
-          <p>While setting up a <a href="https://consul.io">Consul</a> cluster, I decided to dig a bit deeper into the whole <code class="highlighter-rouge">/var/run/docker.sock</code> phenomenon. While it is fairly common that a lot of Service Meshes like Consul, and System Monitoring Services like <a href="https://newrelic.com">Newrelic</a> and <a href="https://datadog.com">DataDog</a> ask to mount <code class="highlighter-rouge">/var/run/docker.sock</code>, I must admit I’ve always been curious about this particular socket (vs. taking the mount step for granted). These are my notes from calling Docker Server by <em>curl-ing</em> the socket.</p>
+          <p>While setting up a <a href="https://consul.io">Consul</a> cluster, I decided to dig a bit deeper into the whole <code class="language-plaintext highlighter-rouge">/var/run/docker.sock</code> phenomenon. While it is fairly common that a lot of Service Meshes like Consul, and System Monitoring Services like <a href="https://newrelic.com">Newrelic</a> and <a href="https://datadog.com">DataDog</a> ask to mount <code class="language-plaintext highlighter-rouge">/var/run/docker.sock</code>, I must admit I’ve always been curious about this particular socket (vs. taking the mount step for granted). These are my notes from calling Docker Server by <em>curl-ing</em> the socket.</p>
 
 
         </div>
@@ -753,7 +747,6 @@
 
         <div class="post-content">
           <p>Simple script to manage multiple <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html">AWS credentials</a> when using the CLI or SDKs.</p>
-
 
         </div>
         

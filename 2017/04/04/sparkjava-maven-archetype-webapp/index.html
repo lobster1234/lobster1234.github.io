@@ -31,35 +31,29 @@
   
   
 
-  <script type="text/javascript">
-  WebFontConfig = {
-    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
-  };
-  (function(d) {
-    var wf = d.createElement('script'), s = d.scripts[0];
-    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
-    wf.async = true;
-    s.parentNode.insertBefore(wf, s);
-  })(document);
-</script>
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet">
 
   
-  <!-- Google Analytics -->
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    ga('create', 'UA-96931340-1', 'auto');
-    ga('send', 'pageview');
+      ga('create', 'UA-96931340-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  
 
-  </script>
 
-
-  <!-- Begin Jekyll SEO tag v2.4.0 -->
+  <!-- Begin Jekyll SEO tag v2.6.1 -->
 <title>SparkJava Maven Archetype with .war generation | Manish Pandit’s Blog</title>
-<meta name="generator" content="Jekyll v3.4.3" />
+<meta name="generator" content="Jekyll v4.3.4" />
 <meta property="og:title" content="SparkJava Maven Archetype with .war generation" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
@@ -71,7 +65,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2017-04-04T01:11:03-07:00" />
 <script type="application/ld+json">
-{"description":"Spark Java is a Java 8 based lightweight framework which I highly recommend for writing APIs. It is so simple that it comes with an embedded jetty. However, in real world production you’d want to run it in an external container like Tomcat, JBoss, or Jetty (external), etc. I found a SparkJava Hello World archetype, however, it uses the embedded jetty. I was able to fork the repo and add .war support to it. The fork is here This post walks through the usage.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"BlogPosting","url":"https://lobster1234.github.io/2017/04/04/sparkjava-maven-archetype-webapp/","headline":"SparkJava Maven Archetype with .war generation","dateModified":"2017-04-04T01:11:03-07:00","datePublished":"2017-04-04T01:11:03-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/04/04/sparkjava-maven-archetype-webapp/"},"@context":"http://schema.org"}</script>
+{"url":"https://lobster1234.github.io/2017/04/04/sparkjava-maven-archetype-webapp/","description":"Spark Java is a Java 8 based lightweight framework which I highly recommend for writing APIs. It is so simple that it comes with an embedded jetty. However, in real world production you’d want to run it in an external container like Tomcat, JBoss, or Jetty (external), etc. I found a SparkJava Hello World archetype, however, it uses the embedded jetty. I was able to fork the repo and add .war support to it. The fork is here This post walks through the usage.","author":{"@type":"Person","name":"Manish Pandit"},"headline":"SparkJava Maven Archetype with .war generation","dateModified":"2017-04-04T01:11:03-07:00","datePublished":"2017-04-04T01:11:03-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/04/04/sparkjava-maven-archetype-webapp/"},"@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -270,17 +264,16 @@ I found a <a href="https://github.com/ImaginateWayne/sparkjava-archetypes" targe
 
 <h3 id="clone-the-fork">Clone the fork</h3>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>  C02STG51GTFM:work mpandit$ git clone https://github.com/marqeta/sparkjava-archetypes.git
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  C02STG51GTFM:work mpandit$ git clone https://github.com/marqeta/sparkjava-archetypes.git
   Cloning into 'sparkjava-archetypes'...
   remote: Counting objects: 115, done.
   remote: Compressing objects: 100% (13/13), done.
   remote: Total 115 (delta 3), reused 0 (delta 0), pack-reused 101
   Receiving objects: 100% (115/115), 13.20 KiB | 0 bytes/s, done.
   Resolving deltas: 100% (18/18), done.
-</code></pre>
-</div>
+</code></pre></div></div>
 <h3 id="install-the-archetype-in-your-local-m2">Install the archetype in your local .m2</h3>
-<div class="highlighter-rouge"><pre class="highlight"><code>  C02STG51GTFM:work mpandit$ cd sparkjava-archetypes/
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  C02STG51GTFM:work mpandit$ cd sparkjava-archetypes/
   C02STG51GTFM:sparkjava-archetypes mpandit$ cd sparkjava-helloworld-archetype/
   C02STG51GTFM:sparkjava-helloworld-archetype mpandit$ mvn install
   INFO] Scanning for projects...
@@ -297,13 +290,12 @@ I found a <a href="https://github.com/ImaginateWayne/sparkjava-archetypes" targe
   [INFO] Finished at: 2017-04-06T20:47:41-07:00
   [INFO] Final Memory: 13M/245M
   [INFO] ------------------------------------------------------------------------
-</code></pre>
-</div>
+</code></pre></div></div>
 <h3 id="create-the-helloworld-project-using-this-archetype">Create the HelloWorld project using this archetype</h3>
 
-<p>You may want to replace the <code class="highlighter-rouge">groupId</code>, <code class="highlighter-rouge">artifactId</code>, and <code class="highlighter-rouge">package</code> to match your code structure.</p>
+<p>You may want to replace the <code class="language-plaintext highlighter-rouge">groupId</code>, <code class="language-plaintext highlighter-rouge">artifactId</code>, and <code class="language-plaintext highlighter-rouge">package</code> to match your code structure.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>C02STG51GTFM:sparkjava-helloworld-archetype mpandit$ cd ~/work
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>C02STG51GTFM:sparkjava-helloworld-archetype mpandit$ cd ~/work
 C02STG51GTFM:work mpandit$ mvn archetype:generate \
 &gt;     -DarchetypeGroupId=com.sparkjava \
 &gt;     -DarchetypeArtifactId=sparkjava-helloworld-archetype \
@@ -337,13 +329,12 @@ version: 1.0-SNAPSHOT
 package: com.marqeta.mqpay
  Y: :
 
-</code></pre>
-</div>
+</code></pre></div></div>
 <p>Hit enter, and you will notice a webhooks-api folder with the project in it.</p>
 
 <p>You can notice the generated files - Most importantly the Spark Application and web.xml.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>C02STG51GTFM:work mpandit$ cd webhooks-api
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>C02STG51GTFM:work mpandit$ cd webhooks-api
 C02STG51GTFM:webhooks-api mpandit$ tree
 .
 ├── README.md
@@ -361,11 +352,10 @@ C02STG51GTFM:webhooks-api mpandit$ tree
 
 8 directories, 4 files
 
-</code></pre>
-</div>
+</code></pre></div></div>
 <h3 id="build-the-project">Build the Project</h3>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>C02STG51GTFM:webhooks-api mpandit$ mvn install
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>C02STG51GTFM:webhooks-api mpandit$ mvn install
 [INFO] Scanning for projects...
 [INFO]                                                                         
 [INFO] ------------------------------------------------------------------------
@@ -382,31 +372,28 @@ C02STG51GTFM:webhooks-api mpandit$ tree
 [INFO] Finished at: 2017-04-06T20:52:07-07:00
 [INFO] Final Memory: 21M/308M
 [INFO] ------------------------------------------------------------------------
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h3 id="deploy-the-generated-war-file">Deploy the generated war file</h3>
-<p>I have tomcat under <code class="highlighter-rouge">~/Downloads/tomcat</code>. Replace it with your destination Servlet container’s webapp folder.</p>
+<p>I have tomcat under <code class="language-plaintext highlighter-rouge">~/Downloads/tomcat</code>. Replace it with your destination Servlet container’s webapp folder.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>C02STG51GTFM:webhooks-api mpandit$ cp target/webhooks-api-1.0-SNAPSHOT.war ~/Downloads/tomcat/webapps/
-</code></pre>
-</div>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>C02STG51GTFM:webhooks-api mpandit$ cp target/webhooks-api-1.0-SNAPSHOT.war ~/Downloads/tomcat/webapps/
+</code></pre></div></div>
 
 <h3 id="verify-if-it-all-worked">Verify if it all worked</h3>
 
 <p>We can do a simple curl, or browser to hit localhost.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>C02STG51GTFM:webhooks-api mpandit$ curl -i http://localhost:8080/webhooks-api-1.0-SNAPSHOT/hello
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>C02STG51GTFM:webhooks-api mpandit$ curl -i http://localhost:8080/webhooks-api-1.0-SNAPSHOT/hello
 HTTP/1.1 200
 Content-Type: text/html;charset=utf-8
 Transfer-Encoding: chunked
 Date: Fri, 07 Apr 2017 04:17:26 GMT
 
 Hello World!
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<p>You can modify the code in <code class="highlighter-rouge">SparkJavaHelloWorld.java</code> to add more endpoints, or add new controllers (remember to add them to <code class="highlighter-rouge">web.xml</code> so Spark can process them).</p>
+<p>You can modify the code in <code class="language-plaintext highlighter-rouge">SparkJavaHelloWorld.java</code> to add more endpoints, or add new controllers (remember to add them to <code class="language-plaintext highlighter-rouge">web.xml</code> so Spark can process them).</p>
 
   </div>
 

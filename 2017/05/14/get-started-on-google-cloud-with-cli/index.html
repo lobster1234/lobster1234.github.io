@@ -31,35 +31,29 @@
   
   
 
-  <script type="text/javascript">
-  WebFontConfig = {
-    google: { families: [ 'Bitter:400,700,400italic:latin' ] }
-  };
-  (function(d) {
-    var wf = d.createElement('script'), s = d.scripts[0];
-    wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
-    wf.async = true;
-    s.parentNode.insertBefore(wf, s);
-  })(document);
-</script>
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet">
 
   
-  <!-- Google Analytics -->
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+  
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    ga('create', 'UA-96931340-1', 'auto');
-    ga('send', 'pageview');
+      ga('create', 'UA-96931340-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  
 
-  </script>
 
-
-  <!-- Begin Jekyll SEO tag v2.4.0 -->
+  <!-- Begin Jekyll SEO tag v2.6.1 -->
 <title>Get Started on Google Cloud with CLI | Manish Pandit’s Blog</title>
-<meta name="generator" content="Jekyll v3.4.3" />
+<meta name="generator" content="Jekyll v4.3.4" />
 <meta property="og:title" content="Get Started on Google Cloud with CLI" />
 <meta name="author" content="Manish Pandit" />
 <meta property="og:locale" content="en_US" />
@@ -72,7 +66,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2017-05-14T23:44:37-07:00" />
 <script type="application/ld+json">
-{"description":"After working with Amazon Web Services for a few years, I decided to take Google Cloud Platform for a spin. In this post we will get set up with Google Cloud Platform (GCP), and use the CLI to interact with it for a very basic use case (launch, delete an instance). I will also refer to AWS counterpart(s) as and when it makes sense. The idea is to conceptualize automated creation and teardown of entire environments using the idea of projects in GCP.","author":{"@type":"Person","name":"Manish Pandit"},"@type":"BlogPosting","url":"https://lobster1234.github.io/2017/05/14/get-started-on-google-cloud-with-cli/","image":"https://lobster1234.github.io/assets/google-cloud.png","headline":"Get Started on Google Cloud with CLI","dateModified":"2017-05-14T23:44:37-07:00","datePublished":"2017-05-14T23:44:37-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/05/14/get-started-on-google-cloud-with-cli/"},"@context":"http://schema.org"}</script>
+{"url":"https://lobster1234.github.io/2017/05/14/get-started-on-google-cloud-with-cli/","description":"After working with Amazon Web Services for a few years, I decided to take Google Cloud Platform for a spin. In this post we will get set up with Google Cloud Platform (GCP), and use the CLI to interact with it for a very basic use case (launch, delete an instance). I will also refer to AWS counterpart(s) as and when it makes sense. The idea is to conceptualize automated creation and teardown of entire environments using the idea of projects in GCP.","author":{"@type":"Person","name":"Manish Pandit"},"image":"https://lobster1234.github.io/assets/google-cloud.png","headline":"Get Started on Google Cloud with CLI","dateModified":"2017-05-14T23:44:37-07:00","datePublished":"2017-05-14T23:44:37-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://lobster1234.github.io/2017/05/14/get-started-on-google-cloud-with-cli/"},"@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -278,20 +272,20 @@
     <p><a href="https://cloud.google.com/sdk/" target="_blank_">Download and unzip</a> the Google Cloud SDK. While AWS Command Line Interface is called AWS CLI, GCP’s is called Cloud SDK.</p>
   </li>
   <li>
-    <p><code class="highlighter-rouge">cd google-cloud-sdk</code></p>
+    <p><code class="language-plaintext highlighter-rouge">cd google-cloud-sdk</code></p>
   </li>
   <li>
-    <p><code class="highlighter-rouge">./install.sh</code> to add the CLI SDK to our path.</p>
+    <p><code class="language-plaintext highlighter-rouge">./install.sh</code> to add the CLI SDK to our path.</p>
   </li>
   <li>
-    <p><code class="highlighter-rouge">gcloud init</code> to initialize the SDK. This will trigger an OAuth flow, authorizing the SDK to make API calls on our behalf.</p>
+    <p><code class="language-plaintext highlighter-rouge">gcloud init</code> to initialize the SDK. This will trigger an OAuth flow, authorizing the SDK to make API calls on our behalf.</p>
   </li>
   <li>
     <p>Once authorized, we will se a list of projects to pick from (If there are any existing ones), or to create a new project. Let us create a new project.</p>
   </li>
 </ol>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>  You are logged in as: [your_email_at_gmail.com].
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  You are logged in as: [your_email_at_gmail.com].
 
   Pick cloud project to use:
    [1] cp100-166810
@@ -308,35 +302,32 @@
   ...
 
   Your Google Cloud SDK is configured and ready to use!
-</code></pre>
-</div>
-<p>There are several files created in <code class="highlighter-rouge">~/.config/gcloud</code> which contain the config, logs, credentials, etc. Similar to AWS, which uses <code class="highlighter-rouge">~/.aws</code> folder.</p>
+</code></pre></div></div>
+<p>There are several files created in <code class="language-plaintext highlighter-rouge">~/.config/gcloud</code> which contain the config, logs, credentials, etc. Similar to AWS, which uses <code class="language-plaintext highlighter-rouge">~/.aws</code> folder.</p>
 
 <h2 id="exploring-the-cli">Exploring the CLI</h2>
 
-<p>The typical syntax of gcloud CLI is <code class="highlighter-rouge">gcloud [flags ] &lt;group | command&gt;</code>. This is similar to AWS CLI, where it is <code class="highlighter-rouge">aws &lt;command&gt; &lt;subcommand&gt; [&lt;subcommand&gt; ...] [params]</code>.</p>
+<p>The typical syntax of gcloud CLI is <code class="language-plaintext highlighter-rouge">gcloud [flags ] &lt;group | command&gt;</code>. This is similar to AWS CLI, where it is <code class="language-plaintext highlighter-rouge">aws &lt;command&gt; &lt;subcommand&gt; [&lt;subcommand&gt; ...] [params]</code>.</p>
 
 <p>Here is a compare and contrast to show configuration</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ gcloud config configurations list
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ gcloud config configurations list
 NAME     IS_ACTIVE  ACCOUNT                       PROJECT              DEFAULT_ZONE  DEFAULT_REGION
 default  True       your_email_at_gmail@gmail.com  project-for-my-blog
-</code></pre>
-</div>
+</code></pre></div></div>
 <p>vs.</p>
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ aws configure list
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ aws configure list
       Name                    Value             Type    Location
       ----                    -----             ----    --------
    profile                &lt;not set&gt;             None    None
 access_key                &lt;not set&gt;             None    None
 secret_key                &lt;not set&gt;             None    None
     region                us-east-1      config-file    ~/.aws/config
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<p>To list out components installed with the CLI, we can use <code class="highlighter-rouge">gcloud components list</code> command. This is very different than AWS CLI.</p>
+<p>To list out components installed with the CLI, we can use <code class="language-plaintext highlighter-rouge">gcloud components list</code> command. This is very different than AWS CLI.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ gcloud components list
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ gcloud components list
 
 Your current Cloud SDK version is: 155.0.0
 The latest available version is: 155.0.0
@@ -372,47 +363,43 @@ To install or remove components at your current SDK version [155.0.0], run:
 To update your SDK installation to the latest version [155.0.0], run:
   $ gcloud components update
 
-</code></pre>
-</div>
+</code></pre></div></div>
 <p>As we can see, we have the basic components pre-installed, and others can be installed/removed at any time.</p>
 
 <h2 id="gcloud-interactive-shell">gcloud Interactive Shell</h2>
 
-<p>Just like in AWS we can use the super awesome <a href="https://github.com/awslabs/aws-shell" target="_blank_">AWS Shell</a>, for gcloud, the interactive shell is a part of the <code class="highlighter-rouge">Alpha</code> component. It can be installed with <code class="highlighter-rouge">gcloud components install alpha</code>, and can be run with <code class="highlighter-rouge">gcloud alpha shell</code>.</p>
+<p>Just like in AWS we can use the super awesome <a href="https://github.com/awslabs/aws-shell" target="_blank_">AWS Shell</a>, for gcloud, the interactive shell is a part of the <code class="language-plaintext highlighter-rouge">Alpha</code> component. It can be installed with <code class="language-plaintext highlighter-rouge">gcloud components install alpha</code>, and can be run with <code class="language-plaintext highlighter-rouge">gcloud alpha shell</code>.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>bash-3.2$ gcloud alpha shell
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash-3.2$ gcloud alpha shell
 gcloud&gt;
 -------------------------------------------------------------------------------
 your_email_at_gmail@gmail.com | project-for-my-blog | ctrl-q: Quit | ctrl-t: Help ON
-</code></pre>
-</div>
+</code></pre></div></div>
 <p>This has the contextual help as well as smart auto-complete/auto-suggest features similar to the aws-shell.</p>
 
 <h2 id="creating-a-project-via-gcloud-cli">Creating a Project via gcloud CLI</h2>
 
 <p>This is where it gets <strong>really interesting</strong>, specially when compared to AWS. Before the project can be put to any use, it needs to have Cloud APIs enabled, and to do that, it needs to have billing enabled.</p>
 
-<p>Verify the billing account, which has been initialized after authentication we did during <code class="highlighter-rouge">gcloud init</code>.</p>
+<p>Verify the billing account, which has been initialized after authentication we did during <code class="language-plaintext highlighter-rouge">gcloud init</code>.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>gcloud&gt; alpha billing accounts list
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gcloud&gt; alpha billing accounts list
 ID                    NAME                OPEN
 XXXXXX-XXXXXX-XXXXXX  My Billing Account  True
-</code></pre>
-</div>
-<p>Next, we associate, or <code class="highlighter-rouge">link</code> our project, <code class="highlighter-rouge">project-for-my-blog</code> with this <code class="highlighter-rouge">account-id</code>, like so -</p>
+</code></pre></div></div>
+<p>Next, we associate, or <code class="language-plaintext highlighter-rouge">link</code> our project, <code class="language-plaintext highlighter-rouge">project-for-my-blog</code> with this <code class="language-plaintext highlighter-rouge">account-id</code>, like so -</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>gcloud&gt; alpha billing accounts projects link project-for-my-blog --account-id=XXXXXX-XXXXXX-XXXXXX
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gcloud&gt; alpha billing accounts projects link project-for-my-blog --account-id=XXXXXX-XXXXXX-XXXXXX
 billingAccountName: billingAccounts/XXXXXX-XXXXXX-XXXXXX
 billingEnabled: true
 name: projects/project-for-my-blog/billingInfo
 projectId: project-for-my-blog
 gcloud&gt;
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<p>We’re not done yet. We need to associate services to this project. We can list the available services by using <code class="highlighter-rouge">list --available</code> command.</p>
+<p>We’re not done yet. We need to associate services to this project. We can list the available services by using <code class="language-plaintext highlighter-rouge">list --available</code> command.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>gcloud&gt; service-management list --available
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gcloud&gt; service-management list --available
 NAME                                      TITLE
 picker.googleapis.com                     Google Picker API
 bigquery-json.googleapis.com              BigQuery API
@@ -423,38 +410,34 @@ youtubeanalytics.googleapis.com           YouTube Analytics API
 clouderrorreporting.googleapis.com        Stackdriver Error Reporting API
 ...
 ...
-</code></pre>
-</div>
-<p>Since we need the compute services enabled, we will enable it by using <code class="highlighter-rouge">service-management --enable &lt;service-name&gt;</code>.</p>
+</code></pre></div></div>
+<p>Since we need the compute services enabled, we will enable it by using <code class="language-plaintext highlighter-rouge">service-management --enable &lt;service-name&gt;</code>.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>gcloud&gt; service-management enable compute-component.googleapis.com
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gcloud&gt; service-management enable compute-component.googleapis.com
 Waiting for async operation operations/projectSettings.544ddc35-4780-414d-a814-XXXXXXXXX to complete...
 Operation finished successfully. The following command can describe the Operation details:
  gcloud service-management operations describe operations/projectSettings.544ddc35-4780-414d-a814-XXXXXXXX
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<p>Now that we got the billing and the service-management sorted out, we can issue <code class="highlighter-rouge">compute</code> commands.</p>
+<p>Now that we got the billing and the service-management sorted out, we can issue <code class="language-plaintext highlighter-rouge">compute</code> commands.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>gcloud&gt; compute instances list
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gcloud&gt; compute instances list
 Listed 0 items.
 gcloud&gt;
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h2 id="creating-an-instance">Creating an Instance</h2>
 
 <p>Next, we will create an instance. This is much easier compared to AWS, as gcloud defaults pretty much everything except for the name and zone of the instance.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>gcloud&gt; compute instances create first-gcloud-instance --zone us-west1-a
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gcloud&gt; compute instances create first-gcloud-instance --zone us-west1-a
 Created [https://www.googleapis.com/compute/v1/projects/project-for-my-blog/zones/us-west1-a/instances/first-gcloud-instance].
 NAME                   ZONE        MACHINE_TYPE   PREEMPTIBLE  INTERNAL_IP  EXTERNAL_IP    STATUS
 first-gcloud-instance  us-west1-a  n1-standard-1               10.138.0.3   35.xxx.yyy.zz  RUNNING
-</code></pre>
-</div>
-<p>We can verify the default values by issuing a <code class="highlighter-rouge">describe</code> command, just like AWS.</p>
+</code></pre></div></div>
+<p>We can verify the default values by issuing a <code class="language-plaintext highlighter-rouge">describe</code> command, just like AWS.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>gcloud&gt; compute instances describe first-gcloud-instance --zone us-west1-a
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gcloud&gt; compute instances describe first-gcloud-instance --zone us-west1-a
 canIpForward: false
 cpuPlatform: Intel Broadwell
 creationTimestamp: '2017-05-16T01:24:55.090-07:00'
@@ -509,16 +492,15 @@ tags:
   fingerprint: 42AAAAAAAAA=
 zone: https://www.googleapis.com/compute/v1/projects/project-for-my-blog/zones/us-west1-a
 gcloud&gt;
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>To summarize, the instance is a Debian8 (Jessie) VM, type n1-standard-1 (1 vCPU, 3.75G RAM), has a Public IP, a 10GB Standard Persistent Disk (HDD).</p>
 
-<p>In AWS terms, the AMI is <code class="highlighter-rouge">Debian GNU/Linux 8 (Jessie)</code>, instance type is <code class="highlighter-rouge">m3.medium</code>, with a 10G HDD Root Volume, no EBS volume, in the <code class="highlighter-rouge">Default VPC</code>’s <code class="highlighter-rouge">Public Subnet</code>.</p>
+<p>In AWS terms, the AMI is <code class="language-plaintext highlighter-rouge">Debian GNU/Linux 8 (Jessie)</code>, instance type is <code class="language-plaintext highlighter-rouge">m3.medium</code>, with a 10G HDD Root Volume, no EBS volume, in the <code class="language-plaintext highlighter-rouge">Default VPC</code>’s <code class="language-plaintext highlighter-rouge">Public Subnet</code>.</p>
 
-<p>We can <code class="highlighter-rouge">ssh</code> into this instance. Note that we did not deal with any <code class="highlighter-rouge">keypair</code> like we do with AWS. However, as we try to <code class="highlighter-rouge">ssh</code> into this instance, gcloud will create a keypair for us.</p>
+<p>We can <code class="language-plaintext highlighter-rouge">ssh</code> into this instance. Note that we did not deal with any <code class="language-plaintext highlighter-rouge">keypair</code> like we do with AWS. However, as we try to <code class="language-plaintext highlighter-rouge">ssh</code> into this instance, gcloud will create a keypair for us.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>gcloud&gt; compute ssh first-gcloud-instance --zone us-west1-a
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gcloud&gt; compute ssh first-gcloud-instance --zone us-west1-a
 
 WARNING: The public SSH key file for gcloud does not exist.
 WARNING: The private SSH key file for gcloud does not exist.
@@ -552,12 +534,11 @@ permitted by applicable law.
 mpandit@first-gcloud-instance:~$
 mpandit@first-gcloud-instance:~$ uname -a
 Linux first-gcloud-instance 3.16.0-4-amd64 #1 SMP Debian 3.16.39-1+deb8u2 (2017-03-07) x86_64 GNU/Linux
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>Feel free to play around with the instance. Here is how to install Apache2.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>mpandit@first-gcloud-instance:~$ sudo apt-get install apache2
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mpandit@first-gcloud-instance:~$ sudo apt-get install apache2
 Reading package lists... Done
 Building dependency tree
 Reading state information... Done
@@ -574,17 +555,16 @@ Trying 127.0.0.1...
 Connected to localhost.
 Escape character is '^]'.
 
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<p>However, if we try to use the public IP from our browser, the connection will fail. This is because only <code class="highlighter-rouge">ssh</code> (port 22) access is allowed by default.</p>
+<p>However, if we try to use the public IP from our browser, the connection will fail. This is because only <code class="language-plaintext highlighter-rouge">ssh</code> (port 22) access is allowed by default.</p>
 
-<p>We can compare this to AWS where the Default VPC Security Group allows all traffic to all ports from <code class="highlighter-rouge">0.0.0.0/0</code>.</p>
+<p>We can compare this to AWS where the Default VPC Security Group allows all traffic to all ports from <code class="language-plaintext highlighter-rouge">0.0.0.0/0</code>.</p>
 
 <h2 id="deleting-the-instance">Deleting the Instance</h2>
 
 <p>Deleting the instance is also straightforward, needing only the name and the zone.</p>
-<div class="highlighter-rouge"><pre class="highlight"><code>gcloud&gt; compute instances list
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gcloud&gt; compute instances list
 NAME                ZONE        MACHINE_TYPE   PREEMPTIBLE  INTERNAL_IP  EXTERNAL_IP     STATUS
 first-gcloud-instance  us-west1-a  n1-standard-1               10.138.0.3   35.xxx.yyy.zz  RUNNING
 gcloud&gt; compute instances delete my-gcloud-instance --zone us-west1-a
@@ -598,14 +578,13 @@ Do you want to continue (Y/n)?  Y
 
 Deleted [https://www.googleapis.com/compute/v1/projects/project-for-my-blog/zones/us-west1-a/instances/first-gcloud-instance].
 gcloud&gt;
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h2 id="deleting-the-project">Deleting the Project</h2>
 
-<p>Finally, we can delete the project. This is not an instantaneous action though - as GCP lets us <code class="highlighter-rouge">undelete</code> a project for up to a certain time (30 days?). Once the project is deleted, an email is sent informing the same.  Deleting a project will delete all the resources associated with it.</p>
+<p>Finally, we can delete the project. This is not an instantaneous action though - as GCP lets us <code class="language-plaintext highlighter-rouge">undelete</code> a project for up to a certain time (30 days?). Once the project is deleted, an email is sent informing the same.  Deleting a project will delete all the resources associated with it.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>gcloud&gt; projects list
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gcloud&gt; projects list
 PROJECT_ID                NAME                   PROJECT_NUMBER
 project-for-my-blog       project-for-my-blog    28XXXXXXXXXXXX
 gcloud&gt; projects delete project-for-my-blog
@@ -618,8 +597,7 @@ Deleted [https://cloudresourcemanager.googleapis.com/v1/projects/project-for-my-
 You can undo this operation for a limited period by running:
   $ gcloud projects undelete project-for-my-blog
 gcloud&gt;
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h2 id="conclusion">Conclusion</h2>
 
